@@ -1,0 +1,156 @@
+.cartaoSecao {
+  width: 100%;
+  overflow: hidden;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.9rem;
+  background: var(--cor-neutra-0);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035), 0 8px 22px rgba(15, 23, 42, 0.025);
+}
+
+.cabecalhoSecao {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.85rem 1rem;
+  border-bottom: 1px solid var(--c-ardosia-100);
+  background: linear-gradient(180deg, rgba(248,250,252,0.88), rgba(255,255,255,0.96));
+}
+
+.envoltorioIconeSecao {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--c-primaria-borda);
+  border-radius: 0.58rem;
+  background: var(--c-primaria-clara);
+  color: var(--correios-blue);
+}
+
+.tituloSecao {
+  min-width: 0;
+  margin: 0;
+  color: var(--c-ardosia-800);
+  font-size: 0.92rem;
+  font-weight: 900;
+  line-height: 1.25;
+}
+
+.corpoSecao {
+  width: 100%;
+  padding: clamp(0.9rem, 2vw, 1.25rem);
+}
+
+.envoltorioCampoBloqueado {
+  position: relative;
+  width: 100%;
+  display: flex;
+  align-items: flex-end;
+  gap: 0.48rem;
+}
+
+.conteudoCampoBloqueado {
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+.conteudoCampoBloqueado > div {
+  width: 100% !important;
+  margin-bottom: 0 !important;
+}
+
+.botaoCampoBloqueado {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid transparent;
+  border-radius: 0.62rem;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.botaoCampoBloqueadoBloqueado {
+  border-color: var(--c-primaria-borda);
+  background: var(--c-primaria-clara);
+  color: var(--correios-blue);
+}
+
+.botaoCampoBloqueadoBloqueado:hover {
+  background: var(--cor-correios-azul-100);
+}
+
+.botaoCampoBloqueadoDesbloqueado {
+  border-color: var(--c-aviso-borda);
+  background: var(--c-aviso-fundo);
+  color: var(--c-aviso-texto);
+}
+
+.botaoCampoBloqueadoDesbloqueado:hover {
+  background: var(--cor-alerta-100);
+}
+
+.envoltorioInterruptor {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.65rem;
+  cursor: pointer;
+}
+
+.interruptorDesabilitado {
+  opacity: 0.58;
+  cursor: not-allowed;
+}
+
+.envoltorioTrilhaInterruptor {
+  position: relative;
+  width: 2.75rem;
+  height: 1.5rem;
+  flex: 0 0 auto;
+}
+
+.entradaInterruptor {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  opacity: 0;
+}
+
+.trilhaInterruptor {
+  position: absolute;
+  inset: 0;
+  border-radius: 9999px;
+  background: var(--c-ardosia-300);
+  transition: background 0.2s ease;
+}
+
+.trilhaInterruptorMarcado { background: var(--c-sucesso); }
+
+.polegarInterruptor {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 1.125rem;
+  height: 1.125rem;
+  border-radius: 50%;
+  background: var(--cor-neutra-0);
+  box-shadow: 0 1px 4px rgba(15, 23, 42, 0.26);
+  transition: transform 0.2s ease;
+}
+
+.polegarInterruptorMarcado { transform: translateX(1.25rem); }
+.rotuloInterruptor { color: var(--c-ardosia-700); font-size: 0.8rem; font-weight: 700; }
+
+@media (max-width: 560px) {
+  .cabecalhoSecao { padding: 0.75rem 0.8rem; }
+  .corpoSecao { padding: 0.82rem; }
+  .tituloSecao { font-size: 0.86rem; }
+  .envoltorioCampoBloqueado { gap: 0.38rem; }
+  .botaoCampoBloqueado { width: 2.42rem; height: 2.42rem; }
+}

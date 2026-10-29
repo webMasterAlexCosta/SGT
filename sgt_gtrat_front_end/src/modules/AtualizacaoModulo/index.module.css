@@ -1,0 +1,337 @@
+/* src/modules/AtualizacaoModulo/index.module.css */
+
+.conteinerPrincipal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  background-color: var(--correios-blue, var(--cor-correios-azul-800));
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: 'Courier New', Courier, monospace;
+  transition: opacity 1s cubic-bezier(0.25, 1, 0.5, 1), transform 1s ease;
+  opacity: 1;
+}
+
+.animacaoSaida {
+  opacity: 0;
+  transform: scale(1.05); /* Efeito de warp speed ao sair */
+  pointer-events: none;
+}
+
+/* --- OVERLAYS DE FUNDO --- */
+.gradeFundo {
+  position: absolute;
+  inset: 0;
+  background-image: 
+    linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
+  background-size: 50px 50px;
+  background-position: center;
+  z-index: 1;
+  animation: moverGrade 20s linear infinite;
+}
+
+.linhasVarredura {
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, 0) 0px,
+    rgba(0, 0, 0, 0.15) 1px,
+    rgba(0, 0, 0, 0) 2px
+  );
+  pointer-events: none;
+  z-index: 99;
+}
+
+@keyframes moverGrade {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(50px); }
+}
+
+/* --- TERMINAL SUPERIOR COM HISTÓRICO --- */
+.painelTerminal {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 600px;
+  max-width: 90vw;
+  background: rgba(0, 10, 20, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-top: 3px solid var(--correios-yellow, var(--cor-correios-amarelo-500));
+  padding: 20px 30px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Espaçamento entre logs */
+  backdrop-filter: blur(8px);
+  z-index: 50;
+  clip-path: polygon(20px 0, calc(100% - 20px) 0, 100% 20px, 100% 100%, 0 100%, 0 20px);
+}
+
+.cabecalhoTerminal {
+  display: flex;
+  justify-content: space-between;
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.85rem;
+  font-weight: bold;
+  letter-spacing: 0.1em;
+  border-bottom: 1px dashed rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+  margin-bottom: 5px;
+}
+
+.historicoLog {
+  color: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  font-size: 0.85rem;
+  opacity: 0.35;
+  text-transform: uppercase;
+}
+
+.logAtivo {
+  color: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  font-size: clamp(1rem, 2.5vw, 1.3rem); 
+  font-weight: 800;
+  text-shadow: 0 0 8px rgba(255, 230, 0, 0.5);
+  line-height: 1.4;
+  border-right: 12px solid var(--correios-yellow, var(--cor-correios-amarelo-500));
+  animation: piscarCursor 0.5s infinite alternate;
+  word-wrap: break-word;
+}
+
+@keyframes piscarCursor {
+  from { border-color: var(--correios-yellow, var(--cor-correios-amarelo-500)); }
+  to { border-color: transparent; }
+}
+
+/* --- PAINÉIS LATERAIS SCI-FI (HUD) --- */
+.painelHudEsquerdo, .painelHudDireito {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 280px;
+  background: rgba(0, 20, 40, 0.6);
+  border: 1px solid rgba(255, 230, 0, 0.2);
+  padding: 20px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  backdrop-filter: blur(4px);
+}
+
+.painelHudEsquerdo {
+  left: 40px;
+  border-left: 3px solid var(--correios-yellow, var(--cor-correios-amarelo-500));
+  clip-path: polygon(0 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+}
+
+.painelHudDireito {
+  right: 40px;
+  border-right: 3px solid var(--correios-yellow, var(--cor-correios-amarelo-500));
+  clip-path: polygon(0 0, 100% 0, 100% 100%, 20px 100%, 0 calc(100% - 20px));
+  text-align: right;
+  align-items: flex-end;
+}
+
+.cabecalhoPainel {
+  color: var(--cor-neutra-0);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.1em;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  width: 100%;
+}
+
+.blocoDados {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  width: 100%;
+}
+
+.rotuloDados {
+  color: rgba(255, 255, 255, 0.5);
+  font-size: 0.65rem;
+  letter-spacing: 0.05em;
+}
+
+.valorDados {
+  color: var(--cor-neutra-0);
+  font-size: 0.9rem;
+  font-weight: 600;
+}
+
+.valorDadosDestaque {
+  color: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-shadow: 0 0 8px rgba(255, 230, 0, 0.4);
+}
+
+/* Gráficos em barra simples */
+.graficoBarra {
+  width: 100%;
+  height: 4px;
+  background: rgba(255, 255, 255, 0.1);
+  margin-top: 4px;
+}
+
+.preenchimentoBarra {
+  height: 100%;
+  background: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  transition: width 0.3s ease;
+  box-shadow: 0 0 5px var(--correios-yellow, var(--cor-correios-amarelo-500));
+}
+
+/* Equalizador animado para a CPU */
+.equalizadorCpu {
+  display: flex;
+  gap: 2px;
+  height: 15px;
+  align-items: flex-end;
+  margin-top: 4px;
+}
+
+.barraEqualizador {
+  flex: 1;
+  background: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  transition: height 0.2s ease, opacity 0.2s ease;
+}
+
+/* Pequena retícula de mira no painel direito */
+.reticulaMiraPequena {
+  position: relative;
+  width: 40px;
+  height: 40px;
+  margin-top: 10px;
+  border: 1px dashed rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  animation: girarDireita 10s linear infinite;
+}
+
+.miraX { position: absolute; top: 50%; left: -5px; right: -5px; height: 1px; background: rgba(255,255,255,0.4); }
+.miraY { position: absolute; left: 50%; top: -5px; bottom: -5px; width: 1px; background: rgba(255,255,255,0.4); }
+
+/* --- NÚCLEO CENTRAL --- */
+.reatorCentral {
+  position: relative;
+  width: 300px;
+  height: 300px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 10;
+}
+
+/* Cantos da Retícula de Mira em volta do círculo */
+.cantoMiraSE, .cantoMiraSD, .cantoMiraIE, .cantoMiraID {
+  position: absolute;
+  width: 20px;
+  height: 20px;
+  border: 2px solid var(--correios-yellow, var(--cor-correios-amarelo-500));
+  opacity: 0.5;
+}
+.cantoMiraSE { top: -10px; left: -10px; border-right: none; border-bottom: none; }
+.cantoMiraSD { top: -10px; right: -10px; border-left: none; border-bottom: none; }
+.cantoMiraIE { bottom: -10px; left: -10px; border-right: none; border-top: none; }
+.cantoMiraID { bottom: -10px; right: -10px; border-left: none; border-top: none; }
+
+.rastreadorRadar {
+  position: absolute;
+  inset: -20px;
+  border-radius: 50%;
+  background: conic-gradient(from 0deg, transparent 70%, rgba(255, 230, 0, 0.2) 95%, var(--correios-yellow, var(--cor-correios-amarelo-500)) 100%);
+  animation: girarRadar 2.5s linear infinite;
+  mask-image: radial-gradient(transparent 60%, black 70%);
+  -webkit-mask-image: radial-gradient(transparent 60%, black 70%);
+  pointer-events: none;
+}
+
+.anelTracejado {
+  position: absolute;
+  inset: 10px;
+  border-radius: 50%;
+  border: 1px dashed rgba(255, 255, 255, 0.3);
+  animation: girarEsquerda 30s linear infinite;
+}
+
+.svgProgresso {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  transform: rotate(-90deg);
+}
+
+.trilhaProgresso {
+  fill: none;
+  stroke: rgba(0, 0, 0, 0.4); 
+  stroke-width: 3;
+}
+
+.barraProgresso {
+  fill: none;
+  stroke: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  stroke-width: 4;
+  stroke-linecap: square;
+  transition: stroke-dashoffset 0.1s linear;
+  filter: drop-shadow(0 0 10px var(--correios-yellow, var(--cor-correios-amarelo-500)));
+}
+
+/* --- HUD DA LOGO --- */
+.hudCentral {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 15px;
+  background: radial-gradient(circle, rgba(0, 0, 0, 0.4) 0%, transparent 70%);
+  width: 300px;
+  height: 300px;
+  border-radius: 50%;
+}
+
+.logotipo {
+  height: auto;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0px 0px 15px var(--cor-neutra-0));
+}
+
+.leituraDados {
+  display: flex;
+  align-items: baseline;
+}
+
+.textoValor {
+  color: var(--cor-neutra-0);
+  font-size: 2.8rem;
+  font-weight: 700;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.textoUnidade {
+  color: var(--correios-yellow, var(--cor-correios-amarelo-500));
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+/* --- ANIMAÇÕES AUXILIARES --- */
+@keyframes girarRadar { 100% { transform: rotate(360deg); } }
+@keyframes girarEsquerda { 100% { transform: rotate(-360deg); } }
+@keyframes girarDireita { 100% { transform: rotate(360deg); } }
+
+/* --- RESPONSIVIDADE (Celulares e Tablets) --- */
+@media (max-width: 1050px) {
+  .painelHudEsquerdo, .painelHudDireito { display: none; }
+  
+  .painelTerminal { 
+    width: 90%; 
+    top: 30px;
+  }
+}

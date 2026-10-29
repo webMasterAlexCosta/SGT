@@ -1,0 +1,73 @@
+/* src/core/ui/Homologacao.module.css */
+
+.emblemaHomologacao {
+    margin-top: 0.625rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    background-color: rgba(239, 68, 68, 0.2);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    padding: 0.25rem 0.75rem;
+    border-radius: 9999px;
+    box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.06);
+    user-select: none;
+    pointer-events: none;
+}
+
+.envoltorioPontoAnimado {
+    position: relative;
+    display: flex;
+    width: 0.75rem;
+    height: 0.75rem;
+}
+
+.pontoAura {
+    position: absolute;
+    display: inline-flex;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #f87171;
+    opacity: 0.75;
+    animation: auraAnimacao 1.5s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+.pontoCentral {
+    position: relative;
+    display: inline-flex;
+    border-radius: 50%;
+    width: 0.75rem;
+    height: 0.75rem;
+    background-color: var(--cor-perigo-600);
+}
+
+.textoHomologacao {
+    color: var(--cor-perigo-600);
+    font-weight: 800;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    animation: pulsoTexto 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes auraAnimacao {
+
+    75%,
+    100% {
+        transform: scale(2);
+        opacity: 0;
+    }
+}
+
+@keyframes pulsoTexto {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: .5;
+    }
+}

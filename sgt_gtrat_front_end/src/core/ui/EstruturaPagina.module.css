@@ -1,0 +1,55 @@
+.pagina { display: grid; gap: var(--espaco-4); min-width: 0; }
+.cabecalho {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: var(--espaco-4);
+  padding: var(--espaco-5) var(--espaco-6);
+  border: 1px solid var(--cor-borda-sutil);
+  border-top: 4px solid var(--cor-correios-amarelo-500);
+  border-radius: var(--raio-md);
+  background: var(--cor-fundo-elevado);
+  box-shadow: var(--sombra-xs);
+}
+.textosCabecalho { min-width: 0; }
+.titulo { margin: 0; color: var(--cor-correios-azul-950); font-size: var(--texto-xl); font-weight: var(--peso-extra); line-height: 1.2; }
+.subtitulo { max-width: 70ch; margin: var(--espaco-2) 0 0; color: var(--cor-texto-secundario); font-size: var(--texto-sm); line-height: 1.5; }
+.acoes { display: flex; align-items: center; justify-content: flex-end; flex-wrap: wrap; gap: var(--espaco-2); }
+.filtros {
+  display: grid;
+  gap: var(--espaco-3);
+  padding: var(--espaco-4);
+  border: 1px solid var(--cor-borda-sutil);
+  border-radius: var(--raio-md);
+  background: var(--cor-fundo-elevado);
+}
+.filtrosConteudo { min-width: 0; }
+.resumoFiltros { display: flex; align-items: center; justify-content: space-between; gap: var(--espaco-3); padding-top: var(--espaco-3); border-top: 1px solid var(--cor-borda-sutil); color: var(--cor-texto-suave); font-size: var(--texto-xs); }
+.conteudo { min-width: 0; }
+.estado {
+  display: grid;
+  justify-items: center;
+  gap: var(--espaco-2);
+  min-height: 15rem;
+  padding: var(--espaco-8) var(--espaco-4);
+  border: 1px dashed var(--cor-borda-forte);
+  border-radius: var(--raio-md);
+  color: var(--cor-texto-secundario);
+  background: var(--cor-fundo-sutil);
+  text-align: center;
+  place-content: center;
+}
+.estado strong { color: var(--cor-correios-azul-900); font-size: var(--texto-lg); }
+.estado p { max-width: 52ch; margin: 0; line-height: 1.5; }
+.estadoErro { border-color: var(--cor-perigo-100); background: var(--cor-perigo-50); }
+.estadoErro strong, .estadoErro .iconeEstado { color: var(--cor-perigo-700); }
+.iconeEstado { color: var(--cor-correios-azul-700); }
+.iconeGirando { color: var(--cor-correios-azul-700); animation: girarEstado .8s linear infinite; }
+.acaoEstado { margin-top: var(--espaco-2); }
+@keyframes girarEstado { to { transform: rotate(360deg); } }
+@media (max-width: 640px) {
+  .cabecalho { align-items: stretch; flex-direction: column; padding: var(--espaco-4); }
+  .acoes { justify-content: stretch; }
+  .acoes > * { flex: 1 1 auto; }
+  .resumoFiltros { align-items: stretch; flex-direction: column; }
+}

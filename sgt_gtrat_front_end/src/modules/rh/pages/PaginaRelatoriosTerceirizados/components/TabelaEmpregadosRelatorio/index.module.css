@@ -1,0 +1,161 @@
+.cartaoTabela { overflow: hidden; border: 1px solid var(--c-ardosia-200); border-radius: .9rem; background: var(--cor-neutra-0); box-shadow: 0 8px 20px rgba(15,23,42,.05); }
+.cartaoTabela > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding: .8rem .95rem; border-bottom: 1px solid var(--c-ardosia-200); background: var(--c-ardosia-50); }
+.cartaoTabela > header div { display: flex; align-items: baseline; gap: .55rem; }
+.avisoTodos { max-width: 31rem; color: var(--c-ardosia-500); font-size: .62rem; font-weight: 700; line-height: 1.35; text-align: right; }
+.cartaoTabela > header strong { color: var(--correios-blue); font-size: .8rem; } .cartaoTabela > header span { color: var(--c-ardosia-400); font-size: .66rem; font-weight: 700; }
+.tabelaResponsiva { overflow: auto; max-height: 31rem; }
+.cartaoTabela table { width: 100%; min-width: 980px; border-collapse: collapse; }
+.cartaoTabela th { position: sticky; top: 0; z-index: 1; padding: .7rem .85rem; border-bottom: 1px solid var(--c-ardosia-200); color: var(--c-ardosia-500); background: var(--cor-neutra-0); font-size: .65rem; font-weight: 850; letter-spacing: .06em; text-align: left; text-transform: uppercase; }
+.cartaoTabela td { padding: .78rem .85rem; border-bottom: 1px solid var(--c-ardosia-100); color: var(--c-ardosia-600); font-size: .74rem; vertical-align: middle; }
+.cartaoTabela tbody tr:hover { background: #fbfdff; }
+.identificacao, .textoDuplo { display: flex; flex-direction: column; gap: .18rem; }
+.identificacao strong { color: var(--c-ardosia-800); font-size: .78rem; } .identificacao span, .textoDuplo span { color: var(--c-ardosia-400); font-size: .66rem; }
+.textoDuplo strong { color: var(--c-ardosia-700); font-size: .73rem; }
+.status { display: inline-flex; width: fit-content; padding: .25rem .46rem; border-radius: 999px; font-size: .63rem; font-weight: 850; text-transform: uppercase; }
+.statusAtivo { color: var(--c-sucesso-texto); background: var(--c-sucesso-fundo); } .statusFerias { color: var(--c-info-texto); background: var(--c-info-fundo); } .statusAfastado { color: var(--c-aviso-texto); background: var(--c-aviso-fundo); } .statusInativo { color: var(--c-ardosia-500); background: var(--c-ardosia-100); }
+.listaContratos { display: flex; flex-wrap: wrap; gap: .28rem; }
+.listaContratos span { padding: .22rem .4rem; border: 1px solid var(--c-primaria-borda); border-radius: .4rem; color: var(--correios-blue); background: var(--c-primaria-clara); font-size: .62rem; font-weight: 750; }
+.semContrato { color: var(--c-perigo-texto); font-size: .67rem; font-weight: 800; }
+.estadoVazio, .estadoCarregamento { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .32rem; min-height: 14rem; padding: 2rem; border: 1px solid var(--c-ardosia-200); border-radius: .9rem; color: var(--c-ardosia-400); background: var(--cor-neutra-0); text-align: center; }
+.estadoVazio strong, .estadoCarregamento strong { color: var(--c-ardosia-700); font-size: .85rem; } .estadoVazio span, .estadoCarregamento span, .estadoCarregamento { font-size: .72rem; }
+.contratoInvalido { color: var(--c-aviso-texto) !important; border-color: color-mix(in srgb, var(--c-aviso-texto) 28%, white) !important; background: var(--c-aviso-fundo) !important; }
+.atualizando { display: inline-flex !important; align-items: center; gap: .25rem; color: var(--correios-blue) !important; }
+.atualizando svg, .girando { animation: girar .9s linear infinite; }
+.rodapePaginacao { display: flex; align-items: center; justify-content: space-between; gap: .85rem; padding: .72rem .9rem; border-top: 1px solid var(--c-ardosia-200); background: var(--c-ardosia-50); }
+.rodapePaginacao label, .controlesPagina { display: flex; align-items: center; gap: .5rem; color: var(--c-ardosia-500); font-size: .68rem; font-weight: 750; }
+.rodapePaginacao select { min-height: 2rem; padding: .25rem .45rem; border: 1px solid var(--c-ardosia-300); border-radius: .45rem; color: var(--c-ardosia-700); background: var(--cor-neutra-0); font-size: .7rem; }
+.controlesPagina button { display: inline-grid; place-items: center; width: 2rem; height: 2rem; padding: 0; border: 1px solid var(--c-ardosia-300); border-radius: .45rem; color: var(--correios-blue); background: var(--cor-neutra-0); cursor: pointer; }
+.controlesPagina button:disabled { opacity: .42; cursor: not-allowed; }
+@keyframes girar { to { transform: rotate(360deg); } }
+@media (max-width: 600px) { .rodapePaginacao { align-items: stretch; flex-direction: column; } .controlesPagina { justify-content: space-between; } }
+
+/* No celular a tabela vira uma sequência de cartões sem rolagem horizontal. */
+@media (max-width: 700px) {
+  .cartaoTabela { border-radius: .8rem; }
+  .cartaoTabela > header { align-items: flex-start; flex-direction: column; padding: .75rem; }
+  .avisoTodos { max-width: none; text-align: left; }
+  .cartaoTabela > header div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .2rem;
+  }
+
+  .tabelaResponsiva {
+    overflow: visible;
+    max-height: none;
+    padding: .55rem;
+    background: var(--c-ardosia-50);
+  }
+
+  .cartaoTabela table,
+  .cartaoTabela tbody {
+    display: block;
+    width: 100%;
+    min-width: 0;
+  }
+
+  .cartaoTabela thead { display: none; }
+
+  .cartaoTabela tbody {
+    display: grid;
+    gap: .6rem;
+  }
+
+  .cartaoTabela tbody tr {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    overflow: hidden;
+    border: 1px solid var(--c-ardosia-200);
+    border-radius: .72rem;
+    background: var(--cor-neutra-0);
+    box-shadow: 0 4px 12px rgba(15, 23, 42, .045);
+  }
+
+  .cartaoTabela tbody tr:hover { background: var(--cor-neutra-0); }
+
+  .cartaoTabela td {
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    gap: .28rem;
+    padding: .65rem .7rem;
+    border-right: 1px solid var(--c-ardosia-100);
+    border-bottom: 1px solid var(--c-ardosia-100);
+    font-size: .72rem;
+  }
+
+  .cartaoTabela td::before {
+    content: attr(data-label);
+    color: var(--c-ardosia-400);
+    font-size: .58rem;
+    font-weight: 850;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+
+  .cartaoTabela td:nth-child(1),
+  .cartaoTabela td:nth-child(6) { grid-column: 1 / -1; }
+
+  .cartaoTabela td:nth-child(even) { border-right: 0; }
+  .cartaoTabela td:nth-last-child(-n + 1) { border-bottom: 0; }
+
+  .identificacao strong { font-size: .82rem; }
+  .identificacao span,
+  .textoDuplo span { overflow-wrap: anywhere; }
+  .listaContratos { gap: .35rem; }
+  .listaContratos span { white-space: normal; overflow-wrap: anywhere; }
+
+  .rodapePaginacao {
+    align-items: stretch;
+    flex-direction: column;
+    gap: .7rem;
+    padding: .75rem;
+  }
+
+  .rodapePaginacao label { justify-content: space-between; }
+  .rodapePaginacao select { min-height: 2.5rem; }
+  .controlesPagina { justify-content: space-between; }
+  .controlesPagina button { width: 2.5rem; height: 2.5rem; }
+}
+
+@media (max-width: 430px) {
+  .tabelaResponsiva { padding: .42rem; }
+  .cartaoTabela tbody tr { grid-template-columns: 1fr; }
+  .cartaoTabela td,
+  .cartaoTabela td:nth-child(1),
+  .cartaoTabela td:nth-child(6) { grid-column: 1; border-right: 0; }
+  .cartaoTabela td:last-child { border-bottom: 0; }
+  .controlesPagina > span { flex: 1; text-align: center; }
+}
+
+/* Refinamento visual da visão consolidada: leitura horizontal com identificação preservada. */
+@media (min-width: 701px) {
+  .cartaoTabela th {
+    color: #fff;
+    background: linear-gradient(180deg, #00416b, #083d62);
+    border-bottom-color: #082f49;
+  }
+
+  .cartaoTabela tbody tr:nth-child(even) td { background: #f8fafc; }
+
+  .cartaoTabela th:first-child,
+  .cartaoTabela td:first-child {
+    position: sticky;
+    left: 0;
+  }
+
+  .cartaoTabela th:first-child {
+    z-index: 4;
+    box-shadow: 5px 0 10px rgba(15, 23, 42, .08);
+  }
+
+  .cartaoTabela td:first-child {
+    z-index: 2;
+    background: #fff;
+    box-shadow: 5px 0 10px rgba(15, 23, 42, .055);
+  }
+
+  .cartaoTabela tbody tr:nth-child(even) td:first-child { background: #f8fafc; }
+  .cartaoTabela tbody tr:hover td { background: #f8fbff; }
+  .cartaoTabela tbody tr:hover td:first-child { background: #f8fbff; }
+}

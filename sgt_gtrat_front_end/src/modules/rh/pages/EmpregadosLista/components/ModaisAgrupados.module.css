@@ -1,0 +1,11 @@
+.conteudoFormulario {
+  width: 100%;
+  min-width: 0;
+}
+
+@media (max-width: 640px) {
+  .conteudoFormulario {
+    margin: -1rem;
+    width: calc(100% + 2rem);
+  }
+}

@@ -1,0 +1,42 @@
+.painelFiltros {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--cor-borda-sutil);
+  border-radius: var(--raio-md);
+  background: var(--cor-neutra-0);
+  box-shadow: var(--sombra-xs);
+}
+
+.tituloPainel { display: flex; flex: 0 0 auto; align-items: center; gap: .65rem; color: var(--cor-correios-azul-700); }
+.tituloPainel > svg { box-sizing: content-box; padding: .55rem; border-radius: .65rem; background: var(--cor-correios-azul-50); }
+.tituloPainel strong, .tituloPainel span { display: block; }
+.tituloPainel strong { color: var(--cor-neutra-800); font-size: .78rem; }
+.tituloPainel span { margin-top: .13rem; color: var(--cor-texto-suave); font-size: .67rem; }
+
+.controles { display: flex; flex: 1; align-items: flex-end; justify-content: flex-end; gap: .8rem; }
+.grupoBusca { display: flex; width: min(100%, 31rem); flex-direction: column; gap: .35rem; }
+.grupoBusca label { color: var(--cor-texto-suave); font-size: .63rem; font-weight: 800; letter-spacing: .06em; text-transform: uppercase; }
+
+.campoBusca {
+  display: flex;
+  min-height: 2.65rem;
+  align-items: center;
+  gap: .5rem;
+  padding: 0 .72rem;
+  border: 1px solid var(--cor-borda-forte);
+  border-radius: var(--raio-sm);
+  background: var(--cor-neutra-25);
+  color: var(--cor-neutra-400);
+  transition: border-color var(--transicao-rapida), box-shadow var(--transicao-rapida), background var(--transicao-rapida);
+}
+.campoBusca:focus-within { border-color: var(--cor-correios-azul-700); background: var(--cor-neutra-0); box-shadow: 0 0 0 3px rgba(0,90,141,.12); }
+.campoBusca input { min-width: 0; flex: 1; border: 0; outline: 0; background: transparent; color: var(--cor-neutra-800); font-size: .8rem; font-weight: 600; }
+.campoBusca button { display: grid; width: 1.65rem; height: 1.65rem; place-items: center; border: 0; border-radius: 50%; background: var(--cor-neutra-100); color: var(--cor-neutra-500); cursor: pointer; }
+
+@media (max-width: 1080px) {
+  .painelFiltros, .controles { align-items: stretch; flex-direction: column; }
+  .grupoBusca { width: 100%; }
+}

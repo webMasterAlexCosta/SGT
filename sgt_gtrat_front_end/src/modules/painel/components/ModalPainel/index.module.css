@@ -1,0 +1,53 @@
+.botaoExpandir,
+.botaoAjuda {
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 1px solid var(--cor-correios-azul-200);
+  background: var(--cor-correios-azul-50);
+  color: var(--cor-correios-azul-800);
+  cursor: pointer;
+}
+.botaoExpandir { width: 34px; height: 34px; flex: 0 0 34px; border-radius: 9px; }
+.botaoAjuda { width: 32px; height: 32px; flex: 0 0 32px; border-radius: 999px; }
+.botaoExpandir:hover,
+.botaoAjuda:hover { border-color: var(--cor-correios-amarelo-600); background: var(--cor-correios-amarelo-100); color: var(--cor-correios-azul-950); }
+.botaoExpandir:focus-visible,
+.botaoAjuda:focus-visible { outline: 3px solid rgba(255,211,0,.32); outline-offset: 2px; }
+
+.sobreposicao { position: fixed; inset: 0; z-index: 12000; display: grid; place-items: center; padding: clamp(10px,1.6vw,26px); background: rgba(6,26,39,.68); backdrop-filter: blur(7px); }
+.modal { display: flex; flex-direction: column; width: min(1480px,97vw); max-height: 95vh; overflow: hidden; border: 1px solid rgba(255,255,255,.55); border-radius: 18px; background: #f7fafc; box-shadow: 0 34px 100px rgba(0,25,45,.38); }
+.modalTelaCheia { width: calc(100vw - 18px); height: calc(100vh - 18px); max-height: none; border-radius: 13px; }
+.cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 20px; border-bottom: 4px solid var(--cor-correios-amarelo-500); background: linear-gradient(125deg, var(--cor-correios-azul-950), var(--cor-correios-azul-700)); color: #fff; }
+.cabecalho h2 { margin: 2px 0 0; font-size: 1.24rem; }
+.cabecalho p { margin: 4px 0 0; color: rgba(255,255,255,.82); font-size: .76rem; }
+.selo { color: var(--cor-correios-amarelo-400); font-size: .64rem; font-weight: 900; letter-spacing: .12em; text-transform: uppercase; }
+.acoesModal { display: flex; align-items: center; gap: 7px; }
+.botaoFechar,
+.botaoJanela { display: grid; place-items: center; width: 38px; height: 38px; padding: 0; border: 1px solid rgba(255,255,255,.34); border-radius: 9px; background: rgba(255,255,255,.1); color: #fff; cursor: pointer; }
+.botaoFechar:hover,
+.botaoJanela:hover { background: rgba(255,255,255,.2); }
+.botaoFechar:focus-visible,
+.botaoJanela:focus-visible { outline: 3px solid rgba(255,224,75,.45); outline-offset: 2px; }
+.conteudo { flex: 1; overflow: auto; padding: clamp(14px,1.8vw,24px); background: linear-gradient(180deg, var(--cor-correios-azul-50), var(--cor-correios-azul-100)); }
+.conteudo > * { width: 100%; }
+.conteudo :global(.recharts-responsive-container) { min-height: 360px; }
+.ajudaIndicador { display: grid; gap: 10px; max-width: 760px; margin: 0 auto; }
+.ajudaIndicador section { padding: 13px 15px; border: 1px solid var(--cor-correios-azul-100); border-radius: 10px; background: #fff; }
+.ajudaIndicador h3 { margin: 0 0 5px; color: var(--cor-correios-azul-900); font-size: .88rem; }
+.ajudaIndicador p { margin: 0; color: #536773; font-size: .78rem; line-height: 1.5; }
+
+@media (max-width: 980px) {
+  .modal { width: min(100%,96vw); max-height: 94vh; }
+}
+
+@media (max-width: 720px) {
+  .sobreposicao { align-items: stretch; padding: 0; }
+  .modal,
+  .modalTelaCheia { width: 100vw; height: 100dvh; max-height: 100dvh; border-radius: 0; }
+  .cabecalho { gap: 10px; padding: 12px 13px; }
+  .cabecalho h2 { font-size: 1.06rem; }
+  .cabecalho p { max-width: 70vw; font-size: .7rem; }
+  .conteudo { padding: 10px; overscroll-behavior: contain; }
+  .botaoJanela { display: none; }
+}

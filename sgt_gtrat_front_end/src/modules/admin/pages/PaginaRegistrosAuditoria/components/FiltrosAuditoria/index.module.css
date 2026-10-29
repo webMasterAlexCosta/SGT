@@ -1,0 +1,10 @@
+.cabecalho { display: flex; align-items: center; justify-content: space-between; width: 100%; padding: .25rem; color: var(--cor-correios-azul-900); background: transparent; border: 0; font-size: .8rem; font-weight: 850; text-transform: uppercase; cursor: pointer; }
+.cabecalho span { display: flex; align-items: center; gap: .45rem; }
+.corpo { margin-top: .75rem; padding-top: .85rem; border-top: 1px solid var(--cor-borda-sutil); }
+.grade { display: grid; grid-template-columns: repeat(5,minmax(0,1fr)); gap: .65rem; }
+.rodape { display: flex; align-items: flex-end; gap: .65rem; margin-top: .65rem; }
+.rodape label { display: flex; flex-direction: column; gap: .35rem; color: var(--cor-texto-secundario); font-size: .72rem; font-weight: 700; }
+.rodape input { min-height: 2.55rem; padding: .5rem .65rem; border: 1px solid var(--cor-borda-forte); border-radius: var(--raio-sm); }
+.rodape > div { display: flex; gap: .5rem; margin-left: auto; }
+@media (max-width: 1000px) { .grade { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 650px) { .grade { grid-template-columns: 1fr; } .rodape { align-items: stretch; flex-direction: column; } .rodape > div { margin-left: 0; } }

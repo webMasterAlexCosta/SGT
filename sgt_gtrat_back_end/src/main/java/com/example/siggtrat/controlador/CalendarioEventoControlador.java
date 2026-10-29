@@ -1,0 +1,48 @@
+package com.example.siggtrat.controlador;
+
+import com.example.siggtrat.configuracao.InvalidaCacheNegocio;
+import com.example.siggtrat.dto.CalendarioEventoDTO;
+import com.example.siggtrat.dto.CalendarioEventoRequisicao;
+import com.example.siggtrat.seguranca.ExigirSenha;
+import com.example.siggtrat.servico.CalendarioEventoServico;
+import jakarta.validation.Valid;
+import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.time.LocalDate;
+import java.util.List;
+
+@InvalidaCacheNegocio
+@RestController
+@RequestMapping("/api/calendario-eventos")
+public class CalendarioEventoControlador {
+    private final CalendarioEventoServico servico;
+    public CalendarioEventoControlador(CalendarioEventoServico servico) { this.servico = servico; }
+
+    @GetMapping
+    public List<CalendarioEventoDTO> listar(
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate data,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate inicio,
+            @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate fim,
+            @RequestParam(required = false) Long lotacaoId) {
+        return servico.listar(data, inicio, fim, lotacaoId);
+    }
+
+    @PostMapping @ExigirSenha
+    public ResponseEntity<CalendarioEventoDTO> criar(@Valid @RequestBody(required = false) CalendarioEventoRequisicao dados) {
+        return ResponseEntity.status(HttpStatus.CREATED).body(servico.criar(dados));
+    }
+
+    @PutMapping("/{id}") @ExigirSenha
+    public ResponseEntity<CalendarioEventoDTO> atualizar(@PathVariable Long id, @Valid @RequestBody CalendarioEventoRequisicao dados) {
+        return ResponseEntity.ok(servico.atualizar(id, dados));
+    }
+
+    @DeleteMapping("/{id}") @ExigirSenha
+    public ResponseEntity<Void> excluir(@PathVariable Long id) {
+        servico.excluir(id);
+        return ResponseEntity.noContent().build();
+    }
+}

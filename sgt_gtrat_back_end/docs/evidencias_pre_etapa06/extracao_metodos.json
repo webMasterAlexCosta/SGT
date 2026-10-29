@@ -1,0 +1,58 @@
+[
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+    "assinatura": "private Set<Long> resolverIdsAtivos(",
+    "linha_inicio": 468,
+    "sha256_arquivo": "38fc0b5d00302852c15f55dd6bf3f494714f8179b5eeffdf63b3a591338502ee",
+    "sha256_trecho": "c5d9a3de426c738dc1ad24f93e9ea765cc14166cf5d832da0263854363aa4f64"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+    "assinatura": "private Long id(EventoCicloVidaContrato e)",
+    "linha_inicio": 648,
+    "sha256_arquivo": "38fc0b5d00302852c15f55dd6bf3f494714f8179b5eeffdf63b3a591338502ee",
+    "sha256_trecho": "e6fd571c2d59998df1a29050628f779d249f28c7facb71193e9018571ef536d1"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+    "assinatura": "private void aplicarRemanejamento(",
+    "linha_inicio": 190,
+    "sha256_arquivo": "12247b4e8c7fd176d0d39ca477a044c709ddffb94cb9e78df79f091ebf6f4581",
+    "sha256_trecho": "7a91636425b51955299d3520fa1b236884811b193061a721124a2c902176bcba"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+    "assinatura": "private void validarConflitosMesmaData(",
+    "linha_inicio": 494,
+    "sha256_arquivo": "a764965caa508aebebd831b3ccd17767a702c14ead7ca9111a1cd5d43405b9da",
+    "sha256_trecho": "303977da566183a208d57b52162c53436aaec275c5a20e6f80d99a3af36d8401"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/RemanejamentoContratualServico.java",
+    "assinatura": "private void validarConflitosMesmaData(",
+    "linha_inicio": 277,
+    "sha256_arquivo": "fbc6e14d81405a034a40bb0767108f7d32f0e70a7f20189c9c640e18c03b054a",
+    "sha256_trecho": "c61d58ae8ecd72e1326e72e39078a81ba80c1711d0fcd0f975e6a64893637c3f"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+    "assinatura": "public PosicaoTemporalContratoDTO reconstruirPosicao(",
+    "linha_inicio": 310,
+    "sha256_arquivo": "38fc0b5d00302852c15f55dd6bf3f494714f8179b5eeffdf63b3a591338502ee",
+    "sha256_trecho": "d00ae9228bd8b532fe43e4765261265c00563da60dc52ae2babaca1ebfb57a6e"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+    "assinatura": "private SituacaoTemporalContrato situacaoTemporal(",
+    "linha_inicio": 381,
+    "sha256_arquivo": "38fc0b5d00302852c15f55dd6bf3f494714f8179b5eeffdf63b3a591338502ee",
+    "sha256_trecho": "d25710986995d412ade0c361b2159ebd8295253ed03dd5b29e2d8c7b21c165e3"
+  },
+  {
+    "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+    "assinatura": "private EstadoNegocialContrato estadoInicialConhecido(",
+    "linha_inicio": 360,
+    "sha256_arquivo": "38fc0b5d00302852c15f55dd6bf3f494714f8179b5eeffdf63b3a591338502ee",
+    "sha256_trecho": "5fb7bfd8c78bd5b4ad803b72199dd4146f44a900e55ae9d3ed734062f8c13c8c"
+  }
+]

@@ -1,0 +1,203 @@
+.cabecalhoPagina {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: clamp(1rem, 1.7vw, 1.35rem);
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 1rem;
+  background:
+    linear-gradient(110deg, rgba(255, 255, 255, 1) 0%, rgba(255, 255, 255, 0.97) 72%, rgba(239, 246, 255, 0.9) 100%);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04), 0 12px 34px rgba(15, 23, 42, 0.04);
+}
+
+.blocoTitulo {
+  min-width: 0;
+}
+
+.sobretitulo {
+  display: block;
+  margin-bottom: 0.3rem;
+  color: var(--correios-blue);
+  font-size: 0.66rem;
+  font-weight: 900;
+  letter-spacing: 0.09em;
+  text-transform: uppercase;
+}
+
+.tituloPagina {
+  margin: 0;
+  color: var(--c-ardosia-900);
+  font-size: clamp(1.35rem, 2vw, 1.7rem);
+  font-weight: 900;
+  letter-spacing: -0.025em;
+  line-height: 1.08;
+}
+
+.descricaoPagina {
+  max-width: 46rem;
+  margin: 0.38rem 0 0;
+  color: var(--c-ardosia-500);
+  font-size: 0.78rem;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.areaDireita {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.7rem;
+}
+
+.resumosCabecalho {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+}
+
+.cartaoResumo {
+  min-width: 0;
+  min-height: 3.4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.62rem;
+  padding: 0.58rem 0.68rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.75rem;
+  background: rgba(255, 255, 255, 0.9);
+  color: var(--correios-blue);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.cartaoResumo:hover {
+  border-color: var(--c-primaria-borda);
+  box-shadow: 0 4px 12px rgba(15, 23, 42, 0.055);
+  transform: translateY(-1px);
+}
+
+.iconeResumo {
+  width: 2rem;
+  height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 1px solid var(--c-primaria-borda);
+  border-radius: 0.62rem;
+  background: var(--c-primaria-clara);
+}
+
+.textoResumo {
+  min-width: 0;
+}
+
+.cartaoResumo strong {
+  display: block;
+  overflow: hidden;
+  color: var(--c-ardosia-900);
+  font-size: 0.9rem;
+  font-weight: 900;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cartaoResumo span:last-child {
+  display: block;
+  margin-top: 0.17rem;
+  overflow: hidden;
+  color: var(--c-ardosia-500);
+  font-size: 0.63rem;
+  font-weight: 750;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.resumoAtivo .iconeResumo {
+  border-color: #a7f3d0;
+  background: #ecfdf5;
+  color: var(--c-sucesso-texto);
+}
+
+.resumoFavorito .iconeResumo {
+  border-color: #fde68a;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+.botaoNovoCorreios {
+  min-height: 2.8rem !important;
+  justify-content: center !important;
+  border: 1px solid #f4cf00 !important;
+  border-radius: 0.72rem !important;
+  background: var(--correios-yellow) !important;
+  color: var(--correios-blue) !important;
+  font-weight: 900 !important;
+  box-shadow: 0 6px 14px rgba(255, 214, 0, 0.2) !important;
+}
+
+.botaoNovoCorreios:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 9px 18px rgba(255, 214, 0, 0.26) !important;
+}
+
+@media (min-width: 900px) {
+  .cabecalhoPagina {
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .blocoTitulo {
+    flex: 1 1 22rem;
+  }
+
+  .areaDireita {
+    flex: 1 1 44rem;
+    flex-direction: row;
+    align-items: stretch;
+    justify-content: flex-end;
+  }
+
+  .resumosCabecalho {
+    flex: 1 1 auto;
+    grid-template-columns: repeat(4, minmax(7rem, 1fr));
+  }
+
+  .botaoNovoCorreios {
+    flex: 0 0 auto;
+    min-width: 9.5rem;
+  }
+}
+
+@media (max-width: 560px) {
+  .cabecalhoPagina {
+    padding: 0.9rem;
+    border-radius: 0.85rem;
+  }
+
+  .descricaoPagina {
+    font-size: 0.74rem;
+  }
+
+  .resumosCabecalho {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .cartaoResumo {
+    min-height: 3.2rem;
+    padding: 0.5rem 0.58rem;
+  }
+
+  .botaoNovoCorreios {
+    width: 100% !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .resumosCabecalho {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,0 +1,220 @@
+.formulario {
+  display: flex;
+  flex-direction: column;
+  gap: 1.15rem;
+}
+
+.apresentacao {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 0.9rem;
+  border: 1px solid var(--c-primaria-borda);
+  border-radius: 0.85rem;
+  background: linear-gradient(135deg, var(--c-primaria-clara), var(--bg-branco));
+}
+
+.iconeApresentacao {
+  display: grid;
+  width: 2.8rem;
+  height: 2.8rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border-radius: 0.75rem;
+  background: var(--correios-blue);
+  color: var(--bg-branco);
+}
+
+.apresentacao strong {
+  color: var(--c-ardosia-800);
+  font-size: 0.92rem;
+}
+
+.apresentacao p {
+  margin: 0.2rem 0 0;
+  color: var(--c-ardosia-500);
+  font-size: 0.76rem;
+  line-height: 1.4;
+}
+
+.grupoCampo {
+  display: flex;
+  flex-direction: column;
+  gap: 0.42rem;
+}
+
+.grupoCampo label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--c-ardosia-600);
+  font-size: 0.76rem;
+  font-weight: 850;
+}
+
+.grupoCampo select {
+  min-height: 44px;
+  padding: 0 0.75rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.7rem;
+  outline: 0;
+  background: var(--bg-branco);
+  color: var(--c-ardosia-800);
+  font-size: 0.82rem;
+  font-weight: 650;
+}
+
+.grupoCampo select:focus {
+  border-color: var(--correios-blue);
+  box-shadow: 0 0 0 3px var(--c-primaria-alfa);
+}
+
+.gradeCampos {
+  display: grid;
+  grid-template-columns: 1.2fr 1fr;
+  gap: 1rem;
+}
+
+.secaoTurnos {
+  overflow: hidden;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.85rem;
+}
+
+.cabecalhoTurnos {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border-bottom: 1px solid var(--c-ardosia-100);
+  background: var(--c-ardosia-50);
+}
+
+.cabecalhoTurnos span {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  color: var(--c-ardosia-800);
+  font-size: 0.78rem;
+  font-weight: 900;
+}
+
+.cabecalhoTurnos p {
+  margin: 0.15rem 0 0;
+  color: var(--c-ardosia-500);
+  font-size: 0.68rem;
+}
+
+.cabecalhoTurnos > strong {
+  flex: 0 0 auto;
+  padding: 0.3rem 0.55rem;
+  border-radius: 999px;
+  background: var(--correios-blue);
+  color: var(--bg-branco);
+  font-size: 0.65rem;
+}
+
+.listaSelecao {
+  display: grid;
+  max-height: 18rem;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.55rem;
+  overflow-y: auto;
+  padding: 0.75rem;
+}
+
+.itemTurno {
+  display: flex;
+  min-width: 0;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.68rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.7rem;
+  background: var(--bg-branco);
+  cursor: pointer;
+  transition: border-color 0.18s ease, background 0.18s ease;
+}
+
+.itemTurno input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.checkVisual {
+  display: grid;
+  width: 1.2rem;
+  height: 1.2rem;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--c-ardosia-300);
+  border-radius: 0.35rem;
+  color: var(--bg-branco);
+}
+
+.itemMarcado {
+  border-color: var(--correios-blue);
+  background: var(--c-primaria-clara);
+}
+
+.itemMarcado .checkVisual {
+  border-color: var(--correios-blue);
+  background: var(--correios-blue);
+}
+
+.infoTurno {
+  min-width: 0;
+}
+
+.infoTurno strong,
+.infoTurno small {
+  display: block;
+}
+
+.infoTurno strong {
+  color: var(--c-ardosia-800);
+  font-size: 0.74rem;
+}
+
+.infoTurno small {
+  margin-top: 0.2rem;
+  color: var(--c-ardosia-500);
+  font-size: 0.65rem;
+  line-height: 1.35;
+}
+
+.semTurnos {
+  display: flex;
+  align-items: center;
+  gap: 0.55rem;
+  padding: 1rem;
+  color: var(--c-ardosia-500);
+  font-size: 0.76rem;
+}
+
+.dica {
+  display: flex;
+  align-items: center;
+  gap: 0.4rem;
+  color: var(--c-ardosia-500);
+  font-size: 0.7rem;
+}
+
+.rodape {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.7rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--c-ardosia-100);
+}
+
+@media (max-width: 700px) {
+  .gradeCampos,
+  .listaSelecao {
+    grid-template-columns: 1fr;
+  }
+}
+
+.statusAtivo { display: flex; align-items: center; gap: .55rem; margin-top: .75rem; color: var(--cor-texto-secundario); font-size: .84rem; }

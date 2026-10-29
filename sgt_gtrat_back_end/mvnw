@@ -1,0 +1,67 @@
+#!/bin/sh
+set -eu
+
+BASE_DIR=$(CDPATH= cd -- "$(dirname -- "$0")" && pwd)
+PROPS="$BASE_DIR/.mvn/wrapper/maven-wrapper.properties"
+
+prop() {
+  sed -n "s/^$1=//p" "$PROPS" | tr -d '\r' | head -n 1
+}
+
+DIST_URL=$(prop distributionUrl)
+DIST_SHA256=$(prop distributionSha256Sum)
+[ -n "$DIST_URL" ] || { echo "distributionUrl ausente em $PROPS" >&2; exit 1; }
+
+if [ -n "${MVNW_REPOURL:-}" ]; then
+  DIST_URL=$(printf '%s' "$DIST_URL" | sed "s#https://repo.maven.apache.org/maven2#${MVNW_REPOURL%/}#")
+fi
+
+ARCHIVE=${DIST_URL##*/}
+MAVEN_VERSION=$(printf '%s' "$ARCHIVE" | sed -n 's/^apache-maven-\([0-9][^-]*\)-bin\.zip$/\1/p')
+[ -n "$MAVEN_VERSION" ] || { echo "Não foi possível identificar a versão do Maven em: $ARCHIVE" >&2; exit 1; }
+
+MAVEN_USER_HOME=${MAVEN_USER_HOME:-"$HOME/.m2"}
+DIST_ROOT="$MAVEN_USER_HOME/wrapper/dists/apache-maven-$MAVEN_VERSION-bin/sgt-gtrat"
+MAVEN_HOME="$DIST_ROOT/apache-maven-$MAVEN_VERSION"
+MVN_BIN="$MAVEN_HOME/bin/mvn"
+
+if [ ! -x "$MVN_BIN" ]; then
+  TMP_DIR=$(mktemp -d 2>/dev/null || mktemp -d -t mvnw)
+  trap 'rm -rf "$TMP_DIR"' EXIT INT TERM
+  ZIP="$TMP_DIR/$ARCHIVE"
+
+  echo "Baixando Apache Maven $MAVEN_VERSION..." >&2
+  if command -v curl >/dev/null 2>&1; then
+    curl -fsSL "$DIST_URL" -o "$ZIP"
+  elif command -v wget >/dev/null 2>&1; then
+    wget -q "$DIST_URL" -O "$ZIP"
+  else
+    echo "curl ou wget é necessário para o Maven Wrapper only-script." >&2
+    exit 1
+  fi
+
+  if [ -n "$DIST_SHA256" ]; then
+    if command -v sha256sum >/dev/null 2>&1; then
+      ACTUAL=$(sha256sum "$ZIP" | awk '{print $1}')
+    elif command -v shasum >/dev/null 2>&1; then
+      ACTUAL=$(shasum -a 256 "$ZIP" | awk '{print $1}')
+    else
+      echo "sha256sum ou shasum é necessário para validar o Maven baixado." >&2
+      exit 1
+    fi
+    [ "$ACTUAL" = "$DIST_SHA256" ] || { echo "Checksum SHA-256 inválido para $ARCHIVE" >&2; exit 1; }
+  fi
+
+  mkdir -p "$DIST_ROOT"
+  if command -v unzip >/dev/null 2>&1; then
+    unzip -q "$ZIP" -d "$DIST_ROOT"
+  elif command -v jar >/dev/null 2>&1; then
+    (cd "$DIST_ROOT" && jar xf "$ZIP")
+  else
+    echo "unzip ou jar é necessário para extrair o Maven." >&2
+    exit 1
+  fi
+  [ -x "$MVN_BIN" ] || { echo "Maven não foi extraído corretamente em $MAVEN_HOME" >&2; exit 1; }
+fi
+
+exec "$MVN_BIN" "$@"

@@ -1,0 +1,74 @@
+.cartaoGeral {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  min-height: 18rem;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--cor-borda-sutil);
+  border-radius: var(--raio-lg);
+  background: var(--cor-neutra-0);
+  box-shadow: var(--sombra-sm);
+  transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao), transform var(--transicao-padrao);
+}
+.cartaoGeral::before { position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--cor-correios-azul-700), var(--cor-correios-amarelo-500)); content: ""; }
+.cartaoGeral:hover { transform: translateY(-2px); border-color: var(--cor-correios-azul-200); box-shadow: var(--sombra-md); }
+
+.cabecalhoDoCartao { padding: 1.05rem 1rem .78rem; border-bottom: 1px solid var(--cor-borda-sutil); }
+.linhaDeTitulo { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; }
+.identidadeDoTurno, .textosDoTitulo { min-width: 0; }
+.identidadeDoTurno { display: flex; align-items: center; gap: .45rem; }
+.identidadeDoTurno h3 { overflow: hidden; margin: 0 0 .2rem; color: var(--cor-neutra-800); font-size: .98rem; font-weight: 900; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.subtituloDoCartao { display: flex; align-items: center; gap: .3rem; margin: 0; color: var(--cor-texto-suave); font-size: .67rem; font-weight: 550; }
+.pontoSeparador { color: var(--cor-neutra-300); }
+
+.identificacaoOrganizacional { display: flex; min-width: 0; align-items: center; gap: .35rem; margin-top: .55rem; }
+.seloEstado, .nomeGestor { display: inline-flex; min-height: 1.5rem; align-items: center; gap: .28rem; border-radius: var(--raio-pilula); font-size: .64rem; font-weight: 750; }
+.seloEstado { flex: 0 0 auto; padding: 0 .5rem; border: 1px solid var(--cor-correios-azul-200); background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-800); }
+.nomeGestor { min-width: 0; overflow: hidden; padding: 0 .5rem; border: 1px solid var(--cor-borda-sutil); background: var(--cor-neutra-25); color: var(--cor-texto-secundario); text-overflow: ellipsis; white-space: nowrap; }
+
+.acoesDoTurno { display: flex; flex: 0 0 auto; gap: .3rem; }
+.botaoDeAcao { display: grid; width: 2rem; height: 2rem; place-items: center; border: 1px solid var(--cor-borda-sutil); border-radius: .55rem; background: var(--cor-neutra-0); color: var(--cor-texto-suave); cursor: pointer; transition: transform var(--transicao-rapida), border-color var(--transicao-rapida), background var(--transicao-rapida); }
+.botaoDeAcao:hover { transform: translateY(-1px); border-color: var(--cor-correios-azul-200); background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-700); }
+.botaoDeAcaoPerigo:hover { border-color: var(--cor-perigo-100); background: var(--cor-perigo-50); color: var(--cor-perigo-700); }
+
+.corpoDoCartao { display: flex; flex: 1; flex-direction: column; gap: .8rem; padding: .9rem 1rem 1rem; }
+.secaoDeProgresso { display: flex; flex-direction: column; gap: .48rem; padding: .72rem; border: 1px solid var(--cor-borda-sutil); border-radius: .72rem; background: var(--cor-neutra-25); }
+.linhaDeRotuloDaCarga { display: flex; align-items: flex-start; justify-content: space-between; gap: .5rem; }
+.infoCargaPrincipal { display: flex; flex-direction: column; }
+.tituloDaCarga { color: var(--cor-texto-suave); font-size: .61rem; font-weight: 800; letter-spacing: .055em; text-transform: uppercase; }
+.valorDaCarga { margin-top: .12rem; color: var(--cor-neutra-800); font-size: 1.15rem; font-weight: 900; line-height: 1; }
+.valorDaCarga small { margin-left: .1rem; color: var(--cor-texto-suave); font-size: .75rem; font-weight: 650; }
+.seloDeStatusDaCarga { display: inline-flex; align-items: center; gap: .28rem; padding: .22rem .48rem; border: 1px solid var(--cor-sucesso-100); border-radius: var(--raio-pilula); background: var(--cor-sucesso-50); color: var(--cor-sucesso-700); font-size: .62rem; font-weight: 800; white-space: nowrap; }
+.cargaExcedida .seloDeStatusDaCarga { border-color: var(--cor-perigo-100); background: var(--cor-perigo-50); color: var(--cor-perigo-700); }
+.cargaDentroDoPadrao .seloDeStatusDaCarga { border-color: var(--cor-correios-azul-200); background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-800); }
+
+.fundoDaBarraDeCarga { width: 100%; height: 6px; overflow: hidden; border-radius: var(--raio-pilula); background: var(--cor-neutra-200); }
+.preenchimentoDaBarraDeCarga { height: 100%; border-radius: inherit; background: var(--cor-correios-azul-700); transition: width .4s ease; }
+.cargaReduzida .preenchimentoDaBarraDeCarga { background: var(--cor-sucesso-600); }
+.cargaExcedida .preenchimentoDaBarraDeCarga { background: var(--cor-perigo-600); }
+.cargaDentroDoPadrao .preenchimentoDaBarraDeCarga { background: var(--cor-correios-azul-700); }
+.rodapeDaCarga { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--cor-correios-azul-700); font-size: .66rem; font-weight: 600; }
+.rodapeDaCarga span { display: inline-flex; align-items: center; }
+.rodapeAlerta { color: var(--cor-perigo-700); font-weight: 750; }
+
+.etiquetasDoCartao { display: flex; flex-wrap: wrap; gap: .35rem; min-height: 1.55rem; }
+.etiquetaPadrao, .etiquetaNoturna, .etiquetaAviso { display: inline-flex; align-items: center; gap: .25rem; padding: .25rem .48rem; border: 1px solid transparent; border-radius: var(--raio-pilula); font-size: .6rem; font-weight: 750; text-transform: uppercase; }
+.etiquetaPadrao { border-color: var(--cor-neutra-200); background: var(--cor-neutra-100); color: var(--cor-neutra-600); }
+.etiquetaNoturna { border-color: var(--cor-info-100); background: var(--cor-info-50); color: var(--cor-info-700); }
+.etiquetaAviso { border-color: var(--cor-alerta-100); background: var(--cor-alerta-50); color: var(--cor-alerta-700); }
+
+.miniGradeDeDias { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: .28rem; margin-top: auto; }
+.caixaMiniDoDia { display: flex; min-width: 0; flex-direction: column; align-items: center; justify-content: center; padding: .42rem .1rem; border: 1px solid transparent; border-radius: .48rem; cursor: help; transition: transform var(--transicao-rapida), background var(--transicao-rapida), border-color var(--transicao-rapida); }
+.caixaMiniDoDia span { font-size: .61rem; font-weight: 850; }
+.caixaMiniDoDia small { margin-top: .08rem; overflow: hidden; max-width: 100%; font-size: .55rem; font-weight: 600; text-overflow: ellipsis; white-space: nowrap; }
+.miniDiaAtivo { border-color: var(--cor-correios-azul-200); background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-800); }
+.miniDiaDeFolga { border-color: var(--cor-borda-sutil); border-style: dashed; background: var(--cor-neutra-25); color: var(--cor-neutra-400); }
+.miniDiaAtivo:hover, .miniDiaDeFolga:hover { transform: translateY(-1px); }
+.miniDiaAtivo:hover { border-color: var(--cor-correios-azul-700); background: var(--cor-correios-azul-700); color: var(--cor-neutra-0); }
+.miniDiaDeFolga:hover { border-color: var(--cor-neutra-300); background: var(--cor-neutra-100); color: var(--cor-neutra-600); }
+.iconeDoTurno { display: none; }
+
+.iconePercentual { margin-right: .25rem; }
+
+.seloInativo { margin-left: .4rem; font-size: .65rem; font-weight: 800; color: var(--c-perigo-texto); text-transform: uppercase; }

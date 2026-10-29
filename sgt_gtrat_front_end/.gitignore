@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.*
+!.env.example
+*.p12
+*.jks
+npm-debug.log*
+.DS_Store
+
+reports/

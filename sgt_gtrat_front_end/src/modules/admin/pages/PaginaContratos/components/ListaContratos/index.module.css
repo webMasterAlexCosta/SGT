@@ -1,0 +1,241 @@
+.conteinerLista {
+  overflow: hidden;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.95rem;
+  background: var(--cor-neutra-0);
+  box-shadow: 0 10px 24px rgba(15, 23, 42, 0.05);
+}
+
+.tabelaResponsiva { overflow-x: auto; }
+
+.tabelaContratos {
+  width: 100%;
+  min-width: 880px;
+  border-collapse: collapse;
+}
+
+.tabelaContratos th {
+  padding: 0.8rem 1rem;
+  border-bottom: 1px solid var(--c-ardosia-200);
+  color: var(--c-ardosia-500);
+  background: var(--c-ardosia-50);
+  font-size: 0.69rem;
+  font-weight: 850;
+  letter-spacing: 0.075em;
+  text-align: left;
+  text-transform: uppercase;
+}
+
+.tabelaContratos td {
+  padding: 0.95rem 1rem;
+  border-bottom: 1px solid var(--c-ardosia-100);
+  color: var(--c-ardosia-700);
+  font-size: 0.82rem;
+  vertical-align: middle;
+}
+
+.tabelaContratos tbody tr:last-child td { border-bottom: 0; }
+.tabelaContratos tbody tr { transition: background-color 150ms ease; }
+.tabelaContratos tbody tr:hover { background: #fbfdff; }
+
+.identificacaoContrato,
+.responsavelContrato,
+.blocoVigencia {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.identificacaoContrato strong {
+  color: var(--correios-blue);
+  font-size: 0.88rem;
+  font-weight: 850;
+}
+
+.identificacaoContrato span {
+  max-width: 24rem;
+  color: var(--c-ardosia-700);
+  font-weight: 650;
+}
+
+.identificacaoContrato small {
+  color: var(--c-ardosia-400);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+}
+
+.linhaResponsavel,
+.linhaResponsavelSecundaria,
+.periodoVigencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.38rem;
+}
+
+.linhaResponsavel { color: var(--c-ardosia-700); }
+.linhaResponsavelSecundaria { color: var(--c-ardosia-500); font-size: 0.74rem; }
+.periodoVigencia { color: var(--c-ardosia-600); font-size: 0.76rem; white-space: nowrap; }
+
+.seloVigencia {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.28rem;
+  width: fit-content;
+  padding: 0.22rem 0.48rem;
+  border: 1px solid currentColor;
+  border-radius: 999px;
+  font-size: 0.66rem;
+  font-weight: 800;
+}
+
+.vigenciaRegular { color: var(--c-sucesso-texto); }
+.vigenciaAtencao { color: var(--c-aviso-texto); }
+.vigenciaVencida { color: var(--c-perigo-texto); }
+
+.statusContrato {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  width: fit-content;
+  padding: 0.32rem 0.55rem;
+  border-radius: 999px;
+  font-size: 0.68rem;
+  font-weight: 850;
+}
+
+.pontoStatus {
+  width: 0.43rem;
+  height: 0.43rem;
+  border-radius: 50%;
+  background: currentColor;
+  box-shadow: 0 0 0 3px color-mix(in srgb, currentColor 18%, transparent);
+}
+
+.statusAtivo { color: var(--c-sucesso-texto); background: var(--c-sucesso-fundo); }
+.statusInativo { color: var(--c-ardosia-500); background: var(--c-ardosia-100); }
+
+.colunaAcoes { width: 7rem; text-align: right !important; }
+.acoesContrato { display: flex; align-items: center; justify-content: flex-end; gap: 0.38rem; }
+
+.botaoAcao {
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  border: 1px solid transparent;
+  border-radius: 0.55rem;
+  background: transparent;
+  cursor: pointer;
+  transition: transform 140ms ease, background-color 140ms ease, border-color 140ms ease;
+}
+
+.botaoAcao:hover { transform: translateY(-1px); }
+.botaoEditar { color: var(--correios-blue); }
+.botaoEditar:hover { border-color: var(--c-primaria-borda); background: var(--c-primaria-clara); }
+.botaoExcluir { color: var(--c-perigo-texto); }
+.botaoExcluir:hover { border-color: var(--c-perigo-borda); background: var(--c-perigo-fundo); }
+
+.listaCartoesMoveis { display: none; }
+
+.estadoVazio,
+.estadoCarregamento {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 18rem;
+  padding: 2rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.95rem;
+  background: var(--cor-neutra-0);
+  text-align: center;
+}
+
+.iconeEstadoVazio {
+  display: grid;
+  place-items: center;
+  width: 3.5rem;
+  height: 3.5rem;
+  margin-bottom: 0.85rem;
+  border-radius: 1rem;
+  color: var(--correios-blue);
+  background: var(--c-primaria-clara);
+}
+
+.estadoVazio h2 { margin: 0; color: var(--c-ardosia-800); font-size: 1rem; }
+.estadoVazio p { max-width: 31rem; margin: 0.45rem 0 0; color: var(--c-ardosia-500); font-size: 0.82rem; }
+
+.esqueletoTitulo,
+.esqueletoLinha {
+  width: min(100%, 60rem);
+  border-radius: 0.55rem;
+  background: linear-gradient(90deg, var(--c-ardosia-100), var(--c-ardosia-200), var(--c-ardosia-100));
+  background-size: 200% 100%;
+  animation: carregar 1.2s linear infinite;
+}
+.esqueletoTitulo { height: 2rem; margin-bottom: 1rem; }
+.esqueletoLinha { height: 3.4rem; margin-top: 0.55rem; }
+
+@keyframes carregar { to { background-position: -200% 0; } }
+
+@media (max-width: 760px) {
+  .tabelaResponsiva { display: none; }
+  .listaCartoesMoveis { display: grid; gap: 0.75rem; padding: 0.75rem; }
+  .conteinerLista { border: 0; background: transparent; box-shadow: none; overflow: visible; }
+
+  .cartaoContratoMovel {
+    padding: 1rem;
+    border: 1px solid var(--c-ardosia-200);
+    border-radius: 0.9rem;
+    background: var(--cor-neutra-0);
+    box-shadow: 0 8px 20px rgba(15, 23, 42, 0.05);
+  }
+
+  .cabecalhoCartaoMovel {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--c-ardosia-100);
+  }
+
+  .cabecalhoCartaoMovel > div { min-width: 0; }
+  .cabecalhoCartaoMovel strong { display: block; color: var(--correios-blue); font-size: 0.88rem; }
+  .cabecalhoCartaoMovel span:not(.statusContrato) { display: block; margin-top: 0.2rem; color: var(--c-ardosia-600); font-size: 0.76rem; }
+
+  .detalhesCartaoMovel {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.7rem;
+    margin: 0.85rem 0;
+  }
+
+  .detalhesCartaoMovel div { min-width: 0; }
+  .detalhesCartaoMovel dt { color: var(--c-ardosia-400); font-size: 0.64rem; font-weight: 800; text-transform: uppercase; }
+  .detalhesCartaoMovel dd { margin: 0.18rem 0 0; color: var(--c-ardosia-700); font-size: 0.76rem; font-weight: 650; overflow-wrap: anywhere; }
+}
+
+@media (max-width: 470px) {
+  .detalhesCartaoMovel { grid-template-columns: 1fr; }
+}
+
+.efetivoContrato { display: grid; gap: .3rem; min-width: 10rem; }
+.linhaEfetivo { display: flex; align-items: baseline; gap: .28rem; color: var(--cor-texto-secundario); font-size: .68rem; white-space: nowrap; }
+.linhaEfetivo svg { align-self: center; color: var(--cor-correios-azul-700); }
+.linhaEfetivo strong { color: var(--cor-correios-azul-900); font-size: .84rem; }
+.separadorEfetivo { color: var(--cor-neutra-300); }
+.barraEfetivo { width: 100%; height: .38rem; overflow: hidden; border-radius: var(--raio-pilula); background: var(--cor-neutra-100); }
+.barraEfetivo span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--cor-correios-azul-700), var(--cor-correios-amarelo-500)); }
+.efetivoContrato small { font-size: .65rem; font-weight: 750; }
+.saldoPendente { color: var(--cor-alerta-700); }
+.saldoExcedido { color: var(--cor-perigo-700); }
+.saldoCompleto { color: var(--cor-sucesso-700); }
+
+@media (max-width: 760px) {
+  .cartaoContratoMovel > .efetivoContrato { margin: .8rem 0; padding: .7rem; border: 1px solid var(--cor-correios-azul-100); border-radius: var(--raio-sm); background: var(--cor-correios-azul-50); }
+}
+
+.eixosContrato{display:flex;flex-wrap:wrap;gap:.3rem;align-items:center}.eixosContrato span{display:inline-flex;align-items:center;padding:.24rem .45rem;border-radius:999px;font-size:.64rem;font-weight:750;line-height:1.1;white-space:nowrap}.eixoNegocial{background:var(--c-superficie-alternativa);color:var(--c-texto)}.eixoTemporal{background:var(--c-info-fundo);color:var(--c-info-texto);border:1px solid var(--c-info-borda)}.eixoAtivo{background:var(--c-sucesso-fundo);color:var(--c-sucesso-texto);border:1px solid var(--c-sucesso-borda)}.eixoInativo{background:var(--c-aviso-fundo);color:var(--c-aviso-texto);border:1px solid var(--c-aviso-borda)}
+.botaoDetalhar{color:var(--c-primaria)!important;background:var(--c-info-fundo)!important}.blocoVigencia small{display:block;margin-top:.25rem;color:var(--c-texto-suave);font-size:.68rem;max-width:220px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}

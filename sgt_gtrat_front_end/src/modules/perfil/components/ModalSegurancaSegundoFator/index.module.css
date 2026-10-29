@@ -1,0 +1,106 @@
+.container {
+  display: flex;
+  flex-direction: column;
+  gap: 1.25rem;
+}
+
+.apresentacao {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  padding: 1rem;
+  border: 1px solid var(--cor-correios-azul-100);
+  border-radius: 0.9rem;
+  background: linear-gradient(135deg, var(--cor-correios-azul-50), var(--cor-neutra-0));
+}
+
+.cabecalhoApresentacao {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.85rem;
+}
+
+.iconeProtecao {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: 0 0 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border-radius: 0.8rem;
+  background: var(--cor-correios-azul-800);
+  color: var(--cor-neutra-0);
+}
+
+.cabecalhoApresentacao h3,
+.cabecalhoConfiguracao h3 {
+  margin: 0;
+  color: var(--cor-correios-azul-800);
+  font-size: 0.95rem;
+  font-weight: 800;
+}
+
+.cabecalhoApresentacao p,
+.cabecalhoConfiguracao p {
+  margin: 0.3rem 0 0;
+  color: var(--cor-neutra-600);
+  font-size: 0.78rem;
+  line-height: 1.5;
+}
+
+.gradeBeneficios {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 0.7rem;
+}
+
+.beneficio {
+  display: flex;
+  min-height: 78px;
+  align-items: flex-start;
+  gap: 0.55rem;
+  padding: 0.75rem;
+  border: 1px solid var(--cor-neutra-200);
+  border-radius: 0.75rem;
+  background: var(--cor-neutra-0);
+  color: var(--cor-neutra-700);
+  font-size: 0.72rem;
+  line-height: 1.4;
+}
+
+.beneficio svg {
+  flex: 0 0 auto;
+  color: var(--cor-correios-azul-700);
+}
+
+.configuracao {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+}
+
+.cabecalhoConfiguracao {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.65rem;
+  padding-bottom: 0.85rem;
+  border-bottom: 1px solid var(--cor-neutra-200);
+  color: var(--cor-correios-azul-700);
+}
+
+.rodape {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 1rem;
+  border-top: 1px solid var(--cor-neutra-200);
+}
+
+@media (max-width: 700px) {
+  .gradeBeneficios {
+    grid-template-columns: 1fr;
+  }
+
+  .beneficio {
+    min-height: auto;
+  }
+}

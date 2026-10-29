@@ -1,0 +1,9 @@
+target/
+.env
+.env.*
+!.env
+uploads/
+*.p12
+*.jks
+*.log
+.DS_Store

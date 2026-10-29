@@ -1,0 +1,10 @@
+.conteiner { width: 100%; overflow-x: auto; }
+.lista { display: flex; min-width: max-content; margin: 0; padding: 0; list-style: none; }
+.item { position: relative; display: flex; align-items: center; gap: var(--espaco-2); min-width: 10rem; padding: var(--espaco-3) var(--espaco-4); color: var(--cor-texto-suave); font-size: var(--texto-xs); font-weight: var(--peso-medio); }
+.item:not(:last-child)::after { position: absolute; top: 50%; right: 0; width: 1.5rem; height: 1px; content: ""; background: var(--cor-borda-forte); transform: translate(50%, -50%); }
+.indicador { display: inline-flex; align-items: center; justify-content: center; width: 1.75rem; height: 1.75rem; flex: 0 0 auto; border: 1px solid var(--cor-borda-forte); border-radius: var(--raio-pilula); background: var(--cor-neutra-0); }
+.atual { color: var(--cor-correios-azul-950); font-weight: var(--peso-forte); }
+.atual .indicador { border-color: var(--cor-correios-amarelo-600); color: var(--cor-correios-azul-950); background: var(--cor-correios-amarelo-500); }
+.concluida { color: var(--cor-sucesso-700); }
+.concluida .indicador { border-color: var(--cor-sucesso-600); color: var(--cor-neutra-0); background: var(--cor-sucesso-600); }
+.rotulo { max-width: 14rem; white-space: normal; }

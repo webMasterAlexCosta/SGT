@@ -1,0 +1,332 @@
+.barraLateral {
+  position: fixed;
+  inset-y: 0;
+  left: 0;
+  z-index: var(--z-menu);
+  display: flex;
+  flex-direction: column;
+  width: var(--largura-barra-lateral);
+  overflow: hidden;
+  border-right: 1px solid rgba(255, 255, 255, 0.12);
+  background:
+    linear-gradient(180deg, rgba(0, 86, 138, 0.28), transparent 24%),
+    var(--cor-correios-azul-800);
+  box-shadow: 12px 0 34px rgba(0, 38, 61, .16);
+  transition: transform var(--transicao-padrao);
+}
+
+.barraAberta { transform: translateX(0); }
+.barraFechada { transform: translateX(-100%); }
+
+@media (min-width: 768px) {
+  .barraLateral { position: relative; transform: translateX(0); }
+}
+
+.camadaBrilho {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.efeitoBrilho {
+  opacity: 0.16;
+  animation-duration: 12s !important;
+}
+
+.secaoLogotipo {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.8rem;
+  padding: 1.2rem 1rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 48, 79, 0.2);
+}
+
+.envoltorioLogotipo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.7rem;
+  width: 100%;
+}
+
+.imagemLogotipo {
+  width: auto;
+  height: 2.1rem;
+  flex: 0 0 auto;
+  object-fit: contain;
+  filter: drop-shadow(0 5px 10px rgba(0, 0, 0, 0.18));
+}
+
+.nomeAplicativo {
+  overflow: hidden;
+  color: var(--cor-correios-amarelo-500);
+  font-size: 0.95rem;
+  font-weight: 850;
+  letter-spacing: 0.055em;
+  line-height: 1.3;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+}
+
+.menuNavegacao {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex: 1;
+  flex-direction: column;
+  gap: 0.22rem;
+  overflow-y: auto;
+  padding: 0.7rem 0 1rem;
+  scrollbar-color: rgba(255, 255, 255, 0.22) transparent;
+  scrollbar-width: thin;
+}
+
+.menuNavegacao::-webkit-scrollbar { width: 4px; }
+.menuNavegacao::-webkit-scrollbar-track { background: transparent; }
+.menuNavegacao::-webkit-scrollbar-thumb { border-radius: 99px; background: rgba(255, 255, 255, 0.22); }
+
+.secaoMenu {
+  position: relative;
+  z-index: 2;
+  margin: 0.08rem 0;
+}
+
+.botaoSecaoMenu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.58rem 1rem;
+  border: 0;
+  color: var(--cor-correios-amarelo-400);
+  background: transparent;
+  font-size: 0.67rem;
+  font-weight: 850;
+  letter-spacing: 0.085em;
+  text-align: left;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.botaoSecaoMenu:hover {
+  color: var(--cor-neutra-0);
+  background: rgba(255, 255, 255, 0.075);
+}
+
+.conteudoSecaoMenu,
+.conteudoSubMenu {
+  overflow: hidden;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
+}
+
+.conteudoAberto { max-height: 70rem; opacity: 1; }
+.conteudoFechado { max-height: 0; opacity: 0; }
+
+.secaoSubMenu { margin: 0.05rem 0; }
+
+.botaoSecaoSubMenu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 0.48rem 1rem 0.48rem 2rem;
+  border: 0;
+  color: var(--cor-correios-azul-200);
+  background: transparent;
+  font-size: 0.7rem;
+  font-weight: 750;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease;
+}
+
+.botaoSecaoSubMenu:hover {
+  color: var(--cor-neutra-0);
+  background: rgba(255, 255, 255, 0.06);
+}
+
+.bordaSubMenu {
+  margin-left: 1.55rem;
+  padding: 0.12rem 0;
+  border-left: 1px solid rgba(185, 217, 234, 0.24);
+}
+
+.botaoItemNavegacao {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  align-items: center;
+  gap: 0.68rem;
+  width: 100%;
+  min-height: 2.55rem;
+  border: 0;
+  border-left: 3px solid transparent;
+  background: transparent;
+  text-align: left;
+  cursor: pointer;
+  transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.itemNavegacaoNormal { padding: 0.55rem 1rem; }
+.itemNavegacaoSub { padding: 0.5rem 0.9rem 0.5rem 1.1rem; }
+
+.itemAtivo {
+  border-left-color: var(--cor-correios-amarelo-500);
+  color: var(--cor-correios-amarelo-500);
+  background: linear-gradient(90deg, rgba(255, 230, 0, 0.13), rgba(255, 255, 255, 0.05));
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.035);
+}
+
+.itemInativo { color: var(--cor-correios-azul-100); }
+.itemInativo:hover { color: var(--cor-neutra-0); background: rgba(255, 255, 255, 0.075); }
+
+.iconeItem { flex: 0 0 auto; }
+.textoItem { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.textoItemNormal { font-size: 0.78rem; font-weight: 700; }
+.textoItemSub { font-size: 0.72rem; font-weight: 600; }
+
+.linhaDivisoria {
+  margin: 0.45rem 0.9rem;
+  border-top: 1px solid rgba(255, 255, 255, 0.11);
+}
+
+.rodape {
+  position: relative;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.38rem;
+  min-height: 4.65rem;
+  padding: 0.75rem 0.9rem;
+  overflow: hidden;
+  border-top: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(0, 42, 69, 0.28);
+}
+
+.onda {
+  position: absolute;
+  inset: 0;
+  background: rgba(255, 255, 255, 0.035);
+  transform: translateY(100%);
+  transition: transform 0.35s ease;
+  pointer-events: none;
+}
+.rodape:hover .onda { transform: translateY(0); }
+
+.identificacaoVersaoSidebar {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.26rem 0.48rem;
+  border: 1px solid rgba(255, 230, 0, 0.3);
+  border-radius: 999px;
+  background: rgba(0, 29, 48, 0.34);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+.seloVersaoSidebar {
+  color: var(--cor-correios-amarelo-400);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: 0.64rem;
+  font-weight: 850;
+  letter-spacing: 0.035em;
+}
+
+.rotuloVersaoSidebar {
+  color: rgba(219, 234, 254, 0.7);
+  font-size: 0.52rem;
+  font-weight: 650;
+  letter-spacing: 0.025em;
+  text-transform: uppercase;
+}
+
+.textoTopo,
+.textoFundo {
+  position: relative;
+  z-index: 1;
+  margin: 0;
+  text-align: center;
+}
+
+.textoTopo { color: rgba(219, 234, 254, 0.62); font-size: 0.62rem; font-weight: 650; }
+.textoFundo { color: rgba(255, 233, 91, 0.78); font-size: 0.57rem; font-weight: 750; letter-spacing: 0.02em; }
+
+.divisorRodape {
+  position: relative;
+  z-index: 1;
+  width: 2.2rem;
+  height: 1px;
+  border-radius: 99px;
+  background: rgba(255, 230, 0, 0.34);
+}
+
+.matriculaRodape { margin-left: 0.28rem; color: rgba(219, 234, 254, 0.72); }
+
+.resumoAcesso {
+  display: grid;
+  gap: 0.18rem;
+  width: 100%;
+  padding: 0.62rem 0.72rem;
+  border: 1px solid rgba(255, 255, 255, 0.13);
+  border-radius: var(--raio-md);
+  background: rgba(0, 35, 58, 0.28);
+  text-align: center;
+}
+
+.resumoAcesso strong {
+  color: var(--cor-neutra-0);
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.035em;
+  text-transform: uppercase;
+}
+
+.resumoAcesso span {
+  overflow: hidden;
+  color: var(--cor-correios-azul-100);
+  font-size: 0.63rem;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.envoltorioItemDica { position: relative; display: block; width: 100%; }
+.feixeBrilho {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,.08) 43%, rgba(255,255,255,.16) 50%, rgba(255,255,255,.08) 57%, transparent 75%);
+  transform: translateX(-150%) skewX(-20deg);
+  animation: moverFeixe 8s infinite;
+  pointer-events: none;
+}
+@keyframes moverFeixe { 0% { transform: translateX(-150%) skewX(-20deg); } 55%, 100% { transform: translateX(200%) skewX(-20deg); } }
+.botaoFecharMobile {
+  position: absolute;
+  top: var(--espaco-3);
+  right: var(--espaco-3);
+  z-index: 4;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  width: 2.5rem;
+  height: 2.5rem;
+  padding: 0;
+  border: 1px solid rgba(255,255,255,.28);
+  border-radius: var(--raio-sm);
+  color: var(--cor-neutra-0);
+  background: rgba(0,38,61,.5);
+  cursor: pointer;
+}
+@media (max-width: 767px) { .botaoFecharMobile { display: inline-flex; } }

@@ -1,0 +1,18 @@
+.cartao { overflow: hidden; background: var(--cor-neutra-0); border: 1px solid var(--cor-borda-sutil); border-radius: var(--raio-md); box-shadow: var(--sombra-sm); }
+.topo { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.1rem; background: var(--cor-neutra-50); border-bottom: 1px solid var(--cor-borda-sutil); }
+.topo h2 { display: flex; align-items: center; gap: .45rem; margin: 0; color: var(--cor-correios-azul-950); font-size: 1rem; }
+.topo p { margin: .2rem 0 0; color: var(--cor-texto-suave); font-size: .75rem; }
+.busca { display: flex; align-items: center; gap: .45rem; width: min(100%, 19rem); min-height: 2.55rem; padding: .45rem .7rem; color: var(--cor-neutra-400); background: var(--cor-neutra-0); border: 1px solid var(--cor-borda-forte); border-radius: var(--raio-sm); }
+.busca input { width: 100%; background: transparent; border: 0; outline: 0; }
+.rolagem { overflow-x: auto; }
+.rolagem table { width: 100%; min-width: 46rem; border-collapse: collapse; font-size: .8rem; }
+.rolagem th, .rolagem td { padding: .75rem 1rem; border-bottom: 1px solid var(--cor-borda-sutil); text-align: left; }
+.rolagem th { color: var(--cor-correios-azul-900); background: var(--cor-correios-azul-50); font-size: .67rem; text-transform: uppercase; }
+.rolagem tbody tr:hover { background: var(--cor-correios-azul-50); }
+.uf, .ativo, .inativo { display: inline-flex; padding: .22rem .5rem; border: 1px solid; border-radius: var(--raio-pilula); font-size: .66rem; font-weight: 800; }
+.uf { color: var(--cor-correios-azul-800); background: var(--cor-correios-azul-50); border-color: var(--cor-correios-azul-200); }
+.ativo { color: var(--cor-sucesso-700); background: var(--cor-sucesso-50); border-color: var(--cor-sucesso-100); }
+.inativo { color: var(--cor-neutra-600); background: var(--cor-neutra-100); border-color: var(--cor-neutra-200); }
+.rolagem td button { display: grid; place-items: center; width: 2rem; height: 2rem; color: var(--cor-correios-azul-700); background: var(--cor-neutra-0); border: 1px solid var(--cor-borda-sutil); border-radius: var(--raio-sm); cursor: pointer; }
+.vazio { color: var(--cor-texto-suave); text-align: center !important; }
+@media (max-width: 720px) { .topo { align-items: stretch; flex-direction: column; } .busca { width: 100%; } }

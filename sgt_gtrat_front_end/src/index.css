@@ -1,0 +1,82 @@
+/* CSS realmente global: reset, foco, seleção, scrollbar e preferências do usuário. */
+*,
+*::before,
+*::after { box-sizing: border-box; }
+
+html,
+body,
+#root {
+  min-width: 320px;
+  min-height: 100%;
+  margin: 0;
+}
+
+html {
+  background: var(--cor-fundo-aplicacao);
+  font-family: var(--fonte-sistema);
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  color: var(--cor-texto-principal);
+  background: var(--cor-fundo-aplicacao);
+  font-family: var(--fonte-sistema);
+}
+
+button,
+input,
+select,
+textarea { font: inherit; }
+
+button,
+a,
+input,
+select,
+textarea { -webkit-tap-highlight-color: transparent; }
+
+button:focus-visible,
+a:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 2px solid var(--cor-foco);
+  outline-offset: 2px;
+}
+
+::selection {
+  color: var(--cor-correios-azul-950);
+  background: var(--cor-correios-amarelo-200);
+}
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: var(--cor-neutra-100); }
+::-webkit-scrollbar-thumb {
+  border: 2px solid var(--cor-neutra-100);
+  border-radius: var(--raio-pilula);
+  background: var(--cor-neutra-400);
+}
+::-webkit-scrollbar-thumb:hover { background: var(--cor-neutra-500); }
+
+.somenteLeitorTela {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    scroll-behavior: auto !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .01ms !important;
+  }
+}

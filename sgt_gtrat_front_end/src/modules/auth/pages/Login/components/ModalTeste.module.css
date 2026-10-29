@@ -1,0 +1,88 @@
+.sobreposicaoModal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(15, 23, 42, 0.82);
+  backdrop-filter: blur(6px);
+  animation: surgir 0.18s ease-out;
+}
+
+.cartaoModal {
+  display: flex;
+  flex-direction: column;
+  width: min(100%, 51rem);
+  max-height: min(92vh, 44rem);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 1rem;
+  background: var(--cor-neutra-0);
+  box-shadow: 0 32px 90px rgba(0, 0, 0, 0.34);
+  animation: ampliar 0.2s ease-out;
+}
+
+.cabecalhoModal {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 1rem;
+  padding: 1.1rem 1.2rem;
+  border-bottom: 1px solid var(--c-ardosia-200);
+  background:
+    radial-gradient(circle at 90% 0, rgba(255, 230, 0, 0.24), transparent 32%),
+    linear-gradient(135deg, var(--cor-neutra-0), #f5fafe);
+}
+
+.identificacaoCabecalho { display: flex; gap: 0.8rem; min-width: 0; }
+.iconeCabecalho { display: grid; place-items: center; width: 2.7rem; height: 2.7rem; flex: 0 0 auto; border-radius: 0.8rem; color: var(--cor-neutra-0); background: var(--correios-blue); }
+.identificacaoCabecalho span { display: block; color: var(--correios-blue); font-size: 0.65rem; font-weight: 850; letter-spacing: 0.1em; text-transform: uppercase; }
+.identificacaoCabecalho h2 { margin: 0.15rem 0 0; color: var(--c-ardosia-800); font-size: 1.2rem; font-weight: 850; }
+.identificacaoCabecalho p { margin: 0.3rem 0 0; color: var(--c-ardosia-500); font-size: 0.74rem; line-height: 1.45; }
+.botaoFechar { display: grid; place-items: center; width: 2.2rem; height: 2.2rem; flex: 0 0 auto; border: 0; border-radius: 0.6rem; color: var(--c-ardosia-500); background: transparent; cursor: pointer; }
+.botaoFechar:hover { color: var(--c-perigo-texto); background: var(--c-perigo-fundo); }
+
+.corpoModal { overflow-y: auto; padding: 1rem 1.2rem 1.15rem; }
+.grupoPerfis + .grupoPerfis { margin-top: 1.1rem; padding-top: 1rem; border-top: 1px solid var(--c-ardosia-200); }
+.tituloGrupo,
+.tituloGrupoSemMargem { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; }
+.tituloGrupo { margin-bottom: 0.55rem; }
+.tituloGrupo strong,
+.tituloGrupoSemMargem strong { color: var(--c-ardosia-700); font-size: 0.75rem; font-weight: 850; text-transform: uppercase; letter-spacing: 0.055em; }
+.tituloGrupo span,
+.tituloGrupoSemMargem span { color: var(--c-ardosia-400); font-size: 0.64rem; font-weight: 700; }
+
+.cabecalhoEstadual { display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-bottom: 0.65rem; }
+.tituloGrupoSemMargem { flex: 1; }
+.seletorUf { display: inline-flex; align-items: center; gap: 0.42rem; flex: 0 0 auto; padding: 0.34rem 0.45rem 0.34rem 0.6rem; border: 1px solid var(--c-ardosia-200); border-radius: 0.65rem; color: var(--correios-blue); background: var(--c-ardosia-50); }
+.seletorUf span { font-size: 0.65rem; font-weight: 850; }
+.seletorUf select { min-width: 4.2rem; border: 0; outline: 0; color: var(--c-ardosia-800); background: transparent; font-size: 0.75rem; font-weight: 800; cursor: pointer; }
+
+.gradeUsuarios { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.65rem; }
+.cartaoUsuario { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 0.62rem; min-width: 0; padding: 0.78rem; border: 1px solid var(--c-ardosia-200); border-radius: 0.75rem; color: inherit; background: var(--c-ardosia-50); text-align: left; cursor: pointer; transition: transform 0.15s ease, border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease; }
+.cartaoUsuario:hover { transform: translateY(-2px); border-color: var(--c-primaria-borda); background: var(--c-primaria-clara); box-shadow: 0 8px 16px rgba(15, 23, 42, 0.08); }
+.iconeUsuario { display: grid; place-items: center; width: 2.35rem; height: 2.35rem; border-radius: 0.62rem; color: var(--correios-blue); background: var(--cor-neutra-0); }
+.dadosUsuario { display: flex; flex-direction: column; gap: 0.12rem; min-width: 0; }
+.dadosUsuario strong { overflow: hidden; color: var(--correios-blue); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.8rem; text-overflow: ellipsis; white-space: nowrap; }
+.dadosUsuario span { overflow: hidden; color: var(--c-ardosia-700); font-size: 0.67rem; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+.dadosUsuario .matriculaUsuario { color: var(--correios-blue); font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.62rem; font-weight: 800; }
+.dadosUsuario small { overflow: hidden; color: var(--c-ardosia-400); font-size: 0.59rem; text-overflow: ellipsis; white-space: nowrap; }
+.acaoUsuario { color: var(--c-ardosia-400); font-size: 0.58rem; font-weight: 850; text-transform: uppercase; white-space: nowrap; }
+
+.rodapeModal { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 0.8rem 1.2rem; border-top: 1px solid var(--c-ardosia-200); background: var(--c-ardosia-50); }
+.avisoSenhas { display: flex; align-items: center; gap: 0.45rem; color: var(--c-ardosia-500); font-size: 0.65rem; }
+.avisoSenhas svg { flex: 0 0 auto; color: var(--correios-blue); }
+.rodapeModal button { padding: 0.55rem 0.85rem; border: 1px solid var(--correios-blue); border-radius: 0.6rem; color: var(--cor-neutra-0); background: var(--correios-blue); font-size: 0.72rem; font-weight: 800; cursor: pointer; }
+
+@keyframes surgir { from { opacity: 0; } }
+@keyframes ampliar { from { opacity: 0; transform: translateY(8px) scale(0.985); } }
+
+@media (max-width: 680px) {
+  .gradeUsuarios { grid-template-columns: 1fr; }
+  .cabecalhoEstadual { align-items: stretch; flex-direction: column; }
+  .tituloGrupoSemMargem { align-items: flex-start; flex-direction: column; gap: 0.2rem; }
+  .seletorUf { align-self: flex-start; }
+  .rodapeModal { align-items: stretch; flex-direction: column; }
+  .rodapeModal button { align-self: flex-end; }
+}

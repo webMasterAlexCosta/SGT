@@ -1,0 +1,204 @@
+.containerPagina {
+  --emp-radius-lg: 1rem;
+  --emp-radius-md: 0.8rem;
+  --emp-shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 10px 30px rgba(15, 23, 42, 0.035);
+  --emp-shadow-float: 0 18px 45px rgba(15, 23, 42, 0.16);
+
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.7rem, 1.2vw, 1rem);
+  padding: clamp(0.7rem, 1.35vw, 1.15rem);
+  background:
+    radial-gradient(circle at 100% 0%, rgba(0, 94, 153, 0.055), transparent 28rem),
+    linear-gradient(180deg, rgba(248, 250, 252, 0.96), rgba(241, 245, 249, 0.72));
+  animation: surgirGradualmente 0.28s ease-out;
+}
+
+@keyframes surgirGradualmente {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.gradeOperacional {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(0.7rem, 1vw, 0.9rem);
+  align-items: start;
+}
+
+.colunaPrincipal {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(0.65rem, 0.9vw, 0.85rem);
+}
+
+.areaResultados {
+  position: relative;
+  min-width: 0;
+  min-height: 9rem;
+}
+
+@media (min-width: 1040px) {
+  .gradeOperacional {
+    grid-template-columns: minmax(16.5rem, 19rem) minmax(0, 1fr);
+  }
+
+  .gradeOperacional > :first-child {
+    position: sticky;
+    top: 0.9rem;
+    max-height: calc(100vh - 1.8rem);
+  }
+}
+
+
+.estadoVazio {
+  min-height: 18rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: clamp(2rem, 5vw, 4rem) 1rem;
+  border: 1px dashed var(--c-ardosia-300);
+  border-radius: var(--emp-radius-lg);
+  background: rgba(255, 255, 255, 0.9);
+  box-shadow: var(--emp-shadow-card);
+}
+
+.envoltorioIconeVazio {
+  width: 3.4rem;
+  height: 3.4rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 0.9rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 9999px;
+  background: var(--c-ardosia-50);
+  color: var(--c-ardosia-400);
+}
+
+.textoVazio {
+  max-width: 34rem;
+  margin: 0;
+  color: var(--c-ardosia-600);
+  font-size: 0.9rem;
+  font-weight: 700;
+  line-height: 1.45;
+  text-align: center;
+}
+
+.linkVazio {
+  min-height: 2.3rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: 0.8rem;
+  padding: 0 0.8rem;
+  border: 0;
+  border-radius: 0.6rem;
+  background: var(--c-primaria-clara);
+  color: var(--correios-blue);
+  font-size: 0.8rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.linkVazio:hover {
+  box-shadow: inset 0 0 0 1px var(--c-primaria-borda);
+}
+
+.girador {
+  width: 2.15rem;
+  height: 2.15rem;
+  flex: 0 0 auto;
+  border: 3px solid var(--c-ardosia-200);
+  border-top-color: var(--correios-blue);
+  border-radius: 50%;
+  animation: girar 0.75s linear infinite;
+}
+
+@keyframes girar { to { transform: rotate(360deg); } }
+
+.painelCarregamentoInicial {
+  min-height: 15rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: var(--emp-radius-lg);
+  background: rgba(255, 255, 255, 0.92);
+  box-shadow: var(--emp-shadow-card);
+}
+
+.feedbackCarregamento {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.85rem;
+  padding: 1.25rem;
+  color: var(--correios-blue);
+}
+
+.feedbackCarregamentoSobreposto {
+  position: absolute;
+  inset: 0;
+  z-index: 30;
+  min-height: 9rem;
+  align-items: flex-start;
+  padding-top: 2.5rem;
+  border: 1px solid rgba(203, 213, 225, 0.7);
+  border-radius: var(--emp-radius-lg);
+  background-color: rgba(248, 250, 252, 0.9);
+  backdrop-filter: blur(5px);
+}
+
+.tituloCarregamento {
+  margin: 0;
+  color: var(--correios-blue);
+  font-size: 0.92rem;
+  font-weight: 850;
+}
+
+.textoCarregamento {
+  margin: 0.18rem 0 0;
+  color: var(--c-ardosia-600);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+@media (max-width: 1039px) {
+  .gradeOperacional > :first-child {
+    order: 0;
+  }
+
+  .colunaPrincipal {
+    order: 1;
+  }
+}
+
+@media (max-width: 640px) {
+  .containerPagina {
+    gap: 0.65rem;
+    padding: 0.55rem;
+    background: var(--c-ardosia-50);
+  }
+
+  .feedbackCarregamento {
+    align-items: flex-start;
+    justify-content: flex-start;
+  }
+
+  .feedbackCarregamentoSobreposto {
+    padding: 1.5rem 1rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .containerPagina,
+  .girador {
+    animation: none;
+  }
+}

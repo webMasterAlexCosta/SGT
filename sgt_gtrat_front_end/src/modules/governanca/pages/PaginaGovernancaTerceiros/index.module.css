@@ -1,0 +1,18 @@
+.pagina { display: grid; gap: 18px; padding: 4px; color: #123047; }
+.cabecalho { background: linear-gradient(135deg,#003e65,#075c86); color: white; border-radius: 14px; padding: 22px; }
+.cabecalho h1 { margin: 0 0 6px; }
+.cabecalho p { margin: 0; opacity: .9; }
+.kpis { display: grid; grid-template-columns: repeat(auto-fit,minmax(150px,1fr)); gap: 10px; }
+.kpi,.painel { background: white; border: 1px solid #dbe5eb; border-radius: 12px; padding: 16px; box-shadow: 0 3px 12px #003e6510; }
+.kpi strong { display: block; font-size: 1.6rem; color: #005b88; }
+.abas { display: flex; gap: 8px; flex-wrap: wrap; }
+.abas button,.acoes button,.form button { border: 0; border-radius: 8px; padding: 9px 13px; font-weight: 700; cursor: pointer; background: #e8f1f6; color: #00416b; }
+.abas .ativa,.form button { background: #005f91; color: white; }
+.form { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 10px; margin-bottom: 16px; }
+.form input,.form select,.form textarea { border: 1px solid #b9cad5; border-radius: 8px; padding: 10px; min-width: 0; }
+.tabela { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tabela th,.tabela td { text-align: left; padding: 10px; border-bottom: 1px solid #e5edf2; vertical-align: top; }
+.tabela th { color: #00416b; background: #f4f8fa; }
+.acoes { display: flex; flex-wrap: wrap; gap: 6px; }
+.vazio { padding: 20px; text-align: center; color: #657b8a; }
+@media(max-width:760px){.painel{overflow-x:auto}.form{grid-template-columns:1fr}.tabela{min-width:760px}}

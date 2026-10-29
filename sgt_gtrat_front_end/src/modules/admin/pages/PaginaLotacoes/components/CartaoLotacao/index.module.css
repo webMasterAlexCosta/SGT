@@ -1,0 +1,45 @@
+.cartaoLotacao {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+  border: 1px solid var(--cor-borda-sutil);
+  border-radius: var(--raio-lg);
+  background: var(--cor-neutra-0);
+  box-shadow: var(--sombra-sm);
+  transition: border-color var(--transicao-padrao), box-shadow var(--transicao-padrao), transform var(--transicao-padrao);
+}
+.cartaoLotacao::before { position: absolute; top: 0; right: 0; left: 0; height: 3px; background: linear-gradient(90deg, var(--cor-correios-azul-700), var(--cor-correios-amarelo-500)); content: ""; }
+.cartaoLotacao:hover { transform: translateY(-2px); border-color: var(--cor-correios-azul-200); box-shadow: var(--sombra-md); }
+
+.cabecalhoCartao { display: flex; align-items: flex-start; justify-content: space-between; gap: .75rem; padding: 1.05rem 1rem .8rem; }
+.identidade { display: flex; min-width: 0; align-items: flex-start; gap: .7rem; }
+.identidade > div { min-width: 0; }
+.seloEstado { display: grid; min-width: 2.4rem; height: 2.4rem; flex: 0 0 auto; place-items: center; border: 1px solid var(--cor-correios-azul-200); border-radius: .7rem; background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-800); font-size: .73rem; font-weight: 900; }
+.identidade h3 { overflow: hidden; margin: .04rem 0 0; color: var(--cor-neutra-800); font-size: .96rem; font-weight: 900; line-height: 1.25; text-overflow: ellipsis; white-space: nowrap; }
+.municipio { display: inline-flex; align-items: center; gap: .28rem; margin-top: .35rem; color: var(--cor-texto-suave); font-size: .7rem; font-weight: 600; }
+
+.acoesCartao { display: flex; flex: 0 0 auto; gap: .3rem; }
+.acoesCartao button { display: grid; width: 2rem; height: 2rem; place-items: center; border: 1px solid var(--cor-borda-sutil); border-radius: .55rem; background: var(--cor-neutra-0); color: var(--cor-texto-suave); cursor: pointer; transition: transform var(--transicao-rapida), border-color var(--transicao-rapida), background var(--transicao-rapida); }
+.acoesCartao button:hover { transform: translateY(-1px); border-color: var(--cor-correios-azul-200); background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-700); }
+.acoesCartao .botaoExcluir:hover { border-color: var(--cor-perigo-100); background: var(--cor-perigo-50); color: var(--cor-perigo-700); }
+
+.faixaGestao { display: flex; align-items: center; gap: .62rem; margin: 0 1rem; padding: .68rem .72rem; border: 1px solid var(--cor-borda-sutil); border-radius: .72rem; background: var(--cor-neutra-25); color: var(--cor-correios-azul-700); }
+.faixaGestao div { min-width: 0; }
+.faixaGestao span, .faixaGestao strong, .faixaGestao small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.faixaGestao span { color: var(--cor-texto-suave); font-size: .58rem; font-weight: 850; letter-spacing: .05em; text-transform: uppercase; }
+.faixaGestao strong { margin-top: .06rem; color: var(--cor-neutra-700); font-size: .74rem; }
+.faixaGestao small { margin-top: .1rem; color: var(--cor-texto-suave); font-size: .64rem; }
+
+.corpoCartao { display: flex; flex: 1; flex-direction: column; padding: .9rem 1rem 1rem; }
+.tituloSecao { display: flex; align-items: center; justify-content: space-between; gap: .5rem; color: var(--cor-texto-secundario); font-size: .67rem; font-weight: 850; letter-spacing: .045em; text-transform: uppercase; }
+.tituloSecao span { display: inline-flex; align-items: center; gap: .35rem; }
+.tituloSecao strong { display: grid; min-width: 1.55rem; height: 1.55rem; place-items: center; border-radius: var(--raio-pilula); background: var(--cor-correios-azul-800); color: var(--cor-neutra-0); font-size: .65rem; }
+.listaTurnos { display: flex; flex-direction: column; gap: .45rem; margin-top: .65rem; }
+.itemTurno { padding: .6rem .65rem; border: 1px solid var(--cor-borda-sutil); border-radius: .62rem; background: linear-gradient(135deg, var(--cor-neutra-0), var(--cor-neutra-25)); }
+.nomeTurno { display: flex; align-items: center; gap: .35rem; color: var(--cor-correios-azul-800); font-size: .7rem; }
+.itemTurno p { margin: .22rem 0 0 1.05rem; color: var(--cor-texto-suave); font-size: .65rem; line-height: 1.42; }
+.semTurnos { margin-top: .65rem; padding: .9rem; border: 1px dashed var(--cor-borda-sutil); border-radius: .62rem; background: var(--cor-neutra-25); color: var(--cor-texto-suave); font-size: .72rem; text-align: center; }
+
+.inativo { margin-left: .4rem; color: var(--cor-erro-700, #a51d1d); font-size: .68rem; text-transform: uppercase; }

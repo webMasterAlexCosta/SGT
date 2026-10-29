@@ -1,0 +1,13 @@
+.sobreposicaoModal { position: fixed; inset: 0; z-index: var(--z-modal); display: flex; align-items: center; justify-content: center; padding: 1rem; background: rgba(0,38,61,.76); backdrop-filter: blur(6px); animation: surgirRapido .18s ease-out; }
+@keyframes surgirRapido { from { opacity: 0; } }
+.cartaoModal { width: min(100%, 29rem); overflow: hidden; border: 1px solid rgba(255,255,255,.25); border-radius: var(--raio-lg); background: var(--cor-neutra-0); box-shadow: var(--sombra-lg); animation: deslizarParaCima .25s ease-out; }
+@keyframes deslizarParaCima { from { transform: translateY(1rem) scale(.98); opacity: 0; } }
+.corpoModal { padding: 1.5rem; text-align: center; }
+.iconeCircular { display: flex; align-items: center; justify-content: center; width: 3.8rem; height: 3.8rem; margin: 0 auto 1rem; border-radius: var(--raio-pilula); }
+.fundoPerigo { border: 1px solid var(--cor-perigo-100); color: var(--cor-perigo-700); background: var(--cor-perigo-50); }
+.fundoAviso { border: 1px solid var(--cor-alerta-100); color: var(--cor-alerta-700); background: var(--cor-alerta-50); }
+.tituloAlerta { margin: 0 0 .45rem; color: var(--cor-correios-azul-950); font-size: 1.18rem; font-weight: var(--peso-extra); }
+.textoSecundario { margin: 0 0 1.3rem; color: var(--cor-texto-secundario); font-size: .86rem; line-height: 1.55; }
+.grupoBotoes { display: grid; grid-template-columns: 1fr 1fr; gap: .7rem; }
+.botaoLarguraTotal { width: 100%; }
+@media (max-width: 440px) { .grupoBotoes { grid-template-columns: 1fr; } }

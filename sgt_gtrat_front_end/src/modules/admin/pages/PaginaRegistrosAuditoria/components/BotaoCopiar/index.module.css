@@ -1,0 +1,2 @@
+.botao { display: grid; place-items: center; width: 1.65rem; height: 1.65rem; padding: 0; color: var(--cor-neutra-500); background: var(--cor-neutra-50); border: 1px solid var(--cor-neutra-200); border-radius: .35rem; cursor: pointer; }
+.botao:hover { color: var(--cor-correios-azul-700); background: var(--cor-correios-azul-50); }

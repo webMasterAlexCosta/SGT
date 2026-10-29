@@ -1,0 +1,67 @@
+{
+  "name": "sig-gtrat-front",
+  "private": true,
+  "version": "1.4.1D",
+  "type": "module",
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=22.16.0 <23"
+  },
+  "scripts": {
+    "test": "vitest run --config vitest.config.js --coverage",
+    "validar:nomenclatura": "node scripts/validar-nomenclatura.mjs",
+    "validate:runtime": "node scripts/validate-runtime.mjs",
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:java": "vite build && node scripts/sync-backend-static.mjs",
+    "sync:java": "node scripts/sync-backend-static.mjs",
+    "test:watch": "vitest --config vitest.config.js",
+    "test:integridade": "node scripts/run-tests.mjs",
+    "test:completo": "npm run test && npm run test:componentes && npm run test:camada2 && npm run test:camada3:vitest && npm run test:qualidade:estatica && npm run test:integridade",
+    "test:componentes": "vitest run --config vitest.componentes.config.js --coverage",
+    "test:componentes:watch": "vitest --config vitest.componentes.config.js",
+    "test:diagnostico": "npm run test:componentes",
+    "test:camada2": "vitest run --config vitest.comportamento.config.js --coverage",
+    "test:camada2:watch": "vitest --config vitest.comportamento.config.js",
+    "test:camada3:vitest": "vitest run --config vitest.robustez.config.js",
+    "test:qualidade:estatica": "node scripts/analisar-qualidade-react.mjs",
+    "test:bundle": "vite build && node scripts/verificar-bundle-performance.mjs",
+    "test:camada3": "npm run test:camada3:vitest && npm run test:qualidade:estatica && npm run test:bundle",
+    "test:agressivo": "npm run test:camada2 && npm run test:camada3",
+    "test:tudo-com-build": "npm run test:completo && npm run test:bundle && npm run test:segredos:bundle",
+    "test:configuracao": "node --test test/configuracaoFrontend.test.js test/runtimeConfig.test.js test/configuracaoNegocioNaoAutoritativa.test.js test/bootstrapConfiguracaoRuntime.test.js",
+    "test:segredos:bundle": "node scripts/verificar-segredos-bundle.mjs",
+    "test:smoke:headless": "node scripts/smoke-headless.mjs",
+    "test:etapa18": "node --test test/etapa18GateFinal.test.js"
+  },
+  "dependencies": {
+    "@vladmandic/face-api": "1.7.15",
+    "axios": "1.20.0",
+    "jspdf": "4.2.1",
+    "jspdf-autotable": "5.0.8",
+    "lucide-react": "1.28.0",
+    "react": "19.2.8",
+    "react-dom": "19.2.8",
+    "react-icons": "5.7.0",
+    "react-router-dom": "7.18.3",
+    "react-toastify": "11.1.0",
+    "recharts": "3.10.1"
+  },
+  "devDependencies": {
+    "@vitejs/plugin-basic-ssl": "2.3.0",
+    "@vitejs/plugin-react": "6.0.5",
+    "vite": "8.2.0",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.3",
+    "@vitest/coverage-v8": "4.1.11",
+    "jsdom": "27.4.0",
+    "vitest": "4.1.11"
+  },
+  "overrides": {
+    "uuid": "14.0.0"
+  },
+  "allowScripts": {
+    "core-js@3.50.0": true
+  }
+}

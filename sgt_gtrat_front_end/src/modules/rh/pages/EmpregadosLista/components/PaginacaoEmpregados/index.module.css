@@ -1,0 +1,130 @@
+.cartaoPaginacao {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  padding: 0.68rem 0.8rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.82rem;
+  background: var(--cor-neutra-0);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+}
+
+.informacaoPaginacao {
+  min-width: 0;
+  color: var(--c-ardosia-500);
+  font-size: 0.75rem;
+  font-weight: 650;
+  line-height: 1.45;
+}
+
+.destaquePaginacao {
+  color: var(--correios-blue);
+  font-weight: 900;
+}
+
+.totalPaginacao,
+.tempoConsulta {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.45rem;
+  padding: 0.2rem 0.45rem;
+  border-radius: 9999px;
+  font-size: 0.68rem;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.totalPaginacao {
+  border: 1px solid var(--c-ardosia-200);
+  background: var(--c-ardosia-50);
+  color: var(--c-ardosia-600);
+}
+
+.tempoConsulta {
+  border: 1px solid #a7f3d0;
+  background: #ecfdf5;
+  color: var(--c-sucesso-texto);
+}
+
+.acoesPaginacao {
+  min-width: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.32rem;
+}
+
+.botaoPagina,
+.botaoPaginaIcone,
+.botaoNumeroPagina {
+  min-height: 2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--c-ardosia-300);
+  border-radius: 0.48rem;
+  background: var(--cor-neutra-0);
+  color: var(--c-ardosia-700);
+  font-size: 0.76rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+
+.botaoPagina { gap: 0.25rem; padding: 0.35rem 0.65rem; }
+.botaoPaginaIcone,.botaoNumeroPagina { width: 2rem; height: 2rem; padding: 0; }
+
+.botaoPagina:hover:not(:disabled),
+.botaoPaginaIcone:hover:not(:disabled),
+.botaoNumeroPagina:hover:not(:disabled) {
+  border-color: var(--c-primaria-borda);
+  background: var(--c-primaria-clara);
+  color: var(--correios-blue);
+}
+
+.botaoNumeroPaginaAtivo {
+  border-color: var(--correios-blue);
+  background: var(--correios-blue);
+  color: var(--cor-neutra-0);
+  box-shadow: 0 3px 8px rgba(0, 94, 153, 0.18);
+}
+
+.botaoNumeroPaginaAtivo:hover:not(:disabled) {
+  border-color: var(--correios-blue);
+  background: var(--correios-blue);
+  color: var(--cor-neutra-0);
+}
+
+.botaoPagina:disabled,
+.botaoPaginaIcone:disabled {
+  opacity: 0.38;
+  cursor: not-allowed;
+  box-shadow: none;
+}
+
+.listaPaginas { display: flex; align-items: center; gap: 0.25rem; }
+.separadorPaginas { min-width: 1.1rem; color: var(--c-ardosia-400); text-align: center; font-weight: 900; }
+
+@media (min-width: 900px) {
+  .cartaoPaginacao { flex-direction: row; }
+}
+
+@media (max-width: 640px) {
+  .cartaoPaginacao { align-items: stretch; padding: 0.65rem; }
+  .informacaoPaginacao { text-align: center; }
+  .totalPaginacao,.tempoConsulta { margin-top: 0.38rem; }
+  .totalPaginacao { margin-left: 0; }
+  .acoesPaginacao { display: grid; grid-template-columns: 2rem minmax(0, 1fr) minmax(0, 1fr) 2rem; }
+  .listaPaginas { grid-column: 1 / -1; grid-row: 2; justify-content: center; overflow-x: auto; padding-top: 0.2rem; scrollbar-width: none; }
+  .listaPaginas::-webkit-scrollbar { display: none; }
+  .botaoPagina { width: 100%; padding: 0.35rem 0.4rem; }
+}
+
+@media (max-width: 390px) {
+  .botaoPagina { font-size: 0; }
+  .botaoPagina svg { margin: 0; }
+}

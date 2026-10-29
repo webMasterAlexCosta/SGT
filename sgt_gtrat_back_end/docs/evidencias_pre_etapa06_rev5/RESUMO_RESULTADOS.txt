@@ -1,0 +1,10 @@
+Spring Boot: 3.5.16
+Maven: 3.9.16
+Compiler release: 17
+Produção compilada: 419 fontes
+Testes compilados: 101 fontes
+Surefire: 71 classes / 292 testes / 0 failures / 0 errors / 0 skipped
+clean package -DskipTests: BUILD SUCCESS
+JAR: gerado e validado
+Bytecode produção/teste: major version 61 (Java 17)
+Integration MySQL: não executável neste ambiente por ausência de Docker (/var/run/docker.sock)

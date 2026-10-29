@@ -1,0 +1,6 @@
+.cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.1rem; background: linear-gradient(135deg, var(--cor-neutra-0), var(--cor-correios-azul-50)); border: 1px solid var(--cor-borda-sutil); border-left: 5px solid var(--cor-correios-amarelo-500); border-radius: var(--raio-md); box-shadow: var(--sombra-sm); }
+.titulo { display: flex; align-items: center; gap: .7rem; }
+.titulo > span { display: grid; place-items: center; width: 2.55rem; height: 2.55rem; color: var(--cor-neutra-0); background: var(--cor-correios-azul-800); border-radius: .6rem; }
+.titulo h1 { margin: 0; color: var(--cor-correios-azul-950); font-size: 1.28rem; }
+.titulo p { margin: .22rem 0 0; color: var(--cor-texto-secundario); font-size: .78rem; }
+@media (max-width: 720px) { .cabecalho { align-items: stretch; flex-direction: column; } }

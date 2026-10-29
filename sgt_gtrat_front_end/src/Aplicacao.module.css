@@ -1,0 +1,90 @@
+.fallbackConteiner {
+  display: grid;
+  min-height: 24rem;
+  place-items: center;
+}
+
+.aplicacaoConteiner {
+  display: flex;
+  min-width: 320px;
+  height: 100vh;
+  height: 100dvh;
+  overflow: hidden;
+  color: var(--cor-texto-principal);
+  background: var(--cor-fundo-aplicacao);
+  font-family: var(--fonte-sistema);
+}
+
+.envoltorioPrincipal {
+  position: relative;
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.conteudoPrincipal {
+  display: flex;
+  flex: 1;
+  min-height: 0;
+  flex-direction: column;
+  overflow-x: hidden;
+  overflow-y: auto;
+  background:
+    radial-gradient(circle at 100% 0, rgba(22, 132, 189, .07), transparent 22rem),
+    var(--cor-fundo-aplicacao);
+  scroll-behavior: smooth;
+}
+
+.conteinerPagina {
+  flex: 1 0 auto;
+  width: min(100%, var(--largura-conteudo-max));
+  margin: 0 auto;
+  padding: 1.25rem;
+}
+
+.botaoRolarTopo {
+  position: fixed;
+  right: 1.5rem;
+  bottom: 1.5rem;
+  z-index: var(--z-flutuante);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 3rem;
+  height: 3rem;
+  padding: 0;
+  border: 1px solid var(--cor-correios-amarelo-600);
+  border-radius: var(--raio-pilula);
+  color: var(--cor-correios-azul-950);
+  background: var(--cor-correios-amarelo-500);
+  box-shadow: var(--sombra-md);
+  cursor: pointer;
+  transition: opacity var(--transicao-padrao), transform var(--transicao-padrao), box-shadow var(--transicao-padrao);
+}
+
+.botaoRolarTopoVisivel { opacity: 1; transform: translateY(0) scale(1); }
+.botaoRolarTopoVisivel:hover { transform: translateY(-2px) scale(1.04); box-shadow: var(--sombra-lg); }
+.botaoRolarTopoOculto { opacity: 0; transform: translateY(2rem); pointer-events: none; }
+
+.sobreposicaoMenuMobile {
+  position: fixed;
+  inset: 0;
+  z-index: 30;
+  padding: 0;
+  border: 0;
+  background: rgba(0, 38, 61, .56);
+  backdrop-filter: blur(3px);
+  cursor: pointer;
+}
+
+@media (min-width: 768px) {
+  .conteinerPagina { padding: 1.5rem clamp(1.5rem, 2.5vw, 2.5rem); }
+  .sobreposicaoMenuMobile { display: none; }
+}
+
+@media (max-width: 640px) {
+  .conteinerPagina { padding: .9rem; }
+  .botaoRolarTopo { right: 1rem; bottom: 1rem; width: 2.7rem; height: 2.7rem; }
+}

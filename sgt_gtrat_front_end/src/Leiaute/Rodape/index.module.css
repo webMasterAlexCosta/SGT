@@ -1,0 +1,104 @@
+.rodapeGeral {
+  flex: 0 0 auto;
+  margin-top: clamp(2rem, 5vw, 4rem);
+  color: var(--cor-texto-secundario);
+  font-family: var(--fonte-sistema);
+  font-size: .78rem;
+  line-height: 1.5;
+}
+
+.interno { width: min(100%, 90rem); margin: 0 auto; padding: 0 clamp(1rem, 3vw, 2rem); }
+
+.topo {
+  position: relative;
+  overflow: hidden;
+  padding: 1.6rem 0 1.35rem;
+  border-top: 3px solid var(--cor-correios-azul-800);
+  border-bottom: 1px solid var(--cor-borda-sutil);
+  background: var(--cor-neutra-0);
+  box-shadow: 0 -8px 22px rgba(0, 38, 61, .04);
+}
+
+.colunas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 4rem); }
+.coluna { min-width: 0; }
+.colunaDireita { text-align: left; }
+.coluna h4 { margin: 0 0 .65rem; color: var(--cor-correios-azul-900); font-size: .82rem; font-weight: var(--peso-extra); letter-spacing: .02em; }
+.coluna ul { margin: 0; padding: 0; list-style: none; }
+.coluna li + li { margin-top: .42rem; }
+.coluna a, .botaoLink { display: inline-flex; padding: 0; border: 0; color: var(--cor-texto-suave); background: none; font: inherit; text-decoration: none; cursor: pointer; transition: color var(--transicao-rapida), transform var(--transicao-rapida); }
+.coluna a:hover, .botaoLink:hover { color: var(--cor-correios-azul-800); transform: translateX(2px); }
+
+.fundo {
+  position: relative;
+  overflow: hidden;
+  padding: .9rem 0;
+  border-top: 1px solid var(--cor-correios-amarelo-600);
+  background: linear-gradient(100deg, var(--cor-correios-amarelo-500), var(--cor-correios-amarelo-400));
+}
+
+.fundo::after {
+  position: absolute;
+  top: 0;
+  left: 0;
+  z-index: 1;
+  width: 40%;
+  height: 100%;
+  content: "";
+  background: linear-gradient(to right, transparent, rgba(255,255,255,.42), transparent);
+  animation: brilhoFundoAnimado 8s infinite ease-in-out;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.fundoInterno { position: relative; z-index: 2; display: flex; align-items: center; justify-content: space-between; gap: 1.5rem; }
+.marca { display: flex; align-items: center; min-width: 0; }
+.imagemMarca { display: block; width: auto; max-width: 11rem; height: 2.1rem; object-fit: contain; }
+.direitosAutorais { color: var(--cor-correios-azul-950); text-align: right; }
+.direitosAutorais p { margin: 0; }
+.cnpj { margin-top: .15rem !important; opacity: .82; }
+.metadadosSistema {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: .45rem;
+  margin-top: .55rem;
+}
+.seloVersao {
+  display: inline-flex;
+  align-items: center;
+  min-height: 1.65rem;
+  padding: .24rem .7rem;
+  border: 1px solid rgba(0,38,61,.16);
+  border-radius: var(--raio-pilula);
+  color: var(--cor-correios-azul-950);
+  background: rgba(255,255,255,.42);
+  font-family: ui-monospace, SFMono-Regular, Consolas, monospace;
+  font-size: .68rem;
+  font-weight: var(--peso-extra);
+  letter-spacing: .02em;
+}
+.statusServidor { display: inline-flex; align-items: center; gap: .55rem; padding: .24rem .7rem; border: 1px solid rgba(0,38,61,.12); border-radius: var(--raio-pilula); background: rgba(255,255,255,.34); cursor: default; }
+.textoStatus { font-family: ui-monospace, SFMono-Regular, Consolas, monospace; font-size: .68rem; font-weight: var(--peso-medio); }
+.pontoStatus { width: .48rem; height: .48rem; border-radius: 50%; }
+
+@keyframes brilhoFundoAnimado {
+  0% { transform: translateX(-220%) skewX(-24deg); }
+  55%, 100% { transform: translateX(360%) skewX(-24deg); }
+}
+
+@media (max-width: 800px) {
+  .colunas { grid-template-columns: 1fr 1fr; }
+  .fundoInterno { align-items: flex-start; flex-direction: column; }
+  .direitosAutorais { text-align: left; }
+  .metadadosSistema { justify-content: flex-start; }
+}
+
+@media (max-width: 520px) {
+  .colunas { grid-template-columns: 1fr; }
+}
+.envoltorioDicaRodape { position: relative; display: inline-block; width: fit-content; cursor: pointer; }
+.statusServidorOk { border-color: rgba(0,38,61,.18); color: var(--cor-correios-azul-950); }
+.statusServidorErro { border-color: var(--cor-perigo-100); color: var(--cor-perigo-700); background: var(--cor-perigo-50); }
+.statusServidorOk .pontoStatus { background: var(--cor-sucesso-600); box-shadow: 0 0 6px rgba(21,134,83,.45); }
+.statusServidorErro .pontoStatus { background: var(--cor-perigo-600); box-shadow: 0 0 6px rgba(200,61,61,.45); }

@@ -1,0 +1,521 @@
+/* src/modules/admin/pages/PaginaTurnos/components/ModalDeTurno/index.module.css */
+
+.corpoModal {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding-bottom: 0.5rem;
+}
+
+/* =========================================
+   PAINEL DE RESUMO (CABECALHO MODAL)
+========================================= */
+.painelResumo {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1.5rem;
+    justify-content: space-between;
+    padding: 1.25rem;
+    background-color: var(--c-ardosia-50);
+    border: 1px solid var(--c-ardosia-200);
+    border-radius: 0.85rem;
+}
+
+.resumoInfo {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    min-width: 250px;
+}
+
+.tagResumo {
+    font-size: 0.7rem;
+    font-weight: 800;
+    color: var(--correios-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    background-color: var(--c-primaria-clara);
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    width: fit-content;
+    margin-bottom: 0.5rem;
+    border: 1px solid var(--c-primaria-borda);
+}
+
+.tituloResumo {
+    margin: 0;
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: var(--c-ardosia-800);
+    line-height: 1.1;
+    letter-spacing: -0.02em;
+}
+
+.textoResumo {
+    margin: 0.25rem 0 0;
+    font-size: 0.85rem;
+    color: var(--c-ardosia-500);
+    font-weight: 500;
+}
+
+.gradeMetricas {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+}
+
+.cartaoMetrica {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background-color: var(--bg-branco);
+    border: 1px solid var(--c-ardosia-200);
+    padding: 0.75rem 1rem;
+    border-radius: 0.65rem;
+    min-width: 110px;
+    box-shadow: 0 1px 2px var(--c-sombra);
+}
+
+.rotuloMetrica {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--c-ardosia-500);
+    text-transform: uppercase;
+    margin-bottom: 0.25rem;
+}
+
+.valorMetrica {
+    font-size: 1.25rem;
+    font-weight: 900;
+    color: var(--correios-blue);
+    line-height: 1;
+}
+
+.metricaSucesso {
+    background-color: var(--c-sucesso-fundo);
+    border-color: var(--c-sucesso-borda);
+}
+
+.metricaSucesso .rotuloMetrica,
+.metricaSucesso .valorMetrica {
+    color: var(--c-sucesso-texto);
+}
+
+.metricaAlerta {
+    background-color: var(--c-perigo-fundo);
+    border-color: var(--c-perigo-borda);
+}
+
+.metricaAlerta .rotuloMetrica,
+.metricaAlerta .valorMetrica {
+    color: var(--c-perigo-texto);
+}
+
+/* =========================================
+   SECÇÃO NOME DA ROTINA
+========================================= */
+.secaoNome {
+    display: flex;
+    flex-direction: column;
+}
+
+.secaoNome > div {
+    margin-bottom: 0 !important; /* Reseta a margem padrão do CampoEntrada component */
+}
+
+.dicaCampo {
+    margin: 0.25rem 0 0;
+    font-size: 0.8rem;
+    color: var(--c-ardosia-500);
+    font-weight: 500;
+}
+
+.avisoNoturno {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+    margin-top: -0.5rem;
+    padding: 0.75rem 0.9rem;
+    border: 1px solid var(--c-ardosia-200);
+    border-radius: 0.65rem;
+    background-color: var(--c-ardosia-50);
+    color: var(--c-ardosia-600);
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.avisoNoturno svg {
+    flex-shrink: 0;
+    color: var(--correios-blue);
+}
+
+.avisoNoturnoAtivo {
+    border-color: var(--c-primaria-borda);
+    background-color: var(--c-primaria-clara);
+    color: var(--correios-blue);
+}
+
+/* =========================================
+   TABELA DE DIAS DA JORNADA
+========================================= */
+.secaoTabela {
+    border: 1px solid var(--c-ardosia-200);
+    border-radius: 0.85rem;
+    overflow: hidden;
+    background-color: var(--bg-branco);
+    box-shadow: 0 2px 4px var(--c-sombra);
+}
+
+.cabecalhoTabela {
+    display: grid;
+    /* Tamanhos exatos para que nada fique esmagado */
+    grid-template-columns: 160px 1fr 1fr 100px 50px;
+    gap: 1rem;
+    padding: 0.85rem 1rem;
+    background-color: var(--c-ardosia-50);
+    border-bottom: 1px solid var(--c-ardosia-200);
+    font-size: 0.72rem;
+    font-weight: 900;
+    color: var(--c-ardosia-600);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.linhaTabela {
+    display: grid;
+    grid-template-columns: 160px 1fr 1fr 100px 50px;
+    gap: 1rem;
+    align-items: center;
+    padding: 0.85rem 1rem;
+    border-bottom: 1px solid var(--c-ardosia-100);
+    transition: background-color 0.2s ease;
+}
+
+.linhaTabela:last-child {
+    border-bottom: none;
+}
+
+.linhaInativa {
+    background-color: var(--c-ardosia-50);
+    opacity: 0.8;
+}
+
+.linhaComErro {
+    background-color: var(--c-perigo-fundo);
+}
+
+/* --- Colunas da Tabela --- */
+.colDia {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+}
+
+.infoDia {
+    display: flex;
+    flex-direction: column;
+}
+
+.infoDia strong {
+    font-size: 0.875rem;
+    font-weight: 800;
+    color: var(--c-ardosia-800);
+}
+
+.infoDia span {
+    font-size: 0.7rem;
+    color: var(--c-ardosia-500);
+    font-weight: 600;
+    text-transform: uppercase;
+}
+
+/* Campos de Horário "Início às Fim" */
+.colPeriodo {
+    display: flex;
+    align-items: center;
+}
+
+.grupoHorario {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+}
+
+.grupoHorario input {
+    width: 66px;
+    height: 38px;
+    text-align: center;
+    border: 1px solid var(--c-ardosia-300);
+    border-radius: 0.5rem;
+    font-family: monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: var(--c-ardosia-800);
+    outline: none;
+    transition: all 0.2s;
+}
+
+.grupoHorario input:focus {
+    border-color: var(--correios-blue);
+    box-shadow: 0 0 0 3px var(--c-primaria-alfa);
+}
+
+.separadorHorario {
+    font-size: 0.75rem;
+    color: var(--c-ardosia-400);
+    font-weight: 800;
+}
+
+/* Coluna de Carga e Etiquetas */
+.colCarga {
+    display: flex;
+    align-items: center;
+}
+
+.emblemaCarga {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.35rem 0.65rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 800;
+    border: 1px solid transparent;
+    white-space: nowrap;
+}
+
+.cargaSucesso {
+    background-color: var(--c-sucesso-fundo);
+    color: var(--c-sucesso-texto);
+    border-color: var(--c-sucesso-borda);
+}
+
+.cargaErro {
+    background-color: var(--bg-branco);
+    color: var(--c-perigo-texto);
+    border-color: var(--c-perigo-borda);
+}
+
+/* Botões de Ação na Tabela */
+.colAcoes {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+}
+
+.botaoCopiar {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 36px;
+    height: 36px;
+    border-radius: 0.5rem;
+    border: 1px solid var(--c-ardosia-200);
+    background-color: var(--bg-branco);
+    color: var(--c-ardosia-500);
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 1px 2px var(--c-sombra);
+}
+
+.botaoCopiar:hover {
+    color: var(--correios-blue);
+    border-color: var(--correios-blue);
+    background-color: var(--c-primaria-clara);
+}
+
+.diaFolgaOcupador {
+    grid-column: span 4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    color: var(--c-ardosia-400);
+    font-size: 0.85rem;
+    font-weight: 600;
+    border: 1px dashed var(--c-ardosia-300);
+    border-radius: 0.5rem;
+    background-color: var(--bg-branco);
+}
+
+/* =========================================
+   TOGGLE SWITCH (INTERRUPTOR)
+========================================= */
+.toggleSwitch {
+    position: relative;
+    display: inline-block;
+    width: 44px;
+    height: 24px;
+    flex-shrink: 0;
+}
+
+.toggleSwitch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.toggleSlider {
+    position: absolute;
+    cursor: pointer;
+    inset: 0;
+    background-color: var(--c-ardosia-300);
+    transition: 0.2s;
+    border-radius: 999px;
+}
+
+.toggleSlider::before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: 0.2s;
+    border-radius: 50%;
+}
+
+.toggleSwitch input:checked + .toggleSlider {
+    background-color: var(--correios-blue);
+}
+
+.toggleSwitch input:checked + .toggleSlider::before {
+    transform: translateX(20px);
+}
+
+/* =========================================
+   RODAPÉ DO MODAL (SALVAR/CANCELAR)
+========================================= */
+.rodapeModal {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--c-ardosia-200);
+    margin-top: 0.5rem;
+}
+
+.infoRodape {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.infoRodape strong {
+    font-size: 1.4rem;
+    font-weight: 900;
+    color: var(--correios-blue);
+    line-height: 1;
+}
+
+.infoRodape span {
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--c-ardosia-500);
+    text-transform: uppercase;
+}
+
+.botoesRodape {
+    display: flex;
+    gap: 0.75rem;
+}
+
+/* =========================================
+   RESPONSIVIDADE 
+========================================= */
+@media (max-width: 920px) {
+    .painelResumo {
+        flex-direction: column;
+    }
+
+    .cabecalhoTabela {
+        display: none;
+    }
+
+    .linhaTabela {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+        padding: 1.25rem;
+    }
+
+    .colDia {
+        padding-bottom: 0.75rem;
+        border-bottom: 1px solid var(--c-ardosia-200);
+    }
+
+    .diaFolgaOcupador {
+        grid-column: span 1;
+    }
+
+    .colCarga, .colAcoes {
+        justify-content: flex-start;
+    }
+
+    .rodapeModal {
+        flex-direction: column;
+        align-items: stretch;
+        gap: 1.5rem;
+    }
+
+    .botoesRodape {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+    }
+}
+.corpoTabela {
+    display: flex;
+    flex-direction: column;
+    min-width: 0;
+}
+
+.secaoGestaoLocal {
+  display: flex;
+  flex-direction: column;
+  gap: .42rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--cor-correios-azul-200, #bfd7ea);
+  border-radius: var(--raio-md, .75rem);
+  background: var(--cor-correios-azul-50, #eef7fc);
+}
+
+.secaoGestaoLocal label {
+  color: var(--cor-correios-azul-900, #003b5c);
+  font-size: .76rem;
+  font-weight: 800;
+}
+
+.secaoGestaoLocal select {
+  min-height: 2.65rem;
+  padding: .6rem .75rem;
+  border: 1px solid var(--cor-borda-forte, #cbd5e1);
+  border-radius: var(--raio-sm, .5rem);
+  background: #fff;
+}
+
+.iconeMetrica, .iconeCarga { display: inline; margin-right: .25rem; vertical-align: text-bottom; }
+
+
+.statusAtivo { display: grid; grid-template-columns: auto 1fr; gap: .25rem .65rem; align-items: center; padding: .85rem 1rem; border: 1px solid var(--c-ardosia-200); border-radius: .65rem; background: var(--c-ardosia-50); font-weight: 700; color: var(--c-ardosia-800); }
+.statusAtivo input { width: 1rem; height: 1rem; accent-color: var(--correios-blue); }
+.statusAtivo small { grid-column: 2; color: var(--c-ardosia-500); font-weight: 500; }
+.secaoRegras { border: 1px solid var(--c-ardosia-200); border-radius: .85rem; padding: 1rem; display: grid; gap: .85rem; background: var(--bg-branco); }
+.cabecalhoRegras { display: flex; justify-content: space-between; gap: 1rem; align-items: flex-start; }
+.cabecalhoRegras h3 { margin: 0; color: var(--c-ardosia-800); font-size: 1rem; }
+.cabecalhoRegras p { margin: .2rem 0 0; color: var(--c-ardosia-500); font-size: .8rem; }
+.cabecalhoRegras > span { font-size: .75rem; font-weight: 800; color: var(--correios-blue); }
+.estadoRegras { margin: 0; padding: .75rem; background: var(--c-ardosia-50); color: var(--c-ardosia-500); border-radius: .5rem; }
+.listaRegras { display: grid; gap: .5rem; }
+.itemRegra { display: flex; justify-content: space-between; gap: 1rem; align-items: center; padding: .65rem .75rem; border: 1px solid var(--c-ardosia-200); border-radius: .55rem; }
+.itemRegra > div:first-child { display: grid; gap: .2rem; }
+.itemRegra span { color: var(--c-ardosia-500); font-size: .78rem; }
+.acoesRegra { display: flex; gap: .35rem; }
+.acoesRegra button { width: 32px; height: 32px; border: 1px solid var(--c-ardosia-200); border-radius: .45rem; background: var(--bg-branco); color: var(--c-ardosia-600); cursor: pointer; }
+.formularioRegra { display: grid; grid-template-columns: minmax(180px, 2fr) repeat(4, minmax(90px, 1fr)); gap: .65rem; align-items: end; padding-top: .75rem; border-top: 1px solid var(--c-ardosia-200); }
+.formularioRegra label { display: grid; gap: .3rem; font-size: .72rem; font-weight: 800; color: var(--c-ardosia-600); }
+.formularioRegra input { min-height: 38px; border: 1px solid var(--c-ardosia-300); border-radius: .45rem; padding: .45rem .55rem; }
+.regraAtiva { grid-template-columns: auto 1fr !important; align-items: center; align-self: center; }
+.regraAtiva input { min-height: auto; width: 1rem; height: 1rem; }
+.botoesRegra { grid-column: 1 / -1; display: flex; justify-content: flex-end; gap: .5rem; }
+@media (max-width: 900px) { .formularioRegra { grid-template-columns: 1fr 1fr; } }

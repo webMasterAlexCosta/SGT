@@ -1,0 +1,8 @@
+.cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 1rem; padding: 1rem 1.1rem; background: linear-gradient(135deg, var(--cor-neutra-0), var(--cor-correios-azul-50)); border: 1px solid var(--cor-borda-sutil); border-left: 5px solid var(--cor-correios-amarelo-500); border-radius: var(--raio-md); }
+.identificacao { display: flex; align-items: center; gap: .7rem; }
+.icone { display: grid; place-items: center; width: 2.6rem; height: 2.6rem; color: var(--cor-neutra-0); background: var(--cor-correios-azul-800); border-radius: .65rem; }
+.linha { display: flex; align-items: center; flex-wrap: wrap; gap: .5rem; }
+.linha h1 { margin: 0; color: var(--cor-correios-azul-950); font-size: 1.25rem; }
+.linha em { padding: .2rem .5rem; color: var(--cor-correios-azul-800); background: var(--cor-correios-azul-50); border: 1px solid var(--cor-correios-azul-200); border-radius: var(--raio-pilula); font-size: .66rem; font-style: normal; font-weight: 800; }
+.identificacao p { margin: .22rem 0 0; color: var(--cor-texto-secundario); font-size: .78rem; }
+@media (max-width: 760px) { .cabecalho { align-items: stretch; flex-direction: column; } }

@@ -1,0 +1,55 @@
+.barraDeFiltros {
+  display: flex;
+  flex-direction: column;
+  gap: .78rem;
+  padding: .9rem 1rem;
+  border: 1px solid var(--cor-borda-sutil);
+  border-radius: var(--raio-md);
+  background: var(--cor-neutra-0);
+  box-shadow: var(--sombra-xs);
+}
+
+.cabecalhoDaBarra { display: flex; align-items: center; justify-content: space-between; gap: .9rem; flex-wrap: wrap; }
+.infoDeResultados { display: inline-flex; align-items: center; gap: .65rem; color: var(--cor-correios-azul-700); }
+.iconeDaInfo { display: grid; width: 2.15rem; height: 2.15rem; place-items: center; border-radius: .65rem; background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-700); }
+.infoDeResultados strong { display: inline; margin-right: .3rem; color: var(--cor-neutra-800); font-size: 1rem; font-weight: 900; }
+.infoDeResultados span:not(.iconeDaInfo) { display: inline; margin: 0; color: var(--cor-texto-suave); font-size: .68rem; font-weight: 700; letter-spacing: .02em; text-transform: none; }
+.iconePrimario { color: var(--cor-correios-azul-700); flex-shrink: 0; }
+.controlesDoCabecalho { display: flex; align-items: flex-end; justify-content: flex-end; gap: .7rem; flex-wrap: wrap; }
+
+.grupoDeMarcadores { display: flex; align-items: center; flex-wrap: wrap; gap: .45rem; padding-top: .72rem; border-top: 1px solid var(--cor-borda-sutil); }
+.rotuloDaLinhaDeFiltros { display: inline-flex; align-items: center; gap: .32rem; margin-right: .15rem; color: var(--cor-texto-suave); font-size: .64rem; font-weight: 850; letter-spacing: .055em; text-transform: uppercase; }
+
+.marcadorFiltro {
+  display: inline-flex;
+  min-height: 2rem;
+  align-items: center;
+  gap: .35rem;
+  padding: .3rem .58rem;
+  border: 1px solid var(--cor-borda-sutil);
+  border-radius: var(--raio-pilula);
+  background: var(--cor-neutra-0);
+  color: var(--cor-texto-secundario);
+  font-size: .7rem;
+  font-weight: 750;
+  cursor: pointer;
+  transition: transform var(--transicao-rapida), border-color var(--transicao-rapida), background var(--transicao-rapida), color var(--transicao-rapida);
+}
+.marcadorFiltro:hover { transform: translateY(-1px); border-color: var(--cor-correios-azul-200); background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-800); }
+.marcadorAtivo { border-color: var(--cor-correios-azul-800); background: var(--cor-correios-azul-800); color: var(--cor-neutra-0); }
+.marcadorAtivo:hover { border-color: var(--cor-correios-azul-950); background: var(--cor-correios-azul-950); color: var(--cor-neutra-0); }
+.marcadorPerigo:not(.marcadorAtivo) { color: var(--cor-perigo-700); border-color: var(--cor-perigo-100); background: var(--cor-perigo-50); }
+
+.emblemaContagem { display: inline-grid; min-width: 1.25rem; height: 1.25rem; place-items: center; padding: 0 .32rem; border-radius: var(--raio-pilula); background: var(--cor-neutra-100); color: var(--cor-neutra-700); font-size: .62rem; font-weight: 900; }
+.marcadorAtivo .emblemaContagem { background: rgba(255,255,255,.18); color: var(--cor-neutra-0); }
+
+.envoltorioDaOrdenacao { display: inline-flex; min-height: 2.5rem; align-items: center; gap: .45rem; padding: .2rem .42rem .2rem .7rem; border: 1px solid var(--cor-borda-forte); border-radius: var(--raio-sm); background: var(--cor-neutra-25); }
+.caixaDeOrdenacao { border: 0; outline: 0; background: transparent; color: var(--cor-correios-azul-800); font-size: .75rem; font-weight: 750; cursor: pointer; }
+
+@media (max-width: 760px) {
+  .controlesDoCabecalho, .envoltorioDaOrdenacao, .cabecalhoDaBarra, .caixaDeOrdenacao { width: 100%; }
+  .envoltorioDaOrdenacao { justify-content: space-between; }
+  .controlesDoCabecalho { align-items: stretch; }
+  .grupoDeMarcadores { align-items: stretch; }
+  .rotuloDaLinhaDeFiltros { width: 100%; }
+}

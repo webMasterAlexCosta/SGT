@@ -1,0 +1,18 @@
+package com.example.siggtrat.entidade;
+
+/** Eventos explícitos da linha histórica versionada do Contrato. */
+public enum TipoEventoCicloVidaContrato {
+    PUBLICACAO,
+    INATIVACAO_ADMINISTRATIVA,
+    REATIVACAO_ADMINISTRATIVA,
+    ENCERRAMENTO_ANTECIPADO,
+    CANCELAMENTO_CONTRATO_FUTURO,
+    ANULACAO,
+    CORRECAO_ANULACAO,
+    CORRECAO_IDENTIFICADOR,
+    TRANSFERENCIA_GESTAO_LOCAL,
+    ADITAMENTO,
+    CANCELAMENTO_ADITAMENTO,
+    REMANEJAMENTO,
+    CANCELAMENTO_REMANEJAMENTO
+}

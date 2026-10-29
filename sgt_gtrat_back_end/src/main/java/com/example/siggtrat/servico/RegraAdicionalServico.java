@@ -1,0 +1,108 @@
+package com.example.siggtrat.servico;
+
+import com.example.siggtrat.dto.RegraAdicionalDTO;
+import com.example.siggtrat.entidade.UsuarioAplicacao;
+import com.example.siggtrat.entidade.Jornada;
+import com.example.siggtrat.entidade.RegraAdicional;
+import com.example.siggtrat.repositorio.JornadaRepositorio;
+import com.example.siggtrat.repositorio.RegraAdicionalRepositorio;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
+
+import java.time.LocalTime;
+import java.util.List;
+
+@Service
+public class RegraAdicionalServico {
+    private final RegraAdicionalRepositorio repositorio;
+    private final JornadaRepositorio jornadaRepositorio;
+    private final AcessoOrganizacionalServico acessoOrganizacionalServico;
+
+    public RegraAdicionalServico(RegraAdicionalRepositorio repositorio, JornadaRepositorio jornadaRepositorio,
+                                  AcessoOrganizacionalServico acessoOrganizacionalServico) {
+        this.repositorio = repositorio;
+        this.jornadaRepositorio = jornadaRepositorio;
+        this.acessoOrganizacionalServico = acessoOrganizacionalServico;
+    }
+
+    @Transactional(readOnly = true)
+    public List<RegraAdicionalDTO> listar(Long jornadaId) {
+        Jornada jornada = obterJornadaVisivel(jornadaId);
+        return repositorio.findByJornada_IdOrderByOrdemAsc(jornada.getId()).stream().map(this::paraDTO).toList();
+    }
+
+    @Transactional
+    public RegraAdicionalDTO criar(Long jornadaId, RegraAdicionalDTO dto) {
+        Jornada jornada = obterJornadaGerenciavel(jornadaId);
+        RegraAdicional regra = new RegraAdicional();
+        aplicarDados(dto, regra);
+        regra.setJornada(jornada);
+        validar(regra);
+        return paraDTO(repositorio.save(regra));
+    }
+
+    @Transactional
+    public RegraAdicionalDTO atualizar(Long id, RegraAdicionalDTO dto) {
+        RegraAdicional existente = repositorio.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Regra adicional não encontrada."));
+        Jornada jornada = obterJornadaGerenciavel(existente.getJornada().getId());
+        aplicarDados(dto, existente);
+        existente.setJornada(jornada);
+        validar(existente);
+        return paraDTO(repositorio.save(existente));
+    }
+
+    @Transactional
+    public void excluir(Long id) {
+        RegraAdicional existente = repositorio.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Regra adicional não encontrada."));
+        obterJornadaGerenciavel(existente.getJornada().getId());
+        repositorio.delete(existente);
+    }
+
+    private void aplicarDados(RegraAdicionalDTO dto, RegraAdicional r) {
+        if (dto == null) throw new IllegalArgumentException("Regra inválida.");
+        r.setTipo(dto.tipo()); r.setInicio(dto.inicio()); r.setFim(dto.fim()); r.setPercentual(dto.percentual());
+        r.setAtivo(dto.ativo()); r.setOrdem(dto.ordem());
+    }
+
+    private void validar(RegraAdicional regra) {
+        if (regra.getTipo() == null || regra.getTipo().isBlank()) throw new IllegalArgumentException("Tipo da regra é obrigatório.");
+        validarHorario("Início", regra.getInicio()); validarHorario("Fim", regra.getFim());
+        boolean ini = regra.getInicio() != null && !regra.getInicio().isBlank();
+        boolean fim = regra.getFim() != null && !regra.getFim().isBlank();
+        if (ini ^ fim) throw new IllegalArgumentException("Informe início e fim da janela, ou deixe ambos em branco.");
+        if (regra.getPercentual() != null && regra.getPercentual().signum() < 0) throw new IllegalArgumentException("Percentual não pode ser negativo.");
+        if (regra.getAtivo() == null) regra.setAtivo(true);
+    }
+
+    private void validarHorario(String rotulo, String horario) {
+        if (horario == null || horario.isBlank()) return;
+        if (horario.length() != 5) throw new IllegalArgumentException(rotulo + " deve estar no formato HH:mm");
+        try { LocalTime.parse(horario); } catch (Exception e) { throw new IllegalArgumentException(rotulo + " inválido (use HH:mm)"); }
+    }
+
+    private Jornada obterJornadaVisivel(Long id) {
+        UsuarioAplicacao usuario = acessoOrganizacionalServico.usuarioAtual();
+        Jornada jornada = jornadaRepositorio.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turno não encontrado."));
+        if (acessoOrganizacionalServico.ehGlobal(usuario) || acessoOrganizacionalServico.podeAcessarJornada(usuario, jornada)) return jornada;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turno não encontrado no seu escopo.");
+    }
+
+    private Jornada obterJornadaGerenciavel(Long id) {
+        UsuarioAplicacao usuario = acessoOrganizacionalServico.usuarioAtual();
+        if (!acessoOrganizacionalServico.ehGestaoLocal(usuario))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Somente a Gestão Local pode gerir regras de seus turnos.");
+        Jornada jornada = jornadaRepositorio.findById(id)
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Turno não encontrado."));
+        if (jornada.getGestaoLocal() != null && acessoOrganizacionalServico.podeAcessarGestaoLocal(usuario, jornada.getGestaoLocal())) return jornada;
+        throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turno não encontrado no seu escopo.");
+    }
+
+    private RegraAdicionalDTO paraDTO(RegraAdicional r) {
+        return new RegraAdicionalDTO(r.getId(), r.getTipo(), r.getInicio(), r.getFim(), r.getPercentual(), r.getAtivo(), r.getOrdem());
+    }
+}

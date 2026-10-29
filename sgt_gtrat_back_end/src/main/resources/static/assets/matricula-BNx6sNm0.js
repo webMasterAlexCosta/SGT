@@ -1,0 +1,1 @@
+var e=(e=``)=>String(e??``).replace(/\D/g,``).slice(0,8),t=(t=``)=>{let n=e(t);return n?n.length<=1?n:n.length<=4?`${n.slice(0,1)}.${n.slice(1)}`:n.length<=7?`${n.slice(0,1)}.${n.slice(1,4)}.${n.slice(4)}`:`${n.slice(0,1)}.${n.slice(1,4)}.${n.slice(4,7)}-${n.slice(7)}`:``},n=(t=``)=>e(t).length===8;export{n,t};

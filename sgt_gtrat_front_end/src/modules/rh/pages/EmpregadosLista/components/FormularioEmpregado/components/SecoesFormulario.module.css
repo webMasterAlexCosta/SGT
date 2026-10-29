@@ -1,0 +1,220 @@
+.avisoCamposEssenciais {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.82rem 0.95rem;
+  border: 1px solid var(--c-primaria-borda);
+  border-radius: 0.78rem;
+  background: linear-gradient(100deg, var(--c-primaria-clara), rgba(255,255,255,0.92));
+  color: var(--correios-blue);
+}
+.avisoCamposEssenciais > svg { flex: 0 0 auto; margin-top: 0.04rem; }
+.avisoCamposEssenciais > div { min-width: 0; display: flex; flex-direction: column; gap: 0.15rem; }
+.avisoCamposEssenciais strong { font-size: 0.82rem; font-weight: 900; }
+.avisoCamposEssenciais span { color: var(--c-ardosia-600); font-size: 0.72rem; font-weight: 600; line-height: 1.4; }
+
+.gradeColunas12 {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 1rem;
+}
+.gradeColunas4,
+.gradeColunas4Dependentes {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 1rem;
+}
+.gradeColunas4Dependentes { margin-top: 1rem; }
+.colunaSpan12 { grid-column: span 12; }
+.colunaSpan8 { grid-column: span 8; }
+.colunaSpan4 { grid-column: span 4; }
+.colunaSpan2Lg { grid-column: span 2; }
+
+.caixaResumo {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(10rem, 1fr));
+  gap: 0.7rem;
+  margin-top: 1rem;
+  padding-top: 1rem;
+  border-top: 1px dashed var(--c-ardosia-200);
+}
+.itemResumo,.itemResumoComBorda,.itemResumoStatus {
+  min-width: 0;
+  padding: 0.8rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.7rem;
+  background: var(--c-ardosia-50);
+}
+.itemResumoComBorda { border-left: 3px solid var(--correios-blue); }
+.itemResumoStatus { border-left: 3px solid var(--c-sucesso); }
+.rotuloResumo { display: block; margin-bottom: 0.3rem; color: var(--c-ardosia-500); font-size: 0.64rem; font-weight: 850; letter-spacing: 0.045em; text-transform: uppercase; }
+.valorResumo,.valorResumoVerde { display: block; overflow: hidden; font-size: 0.94rem; font-weight: 900; text-overflow: ellipsis; white-space: nowrap; }
+.valorResumo { color: var(--c-ardosia-800); }
+.valorResumoVerde { color: var(--c-sucesso-texto); }
+.valorResumoVazio { color: var(--c-ardosia-400); }
+
+.listaContatos,.listaBeneficios { width: 100%; display: flex; flex-direction: column; gap: 0.72rem; }
+.linhaTelefone {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto auto;
+  gap: 0.55rem;
+  align-items: end;
+  padding: 0.68rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.72rem;
+  background: var(--c-ardosia-50);
+}
+.envoltorioEntradaTelefone { min-width: 0; width: 100%; }
+.envoltorioEntradaTelefone > div { width: 100% !important; margin-bottom: 0 !important; }
+.botaoTelefone {
+  width: 2.5rem;
+  height: 2.5rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid transparent;
+  border-radius: 0.62rem;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.botaoTelefoneEditar { border-color: var(--c-primaria-borda); background: var(--c-primaria-clara); color: var(--correios-blue); }
+.botaoTelefoneEditando { border-color: var(--c-sucesso-borda); background: var(--c-sucesso-fundo); color: var(--c-sucesso-texto); }
+.botaoTelefoneRemover { border-color: var(--c-perigo-borda); background: var(--c-perigo-fundo); color: var(--c-perigo-texto); }
+.botaoTelefoneRemover:disabled { opacity: 0.5; cursor: not-allowed; }
+.envoltorioBotaoAdicionarTelefone { margin-top: 0.4rem; }
+.botaoAdicionarTelefone {
+  min-height: 2.45rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.45rem;
+  padding: 0 0.8rem;
+  border: 1px dashed var(--correios-blue);
+  border-radius: 0.62rem;
+  background: var(--cor-neutra-0);
+  color: var(--correios-blue);
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.botaoAdicionarTelefone:hover { background: var(--c-primaria-clara); }
+
+.caixaBeneficio {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.75rem;
+  padding: 0.85rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.75rem;
+  background: var(--c-ardosia-50);
+}
+.cabecalhoBeneficio { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; padding-bottom: 0.68rem; border-bottom: 1px solid var(--c-ardosia-200); }
+.tituloBeneficio { color: var(--c-ardosia-800); font-size: 0.82rem; font-weight: 850; }
+
+.gradeContratos {
+  width: 100%;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 15rem), 1fr));
+  gap: 0.7rem;
+}
+.gradeContratosInativos { opacity: 0.58; pointer-events: none; filter: grayscale(0.65); }
+.cartaoContrato {
+  min-width: 0;
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  padding: 0.78rem;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.72rem;
+  background: var(--cor-neutra-0);
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: 0.15s ease;
+}
+.cartaoContrato:hover { border-color: var(--c-primaria-borda); box-shadow: 0 5px 14px rgba(15,23,42,0.055); transform: translateY(-1px); }
+.cartaoContratoSelecionado { border-color: var(--correios-blue); background: var(--c-primaria-clara); box-shadow: inset 3px 0 0 var(--correios-yellow); }
+.verificacaoContrato {
+  width: 1.35rem;
+  height: 1.35rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border: 2px solid var(--c-ardosia-300);
+  border-radius: 0.4rem;
+  background: var(--cor-neutra-0);
+}
+.verificacaoContratoSelecionado { border-color: var(--correios-blue); background: var(--correios-blue); color: var(--cor-neutra-0); }
+.envoltorioTextoContrato { min-width: 0; display: flex; flex: 1 1 auto; flex-direction: column; gap: 0.16rem; }
+.numeroContrato { margin: 0; overflow: hidden; color: var(--c-ardosia-800); font-size: 0.78rem; font-weight: 850; text-overflow: ellipsis; white-space: nowrap; }
+.numeroContratoSelecionado { color: var(--correios-blue); }
+.descricaoContrato { margin: 0; overflow: hidden; color: var(--c-ardosia-500); font-size: 0.69rem; font-weight: 600; line-height: 1.35; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+.caixaAlerta {
+  width: 100%;
+  display: flex;
+  align-items: flex-start;
+  gap: 0.7rem;
+  margin-bottom: 0.8rem;
+  padding: 0.8rem;
+  border: 1px solid var(--c-aviso-borda);
+  border-radius: 0.72rem;
+  background: var(--c-aviso-fundo);
+}
+.iconeAlerta { flex: 0 0 auto; color: var(--c-aviso-texto); }
+.tituloAlerta { margin: 0; color: var(--c-aviso-texto-escuro); font-size: 0.8rem; font-weight: 900; }
+.textoAlerta { margin: 0.2rem 0 0; color: var(--c-aviso-texto); font-size: 0.72rem; font-weight: 600; line-height: 1.4; }
+.contratosVazios { width: 100%; padding: 1.5rem 0.8rem; border: 1px dashed var(--c-ardosia-300); border-radius: 0.72rem; background: var(--c-ardosia-50); color: var(--c-ardosia-500); font-size: 0.78rem; font-weight: 700; text-align: center; }
+.contratosVazios p { margin: 0; }
+.enderecoComBorda { width: 100%; padding-bottom: 1rem; border-bottom: 1px dashed var(--c-ardosia-200); }
+.ajudaContratoUnico { margin: 0 0 0.75rem; color: var(--c-ardosia-600); font-size: 0.74rem; font-weight: 700; line-height: 1.4; }
+.pesquisaContratoFormulario {
+  width: 100%;
+  min-height: 2.6rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.65rem 0;
+  padding: 0 0.72rem;
+  border: 1px solid var(--c-ardosia-300);
+  border-radius: 0.65rem;
+  background: var(--c-ardosia-50);
+  color: var(--c-ardosia-400);
+}
+.pesquisaContratoFormulario:focus-within { border-color: var(--correios-blue); background: var(--cor-neutra-0); box-shadow: 0 0 0 3px rgba(0,94,153,0.1); }
+.pesquisaContratoFormulario input { width: 100%; min-width: 0; height: 2.5rem; border: 0; outline: 0; background: transparent; color: var(--c-ardosia-700); font: inherit; font-size: 0.8rem; font-weight: 650; }
+.botaoMaisContratosFormulario { width: 100%; min-height: 2.5rem; margin-top: 0.65rem; border: 1px solid var(--c-primaria-borda); border-radius: 0.65rem; background: var(--c-primaria-clara); color: var(--correios-blue); font-size: 0.76rem; font-weight: 850; cursor: pointer; }
+
+@media (max-width: 900px) {
+  .gradeColunas4,.gradeColunas4Dependentes { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .colunaSpan8 { grid-column: span 12; }
+  .colunaSpan4 { grid-column: span 6; }
+  .colunaSpan2Lg { grid-column: span 1; }
+}
+
+@media (max-width: 600px) {
+  .gradeColunas12,.gradeColunas4,.gradeColunas4Dependentes,.caixaResumo { grid-template-columns: 1fr; gap: 0.72rem; }
+  .colunaSpan12,.colunaSpan8,.colunaSpan4,.colunaSpan2Lg { grid-column: span 1; }
+  .linhaTelefone { grid-template-columns: minmax(0, 1fr) auto auto; padding: 0.58rem; }
+  .gradeContratos { grid-template-columns: 1fr; }
+  .botaoAdicionarTelefone { width: 100%; }
+}
+
+@media (max-width: 420px) {
+  .linhaTelefone { grid-template-columns: 1fr 1fr; }
+  .envoltorioEntradaTelefone { grid-column: 1 / -1; }
+  .botaoTelefone { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .cartaoContrato { transition: none; }
+  .cartaoContrato:hover { transform: none; }
+}

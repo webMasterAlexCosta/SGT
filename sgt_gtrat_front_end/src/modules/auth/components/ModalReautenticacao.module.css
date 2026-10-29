@@ -1,0 +1,197 @@
+/* src/modules/auth/components/ModalReautenticacao.module.css */
+
+.sobreposicaoModal {
+    position: fixed;
+    inset: 0;
+    z-index: 10000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(17, 24, 39, 0.8);
+    backdrop-filter: blur(4px);
+    padding: 1rem;
+    animation: surgirSuave 0.2s ease-out;
+}
+
+@keyframes surgirSuave {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.cartaoModal {
+    background-color: var(--cor-neutra-0);
+    border-radius: 0.75rem;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    width: 100%;
+    max-width: 28rem;
+    overflow: hidden;
+    position: relative;
+    animation: deslizarParaCima 0.3s ease-out;
+}
+
+@keyframes deslizarParaCima {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.botaoFechar {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    color: var(--cor-neutra-400);
+    background: none;
+    border: none;
+    cursor: pointer;
+    transition: color 0.2s;
+}
+
+.botaoFechar:hover {
+    color: var(--cor-neutra-600);
+}
+
+.cabecalhoModal {
+    padding: 1.5rem;
+    border-bottom: 1px solid;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+}
+
+.fundoCritico {
+    background-color: #fff1f2;
+    border-color: #ffe4e6;
+}
+
+.fundoAviso {
+    background-color: var(--cor-alerta-50);
+    border-color: var(--cor-alerta-100);
+}
+
+.envoltorioIcone {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 9999px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 0.75rem;
+}
+
+.iconeCritico {
+    background-color: #ffe4e6;
+    color: #e11d48;
+}
+
+.iconeAviso {
+    background-color: var(--cor-alerta-100);
+    color: #d97706;
+}
+
+.tituloCabecalho {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--cor-neutra-900);
+    margin: 0;
+}
+
+.textoSubtitulo {
+    font-size: 0.875rem;
+    color: var(--cor-neutra-600);
+    margin-top: 0.25rem;
+}
+
+.formularioReautenticacao {
+    padding: 1.5rem;
+}
+
+.grupoEntrada {
+    margin-bottom: 1rem;
+}
+
+.rotuloEntrada {
+    display: block;
+    font-size: 0.875rem;
+    font-weight: 500;
+    color: var(--cor-neutra-700);
+    margin-bottom: 0.25rem;
+}
+
+.envoltorioRelativo {
+    position: relative;
+}
+
+.iconeCadeado {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    padding-left: 0.75rem;
+    display: flex;
+    align-items: center;
+    color: var(--cor-neutra-400);
+    pointer-events: none;
+}
+
+.campoEntrada {
+    display: block;
+    width: 100%;
+    padding: 0.625rem 0.625rem 0.625rem 2.5rem;
+    border-radius: 0.375rem;
+    border: 1px solid var(--cor-neutra-300);
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+    font-size: 0.875rem;
+    outline: none;
+    transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.campoEntrada:focus {
+    border-color: var(--cor-correios-azul-600);
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.5);
+}
+
+.textoErro {
+    margin-top: 0.5rem;
+    font-size: 0.875rem;
+    color: var(--cor-perigo-600);
+    font-weight: 500;
+}
+
+.rodapeBotoes {
+    display: flex;
+    gap: 0.75rem;
+    justify-content: flex-end;
+    margin-top: 1.5rem;
+}
+
+.botaoRenovarCritico {
+    background-color: #e11d48 !important;
+    color: white !important;
+    min-width: 140px;
+}
+
+.botaoRenovarCritico:hover {
+    background-color: #be123c !important;
+}
+
+.botaoRenovarAviso {
+    background-color: var(--cor-correios-azul-700) !important;
+    color: white !important;
+    min-width: 140px;
+}
+
+.botaoRenovarAviso:hover {
+    background-color: var(--cor-correios-azul-700) !important;
+}

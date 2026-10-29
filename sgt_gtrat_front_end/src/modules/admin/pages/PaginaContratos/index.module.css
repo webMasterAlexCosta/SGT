@@ -1,0 +1,26 @@
+.containerPagina {
+  display: flex;
+  flex-direction: column;
+  gap: 0.9rem;
+  min-height: 100%;
+  padding: clamp(0.85rem, 1.5vw, 1.35rem);
+  background:
+    linear-gradient(rgba(248, 250, 252, 0.95), rgba(248, 250, 252, 0.95)),
+    radial-gradient(circle at 10% 0%, rgba(0, 65, 107, 0.08), transparent 32%);
+}
+
+.avisoSomenteLeitura {
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.8rem 0.95rem;
+  border: 1px solid var(--c-info-borda);
+  border-radius: 0.78rem;
+  color: var(--c-info-texto);
+  background: var(--c-info-fundo);
+}
+
+.avisoSomenteLeitura > svg { flex: 0 0 auto; }
+.avisoSomenteLeitura > div { display: flex; flex-direction: column; gap: 0.15rem; }
+.avisoSomenteLeitura strong { font-size: 0.78rem; }
+.avisoSomenteLeitura span { font-size: 0.74rem; line-height: 1.35; }

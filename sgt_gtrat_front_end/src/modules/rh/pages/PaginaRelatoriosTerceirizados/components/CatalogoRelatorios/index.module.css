@@ -1,0 +1,22 @@
+.secaoCatalogo { padding: .95rem; border: 1px solid var(--c-ardosia-200); border-radius: .9rem; background: var(--cor-neutra-0); box-shadow: 0 8px 20px rgba(15,23,42,.045); }
+.secaoCatalogo > header { display: flex; align-items: baseline; gap: .55rem; margin-bottom: .75rem; }
+.secaoCatalogo > header strong { color: var(--correios-blue); font-size: .82rem; } .secaoCatalogo > header span { color: var(--c-ardosia-400); font-size: .66rem; font-weight: 700; }
+.gradeCatalogo { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: .65rem; }
+.cartaoRelatorio { display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: .65rem; padding: .78rem; border: 1px solid var(--c-ardosia-200); border-radius: .75rem; color: inherit; background: var(--c-ardosia-50); text-align: left; cursor: pointer; transition: transform .15s ease, border-color .15s ease, background-color .15s ease; }
+.cartaoRelatorio:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--c-primaria-borda); background: var(--c-primaria-clara); }
+.cartaoAtual { cursor: default; border-color: #ead800; background: #fffceb; }
+.icone { display: grid; place-items: center; width: 2.35rem; height: 2.35rem; border-radius: .65rem; color: var(--correios-blue); background: var(--cor-neutra-0); }
+.textos { display: flex; flex-direction: column; gap: .22rem; min-width: 0; }
+.textos strong { color: var(--c-ardosia-800); font-size: .73rem; } .textos small { color: var(--c-ardosia-500); font-size: .62rem; line-height: 1.35; }
+.seta { color: var(--c-ardosia-400); }
+@media (max-width: 1050px) { .gradeCatalogo { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .gradeCatalogo { grid-template-columns: 1fr; } }
+
+@media (max-width: 700px) {
+  .secaoCatalogo { padding: .8rem; border-radius: .8rem; }
+  .secaoCatalogo > header { align-items: flex-start; flex-direction: column; gap: .18rem; }
+  .gradeCatalogo { gap: .5rem; }
+  .cartaoRelatorio { min-height: 4.25rem; padding: .7rem; }
+  .textos strong { font-size: .75rem; }
+  .textos small { font-size: .64rem; }
+}

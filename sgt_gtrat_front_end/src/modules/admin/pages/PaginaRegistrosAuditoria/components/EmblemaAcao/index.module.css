@@ -1,0 +1,5 @@
+.emblema { display: inline-flex; padding: .22rem .45rem; border: 1px solid; border-radius: var(--raio-pilula); font-size: .62rem; font-weight: 850; }
+.criar { color: var(--cor-sucesso-700); background: var(--cor-sucesso-50); border-color: var(--cor-sucesso-100); }
+.editar { color: var(--cor-correios-azul-700); background: var(--cor-correios-azul-50); border-color: var(--cor-correios-azul-200); }
+.excluir { color: var(--cor-perigo-700); background: var(--cor-perigo-50); border-color: var(--cor-perigo-100); }
+.neutro { color: var(--cor-neutra-600); background: var(--cor-neutra-100); border-color: var(--cor-neutra-200); }

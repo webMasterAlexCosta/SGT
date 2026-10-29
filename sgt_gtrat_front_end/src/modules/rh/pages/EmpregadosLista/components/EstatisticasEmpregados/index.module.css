@@ -1,0 +1,110 @@
+.gradeEstatisticas {
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 0.6rem;
+}
+
+.cartaoEstatistica {
+  position: relative;
+  min-width: 0;
+  min-height: 4rem;
+  display: flex;
+  align-items: center;
+  gap: 0.7rem;
+  padding: 0.72rem 0.82rem;
+  overflow: hidden;
+  border: 1px solid var(--c-ardosia-200);
+  border-radius: 0.82rem;
+  background: var(--cor-neutra-0);
+  box-shadow: 0 1px 2px rgba(15, 23, 42, 0.035);
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
+}
+
+.cartaoEstatistica::after {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: 3px;
+  border-radius: 0.82rem 0 0 0.82rem;
+  background: currentColor;
+  opacity: 0.75;
+}
+
+.cartaoEstatistica:hover {
+  border-color: var(--c-ardosia-300);
+  box-shadow: 0 5px 14px rgba(15, 23, 42, 0.055);
+  transform: translateY(-1px);
+}
+
+.iconeCartao {
+  width: 2.2rem;
+  height: 2.2rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  border-radius: 0.65rem;
+}
+
+.valorCartao {
+  display: block;
+  overflow: hidden;
+  color: var(--c-ardosia-900);
+  font-size: 1rem;
+  font-weight: 900;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rotuloCartao {
+  margin: 0.22rem 0 0;
+  overflow: hidden;
+  color: var(--c-ardosia-500);
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cartaoPrimario { color: var(--correios-blue); }
+.cartaoSucesso { color: var(--c-sucesso-texto); }
+.cartaoAlerta { color: #c2410c; }
+.cartaoFavorito { color: #d97706; }
+
+.cartaoPrimario .iconeCartao {
+  border: 1px solid var(--c-primaria-borda);
+  background: var(--c-primaria-clara);
+  color: var(--correios-blue);
+}
+
+.cartaoSucesso .iconeCartao {
+  border: 1px solid #a7f3d0;
+  background: #ecfdf5;
+  color: var(--c-sucesso-texto);
+}
+
+.cartaoAlerta .iconeCartao {
+  border: 1px solid #fed7aa;
+  background: #fff7ed;
+  color: #c2410c;
+}
+
+.cartaoFavorito .iconeCartao {
+  border: 1px solid #fde68a;
+  background: #fffbeb;
+  color: #d97706;
+}
+
+@media (min-width: 760px) {
+  .gradeEstatisticas {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 420px) {
+  .gradeEstatisticas {
+    grid-template-columns: 1fr;
+  }
+}

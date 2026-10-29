@@ -1,0 +1,35 @@
+SGT-GTRAT — Manifesto do Checkpoint C / Etapa 09
+Data: 09/09/2026
+
+Plataforma do projeto:
+- Spring Boot 3.5.16
+- Java alvo 17 (maven compiler release 17)
+
+Validações executadas:
+- 517 fontes Java principais compiladas
+- 112 fontes Java de teste compiladas
+- 359/359 testes JUnit aprovados
+- 16/16 testes específicos da Etapa 09 aprovados
+- 18/18 testes de integração MySQL 8.4.11 aprovados
+- Checkpoints T01-T110 aprovados
+- JAR Spring Boot executável gerado
+
+Limitação de ambiente:
+- Maven foi executado na JVM 21.0.11 disponível no ambiente.
+- O bytecode foi compilado com release 17.
+- O manifesto do JAR de validação registrou Build-Jdk-Spec: 21.
+- Repetir o pipeline em JDK 17 real antes da homologação final.
+
+Limpeza do pacote:
+- target não incluído
+- .env real não incluído
+- .git não incluído
+- logs/caches/banco/uploads não incluídos
+- bundle React compilado antigo não incluído
+- src/main/resources/static contém somente README do checkpoint backend
+
+Observação funcional:
+- FRE-001..010 e FRE-013..019: implementados no recorte da Etapa 09
+- FRE-011 e FRE-012: parciais somente no trecho de emissão/versionamento de relatórios, reservado à Etapa 11
+- ALO-006: concluído no consumidor de frequência
+- VIN-014: repercussão em frequência concluída; parcela de relatórios permanece para a Etapa 11

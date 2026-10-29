@@ -1,0 +1,29 @@
+DOCUMENTO HISTÓRICO / SUPERADO: use docs/SGT_GTRAT_CORRECAO_PRE_ETAPA_06_SPRING_BOOT3_JAVA17_REV3.md como checkpoint atual antes da Etapa 06.
+
+SGT/GTRAT - Backend Java - Etapa 05
+Data: 08/09/2026
+
+Escopo concluído:
+- Aditamentos temporais/versionados
+- Regra de redução global de 25%
+- Fluxo excepcional de redução
+- Remanejamentos temporais/versionados
+- Cancelamento de fatos futuros
+- Retificação
+- Projeção temporal de composição
+- Precedência e conflito cruzado
+- Prévia revalidada por token
+- Lock transacional por contrato para confirmação crítica
+- Revisão dos 198 requisitos V8
+
+Validações locais disponíveis:
+- Java 17
+- preflight OK
+- smoke de regras OK
+- javac direcionado de DTOs/regras, entidades e repositories OK
+
+Limitação:
+- Maven Central indisponível por DNS no ambiente de execução; mvn test completo não foi declarado como aprovado.
+
+Próxima etapa:
+- Etapa 06: Pessoa, Vínculo, Matrícula e Desligamento.

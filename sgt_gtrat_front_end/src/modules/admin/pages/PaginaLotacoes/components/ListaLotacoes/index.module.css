@@ -1,0 +1,28 @@
+.gradeCartoes {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 360px), 1fr));
+  gap: 1rem;
+  align-items: stretch;
+  animation: entradaLista .24s ease-out;
+}
+
+.estadoLista {
+  display: flex;
+  min-height: 300px;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 2rem;
+  border: 1px dashed var(--cor-borda-forte);
+  border-radius: var(--raio-lg);
+  background: var(--cor-neutra-0);
+  color: var(--cor-texto-suave);
+  text-align: center;
+  box-shadow: var(--sombra-xs);
+}
+.estadoLista h3 { margin: .8rem 0 0; color: var(--cor-neutra-800); font-size: 1.02rem; font-weight: 850; }
+.estadoLista p { max-width: 28rem; margin: .4rem 0 0; font-size: .8rem; line-height: 1.5; }
+.iconeVazio { display: grid; width: 3.7rem; height: 3.7rem; place-items: center; border: 1px solid var(--cor-correios-azul-200); border-radius: .9rem; background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-700); }
+.spinner { width: 38px; height: 38px; border: 3px solid var(--cor-neutra-200); border-top-color: var(--cor-correios-azul-700); border-right-color: var(--cor-correios-amarelo-500); border-radius: 50%; animation: girar .8s linear infinite; }
+@keyframes girar { to { transform: rotate(360deg); } }
+@keyframes entradaLista { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }

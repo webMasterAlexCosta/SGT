@@ -1,0 +1,80 @@
+.gradeGraficos { display: grid; grid-template-columns: minmax(16rem, .9fr) minmax(24rem, 1.6fr); gap: .8rem; }
+.cartaoGrafico { min-height: 18rem; padding: .95rem; border: 1px solid var(--c-ardosia-200); border-radius: .9rem; background: var(--cor-neutra-0); box-shadow: 0 8px 20px rgba(15, 23, 42, .05); }
+.cartaoGrafico > header { display: flex; align-items: center; justify-content: space-between; gap: .8rem; padding-bottom: .75rem; border-bottom: 1px solid var(--c-ardosia-100); }
+.cartaoGrafico > header > div { display: flex; align-items: center; gap: .42rem; color: var(--correios-blue); font-size: .8rem; }
+.cartaoGrafico > header > span { color: var(--c-ardosia-400); font-size: .66rem; font-weight: 700; }
+.listaStatus { display: flex; flex-direction: column; gap: .78rem; padding-top: 1rem; }
+.linhaStatus > div:first-child { display: flex; align-items: center; justify-content: space-between; gap: .6rem; margin-bottom: .28rem; }
+.linhaStatus span { color: var(--c-ardosia-600); font-size: .72rem; font-weight: 700; }
+.linhaStatus strong { color: var(--c-ardosia-800); font-size: .78rem; }
+.trilho { height: .42rem; overflow: hidden; border-radius: 999px; background: var(--c-ardosia-100); }
+.trilho span { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg, var(--correios-blue), #0b86c4); }
+.areaGrafico { height: 14.4rem; padding-top: .7rem; }
+.tooltip { display: flex; flex-direction: column; gap: .15rem; padding: .55rem .65rem; border: 1px solid var(--c-ardosia-200); border-radius: .55rem; background: var(--cor-neutra-0); box-shadow: 0 10px 24px rgba(15,23,42,.15); }
+.tooltip strong { color: var(--correios-blue); font-size: .7rem; } .tooltip span { color: var(--c-ardosia-600); font-size: .67rem; }
+.semDados { display: grid; place-items: center; height: 100%; margin: 0; color: var(--c-ardosia-400); font-size: .76rem; text-align: center; }
+@media (max-width: 900px) { .gradeGraficos { grid-template-columns: 1fr; } }
+
+.listaContratosMobile { display: none; }
+
+@media (max-width: 700px) {
+  .cartaoGrafico {
+    min-height: 0;
+    padding: .8rem;
+    border-radius: .8rem;
+  }
+
+  .cartaoGrafico > header {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: .25rem;
+    padding-bottom: .6rem;
+  }
+
+  .listaStatus { gap: .68rem; padding-top: .75rem; }
+  .areaGrafico { display: none; }
+  .listaContratosMobile {
+    display: flex;
+    flex-direction: column;
+    gap: .7rem;
+    padding-top: .75rem;
+  }
+
+  .linhaContratoMobile > div:first-child {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: .65rem;
+    margin-bottom: .3rem;
+  }
+
+  .linhaContratoMobile span {
+    min-width: 0;
+    overflow: hidden;
+    color: var(--c-ardosia-600);
+    font-size: .7rem;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .linhaContratoMobile strong {
+    flex: 0 0 auto;
+    color: var(--c-ardosia-800);
+    font-size: .76rem;
+  }
+
+  .trilhoContrato {
+    height: .45rem;
+    overflow: hidden;
+    border-radius: 999px;
+    background: var(--c-ardosia-100);
+  }
+
+  .trilhoContrato span {
+    display: block;
+    height: 100%;
+    border-radius: inherit;
+    background: linear-gradient(90deg, var(--correios-blue), #0b86c4);
+  }
+}

@@ -1,0 +1,6 @@
+.containerPagina {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  gap: 1.25rem;
+}

@@ -1,0 +1,8 @@
+.grade { display: grid; grid-template-columns: repeat(4, minmax(0,1fr)); gap: .75rem; }
+.grade article { display: flex; align-items: center; gap: .7rem; padding: .8rem .9rem; background: var(--cor-neutra-0); border: 1px solid var(--cor-borda-sutil); border-radius: var(--raio-md); box-shadow: var(--sombra-sm); }
+.grade article > span { display: grid; place-items: center; width: 2.35rem; height: 2.35rem; color: var(--cor-correios-azul-700); background: var(--cor-correios-azul-50); border-radius: .55rem; }
+.grade article div { display: flex; flex-direction: column; }
+.grade strong { color: var(--cor-correios-azul-950); font-size: 1.05rem; }
+.grade small { color: var(--cor-texto-suave); font-size: .68rem; }
+@media (max-width: 900px) { .grade { grid-template-columns: repeat(2,1fr); } }
+@media (max-width: 500px) { .grade { grid-template-columns: 1fr; } }
