@@ -1,0 +1,43 @@
+package com.example.siggtrat.dto;
+
+import com.example.siggtrat.entidade.SituacaoFatoNegocial;
+import java.time.Instant;
+import java.time.LocalDate;
+import java.time.DayOfWeek;
+import java.util.List;
+
+public record AditamentoContratualDTO(
+        Long id,
+        Long contratoId,
+        Long eventoId,
+        String identificacao,
+        Integer versaoInstrumento,
+        LocalDate dataDocumento,
+        LocalDate dataAssinatura,
+        LocalDate dataEfetiva,
+        String justificativa,
+        String referenciaSei,
+        Instant registradoEm,
+        Long usuarioResponsavelId,
+        String usuarioResponsavelUsername,
+        SituacaoFatoNegocial situacao,
+        String novaDescricao,
+        Long novoTipoContratacaoId,
+        String novoTipoContratacaoDescricao,
+        Long novoFornecedorId,
+        String novoCnpjEmpresa,
+        String novaRazaoSocialEmpresa,
+        String novoNomeFantasiaEmpresa,
+        LocalDate novaDataInicio,
+        LocalDate novaDataFim,
+        Integer novoEfetivoTotal,
+        Boolean reducaoExcepcional,
+        String fundamentoExcecao,
+        Boolean impactoConfirmado,
+        List<ImpactoComposicaoContratoDTO> alteracoesComposicao,
+        Boolean novaMatriculaVinculoObrigatoria,
+        DayOfWeek novoDiaSemanaReduzido,
+        Integer novasHorasDiaReduzido,
+        Boolean restaurarPoliticaMatriculaDoTipo,
+        Boolean removerConfiguracaoDiaReduzido
+) {}

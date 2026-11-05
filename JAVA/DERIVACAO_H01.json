@@ -1,0 +1,13 @@
+{
+  "candidate": "C25_H01",
+  "derived_from": "C25",
+  "official_java_source_zip_sha256": "242854d034382d458733696eba81154f9f9732022e716b8cff3fcf9b0f7d5241",
+  "official_react_source_zip_sha256": "6a8ae685776be24aeb3c0d4708c2ed7c5b1a7c429deabfb6871584a2e071adff",
+  "official_jar_sha256": "c12090b461cc6a8037246d001911833a05c5d16a5ec46dfcb92fc821cb8395f7",
+  "production_changes_documented_in": "02_DEFEITOS_E_REVISAO",
+  "original_sources_preserved": true,
+  "schema_rules": {
+    "spring.jpa.hibernate.ddl-auto": "update",
+    "spring.sql.init.mode": "never"
+  }
+}

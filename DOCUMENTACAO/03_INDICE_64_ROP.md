@@ -1,0 +1,68 @@
+# Índice dos 64 roteiros operacionais ROP
+
+Fonte: `MATRIZ_64_ROP_NOVA.md`, incluída integralmente no ZIP. Esta lista é navegação, não substitui os passos, oráculos e evidências dos roteiros.
+
+- **ROP-001:** Cadastro da empresa contratada
+- **ROP-002:** Edição, inativação e reativação cadastral da empresa
+- **ROP-003:** Associação da empresa ao contrato e bloqueio após publicação
+- **ROP-004:** Rascunho, composição e publicação contratual
+- **ROP-005:** Cargo e catálogos operacionais por gestão
+- **ROP-006:** Fluxo empresa → contrato → pessoa/empregado → vínculo → cargo/alocação
+- **ROP-007:** Cadastro inválido e integridade de pessoa/matrícula
+- **ROP-008:** Admissão programada, limites inclusivos e recontratação
+- **ROP-009:** Alocação, mudança de cargo/turno/lotação e consentimento de excedente
+- **ROP-010:** Presença sem batidas explícitas em jornada comprovada
+- **ROP-011:** Presença integral por batidas físicas
+- **ROP-012:** Presença parcial por batidas físicas
+- **ROP-013:** Presença futura proibida inclusive ao Gestor Local
+- **ROP-014:** Sete dias: imediatamente antes do limite
+- **ROP-015:** Sete dias: instante exato do limite
+- **ROP-016:** Sete dias: após o limite
+- **ROP-017:** Fuso do prazo e contador visual
+- **ROP-018:** Plantão noturno cruza meia-noite com mudança no dia seguinte
+- **ROP-019:** Correção gerencial formal dentro e depois da janela
+- **ROP-020:** Bloqueio gerencial restrito ao registro corrigido
+- **ROP-021:** Justificativa gerencial, chave e entrada inválida
+- **ROP-022:** Ausência/FALTA, sem lançamento e absenteísmo
+- **ROP-023:** Atestado e ocorrência com anexo sobre presença existente
+- **ROP-024:** Ocorrência inválida e período que atravessa gestões
+- **ROP-025:** Vínculo explícito correto, homônimos e projeção de outra pessoa
+- **ROP-026:** Vínculo inexistente ou ID ausente
+- **ROP-027:** Vínculo fora da data efetiva, contrato inativo ou vínculo cancelado
+- **ROP-028:** Alocação inexistente, cancelada ou incompatível com vínculo/data
+- **ROP-029:** Mudança cadastral de nome sem reescrever fotografias
+- **ROP-030:** Mudança de cargo/turno/município não altera apuração histórica
+- **ROP-031:** Desligamento retroativo preserva presença, ocorrência e documento
+- **ROP-032:** Transferência de gestão e acesso histórico corrigido
+- **ROP-033:** Fonte histórica tardia e desconhecimento preservado
+- **ROP-034:** Fechamento automático no oitavo dia
+- **ROP-035:** Fechamento assíncrono preserva comando e contexto
+- **ROP-036:** Cancelamento, reprocessamento e recuperação de fechamento
+- **ROP-037:** Perfis e escopos de leitura/escrita operacional
+- **ROP-038:** Documento contratual: upload, SEI, versão e invalidação
+- **ROP-039:** Download restrito, finalidade, revogação e expiração
+- **ROP-040:** Relatório, emissão histórica e invalidação de fonte alterada
+- **ROP-041:** Exportação XLSX/PDF síncrona e assíncrona
+- **ROP-042:** Paginação preserva totais, cauda e filtros
+- **ROP-043:** Idempotência de frequência com/sem chave
+- **ROP-044:** Frequência concorrente, inativação de contrato e executor revogado
+- **ROP-045:** Rollback de lote com item inválido/futuro
+- **ROP-046:** Ocorrência: concorrência idempotente e rollback de arquivo/fato
+- **ROP-047:** Documento: rollback e concorrência da cadeia
+- **ROP-048:** Vínculos concorrentes e reserva global da Pessoa
+- **ROP-049:** Fornecedor: autorização corrente após espera de lock
+- **ROP-050:** GOV-003: auditoria geral e publicação após commit
+- **ROP-051:** APIs antigas realmente removidas com controle autenticado
+- **ROP-052:** UI removida, menu e nova página de empresas
+- **ROP-053:** Classes, entidades, DTOs e jobs exclusivos de risco retirados
+- **ROP-054:** Jobs operacionais de frequência, pendências, painel e auditoria preservados
+- **ROP-055:** Upgrade com dados legados preservados sem purga nem DDL manual
+- **ROP-056:** Ausência financeira previamente decidida permanece
+- **ROP-057:** Painel e indicadores operacionais após retificação
+- **ROP-058:** HTTP do JAR empacotado com bundle novo
+- **ROP-059:** Navegador real: fluxo operacional completo e rotas retiradas
+- **ROP-060:** Reinício conserva fatos, histórico e jobs
+- **ROP-061:** Listagem nacional: falha histórica existente
+- **ROP-062:** Caracterização causal com restauração da única revisão sintética
+- **ROP-063:** Isolamento entre IND08 negativo real e observador/CRUD
+- **ROP-064:** Recusas, confirmação cancelada e respostas antigas não simulam sucesso

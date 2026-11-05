@@ -1,0 +1,60 @@
+import React from 'react';
+import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
+import '@testing-library/jest-dom/vitest';
+import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+const { listar, filtros, previa, notificar }=vi.hoisted(()=>({listar:vi.fn(),filtros:vi.fn(),previa:vi.fn(),notificar:vi.fn()}));
+vi.mock('../src/services/rh/ServicoFrequencia.js',()=>({ServicoFrequencia:{carregarFiltrosRelatorio:filtros}}));
+vi.mock('../src/services/rh/ServicoRelatorioAdministrativo.js',()=>({ServicoRelatorioAdministrativo:{listar,previa},criarChaveIdempotenciaRelatorio:()=> 'intencao-sintetica'}));
+vi.mock('../src/modules/auth/context.jsx',()=>({useAutenticacao:()=>({user:{id:1,perfil:'GESTOR_LOCAL',autoridade:'PERFIL_GESTOR_LOCAL'}})}));
+vi.mock('../src/core/events.js',()=>({notificar}));
+import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.jsx';
+const diferida=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
+const pagina=(id,tipo='FREQUENCIA_CONSOLIDADA',number=0)=>({content:[{id,tipo,versao:1,estado:'VIGENTE',natureza:'ORIGINAL'}],number,totalPages:2,totalElements:6,first:number===0,last:number===1});
+beforeEach(()=>{vi.resetAllMocks();filtros.mockResolvedValue({contratos:[],lotacoes:[],turnos:[]});});
+afterEach(cleanup);
+const regiao=()=>within(screen.getByRole('region',{name:'Histórico de emissões'}));
+it('limpa linhas do filtro anterior enquanto a consulta nova está pendente',async()=>{
+  const b=diferida();listar.mockImplementation(p=>p.tipo==='ABSENTEISMO'?b.promise:Promise.resolve(pagina(101)));
+  render(<PaginaRelatoriosAdministrativos/>);await screen.findByText('#101');
+  fireEvent.change(screen.getByRole('combobox',{name:'Relatório',exact:true}),{target:{value:'ABSENTEISMO'}});
+  expect(regiao().queryByText('#101')).not.toBeInTheDocument();
+  expect(regiao().getByRole('status')).toHaveTextContent(/carregando/i);
+  await act(async()=>{b.resolve(pagina(202,'ABSENTEISMO'));await b.promise;});
+  expect(regiao().getByText('#202')).toBeInTheDocument();
+});
+it('erro antigo não notifica nem apaga resultado mais recente de outro filtro',async()=>{
+  const a=diferida();listar.mockImplementation(p=>p.tipo==='ABSENTEISMO'?Promise.resolve(pagina(202,'ABSENTEISMO')):a.promise);
+  render(<PaginaRelatoriosAdministrativos/>);
+  await waitFor(()=>expect(listar).toHaveBeenCalled());
+  fireEvent.change(screen.getByRole('combobox',{name:'Relatório',exact:true}),{target:{value:'ABSENTEISMO'}});
+  await screen.findByText('#202');
+  await act(async()=>{a.reject({status:403,message:'Erro antigo'});await a.promise.catch(()=>{});});
+  expect(regiao().getByText('#202')).toBeInTheDocument();
+  expect(notificar).not.toHaveBeenCalledWith('error','Erro antigo');
+});
+it('página antiga não substitui a primeira página depois da alteração do estado',async()=>{
+  const antiga=diferida();listar.mockImplementation(p=>p.estado==='SUPERADA'?Promise.resolve(pagina(303)):p.pagina===1?antiga.promise:Promise.resolve(pagina(101)));
+  render(<PaginaRelatoriosAdministrativos/>);await screen.findByText('#101');
+  fireEvent.click(regiao().getByRole('button',{name:'Próxima'}));
+  fireEvent.change(screen.getByRole('combobox',{name:'Estado',exact:true}),{target:{value:'SUPERADA'}});
+  await screen.findByText('#303');
+  await act(async()=>{antiga.resolve(pagina(202,'FREQUENCIA_CONSOLIDADA',1));await antiga.promise;});
+  expect(regiao().getByText('#303')).toBeInTheDocument();
+  expect(regiao().queryByText('#202')).not.toBeInTheDocument();
+  expect(regiao().getByText('Página 1 de 2')).toBeInTheDocument();
+});
+it('desmontagem descarta erro tardio',async()=>{
+  const p=diferida();listar.mockReturnValue(p.promise);const r=render(<PaginaRelatoriosAdministrativos/>);
+  await waitFor(()=>expect(listar).toHaveBeenCalled());r.unmount();
+  await act(async()=>{p.reject({status:500,message:'Tela encerrada'});await p.promise.catch(()=>{});});
+  expect(notificar).not.toHaveBeenCalledWith('error','Tela encerrada');
+});
+it('prévia do filtro anterior não reaparece após mudar relatório',async()=>{
+  listar.mockResolvedValue(pagina(101));const p=diferida();previa.mockReturnValue(p.promise);
+  render(<PaginaRelatoriosAdministrativos/>);await screen.findByText('#101');
+  fireEvent.click(screen.getByRole('button',{name:'Gerar prévia'}));
+  await waitFor(()=>expect(previa).toHaveBeenCalled());
+  fireEvent.change(screen.getByRole('combobox',{name:'Relatório',exact:true}),{target:{value:'ABSENTEISMO'}});
+  await act(async()=>{p.resolve({metadados:{tipo:'FREQUENCIA_CONSOLIDADA'},conteudo:{registros:[]}});await p.promise;});
+  expect(screen.queryByRole('region',{name:'Resultado administrativo'})).not.toBeInTheDocument();
+});

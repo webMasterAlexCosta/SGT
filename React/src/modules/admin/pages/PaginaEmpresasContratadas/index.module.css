@@ -1,0 +1,27 @@
+.pagina { display: grid; gap: 18px; padding: 4px; color: #123047; }
+.cabecalho { background: linear-gradient(135deg,#003e65,#075c86); color: white; border-radius: 14px; padding: 22px; }
+.cabecalho h1 { margin: 0 0 6px; }
+.cabecalho p { margin: 0; opacity: .9; }
+.painel { background: white; border: 1px solid #dbe5eb; border-radius: 12px; padding: 16px; box-shadow: 0 3px 12px #003e6510; }
+.acoes button,.form button { border: 0; border-radius: 8px; padding: 9px 13px; font-weight: 700; cursor: pointer; background: #e8f1f6; color: #00416b; }
+.form button { background: #005f91; color: white; }
+.form { display: grid; grid-template-columns: repeat(auto-fit,minmax(170px,1fr)); gap: 10px; margin-bottom: 16px; }
+.form input,.form select { border: 1px solid #b9cad5; border-radius: 8px; padding: 10px; min-width: 0; }
+.form button:disabled,.form input:disabled,.form select:disabled { opacity: .6; cursor: not-allowed; }
+.vinculoPendente { display: grid; gap: 10px; margin-bottom: 16px; }
+.vinculoPendente .form { margin-bottom: 0; }
+.tabela { width: 100%; border-collapse: collapse; font-size: .9rem; }
+.tabela th,.tabela td { text-align: left; padding: 10px; border-bottom: 1px solid #e5edf2; vertical-align: top; }
+.tabela th { color: #00416b; background: #f4f8fa; }
+.acoes { display: flex; flex-wrap: wrap; gap: 6px; }
+.acoes button:disabled { opacity: .5; cursor: not-allowed; }
+.vazio { padding: 20px; text-align: center; color: #657b8a; }
+.erro { margin: 0; border: 1px solid #e3a8a8; border-radius: 8px; padding: 10px; background: #fff4f4; color: #8f2525; }
+.pesquisa { display: grid; gap: 6px; max-width: 580px; font-weight: 600; }
+.pesquisa input { border: 1px solid #b9cad5; border-radius: 8px; padding: 10px; background: white; color: #123047; }
+.paginacao { display: flex; gap: 10px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.paginacao span { margin-right: auto; }
+.paginacao button { border: 1px solid #b9cad5; border-radius: 8px; padding: 9px 13px; background: white; color: #00416b; font-weight: 700; cursor: pointer; }
+.paginacao button:disabled { cursor: default; opacity: .5; }
+.paginacao button:focus-visible,.pesquisa input:focus-visible { outline: 3px solid #e0b900; outline-offset: 2px; }
+@media(max-width:760px){.painel{overflow-x:auto}.form{grid-template-columns:1fr}.tabela{min-width:760px}}

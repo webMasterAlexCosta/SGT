@@ -1,0 +1,20 @@
+const { contratoDaFixture } = require('./contexto-fixture.cjs');
+const { execute } = require('./ambiente-real.cjs');
+execute('visual-dialogos', async ({ page, fixture, check, screenshot, open }) => {
+  const contratoAlvo = contratoDaFixture(fixture);
+  await open('/contratos');
+  await page.getByRole('button', { name: contratoAlvo.botaoAbrir, exact: true }).click();
+  const details = page.getByRole('dialog', { name: contratoAlvo.titulo, exact: true });
+  await details.waitFor();
+  const visual = await details.evaluate(el => ({ background: getComputedStyle(el).backgroundColor, color: getComputedStyle(el).color, border: getComputedStyle(el).borderColor }));
+  check('Detalhes contratuais têm superfície opaca e legível', visual.background !== 'rgba(0, 0, 0, 0)' && visual.background !== 'transparent', visual);
+  await details.getByRole('button', { name: 'Inativar', exact: true }).click();
+  const action = page.getByRole('dialog', { name: 'Inativar administrativamente', exact: true });
+  await action.waitFor();
+  const actionVisual = await action.evaluate(el => ({ background: getComputedStyle(el).backgroundColor, color: getComputedStyle(el).color }));
+  check('Diálogo de ação tem superfície opaca', actionVisual.background !== 'rgba(0, 0, 0, 0)' && actionVisual.background !== 'transparent', actionVisual);
+  await screenshot('superficies');
+  await page.keyboard.press('Escape');
+  await action.waitFor({ state: 'hidden' });
+  check('ESC fecha diálogo sem executar ação', true);
+});

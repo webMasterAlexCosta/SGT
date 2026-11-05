@@ -1,0 +1,282 @@
+{
+  "methods": [
+    {
+      "reference": "A244Adi004AtomicidadeHttpIT#adi004_004_lateFailureRollsBackAllBusinessRowsSourcesAndFiles",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/A244Adi004AtomicidadeHttpIT.java",
+      "source_sha256": "e0035d92ddbc68031912ebb5b27fc0e26d2bae1d2b8c5e310e0c1b1dd1f59871",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "A244Con008FotografiaHttpIT#con008_004_allPublishedValuesSurviveIndependentMasterChanges",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con008FotografiaHttpIT.java",
+      "source_sha256": "f18536e1963d85527fbc5d70869da101f5a2fd4cdaa9d134ca58c342a2ee8c53",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "A244Cmp005InstrumentosHttpIT#cmp005_004_zeroAndRestorePreserveBothInstrumentContents",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/A244Cmp005InstrumentosHttpIT.java",
+      "source_sha256": "2ace2fe916db51807c51031a016e896322f9888d894347ea08a07ff76163db29",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "A244Con005PendenciasHttpIT#con005_002_nonEmptyFactsBelongToTheSelectedContract",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con005PendenciasHttpIT.java",
+      "source_sha256": "afe869ae595022a6d8f3a3b8859c0d94d928ff4c96d0e50596ccfbab39db3c35",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "A244Con012RetomadaHttpIT#con012_004_onlyExplicitReactivationResumesAfterRetroactiveExtension",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con012RetomadaHttpIT.java",
+      "source_sha256": "872d1c109bdb43bf041d6a678c899e1a1fc495336003874f72043fe54f5a834f",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "A244Con018AnulacaoHttpIT#con018_001_linkAndAllocationRemainQueryableAfterAnnulment",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con018AnulacaoHttpIT.java",
+      "source_sha256": "2e4d857f9087696fc77df190544ff6beb6c4158b63bfd0b4bdf6ab34381a12fe",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#cat001TextoLivreNaoSubstituiTipoIdENaoGravaContrato",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#cat001GestaoInativaEContaInativaNaoAdministramTipoMesmoComIdProprio",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#cat001TodosOsPerfisNaoLocaisEOutraGestaoSaoRecusados",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#cat005InstrumentoFuturoIsoladoImpedeInativacaoEAposCancelamentoPermite",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "ParameterizedTest",
+      "planned_invocations_static": 6,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#col006CadaCampoExcepcionalAusenteRecusaSemGravarEControleCompletoPassa",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "ParameterizedTest",
+      "planned_invocations_static": 4,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#col006MatrizDeExecutorRecusaPerfisETerritorioSemCorrecao",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230CatalogosPessoasComplementosHttpIT#vin014CadaCampoObrigatorioRecusaConfirmacaoMesmoComTokenEControleCompletoPassa",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "source_sha256": "718c686e4efee5a19307ddad4ca253602a06be8600724115097a099055aad3ef",
+      "annotation": "ParameterizedTest",
+      "planned_invocations_static": 3,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230RelatoriosComplementosHttpIT#vin014RetificacaoDoInicioSuperaSomenteEmissaoAfetadaPreservaBytesERecalculaRecorte",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java",
+      "source_sha256": "ad6b892b2964ea63f767a063a625c907b83c020460079b9b147ddaa8373033ce",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230RelatoriosComplementosHttpIT#fre011XlsxBaixadoContemQuantidadeDePendenciasReaisEControleNaoAfetadoNaoAvisa",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java",
+      "source_sha256": "ad6b892b2964ea63f767a063a625c907b83c020460079b9b147ddaa8373033ce",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#tmp017AnulacaoMudaOMesmoDiaSomenteNoCorteDeConhecimentoDoAto",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#vin002PesquisaIgnoraDataDaMudancaDeAlocacaoEDataAdmissaoDivergente",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#vin008FimNaturalRecusaOperacaoNoDiaSeguinteMasVinculoContinuaAberto",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#vin013ReativacaoRetomaElegiveisMasNaoEncerradoCanceladoOuVinculoSucedido",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#alo008ReativacaoPreservaFaixaVencidaESubstituidaERetomaSomenteUltimaValida",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#alo008ComposicaoZeradaPorAditamentoImpedeRetomadaSemGravarReativacao",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "B230TemporalOperacionalComplementosHttpIT#fre016NovoOperacionalNaoHerdeEdicaoDaFonteMesmoDentroDosSeteDias",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "source_sha256": "3d93923f685338be28d546656c14d92fef05d454737871a8c13cfcada9420834",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCDocumentosHttpIT#postFinalSemFonteRecusaAntesDaGravacaoEControleComFonteConfirma",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "source_sha256": "8b798280eccbd574a3facd4e945a2dabdacf84f8a273678d77bf1028b2393943",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCDocumentosHttpIT#substituirEInvalidarPreservamBytesFisicosDownloadsEMetadadosAnteriores",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "source_sha256": "8b798280eccbd574a3facd4e945a2dabdacf84f8a273678d77bf1028b2393943",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCDocumentosHttpIT#chaveDivergentePreservaConteudoIntegralDaCadeiaDocumental",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "source_sha256": "8b798280eccbd574a3facd4e945a2dabdacf84f8a273678d77bf1028b2393943",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCDocumentosHttpIT#estadualForaDoEstadoNaoLeMetadadosNemBytesDeDocumentoExistente",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "source_sha256": "8b798280eccbd574a3facd4e945a2dabdacf84f8a273678d77bf1028b2393943",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCHistoricoHttpIT#filtrosFimUsamTerminoEfetivoInclusivoERetificacaoSemConfundirRegistroTardio",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "source_sha256": "1962038be8bca4206bacb4081a038149f27a92f6a416a4ae877569b6fc34883b",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCHistoricoHttpIT#alocacaoInternaNaoCriaAdmissaoOuDesligamentoNosFiltrosDeVinculo",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "source_sha256": "1962038be8bca4206bacb4081a038149f27a92f6a416a4ae877569b6fc34883b",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCHistoricoHttpIT#assinaturaV2DetectaCadaMetadadoIsoladamente",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "source_sha256": "1962038be8bca4206bacb4081a038149f27a92f6a416a4ae877569b6fc34883b",
+      "annotation": "ParameterizedTest",
+      "planned_invocations_static": 3,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCOcorrenciasHttpIT#finalidadeAusenteOuBrancaNaoBaixaMesmaConcessaoPositiva",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "source_sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "annotation": "ParameterizedTest",
+      "planned_invocations_static": 3,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCOcorrenciasHttpIT#consultaInstitucionalNaoHabilitaCriacaoNemCancelamento",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "source_sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "annotation": "ParameterizedTest",
+      "planned_invocations_static": 2,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCOcorrenciasHttpIT#listaEstadualIncluiIdETotalMasNaoNarrativaSeiOuAnexoPessoal",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "source_sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCOcorrenciasHttpIT#fronteiraDeGestaoEmDoisDiasRecusaCriacaoECancelamentoParciais",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "source_sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    },
+    {
+      "reference": "CriteriosCOcorrenciasHttpIT#reenvioSemChaveNormalizaBordasEIdentificaArquivos",
+      "source": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "source_sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "annotation": "Test",
+      "planned_invocations_static": 1,
+      "status": "NAO_COMPILADO_NAO_EXECUTADO"
+    }
+  ],
+  "test_classes": 12,
+  "test_methods": 34,
+  "planned_invocations_static": 49,
+  "executed": 0,
+  "compiled": false,
+  "limit": "Invocações calculadas das anotações, não contagem de XML executado."
+}

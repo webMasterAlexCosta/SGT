@@ -1,0 +1,30 @@
+{
+  "status": "SUGESTOES_NAO_EXECUTADAS",
+  "rounds": [
+    {
+      "round": "SUP_A",
+      "selector": "A244Adi004AtomicidadeHttpIT,A244Cmp005InstrumentosHttpIT,A244Con005PendenciasHttpIT,A244Con008FotografiaHttpIT,A244Con012RetomadaHttpIT,A244Con018AnulacaoHttpIT",
+      "planned": 6
+    },
+    {
+      "round": "SUP_B_CATALOGOS_RELATORIOS",
+      "selector": "B230CatalogosPessoasComplementosHttpIT,B230RelatoriosComplementosHttpIT",
+      "planned": 19
+    },
+    {
+      "round": "SUP_B_TEMPORAIS",
+      "selector": "B230TemporalOperacionalComplementosHttpIT#tmp017AnulacaoMudaOMesmoDiaSomenteNoCorteDeConhecimentoDoAto+vin002PesquisaIgnoraDataDaMudancaDeAlocacaoEDataAdmissaoDivergente+vin008FimNaturalRecusaOperacaoNoDiaSeguinteMasVinculoContinuaAberto+vin013ReativacaoRetomaElegiveisMasNaoEncerradoCanceladoOuVinculoSucedido+alo008ReativacaoPreservaFaixaVencidaESubstituidaERetomaSomenteUltimaValida+fre016NovoOperacionalNaoHerdeEdicaoDaFonteMesmoDentroDosSeteDias",
+      "planned": 6
+    },
+    {
+      "round": "SUP_C",
+      "selector": "CriteriosCDocumentosHttpIT,CriteriosCHistoricoHttpIT,CriteriosCOcorrenciasHttpIT",
+      "planned": 17
+    },
+    {
+      "round": "SUP_ALO_PREPARO_SEPARADO",
+      "selector": "B230TemporalOperacionalComplementosHttpIT#alo008ComposicaoZeradaPorAditamentoImpedeRetomadaSemGravarReativacao",
+      "planned": 1
+    }
+  ]
+}

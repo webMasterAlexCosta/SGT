@@ -1,0 +1,20 @@
+{
+  "gerada_utc": "2026-10-31T05:16:29.187362+00:00",
+  "origem_fontes": "trabalho/sgt_gtrat_back_end",
+  "env_distribuido": "Cópia exata de .env.example; configurar credenciais locais antes de usar.",
+  "jar_sha256": "582dfe319873c94d58ad4b4ccea47311e98c9528ed8a24d18d01de4fad168946",
+  "acervo_original": {
+    "destino": "docs/HISTORICO/ACERVO_ORIGINAL",
+    "arquivos_originais_preservados": 56,
+    "manifesto_sha256": "9eb4941723086d0537263595081d82b86dd8734aaa733fb864ccfb110226e1cd",
+    "inspecao_sha256": "5c4c5914047326d6fc42c6df5165b0b711dcbd110eff784bf6269fa5a3bebfc4",
+    "estado": "Histórico recebido, não executado na candidata atual; sem aprovação funcional."
+  },
+  "aprovacao": "Preparação de distribuição não confere aprovação. Ver matrizes, XMLs e gates finais.",
+  "exclusoes": [
+    "Credenciais locais autorizadas somente para execução",
+    "Fixture privada de autenticação TCP",
+    "Backups brutos de dados sintéticos",
+    "Caches Maven, JVM e servidores nativos temporários"
+  ]
+}

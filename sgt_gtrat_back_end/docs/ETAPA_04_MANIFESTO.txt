@@ -1,6 +1,0 @@
-SGT/GTRAT - ETAPA 04
-Motor temporal, histórico, versionamento e precedência negocial.
-Base: ETAPA 03.
-Entrega: 08/09/2026.
-Validação direcionada: CORE_JAVAC_OK + INTEGRATION_JAVAC_OK.
-Maven completo: não executável neste ambiente por falha DNS para repo.maven.apache.org.

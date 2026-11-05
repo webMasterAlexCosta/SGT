@@ -1,0 +1,27 @@
+const { execute } = require('./ambiente-real.cjs');
+execute('pessoa-vinculo', async ({ page, fixture, check, screenshot, open, confirmPassword, recordBusiness }) => {
+  await open('/pessoas');
+  await page.getByRole('heading', { name: 'Pessoas e vínculos contratuais' }).waitFor();
+  await page.getByRole('button', { name: 'Novo vínculo', exact: true }).click();
+  const modal = page.getByRole('dialog', { name: 'Cadastrar vínculo contratual', exact: true });
+  await modal.waitFor();
+  await modal.getByRole('button', { name: 'Nova pessoa', exact: true }).click();
+  const data = fixture.pending_vinculo_request;
+  await modal.getByLabel(/^Nome/).fill(data.pessoa.nome);
+  await modal.getByLabel(/^CPF/).fill(data.pessoa.cpf);
+  await modal.getByLabel(/^Contrato/).selectOption(String(data.contratoId));
+  await modal.getByLabel(/^Início efetivo/).fill(data.dataInicio);
+  const composition = modal.getByLabel(/^Composição vigente/);
+  await composition.locator(`option[value="${data.composicaoId}"]`).waitFor({ state: 'attached', timeout: 15000 });
+  await composition.selectOption(String(data.composicaoId));
+  await screenshot('cadastro');
+  const saved = page.waitForResponse(r => r.request().method() === 'POST' && /\/api\/vinculos-contratuais$/.test(new URL(r.url()).pathname) && r.status() < 300, { timeout: 20000 });
+  await modal.getByRole('button', { name: 'Cadastrar vínculo', exact: true }).click();
+  await confirmPassword();
+  const response = await saved;
+  const body = await response.json();
+  recordBusiness({ pessoaId: body.data.pessoaId, vinculoId: body.data.id });
+  check('Pessoa, vínculo e alocação inicial gravados pelo Java', response.status() === 201 && !!body.data.id && !!body.data.pessoaId, { status: response.status(), pessoaId: body.data.pessoaId, vinculoId: body.data.id });
+  await modal.waitFor({ state: 'hidden', timeout: 15000 });
+  await screenshot('vinculo-criado');
+});

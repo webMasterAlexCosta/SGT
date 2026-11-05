@@ -1,0 +1,16 @@
+{
+  "gerado_utc": "2026-10-31T05:16:54.510622+00:00",
+  "aprovado": true,
+  "metodo": "Inventários exatos dos três grupos; originais elegíveis e exclusões permitidas/justificadas; hashes e tamanhos; todas as suítes/invocações/estados XML; valores privados sem impressão.",
+  "limites": [
+    "Diretórios de cache conhecidos são inelegíveis conforme política explícita do copiador.",
+    "Conservar falhas históricas nos XMLs é obrigatório; este gate não aprova o resultado do produto.",
+    "Fontes e JAR são verificados separadamente pelo empacotador; nenhum byte é sanitizado por este verificador."
+  ],
+  "arquivos": 32585,
+  "arquivos_mascarados": 131,
+  "exclusoes_justificadas": 4,
+  "xmls_de_teste_com_resultados_preservados": 2499,
+  "env_distribuido_igual_exemplo": true,
+  "valores_privados_localizados": 0
+}

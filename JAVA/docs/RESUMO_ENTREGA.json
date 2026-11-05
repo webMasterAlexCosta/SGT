@@ -1,0 +1,147 @@
+{
+  "gerado_utc": "2026-10-31T05:14:59.066815+00:00",
+  "candidata": "candidata07",
+  "manifesto_fontes_sha256": "fc92555e0785d29ed9b8f2dd3c86235c7eec03992537f27b7f0bc8f5d3526f25",
+  "jar_sha256": "582dfe319873c94d58ad4b4ccea47311e98c9528ed8a24d18d01de4fad168946",
+  "integral": "regressao_integral_06",
+  "carga": "carga_final_01",
+  "invocacoes_distintas_integral_e_carga": 1608,
+  "execucoes_total_integral_e_carga": 2101,
+  "unitarios_repetidos_na_carga": 493,
+  "http_principal": {
+    "requisicoes": 457,
+    "assercoes": 819
+  },
+  "http_independente": {
+    "requisicoes": 95,
+    "assercoes": 336
+  },
+  "memoria_sha256": "9a69bf95e8bbb8b187a247799038b1543cd2b56cd0084a2e77f520e9150e20e9",
+  "fontes_memoria": [
+    {
+      "rodada": "regressao_integral_06",
+      "arquivo": "evidencias/rodadas/regressao_integral_06/MEMORIA.jsonl",
+      "sha256": "b29958ff6067618ff360d08e357f91c74d95080969c2622fbb905a498f99d73d"
+    },
+    {
+      "rodada": "carga_final_01",
+      "arquivo": "evidencias/rodadas/carga_final_01/MEMORIA.jsonl",
+      "sha256": "ddb11934a429953dfac8da3267156158f15b0a96d572c65b5bbac3aebce65d16"
+    }
+  ],
+  "gates_sha256": "9a2e549492c6d613dc76e70e91eababec16a9fd95863bc1445842c89b0c3adff",
+  "cobertura_mesclada_sha256": "6b7a6f2e85496cdaf7e6f8b135d3592b947bb3b5ee4a6927230f45342d9d4af7",
+  "grupos_alteracoes": 35,
+  "grupos_com_rf": 32,
+  "grupos_suporte_sem_rf": 3,
+  "requisitos_antes": {
+    "A": 0,
+    "B": 149,
+    "C": 49,
+    "D": 0,
+    "E": 0
+  },
+  "requisitos_depois": {
+    "A": 192,
+    "B": 0,
+    "C": 0,
+    "D": 0,
+    "E": 6
+  },
+  "criterios": {
+    "TODAS_REFERENCIAS_APROVADAS": 635
+  },
+  "cobertura": [
+    {
+      "tipo": "INSTRUCTION",
+      "cobertos": 138996,
+      "nao_cobertos": 21207,
+      "total": 160203,
+      "percentual": 86.7624
+    },
+    {
+      "tipo": "BRANCH",
+      "cobertos": 11669,
+      "nao_cobertos": 6804,
+      "total": 18473,
+      "percentual": 63.1679
+    },
+    {
+      "tipo": "LINE",
+      "cobertos": 23713,
+      "nao_cobertos": 2826,
+      "total": 26539,
+      "percentual": 89.3515
+    },
+    {
+      "tipo": "COMPLEXITY",
+      "cobertos": 9078,
+      "nao_cobertos": 6529,
+      "total": 15607,
+      "percentual": 58.1662
+    },
+    {
+      "tipo": "METHOD",
+      "cobertos": 5733,
+      "nao_cobertos": 584,
+      "total": 6317,
+      "percentual": 90.7551
+    },
+    {
+      "tipo": "CLASS",
+      "cobertos": 681,
+      "nao_cobertos": 9,
+      "total": 690,
+      "percentual": 98.6957
+    }
+  ],
+  "aceite_independente_criterios": {
+    "A": 613,
+    "B": 0,
+    "C": 0,
+    "D": 0,
+    "E": 22
+  },
+  "adendo_utilitario_distribuicao": {
+    "necessario": true,
+    "arquivo": "evidencias/controle_roteiros/identidade_carga_01/ADENDO_APROVADO.json",
+    "sha256": "1a7165f9ed20d83d1c4a683ca1c88f3f2565cfad42d1826edf2bd5a61e6a2f56",
+    "alteracoes": [
+      {
+        "arquivo": "scripts/validacao/empacotar_entrega.py",
+        "antes_sha256": "11cd06ab3ce7a05f1083f2ec448a7e48d4a2b8bec1373427bfa243696321befc",
+        "depois_sha256": "d0c085a6047fe5cfa5cd8f8bacafcf1cafeb73c9e2492998ed6f87e395cbea4d"
+      }
+    ],
+    "controles_python": {
+      "arquivo": "evidencias/controle_roteiros/identidade_carga_01/CONTROLES_ATIVOS.json",
+      "sha256": "1c179b162c21a9a8583f14c2c643aeeff3f08a9a94c098434591ce2b5ae70a5a"
+    },
+    "revisoes": [
+      {
+        "grupo": "contratos",
+        "papel": "leitura_cruzada_independente",
+        "arquivo": "auditoria_independente/adendos_distribuicao/identidade_carga_01/REVISAO_CONTRATOS.json",
+        "sha256": "b4fd56c038181f39d197b0a7429b5918a0ee1fd11ebda8801472cc479ded8275"
+      },
+      {
+        "grupo": "transversais",
+        "papel": "autor_da_correcao_e_controles",
+        "arquivo": "auditoria_independente/adendos_distribuicao/identidade_carga_01/REVISAO_TRANSVERSAIS.json",
+        "sha256": "fe1489a5b434fd8d72717168257f2e9e02f0e4f611ddb55818d977a7ff29f156"
+      }
+    ],
+    "limite": "Somente o empacotador mudou; Java, testes, JAR e roteiros HTTP exercitados permanecem idênticos."
+  },
+  "relatorios": {
+    "RELATORIO_AUDITORIA_INDEPENDENTE.md": "5eefd5af29cc9731ca025cec315e6845002b1f5aed759b9186c5d9f69572ec13",
+    "RELATORIO_COBERTURA.md": "b1df94fb4439c31b222d4d8f3943174d136ffdf87de45d433678311334a8f468",
+    "RELATORIO_CONTAGEM_CRITERIOS.md": "d2b99783631d2ec564b605f3db21b2bde5ae66a5e92249bff1fd38ce23856fa0",
+    "RELATORIO_TESTES_INTEGRACAO_MYSQL.md": "56890e68d0dac2f7c3ed67b48b1d985ab6ec9cc0ef1b81052a95996b63461cb2",
+    "RELATORIO_SEGURANCA_AUTORIZACAO.md": "a018311331f9de60f7507fc753bca5982d28297bdf7040395af02dd43020a744",
+    "RELATORIO_DEFEITOS_CORRIGIDOS.md": "2fd580aaffbab2653af6da9932a6cf1f758a13123b6dba95fe7539227370ccc2",
+    "RELATORIO_CONCORRENCIA_TRANSACOES.md": "f33c7d4dfc07bd64921d455c5a836ae83765588b359df4bc9c276dcce352c349",
+    "RELATORIO_JAR_HTTP_REINICIO.md": "f3ce42b93dea5305e12ff058a24ac50d109e03d7081faccbcdd8929d8f9064ac",
+    "RELATORIO_REGRESSAO.md": "3fda1ff9f6f0aa8d36eff75dd0184f232797f8006c6922a4267345e4d6ff0179"
+  }
+}

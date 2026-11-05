@@ -1,0 +1,539 @@
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/A244Suporte.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/A244Suporte.java
+@@ -3,7 +3,6 @@
+ import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
+ import com.example.siggtrat.dominio.vinculo.CategoriaTerminoVinculo;
+ import com.example.siggtrat.entidade.*;
+-import com.example.siggtrat.infra.ConfiguracaoMysqlIntegracao;
+ import com.example.siggtrat.servico.GestaoContratoTemporalServico;
+ import com.example.siggtrat.servico.PendenciaAdministrativaServico;
+ import com.example.siggtrat.utilitario.RelogioSistema;
+@@ -20,7 +19,6 @@
+ import org.springframework.transaction.support.TransactionSynchronizationManager;
+ import org.springframework.transaction.support.TransactionTemplate;
+ 
+-import java.net.URI;
+ import java.nio.file.*;
+ import java.nio.charset.StandardCharsets;
+ import java.security.MessageDigest;
+@@ -37,38 +35,26 @@
+  * Background TaskScheduler is the inherited test double, never an E2E claim.
+  */
+ @Transactional(propagation = Propagation.NOT_SUPPORTED)
+-@TestPropertySource(properties = {"spring.data.redis.database=9"})
++@org.springframework.context.annotation.Import(Suplementos8045Ambiente.class)
++@TestPropertySource(properties = {"spring.data.redis.database=${REDIS_DATABASE}"})
+ abstract class A244Suporte extends ContratosHttpBase {
+-    static final String SCHEMA = "sgt_audit_h02_crit_a2";
+-    static {
+-        if (!"1".equals(System.getenv("SGT_CRIT_A_EXECUTE")))
+-            throw new IllegalStateException("A244 requires the explicit execution flag after coordinator GO");
+-        var cfg = ConfiguracaoMysqlIntegracao.carregar();
+-        if (cfg.usaTestcontainers() || cfg.url() == null || !cfg.url().startsWith("jdbc:mysql://"))
+-            throw new IllegalStateException("A244 requires the dedicated native MySQL configuration");
+-        var uri = URI.create(cfg.url().substring("jdbc:".length()));
+-        if (!"h02_crit_a2".equals(cfg.usuario())
+-                || !"127.0.0.1".equals(uri.getHost()) || uri.getPort() != 33461
+-                || !("/" + SCHEMA).equals(uri.getPath()))
+-            throw new IllegalStateException("A244 refuses any database outside its dedicated native identity");
+-        Path cwd = Path.of("").toAbsolutePath().normalize();
+-        if (!cwd.toString().contains("/tests/a244_followup_v2/materialized/")
+-                || !Files.isRegularFile(cwd.resolve("H02_A244_MATERIALIZED.json")))
+-            throw new IllegalStateException("A244 must execute only in the sealed external project");
+-    }
++    static final String SCHEMA = Suplementos8045Ambiente.schema();
+ 
+     @Autowired protected PendenciaAdministrativaServico pendenciasA244;
+     @Autowired protected GestaoContratoTemporalServico gestaoTemporalA244;
+     @Autowired private Environment environmentA244;
++    @Autowired private javax.sql.DataSource dataSourceA244;
+ 
+     @BeforeEach void identityAndTransactionA244() throws Exception {
+         assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isFalse();
+-        assertThat(environmentA244.getProperty("spring.data.redis.database")).isEqualTo("9");
++        Suplementos8045Ambiente.confirmar(environmentA244, dataSourceA244);
++        assertThat(environmentA244.getProperty("spring.data.redis.database", Integer.class))
++                .isEqualTo(Suplementos8045Ambiente.redisDatabase());
+         readTx(() -> {
+             Object[] row = (Object[]) em.createNativeQuery("select database(), current_user(), version()").getSingleResult();
+             assertThat(row[0].toString()).isEqualTo(SCHEMA);
+-            assertThat(row[1].toString()).startsWith("h02_crit_a2@");
+-            assertThat(row[2].toString()).isEqualTo("8.0.46");
++            assertThat(row[1].toString()).startsWith(Suplementos8045Ambiente.usuario() + "@");
++            assertThat(row[2].toString()).isEqualTo(com.example.siggtrat.infra.GuardaMysql8045.VERSAO_AUTORIZADA);
+             return null;
+         });
+     }
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java
+@@ -28,7 +28,7 @@
+         request.remove("tipo"); request.put("tipoContratacaoId", id);
+         JsonNode accepted = enviar(c.localA, "/api/contratos", request, 201, "Controle: mesmo corpo com ID real pode criar rascunho");
+         assertThat(accepted.path("tipoContratacaoId").asLong()).isEqualTo(c.tipoA.getId());
+-        nova(() -> { assertThat(em.find(Contrato.class, accepted.path("id").asLong()).getTipoContratacao().getId())
++        observar(() -> { assertThat(em.find(Contrato.class, accepted.path("id").asLong()).getTipoContratacao().getId())
+                 .isEqualTo(c.tipoA.getId()); return null; });
+     }
+ 
+@@ -96,7 +96,7 @@
+                 "justificativa", "Publicação sintética para isolar capacidade futura"), 200, "Publicação sem pessoas/alocações");
+         long catalogId = switch (resource) { case "cargos" -> target.cargo(); case "lotacoes" -> target.lotacao(); default -> target.jornada(); };
+         String field = switch (resource) { case "cargos" -> "cargo"; case "lotacoes" -> "lotacao"; default -> "jornada"; };
+-        nova(() -> {
++        observar(() -> {
+             assertThat(em.createQuery("select count(a) from AlocacaoVinculo a where a." + field + ".id=:id", Long.class)
+                     .setParameter("id", catalogId).getSingleResult()).isZero();
+             assertThat(em.createQuery("select count(x) from ComposicaoContratual x where x." + field + ".id=:id and x.efetivoPrevisto>0", Long.class)
+@@ -157,7 +157,7 @@
+         JsonNode corrected = enviar(c.localA, "/api/pessoas/" + c.pessoaA.getId() + "/correcoes-identidade", complete, 200,
+                 "Controle positivo: corpo idêntico com o campo restaurado");
+         assertThat(corrected.path("nome").asText()).isEqualTo(complete.get("novoValor"));
+-        nova(() -> {
++        observar(() -> {
+             var history = em.createQuery("select r from CorrecaoPessoa r where r.pessoa.id=:id", CorrecaoPessoa.class)
+                     .setParameter("id", c.pessoaA.getId()).getResultList();
+             assertThat(history).hasSize(1); assertThat(history.get(0).getResponsavelId()).isEqualTo(c.localA.getId()); return null;
+@@ -190,6 +190,6 @@
+         var accepted = enviar(c.localA, "/api/vinculos-contratuais/" + c.vinculoA.getId() + "/retificar-inicio", complete, 200,
+                 "Controle positivo com o mesmo token ainda válido e corpo integral");
+         assertThat(accepted.path("dataInicio").asText()).isEqualTo(INICIO.plusDays(1).toString());
+-        nova(() -> { assertThat(em.find(VinculoContratual.class, c.vinculoA.getId()).getDataInicio()).isEqualTo(INICIO.plusDays(1)); return null; });
++        observar(() -> { assertThat(em.find(VinculoContratual.class, c.vinculoA.getId()).getDataInicio()).isEqualTo(INICIO.plusDays(1)); return null; });
+     }
+ }
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java
+@@ -34,7 +34,7 @@
+         return consultar(c.localA,"/api/relatorios/administrativos/emissoes/"+id,"Emissão preservada após o fato superveniente");
+     }
+     private String bytesEmitidos(long id) {
+-        return nova(() -> HexFormat.of().formatHex(em.find(EmissaoRelatorioAdministrativo.class,id).getConteudoSnapshotGzip()));
++        return observar(() -> HexFormat.of().formatHex(em.find(EmissaoRelatorioAdministrativo.class,id).getConteudoSnapshotGzip()));
+     }
+ 
+     @Test
+@@ -50,7 +50,7 @@
+         long id=emitida.path("metadados").path("id").asLong(),controlId=naoAtingida.path("metadados").path("id").asLong();
+         String bytes=bytesEmitidos(id),controlBytes=bytesEmitidos(controlId);
+         retificarInicio(c,c.vinculoA.getId(),INICIO.plusDays(1));
+-        nova(() -> {
++        observar(() -> {
+             Frequencia f=em.find(Frequencia.class,frequenciaId);
+             assertThat(f.getStatus()).isEqualTo("FALTA"); assertThat(f.getVinculoContratual().getId()).isEqualTo(c.vinculoA.getId());
+             assertThat(f.getAlocacaoVinculo().getId()).isEqualTo(c.alocacaoA.getId());
+@@ -94,7 +94,7 @@
+         LocalDate controlDay=INICIO.plusDays(4);
+         frequencia(c.localA,c.vinculoA.getId(),controlDay,"FALTA",200);
+         retificarInicio(c,c.vinculoA.getId(),INICIO.plusDays(2));
+-        long count=nova(() -> em.createQuery("select count(p) from PendenciaAdministrativa p where p.frequenciaId in :ids",Long.class)
++        long count=observar(() -> em.createQuery("select count(p) from PendenciaAdministrativa p where p.frequenciaId in :ids",Long.class)
+                 .setParameter("ids",List.of(first,second)).getSingleResult());
+         assertThat(count).isEqualTo(2);
+         JsonNode live=calcular(c,INICIO,INICIO.plusDays(1));
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java
+@@ -29,7 +29,7 @@
+         JsonNode preview = enviar(c.localA,base(n.id())+"/previas/anular",req,200,"Prévia do alcance anulatório");
+         req.put("tokenPrevia",preview.path("tokenPrevia").asText()); req.put("confirmarImpacto",true);
+         enviar(c.localA,base(n.id())+"/anular",req,200,"Anulação explícita do contrato de teste");
+-        Instant registrado = nova(() -> em.createQuery("select e.registradoEm from EventoCicloVidaContrato e "
++        Instant registrado = observar(() -> em.createQuery("select e.registradoEm from EventoCicloVidaContrato e "
+                 + "where e.contrato.id=:c and e.tipoEvento=:tipo",Instant.class).setParameter("c",n.id())
+                 .setParameter("tipo",TipoEventoCicloVidaContrato.ANULACAO).getSingleResult());
+         Instant anterior = registrado.minusNanos(1);
+@@ -71,7 +71,7 @@
+             JsonNode found = procurarInicio(c,c.pessoaA.getId(),date);
+             assertThat(found.path("content")).isEmpty(); assertThat(found.path("totalElements").asLong()).isZero();
+         }
+-        nova(() -> {
++        observar(() -> {
+             assertThat(em.find(VinculoContratual.class,c.vinculoA.getId()).getDataInicio()).isEqualTo(INICIO);
+             assertThat(em.find(Empregado.class,c.empregadoA.getId()).getDataAdmissao()).isEqualTo(divergente); return null;
+         });
+@@ -93,13 +93,13 @@
+         NovoContrato n = publicadoEm(c,5,fim.minusDays(30),fim,null,null);
+         JsonNode vinculo = novoVinculo(c,n.id(),n.composicao1(),fim.minusDays(5),null,2);
+         long id = vinculo.path("id").asLong();
+-        nova(() -> { assertThat(em.find(VinculoContratual.class,id).getDataFim()).isNull(); return null; });
++        observar(() -> { assertThat(em.find(VinculoContratual.class,id).getDataFim()).isNull(); return null; });
+         long frequencia = frequencia(c.operacionalA,id,fim,"FALTA",200).path("id").asLong();
+         var before = negocio();
+         JsonNode refused = frequencia(c.operacionalA,id,fim.plusDays(1),"FALTA",409);
+         assertThat(refused.path("message").asText()).containsIgnoringCase("não está operacional");
+         semMutacao(before,"VIN008 D+1 não cria frequência, encerramento técnico ou nova faixa");
+-        nova(() -> {
++        observar(() -> {
+             assertThat(em.find(VinculoContratual.class,id).getDataFim()).isNull();
+             assertThat(em.find(Frequencia.class,frequencia).getDataReferencia()).isEqualTo(ultimoDia);
+             assertThat(em.createQuery("select count(f) from Frequencia f where f.vinculoContratual.id=:v and f.dataReferencia=:d",Long.class)
+@@ -135,7 +135,7 @@
+                 var before = negocio(); frequencia(c.operacionalA,invalid.path("id").asLong(),reativacao,"FALTA",409);
+                 semMutacao(before,"VIN013 vínculo inelegível continua sem operação após reativação");
+             }
+-            nova(() -> {
++            observar(() -> {
+                 assertThat(em.createQuery("select count(v) from VinculoContratual v where v.contrato.id=:c",Long.class)
+                         .setParameter("c",n.id()).getSingleResult()).isEqualTo(5);
+                 assertThat(em.find(VinculoContratual.class,cancelado.path("id").asLong()).getEstadoNegocial().name()).isEqualTo("CANCELADO");
+@@ -154,7 +154,7 @@
+         JsonNode primeira=alterarAlocacao(c,c.vinculoA.getId(),comp1,mudanca,null);
+         JsonNode atual=alterarAlocacao(c,c.vinculoA.getId(),comp2,mudanca,primeira.path("id").asLong());
+         long atualId=atual.path("id").asLong();
+-        nova(() -> {
++        observar(() -> {
+             assertThat(em.find(AlocacaoVinculo.class,c.alocacaoA.getId()).getDataFim()).isEqualTo(mudanca.minusDays(1));
+             assertThat(em.find(AlocacaoVinculo.class,primeira.path("id").asLong()).getEstadoNegocial().name()).isEqualTo("SUBSTITUIDA");
+             assertThat(em.find(AlocacaoVinculo.class,atualId).getEstadoNegocial().name()).isEqualTo("REGISTRADA"); return null;
+@@ -170,7 +170,7 @@
+             semMutacao(before,"ALO008 escopo de faixa vencida/substituída não retoma escrita");
+         }
+         JsonNode created=frequencia(destino,c.vinculoA.getId(),hoje,"FALTA",200);
+-        nova(() -> { assertThat(em.find(Frequencia.class,created.path("id").asLong()).getAlocacaoVinculo().getId()).isEqualTo(atualId); return null; });
++        observar(() -> { assertThat(em.find(Frequencia.class,created.path("id").asLong()).getAlocacaoVinculo().getId()).isEqualTo(atualId); return null; });
+     }
+ 
+     @Test
+@@ -190,11 +190,11 @@
+         JsonNode rejected=enviar(c.localA,base(n.id())+"/reativar",req,409,"ALO008 composição efetiva zero recusa retomada");
+         assertThat(rejected.path("message").asText()).containsIgnoringCase("zero");
+         semMutacao(before,"ALO008 recusa não cria evento nem materializa habilitação ativa");
+-        nova(() -> { assertThat(em.find(Contrato.class,n.id()).getAtivo()).isFalse();
++        observar(() -> { assertThat(em.find(Contrato.class,n.id()).getAtivo()).isFalse();
+             assertThat(em.find(VinculoContratual.class,v.path("id").asLong()).getDataFim()).isNull(); return null; });
+         ciclo(c,c.contratoA.getId(),"inativar",hoje.minusDays(2));
+         ciclo(c,c.contratoA.getId(),"reativar",hoje);
+-        nova(() -> { assertThat(em.find(Contrato.class,c.contratoA.getId()).getAtivo()).isTrue(); return null; });
++        observar(() -> { assertThat(em.find(Contrato.class,c.contratoA.getId()).getAtivo()).isTrue(); return null; });
+     }
+ 
+     @Test
+@@ -204,7 +204,7 @@
+         long sourceId=frequencia(c.operacionalA,c.vinculoA.getId(),dia,"FALTA",200).path("id").asLong();
+         JsonNode oldEvents=consultar(c.localA,"/api/frequencias/"+sourceId+"/eventos","Fonte operacional antes da mudança");
+         alterarAlocacao(c,c.vinculoA.getId(),comp,dia,null);
+-        nova(() -> {
++        observar(() -> {
+             var source=em.find(Frequencia.class,sourceId);
+             assertThat(source.getAlocacaoVinculo().getId()).isEqualTo(c.alocacaoA.getId());
+             assertThat(source.getAutorOriginalId()).isEqualTo(c.operacionalA.getId());
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/B230Suporte.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/B230Suporte.java
+@@ -26,8 +26,9 @@
+ import static org.assertj.core.api.Assertions.assertThat;
+ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+ 
+-/** External synthetic supplement; it is not copied into either candidate. */
++/** Suplemento sintético portado em staging; só ganha resultado por nova execução. */
+ @Transactional(propagation = Propagation.NOT_SUPPORTED)
++@org.springframework.context.annotation.Import(Suplementos8045Ambiente.class)
+ abstract class B230Suporte extends ContratosHttpBase {
+     @Autowired protected JdbcTemplate jdbc;
+     @Autowired protected Environment ambiente;
+@@ -37,9 +38,11 @@
+ 
+     @BeforeEach
+     void isolamentoB230() {
+-        assertThat(jdbc.queryForObject("select version()", String.class)).isEqualTo("8.0.46");
+-        assertThat(jdbc.queryForObject("select current_user()", String.class)).isEqualTo("h02_crit_b2@127.0.0.1");
+-        assertThat(jdbc.queryForObject("select database()", String.class)).isEqualTo("sgt_audit_h02_crit_b2");
++        Suplementos8045Ambiente.confirmar(ambiente, jdbc.getDataSource());
++        assertThat(jdbc.queryForObject("select version()", String.class))
++                .isEqualTo(com.example.siggtrat.infra.GuardaMysql8045.VERSAO_AUTORIZADA);
++        assertThat(jdbc.queryForObject("select current_user()", String.class)).isEqualTo(Suplementos8045Ambiente.usuario() + "@127.0.0.1");
++        assertThat(jdbc.queryForObject("select database()", String.class)).isEqualTo(Suplementos8045Ambiente.schema());
+         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
+         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
+     }
+@@ -56,13 +59,28 @@
+         });
+     }
+ 
++    /** Observação isolada, sem flush ou persistência de efeitos incidentais. */
++    protected <T> T observar(Acao<T> action) {
++        TransactionTemplate tx = new TransactionTemplate(transactionManager);
++        tx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
++        tx.setIsolationLevel(TransactionDefinition.ISOLATION_READ_COMMITTED);
++        tx.setReadOnly(true);
++        return tx.execute(status -> {
++            em.clear();
++            try { return action.executar(); }
++            catch (RuntimeException e) { throw e; }
++            catch (Exception e) { throw new IllegalStateException(e); }
++            finally { em.clear(); }
++        });
++    }
++
+     /**
+      * Complete values of business tables, read after commit. Session heartbeats
+      * and access/security audit may legitimately change for a rejected request;
+      * only those two tables are outside this business rollback oracle.
+      */
+     protected Map<String,List<String>> negocio() {
+-        return nova(() -> {
++        return observar(() -> {
+             Map<String,List<String>> result = new TreeMap<>();
+             List<String> tables = jdbc.queryForList("select table_name from information_schema.tables "
+                     + "where table_schema=database() and table_type='BASE TABLE' order by table_name", String.class);
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java
+@@ -97,26 +97,28 @@
+         String key = "c-retificar-" + UUID.randomUUID();
+         var req = mapa("novaReferenciaSei", "SEI-C-RETIFICADO", "motivo", "Correção C", "chaveIdempotencia", key);
+         JsonNode primeiro = enviar(c.localA, rota, req, 200, "DOC-005 controle: chave confirma nova versão");
+-        // C02 observed a genuine technical DTO version difference: the first POST returned
+-        // version=0 while the committed row/replay returned version=1. Preserve that observation;
+-        // this focal tests canonical committed state, without dropping version or any other field.
++        // O original v6 registra a divergência técnica histórica sem exigir equivalência.
++        // O mestre exige a resposta canônica completa desde o primeiro POST: nenhuma
++        // propriedade, inclusive version, é retirada para tornar a comparação verde.
+         long documentoId = primeiro.path("id").asLong();
+         JsonNode canonico = consultar(c.localA, base(n.id()) + "/documentos/" + documentoId,
+                 "GET canônico após commit da primeira retificação documental");
+-        long versaoPersistida = emTransacao(() -> em.find(DocumentoComprobatorio.class, documentoId).getVersion());
++        long versaoPersistida = observar(() -> em.find(DocumentoComprobatorio.class, documentoId).getVersion());
+         assertEquals(documentoId, canonico.path("id").asLong());
+         assertEquals(n.id(), canonico.path("contratoId").asLong());
+         assertEquals(2, canonico.path("versaoDocumento").asInt());
+         assertEquals("SEI-C-RETIFICADO", canonico.path("referenciaSei").asText());
+         assertTrue(canonico.path("version").isIntegralNumber());
+         assertEquals(versaoPersistida, canonico.path("version").asLong(), "GET deve expor a versão técnica persistida");
++        assertEquals(canonico, primeiro, "Primeiro POST deve devolver o DTO canônico integral após commit, inclusive version");
+         Set<String> campos = new TreeSet<>();
+         primeiro.fieldNames().forEachRemaining(campos::add); canonico.fieldNames().forEachRemaining(campos::add);
+         List<String> divergentes = campos.stream().filter(campo -> !Objects.equals(primeiro.get(campo), canonico.get(campo))).toList();
++        assertTrue(divergentes.isEmpty(), "Nenhum campo pode divergir entre o primeiro POST e o GET canônico");
+         registrar("doc005-primeiro-dto-vs-get-" + n.id(), mapa("contrato", n.id(),
+                 "primeiroDTO", primeiro, "GETcanonicoPosCommit", canonico, "camposDivergentes", divergentes,
+                 "respostasIntegralmenteIguais", primeiro.equals(canonico),
+-                "interpretacao", "Divergência técnica do primeiro DTO permanece registrada separadamente; não é aceite da equivalência de respostas"));
++                "interpretacao", "Igualdade integral primeiro POST/GET exigida nesta execução; divergência histórica preservada no original v6"));
+         JsonNode antes = estadoDocumental(n.id()); var files = arquivos();
+         var divergente = new LinkedHashMap<>(req); divergente.put("novaReferenciaSei", "SEI-C-OUTRA-INTENCAO");
+         enviar(c.localA, rota, divergente, 409, "DOC-005 intenção divergente conserva cadeia integral");
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java
+@@ -135,7 +135,7 @@
+             h.setDescricao("Ensaio sintético v2 de metadado " + campo);
+             return integridadeC.salvarAssinado(h).getId();
+         });
+-        Map<String, Object> antes = emTransacao(() -> linha(em.find(HistoricoEmpregado.class, historico), HistoricoEmpregado.class));
++        Map<String, Object> antes = observar(() -> linha(em.find(HistoricoEmpregado.class, historico), HistoricoEmpregado.class));
+         assertEquals(2, ((Number) antes.get("versaoAssinatura")).intValue()); assertNull(antes.get("ocorrencia"));
+         assertTrue(integridadeC.verificarEmpregado(c.empregadoA.getId()).integro());
+         emTransacao(() -> {
+@@ -148,7 +148,7 @@
+             }
+             em.flush(); return null;
+         });
+-        Map<String, Object> adulterado = emTransacao(() -> linha(em.find(HistoricoEmpregado.class, historico), HistoricoEmpregado.class));
++        Map<String, Object> adulterado = observar(() -> linha(em.find(HistoricoEmpregado.class, historico), HistoricoEmpregado.class));
+         assertEquals(antes.get("hashIntegridade"), adulterado.get("hashIntegridade"));
+         var check = integridadeC.verificarEmpregado(c.empregadoA.getId()); assertFalse(check.integro());
+         var esperado = new TreeMap<>(antes); var medido = new TreeMap<>(adulterado);
+--- originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java
++++ src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java
+@@ -27,24 +27,41 @@
+ 
+ /** External test-only support. No production class or business service is mocked. */
+ @Transactional(propagation = Propagation.NOT_SUPPORTED)
+-@TestPropertySource(properties = {"file.upload-dir=target/criteria-c/uploads", "spring.data.redis.database=12"})
++@org.springframework.context.annotation.Import(Suplementos8045Ambiente.class)
++@TestPropertySource(properties = {"file.upload-dir=target/criteria-c/uploads", "spring.data.redis.database=${REDIS_DATABASE}"})
+ abstract class CriteriosCHttpBase extends ContratosHttpBase {
+     @Autowired protected PropriedadesArmazenamentoArquivo armazenamentoC;
+     @Autowired private Environment ambienteC;
++    @Autowired private javax.sql.DataSource dataSourceC;
+     protected record PessoaPreparada(Cenario c, NovoContrato contrato, long vinculo, long pessoa,
+                                     long empregado, LocalDate inicio, LocalDate fato) {}
+ 
+     @BeforeEach
+     void confirmarIsolamentoEfetivo() {
+-        assertEquals("h02_crit_c3", ambienteC.getProperty("spring.datasource.username"));
++        Suplementos8045Ambiente.confirmar(ambienteC, dataSourceC);
++        assertEquals(Suplementos8045Ambiente.usuario(), ambienteC.getProperty("spring.datasource.username"));
+         String url = ambienteC.getProperty("spring.datasource.url", "");
+         String schema = java.net.URI.create(url.substring("jdbc:".length())).getPath();
+-        assertEquals("/sgt_audit_h02_crit_c3", schema, "Schema externo novo C2 obrigatório");
+-        assertEquals(12, Objects.requireNonNull(ambienteC.getProperty("spring.data.redis.database", Integer.class)).intValue());
++        assertEquals("/" + Suplementos8045Ambiente.schema(), schema, "Schema nativo autorizado da campanha obrigatório");
++        assertEquals(Suplementos8045Ambiente.redisDatabase(),
++                Objects.requireNonNull(ambienteC.getProperty("spring.data.redis.database", Integer.class)).intValue());
+         assertEquals("none", ambienteC.getProperty("spring.cache.type"));
+         assertEquals(Boolean.FALSE, ambienteC.getProperty("app.cache.redis.http-get.enabled", Boolean.class));
+         assertEquals(Path.of("target/criteria-c/uploads").toAbsolutePath().normalize(),
+                 armazenamentoC.uploadDir().toAbsolutePath().normalize());
++    }
++
++    /** Fotografias sempre relidas em transação independente somente de leitura. */
++    protected <T> T observar(java.util.function.Supplier<T> action) {
++        var tx = new org.springframework.transaction.support.TransactionTemplate(transactionManager);
++        tx.setPropagationBehavior(org.springframework.transaction.TransactionDefinition.PROPAGATION_REQUIRES_NEW);
++        tx.setIsolationLevel(org.springframework.transaction.TransactionDefinition.ISOLATION_READ_COMMITTED);
++        tx.setReadOnly(true);
++        return tx.execute(status -> {
++            em.clear();
++            try { return action.get(); }
++            finally { em.clear(); }
++        });
+     }
+ 
+     protected NovoContrato contratoConfirmado(Cenario c, boolean futuro) {
+@@ -71,8 +88,8 @@
+                 "contratoId", n.id(), "composicaoId", n.composicao1(), "dataInicio", inicio),
+                 201, "PREPARACAO C: vínculo real, contexto e identidade documental explícitos");
+         long vinculo = v.path("id").asLong(); assertTrue(vinculo > 0);
+-        long pessoa = emTransacao(() -> em.find(VinculoContratual.class, vinculo).getPessoa().getId());
+-        long empregado = emTransacao(() -> em.createQuery(
++        long pessoa = observar(() -> em.find(VinculoContratual.class, vinculo).getPessoa().getId());
++        long empregado = observar(() -> em.createQuery(
+                 "select e.id from Empregado e where e.pessoaCanonica.id=:p", Long.class)
+                 .setParameter("p", pessoa).getSingleResult());
+         return new PessoaPreparada(c, n, vinculo, pessoa, empregado, inicio, RelogioSistema.hoje().minusDays(2));
+@@ -126,7 +143,7 @@
+     }
+ 
+     protected JsonNode estadoDocumental(long contrato) {
+-        return emTransacao(() -> mapper.valueToTree(mapa(
++        return observar(() -> mapper.valueToTree(mapa(
+                 "contrato", linha(em.find(Contrato.class, contrato), Contrato.class),
+                 "aditamentos", linhas(AditamentoContratual.class, "x.contrato.id=:id", contrato),
+                 "composicoes", linhas(ComposicaoContratual.class, "x.contrato.id=:id", contrato),
+@@ -137,7 +154,7 @@
+     }
+ 
+     protected JsonNode estadoOcorrencias(long empregado) {
+-        return emTransacao(() -> mapper.valueToTree(mapa(
++        return observar(() -> mapper.valueToTree(mapa(
+                 "ocorrencias", linhas(Ocorrencia.class, "x.empregado.id=:id", empregado),
+                 "contextos", linhas(ContextoOcorrencia.class, "x.ocorrencia.empregado.id=:id", empregado),
+                 "anexos", linhas(AnexoOcorrencia.class, "x.ocorrencia.empregado.id=:id", empregado),
+@@ -160,14 +177,14 @@
+     }
+ 
+     protected byte[] arquivoDocumento(long id) throws Exception {
+-        String nome = emTransacao(() -> em.find(DocumentoComprobatorio.class, id).getNomeArmazenado());
++        String nome = observar(() -> em.find(DocumentoComprobatorio.class, id).getNomeArmazenado());
+         assertNotNull(nome); Path raiz = armazenamentoC.uploadDir().toAbsolutePath().normalize();
+         Path p = raiz.resolve(nome).normalize(); assertTrue(p.startsWith(raiz));
+         assertFalse(Files.isSymbolicLink(p)); return Files.readAllBytes(p);
+     }
+ 
+     protected Map<String, Object> metadadosImutaveisDocumento(long id) {
+-        return emTransacao(() -> {
++        return observar(() -> {
+             Map<String, Object> r = new TreeMap<>(linha(em.find(DocumentoComprobatorio.class, id), DocumentoComprobatorio.class));
+             // Only these state/audit-head fields legitimately change in substitute/invalidate commands.
+             for (String k : List.of("estado", "version", "quantidadeEventosAuditoria", "ultimoHashEventoAuditoria")) r.remove(k);
+--- /dev/null
++++ src/test/java/com/example/siggtrat/auditoria20261029/Suplementos8045Ambiente.java
+@@ -0,0 +1,110 @@
++package com.example.siggtrat.auditoria20261029;
++
++import com.example.siggtrat.infra.ConfiguracaoMysqlIntegracao;
++import com.example.siggtrat.infra.GuardaMysql8045;
++import java.net.URI;
++import java.sql.SQLException;
++import javax.sql.DataSource;
++import org.springframework.beans.BeansException;
++import org.springframework.beans.factory.config.BeanPostProcessor;
++import org.springframework.core.env.Environment;
++
++/**
++ * Guarda exclusiva dos suplementos portados. Não cria schema ou fixture.
++ * Confere a conexão efetiva antes do JPA e novamente antes de cada caso.
++ * Credenciais só são lidas da configuração autorizada; nunca são registradas.
++ */
++public final class Suplementos8045Ambiente implements BeanPostProcessor {
++    private static final String USUARIO = "sgt_campaign";
++
++    private static ConfiguracaoMysqlIntegracao configuracao() {
++        if (!"1".equals(System.getenv("SGT_SUPPLEMENTAL_EXECUTE"))) {
++            throw new IllegalStateException("Suplementos exigem SGT_SUPPLEMENTAL_EXECUTE=1 após autorização do coordenador.");
++        }
++        String modo = System.getProperty("integration.mysql.mode", System.getenv("INTEGRATION_MYSQL_MODE"));
++        if (!"native".equals(modo)) {
++            throw new IllegalStateException("Suplementos exigem a seleção explícita do MySQL nativo da campanha.");
++        }
++        serverUuid(); // Identidade esperada obrigatória antes de abrir qualquer conexão.
++        var cfg = ConfiguracaoMysqlIntegracao.carregar();
++        if (cfg.usaTestcontainers()) throw new IllegalStateException("Suplementos não admitem Testcontainers.");
++        var uri = URI.create(cfg.url().substring("jdbc:".length()));
++        if (!USUARIO.equals(cfg.usuario()) || !"127.0.0.1".equals(uri.getHost())
++                || uri.getPort() != 33075 || !uri.getPath().matches("/sgt_audit_8045_[a-z0-9_]+")) {
++            throw new IllegalStateException("Identidade JDBC fora do endpoint, conta e prefixo de schema autorizados.");
++        }
++        return cfg;
++    }
++
++    static String schema() {
++        return URI.create(configuracao().url().substring("jdbc:".length())).getPath().substring(1);
++    }
++
++    static String usuario() { configuracao(); return USUARIO; }
++
++    private static String ambienteExplicito(String nome) {
++        String valor = System.getenv(nome);
++        if (valor == null || (!nome.equals("REDIS_PASSWORD") && valor.isBlank())) {
++            throw new IllegalStateException("Informe explicitamente " + nome + " para os suplementos.");
++        }
++        return valor;
++    }
++
++    private static String serverUuid() {
++        String valor = ambienteExplicito("SGT_MYSQL_SERVER_UUID");
++        if (!valor.matches("[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}")) {
++            throw new IllegalStateException("SGT_MYSQL_SERVER_UUID deve ser um UUID explícito válido.");
++        }
++        return java.util.UUID.fromString(valor).toString();
++    }
++
++    static int redisDatabase() {
++        String valor = ambienteExplicito("REDIS_DATABASE");
++        if (!valor.matches("[0-9]+")) throw new IllegalStateException("REDIS_DATABASE deve ser um índice explícito válido.");
++        try { return Integer.parseInt(valor); }
++        catch (NumberFormatException erro) { throw new IllegalStateException("REDIS_DATABASE fora do intervalo de índice."); }
++    }
++
++    static void confirmar(Environment ambiente, DataSource dataSource) {
++        var cfg = configuracao();
++        if (!cfg.url().equals(ambiente.getProperty("spring.datasource.url"))
++                || !cfg.usuario().equals(ambiente.getProperty("spring.datasource.username"))
++                || !"update".equals(ambiente.getProperty("spring.jpa.hibernate.ddl-auto"))
++                || !"never".equals(ambiente.getProperty("spring.sql.init.mode"))) {
++            throw new IllegalStateException("Configuração efetiva do JPA/DataSource difere da campanha declarada.");
++        }
++        for (String parte : new String[]{"host", "port", "password", "database"}) {
++            String esperado = ambienteExplicito("REDIS_" + parte.toUpperCase(java.util.Locale.ROOT));
++            if (!esperado.equals(ambiente.getProperty("spring.data.redis." + parte))) {
++                throw new IllegalStateException("Configuração efetiva do Redis difere do ambiente explícito: " + parte);
++            }
++        }
++        redisDatabase();
++        conferirConexao(dataSource);
++    }
++
++    private static void conferirConexao(DataSource dataSource) {
++        var cfg = configuracao();
++        if (dataSource == null) throw new IllegalStateException("DataSource real ausente nos suplementos.");
++        try (var conexao = dataSource.getConnection(); var stmt = conexao.createStatement();
++                var resultado = stmt.executeQuery("SELECT VERSION(), DATABASE(), CURRENT_USER(), @@server_uuid")) {
++            if (!resultado.next()) throw new IllegalStateException("Servidor não retornou identidade para os suplementos.");
++            GuardaMysql8045.exigirVersao(conexao.getMetaData().getDatabaseProductName(),
++                    conexao.getMetaData().getDatabaseProductVersion(), resultado.getString(1));
++            if (!schema().equals(resultado.getString(2))
++                    || !cfg.usuario().equals(resultado.getString(3).split("@", 2)[0])
++                    || !serverUuid().equals(resultado.getString(4))) {
++                throw new IllegalStateException("Conexão efetiva fora do schema, conta ou servidor autorizado.");
++            }
++        } catch (SQLException erro) {
++            // Mensagem deliberadamente sem URL, usuário observado ou erro que possa conter credenciais.
++            throw new IllegalStateException("Não foi possível conferir a identidade MySQL efetiva dos suplementos.");
++        }
++    }
++
++    @Override
++    public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException {
++        if (bean instanceof DataSource dataSource) conferirConexao(dataSource);
++        return bean;
++    }
++}

@@ -1,0 +1,281 @@
+{
+  "generated_utc": "2026-11-03T18:14:55.456622+00:00",
+  "catalog_v2_sha256": "dda62afb04e1e7c511e4d40d1b7af3eab2bd0ab9faf3f7bbeda8aa43b54bcc57",
+  "selected": [
+    {
+      "name": "A244Adi004AtomicidadeHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup_v2/java/com/example/siggtrat/auditoria20261029/A244Adi004AtomicidadeHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Adi004AtomicidadeHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Adi004AtomicidadeHttpIT.java",
+      "original_sha256": "e0035d92ddbc68031912ebb5b27fc0e26d2bae1d2b8c5e310e0c1b1dd1f59871",
+      "bytes_original": 7844,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "A244Con008FotografiaHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup_v2/java/com/example/siggtrat/auditoria20261029/A244Con008FotografiaHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Con008FotografiaHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con008FotografiaHttpIT.java",
+      "original_sha256": "f18536e1963d85527fbc5d70869da101f5a2fd4cdaa9d134ca58c342a2ee8c53",
+      "bytes_original": 11344,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "A244Suporte.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup_v2/java/com/example/siggtrat/auditoria20261029/A244Suporte.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Suporte.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Suporte.java",
+      "original_sha256": "3ab722710b6e862e140c120526a19b0fb4ed0ce2e3fb04c3218d86eeae268642",
+      "bytes_original": 13039,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "A244Cmp005InstrumentosHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Cmp005InstrumentosHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Cmp005InstrumentosHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Cmp005InstrumentosHttpIT.java",
+      "original_sha256": "2ace2fe916db51807c51031a016e896322f9888d894347ea08a07ff76163db29",
+      "bytes_original": 3701,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "A244Con005PendenciasHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Con005PendenciasHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Con005PendenciasHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con005PendenciasHttpIT.java",
+      "original_sha256": "afe869ae595022a6d8f3a3b8859c0d94d928ff4c96d0e50596ccfbab39db3c35",
+      "bytes_original": 5151,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "A244Con012RetomadaHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Con012RetomadaHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Con012RetomadaHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con012RetomadaHttpIT.java",
+      "original_sha256": "872d1c109bdb43bf041d6a678c899e1a1fc495336003874f72043fe54f5a834f",
+      "bytes_original": 4619,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "A244Con018AnulacaoHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Con018AnulacaoHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/A244Con018AnulacaoHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/A244Con018AnulacaoHttpIT.java",
+      "original_sha256": "2e4d857f9087696fc77df190544ff6beb6c4158b63bfd0b4bdf6ab34381a12fe",
+      "bytes_original": 3302,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "B230CatalogosPessoasComplementosHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "original_sha256": "5a8559df91a7c5fdedcd1defa4472e90e5b0fb0ef4b285884a7cf9718efd957c",
+      "bytes_original": 14814,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "B230RelatoriosComplementosHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java",
+      "original_sha256": "44165853c09907faad4810e79d89f588fa1f1be00e00a592b9bdcda60283311d",
+      "bytes_original": 10705,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "B230TemporalOperacionalComplementosHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "original_sha256": "df7a9f9eb48e17f1b8753ea18d1e73a2eb58c649b927163109d1f734da6842e9",
+      "bytes_original": 17053,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "B230Suporte.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230Suporte.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/B230Suporte.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/B230Suporte.java",
+      "original_sha256": "99e062f9a9f3c20ee4abb26468cec3bd3f7f11db831a621db34f3ac51a07510f",
+      "bytes_original": 15167,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "CriteriosCDocumentosHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "original_sha256": "e97f66c1543b8c5cf226ec62cd21d42b0c8696d8048ea4d95058e61ca76293e2",
+      "bytes_original": 11921,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "CriteriosCHistoricoHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "original_sha256": "cdffbc3ee57d0c005edae584ad874cc4f2b0a4d7d6560916e69ec75ae9fe7eac",
+      "bytes_original": 10996,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "CriteriosCOcorrenciasHttpIT.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "original_sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "bytes_original": 16192,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    },
+    {
+      "name": "CriteriosCHttpBase.java",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "original": "originais_selecionados/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "adapted": "src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "original_sha256": "e28e0d85f7758079b41c88522c83e4ebc242e882ba1e92b9e6cc3871fc7d2f0b",
+      "bytes_original": 11546,
+      "status": "PREPARADO_NAO_EXECUTADO"
+    }
+  ],
+  "preserved_variants": [
+    {
+      "name": "A244Adi004AtomicidadeHttpIT.java",
+      "sha256": "e0035d92ddbc68031912ebb5b27fc0e26d2bae1d2b8c5e310e0c1b1dd1f59871",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup_v2/java/com/example/siggtrat/auditoria20261029/A244Adi004AtomicidadeHttpIT.java",
+      "preserved": "proveniencia_variantes/e0035d92ddbc68031912ebb5b27fc0e26d2bae1d2b8c5e310e0c1b1dd1f59871/A244Adi004AtomicidadeHttpIT.java"
+    },
+    {
+      "name": "A244Cmp005InstrumentosHttpIT.java",
+      "sha256": "2ace2fe916db51807c51031a016e896322f9888d894347ea08a07ff76163db29",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Cmp005InstrumentosHttpIT.java",
+      "preserved": "proveniencia_variantes/2ace2fe916db51807c51031a016e896322f9888d894347ea08a07ff76163db29/A244Cmp005InstrumentosHttpIT.java"
+    },
+    {
+      "name": "A244Con005PendenciasHttpIT.java",
+      "sha256": "afe869ae595022a6d8f3a3b8859c0d94d928ff4c96d0e50596ccfbab39db3c35",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Con005PendenciasHttpIT.java",
+      "preserved": "proveniencia_variantes/afe869ae595022a6d8f3a3b8859c0d94d928ff4c96d0e50596ccfbab39db3c35/A244Con005PendenciasHttpIT.java"
+    },
+    {
+      "name": "A244Con008FotografiaHttpIT.java",
+      "sha256": "f18536e1963d85527fbc5d70869da101f5a2fd4cdaa9d134ca58c342a2ee8c53",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup_v2/java/com/example/siggtrat/auditoria20261029/A244Con008FotografiaHttpIT.java",
+      "preserved": "proveniencia_variantes/f18536e1963d85527fbc5d70869da101f5a2fd4cdaa9d134ca58c342a2ee8c53/A244Con008FotografiaHttpIT.java"
+    },
+    {
+      "name": "A244Con012RetomadaHttpIT.java",
+      "sha256": "872d1c109bdb43bf041d6a678c899e1a1fc495336003874f72043fe54f5a834f",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Con012RetomadaHttpIT.java",
+      "preserved": "proveniencia_variantes/872d1c109bdb43bf041d6a678c899e1a1fc495336003874f72043fe54f5a834f/A244Con012RetomadaHttpIT.java"
+    },
+    {
+      "name": "A244Con018AnulacaoHttpIT.java",
+      "sha256": "2e4d857f9087696fc77df190544ff6beb6c4158b63bfd0b4bdf6ab34381a12fe",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Con018AnulacaoHttpIT.java",
+      "preserved": "proveniencia_variantes/2e4d857f9087696fc77df190544ff6beb6c4158b63bfd0b4bdf6ab34381a12fe/A244Con018AnulacaoHttpIT.java"
+    },
+    {
+      "name": "A244Suporte.java",
+      "sha256": "3ab722710b6e862e140c120526a19b0fb4ed0ce2e3fb04c3218d86eeae268642",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup_v2/java/com/example/siggtrat/auditoria20261029/A244Suporte.java",
+      "preserved": "proveniencia_variantes/3ab722710b6e862e140c120526a19b0fb4ed0ce2e3fb04c3218d86eeae268642/A244Suporte.java"
+    },
+    {
+      "name": "A244Suporte.java",
+      "sha256": "9cc669d4ea549dfcc1c55b136a93b97b37ab9c5f74ae16ea7b6bde7e877803f5",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/a244_followup/java/com/example/siggtrat/auditoria20261029/A244Suporte.java",
+      "preserved": "proveniencia_variantes/9cc669d4ea549dfcc1c55b136a93b97b37ab9c5f74ae16ea7b6bde7e877803f5/A244Suporte.java"
+    },
+    {
+      "name": "B230CatalogosPessoasComplementosHttpIT.java",
+      "sha256": "5a8559df91a7c5fdedcd1defa4472e90e5b0fb0ef4b285884a7cf9718efd957c",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "preserved": "proveniencia_variantes/5a8559df91a7c5fdedcd1defa4472e90e5b0fb0ef4b285884a7cf9718efd957c/B230CatalogosPessoasComplementosHttpIT.java"
+    },
+    {
+      "name": "B230CatalogosPessoasComplementosHttpIT.java",
+      "sha256": "a4f4d173093424325b2f42fe06d6b72a0d7bb6a2f616b316d6312c2fa63a5edd",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup/java/com/example/siggtrat/auditoria20261029/B230CatalogosPessoasComplementosHttpIT.java",
+      "preserved": "proveniencia_variantes/a4f4d173093424325b2f42fe06d6b72a0d7bb6a2f616b316d6312c2fa63a5edd/B230CatalogosPessoasComplementosHttpIT.java"
+    },
+    {
+      "name": "B230RelatoriosComplementosHttpIT.java",
+      "sha256": "44165853c09907faad4810e79d89f588fa1f1be00e00a592b9bdcda60283311d",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230RelatoriosComplementosHttpIT.java",
+      "preserved": "proveniencia_variantes/44165853c09907faad4810e79d89f588fa1f1be00e00a592b9bdcda60283311d/B230RelatoriosComplementosHttpIT.java"
+    },
+    {
+      "name": "B230Suporte.java",
+      "sha256": "99e062f9a9f3c20ee4abb26468cec3bd3f7f11db831a621db34f3ac51a07510f",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230Suporte.java",
+      "preserved": "proveniencia_variantes/99e062f9a9f3c20ee4abb26468cec3bd3f7f11db831a621db34f3ac51a07510f/B230Suporte.java"
+    },
+    {
+      "name": "B230Suporte.java",
+      "sha256": "a8242e4aa0fb965d104177073f24b423ccf80ee9514c9b76fa518de6e2e639e7",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_01/results/03_DEFEITOS_E_REVISAO/BUILD03_PREP_ADAPTATION/before/tests/b230_followup/java/com/example/siggtrat/auditoria20261029/B230Suporte.java",
+      "preserved": "proveniencia_variantes/a8242e4aa0fb965d104177073f24b423ccf80ee9514c9b76fa518de6e2e639e7/B230Suporte.java"
+    },
+    {
+      "name": "B230TemporalOperacionalComplementosHttpIT.java",
+      "sha256": "df7a9f9eb48e17f1b8753ea18d1e73a2eb58c649b927163109d1f734da6842e9",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/b230_followup_cat001_v2/java/com/example/siggtrat/auditoria20261029/B230TemporalOperacionalComplementosHttpIT.java",
+      "preserved": "proveniencia_variantes/df7a9f9eb48e17f1b8753ea18d1e73a2eb58c649b927163109d1f734da6842e9/B230TemporalOperacionalComplementosHttpIT.java"
+    },
+    {
+      "name": "CriteriosCDocumentosHttpIT.java",
+      "sha256": "e97f66c1543b8c5cf226ec62cd21d42b0c8696d8048ea4d95058e61ca76293e2",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "preserved": "proveniencia_variantes/e97f66c1543b8c5cf226ec62cd21d42b0c8696d8048ea4d95058e61ca76293e2/CriteriosCDocumentosHttpIT.java"
+    },
+    {
+      "name": "CriteriosCDocumentosHttpIT.java",
+      "sha256": "ef1a892f74460500e95ef963d7c7d2f1b46521d8080e2bbfd41fefda0cefe714",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCDocumentosHttpIT.java",
+      "preserved": "proveniencia_variantes/ef1a892f74460500e95ef963d7c7d2f1b46521d8080e2bbfd41fefda0cefe714/CriteriosCDocumentosHttpIT.java"
+    },
+    {
+      "name": "CriteriosCHistoricoHttpIT.java",
+      "sha256": "cdffbc3ee57d0c005edae584ad874cc4f2b0a4d7d6560916e69ec75ae9fe7eac",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHistoricoHttpIT.java",
+      "preserved": "proveniencia_variantes/cdffbc3ee57d0c005edae584ad874cc4f2b0a4d7d6560916e69ec75ae9fe7eac/CriteriosCHistoricoHttpIT.java"
+    },
+    {
+      "name": "CriteriosCHttpBase.java",
+      "sha256": "032a81ee0a6fee3e77c546999043fdb909e78e4b4cd7a0f5f6ff80f1e4ba2fa8",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/harness_history/criteria_c_probe-pre-seal-guard/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "preserved": "proveniencia_variantes/032a81ee0a6fee3e77c546999043fdb909e78e4b4cd7a0f5f6ff80f1e4ba2fa8/CriteriosCHttpBase.java"
+    },
+    {
+      "name": "CriteriosCHttpBase.java",
+      "sha256": "3f230f8d69fdd938725a8756023ef51fc5308940e0d91bfb7798bc739c73255c",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_v5/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "preserved": "proveniencia_variantes/3f230f8d69fdd938725a8756023ef51fc5308940e0d91bfb7798bc739c73255c/CriteriosCHttpBase.java"
+    },
+    {
+      "name": "CriteriosCHttpBase.java",
+      "sha256": "e28e0d85f7758079b41c88522c83e4ebc242e882ba1e92b9e6cc3871fc7d2f0b",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "preserved": "proveniencia_variantes/e28e0d85f7758079b41c88522c83e4ebc242e882ba1e92b9e6cc3871fc7d2f0b/CriteriosCHttpBase.java"
+    },
+    {
+      "name": "CriteriosCHttpBase.java",
+      "sha256": "eacac505a7aa30f543ed4e6ad194065b0ed4d66b7626c123f3a8b998ed6f6b0d",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/harness_history/criteria_c_probe_v5-before-c2/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCHttpBase.java",
+      "preserved": "proveniencia_variantes/eacac505a7aa30f543ed4e6ad194065b0ed4d66b7626c123f3a8b998ed6f6b0d/CriteriosCHttpBase.java"
+    },
+    {
+      "name": "CriteriosCOcorrenciasHttpIT.java",
+      "sha256": "e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138",
+      "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_v5/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCOcorrenciasHttpIT.java",
+      "preserved": "proveniencia_variantes/e91f6a507f2e9da16a5cf651a3511e39e4b0290473ea7fa89dae5aba19558138/CriteriosCOcorrenciasHttpIT.java"
+    }
+  ],
+  "diagnostic": {
+    "source": "/workspace/scratch/db1992738cfa/sgt/historical_extracted/DEFEITOS_REVISAO_E_TESTES_H01_H02_PARTE_02/tests/criteria_c_probe_doc005_v6/src/test/java/com/example/siggtrat/auditoria20261029/CriteriosCFinalidadeObservacaoHttpIT.java",
+    "sha256": "8e948f0698087b01356a37c5946294f28017d4891ae2a1cf1234d34b02b0901f",
+    "preserved": "diagnostico_sem_credito/com/example/siggtrat/auditoria20261029/CriteriosCFinalidadeObservacaoHttpIT.java",
+    "criterion_credit": false
+  }
+}

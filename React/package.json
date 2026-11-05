@@ -1,0 +1,55 @@
+{
+  "name": "sig-gtrat-front",
+  "private": true,
+  "version": "1.4.4-operacional.20261101",
+  "type": "module",
+  "packageManager": "npm@10.9.2",
+  "engines": {
+    "node": ">=22.16.0 <23"
+  },
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
+    "build:java": "node scripts/bloquear-mutacao-backend.mjs",
+    "sync:java": "node scripts/bloquear-mutacao-backend.mjs",
+    "diagnostico:dependencias": "node scripts/verificar-dependencias-locais.mjs",
+    "test:preparacao": "node --test test/preparacao-local.test.mjs",
+    "dependencias:verificar": "node scripts/verificar-dependencias-locais.mjs",
+    "test:vitest:dependencias": "vitest run --config vitest.dependencias.config.js",
+    "dependencias:empacotar:fedora": "bash scripts/gerar-pacote-dependencias-fedora.sh",
+    "test": "vitest run --config vitest.config.js",
+    "test:watch": "vitest --config vitest.config.js",
+    "test:coverage": "vitest run --config vitest.config.js --coverage",
+    "test:completo": "npm run test:preparacao && npm run test:coverage && npm run build"
+  },
+  "dependencies": {
+    "@vladmandic/face-api": "1.7.15",
+    "axios": "1.20.0",
+    "jspdf": "4.2.1",
+    "jspdf-autotable": "5.0.7",
+    "lucide-react": "1.11.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "react-router-dom": "7.18.3",
+    "react-toastify": "11.0.5",
+    "recharts": "3.8.1"
+  },
+  "devDependencies": {
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.3",
+    "@vitejs/plugin-basic-ssl": "2.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "@vitest/coverage-v8": "4.1.12",
+    "jsdom": "27.4.0",
+    "vite": "8.2.4",
+    "vitest": "4.1.12"
+  },
+  "overrides": {
+    "uuid": "14.0.0"
+  },
+  "allowScripts": {
+    "core-js@3.50.0": true
+  },
+  "description": "Interface React SGT/GTRAT com gestão contratual, operacional e cadastro de empresas preservados após a retirada integral da Governança de Terceiros."
+}

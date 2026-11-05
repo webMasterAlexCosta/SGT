@@ -1,0 +1,310 @@
+{
+  "gerado_utc": "2026-10-31T04:57:36.774718+00:00",
+  "manifesto_fontes_sha256": "fc92555e0785d29ed9b8f2dd3c86235c7eec03992537f27b7f0bc8f5d3526f25",
+  "escopo": "Remoções legadas já existentes no checkpoint; não atribuídas como novas correções desta sessão.",
+  "contagens_java": {
+    "original": 610,
+    "checkpoint": 583,
+    "entrega": 590
+  },
+  "arquivos_removidos_antes_do_atendimento": [
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/auditoria/DiferencasAuditoriaEmpregado.java",
+      "sha256_java_original": "a77b9edd49514793f5deca09e5b4d558348e06483d8075464f3982db035e2a81",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/auditoria/NarradorAlteracoesEmpregado.java",
+      "sha256_java_original": "d8c3340e14a68677fd9973f868fa7458e69feb2329cd470897f28ff480731682",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/controlador/AgenciaControlador.java",
+      "sha256_java_original": "5f7759b22c12943873fb2681ea9dd4b27151fbdcc1b9e0c0a518e5aa919eb475",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/controlador/BancoControlador.java",
+      "sha256_java_original": "a5aa2a167581bd84e5976403345b2885561a86483fde8bcc1d7b0d095ba16278",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/controlador/ContaControlador.java",
+      "sha256_java_original": "e24e130623864ae76cd1d081c047c627b8877bfd1ce14583b3a664a2e430bce3",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/controlador/EnderecoControlador.java",
+      "sha256_java_original": "ea56d8731ec2948f2f7774cdacbc78193faad52007845c2368a8856e84be05ee",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/controlador/TelefoneControlador.java",
+      "sha256_java_original": "9d5f6d1123b66ffb383f5ca232971e9b3508f14ff9a2d906b00526b2305d4340",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/controlador/TipoContaControlador.java",
+      "sha256_java_original": "173584289ab7d6e4a8a4a060cd75c67564d82cbd726c07060470b9a7654951bb",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/AgenciaDTO.java",
+      "sha256_java_original": "bc85d253671648299098a9fb57cc6a11455587e56b5be99a3134b871c7c0ee8a",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/BancoDTO.java",
+      "sha256_java_original": "498c14590d2ab5da3e0672e05fc623fc9b88e42e63c95d7cdaab66ac0b089bae",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/ContaDTO.java",
+      "sha256_java_original": "8e859871c22fb6d3da76865b9054ff9f4bab8b6ae0b43db0f13f8c79cde68e9e",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/EmpregadoContaDTO.java",
+      "sha256_java_original": "bc4118366756bb8b932865b7988ac5695cf73f66c7a59c8257bf5e4415f7156c",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/EmpregadoEnderecoDTO.java",
+      "sha256_java_original": "d22cad4a739b2e8f4586f5c93f2da482b39c46bd07f13898acabd04ca7dd48cb",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/EmpregadoTelefoneDTO.java",
+      "sha256_java_original": "af2a5fd176939cc190b7cf637c6aa0b3f8ca54df74424a8e9a1fde58880ff70c",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/TelefoneDTO.java",
+      "sha256_java_original": "c358e96040e15e801d13ee94e555758ae2622fc27e6ab054ac754d616c81ff10",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/dto/TipoContaDTO.java",
+      "sha256_java_original": "8e98bd7a8c5dc9a703176befbfe701287ed45359825bc4e4a5260c0f65fc5a77",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/entidade/Agencia.java",
+      "sha256_java_original": "ffc139be232e78ce538206478ec86ff6a6f02b051c109b78c6301f37ebd2fd93",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/entidade/Banco.java",
+      "sha256_java_original": "9934a592feb44ede7f6e5901ced92321a9fe98c10d4e08de56acbdbd9760dfd9",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/entidade/Conta.java",
+      "sha256_java_original": "e5ca3bf04493b6aa47b500176da1e349aea01506448123b2ae8b66a217a3a448",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/entidade/Telefone.java",
+      "sha256_java_original": "b406314974a950cffea0c5f8a274d4632971759813e0572080cc7b694e456c4d",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/entidade/TipoConta.java",
+      "sha256_java_original": "7c15515fd085eb5afd18c96593f24d54804437be7d1a9612e08d073e36a04ddc",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/repositorio/AgenciaRepositorio.java",
+      "sha256_java_original": "7f4c5ed58588d2bd6fd737eb42ab9ce3399b2478138d0cb17ebd35657a7e11c2",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/repositorio/BancoRepositorio.java",
+      "sha256_java_original": "6fa23482a9342181971ab74c1b8ae1feb554b7040bff912e870c082680ad4ea6",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/repositorio/ContaRepositorio.java",
+      "sha256_java_original": "d1de21daa6817b17eb1cc3bcf320516a2bfe06dfa19cbf0fc04a2d0ea3582efd",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/repositorio/EnderecoRepositorio.java",
+      "sha256_java_original": "5e1bfad8a3e44b4dc15cba46395712da13d32db119ea31db985ae9a2a4e02b28",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/repositorio/TelefoneRepositorio.java",
+      "sha256_java_original": "01dd3e00721537b5367852849ec0ca41fdec7339a173c3024d0119c9894ec208",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/repositorio/TipoContaRepositorio.java",
+      "sha256_java_original": "e4b6f37de38d1c56156444b2858adf87d3f8a5839fdf144c712e6029b6c7c43b",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/AgenciaServico.java",
+      "sha256_java_original": "cc7a06d521a8d4e783331f61579f503491a9e6144c3397558127a3c3bcdb12f7",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/BancoServico.java",
+      "sha256_java_original": "257df012ea32e6b2be04c362b870951b507745db2245dc781767f95e12c77159",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/CompatibilidadeEmpregadoCanonicoServico.java",
+      "sha256_java_original": "5e5c161b7d12edbedac3569e72fc2870a5693fe8839cae8cee3573bdc0472910",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/ContaServico.java",
+      "sha256_java_original": "53f0447069505b25446444489157e1a0cd3e69bbaf3eda5c628efbdb1c8ebb39",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/EnderecoServico.java",
+      "sha256_java_original": "e703b64556c7946d2b668dcd4bf77297e01b0b835a578c3d0eee4e3c387c5784",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/TelefoneServico.java",
+      "sha256_java_original": "11857853a60aa3f7f1aa433d22acd08387e4e8e949f9168d6c74064376d37520",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/servico/TipoContaServico.java",
+      "sha256_java_original": "103cb6a77e4c0190f137e12490d31d3f9372412e1a67e4cd644eea22291930a2",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    },
+    {
+      "arquivo": "src/main/java/com/example/siggtrat/utilitario/UtilitarioMatriculaEmpregado.java",
+      "sha256_java_original": "eece22f8d284c769cdcf9616d1d437bcea2677347d0c4c87927d825fdc3a6d77",
+      "presente_no_checkpoint": false,
+      "presente_na_entrega": false,
+      "momento": "Retirado antes deste atendimento; ausência atual verificada."
+    }
+  ],
+  "teste_permanente": {
+    "arquivo": "src/test/java/com/example/siggtrat/auditoria20261029/ConclusaoApiCanonicaHttpIT.java",
+    "sha256": "80e75a2dd0c30d4a09be21e2869f72f0796133cf8a61d6a07aef9809873a5989",
+    "rodada": "regressao_integral_06",
+    "casos": [
+      {
+        "classe": "com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT",
+        "metodo": "rotasDeEscritaCompatibilidadeECrudDescontinuadoNaoSaoMapeadas",
+        "invocacao": "rotasDeEscritaCompatibilidadeECrudDescontinuadoNaoSaoMapeadas",
+        "estado": "PASSOU",
+        "segundos": 0.135,
+        "xml": "failsafe-reports/TEST-com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT.xml",
+        "xml_sha256": "b9ec83c02a1a16021bc633f22bae95f293c43abfcc60b2863d80cd644ec92038",
+        "mensagem": null
+      },
+      {
+        "classe": "com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT",
+        "metodo": "dadosOpcionaisCanonicosPreservamEnderecoIdentidadeEVinculoEExigemEscopo",
+        "invocacao": "dadosOpcionaisCanonicosPreservamEnderecoIdentidadeEVinculoEExigemEscopo",
+        "estado": "PASSOU",
+        "segundos": 1.154,
+        "xml": "failsafe-reports/TEST-com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT.xml",
+        "xml_sha256": "b9ec83c02a1a16021bc633f22bae95f293c43abfcc60b2863d80cd644ec92038",
+        "mensagem": null
+      },
+      {
+        "classe": "com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT",
+        "metodo": "atualizacaoCanonicaRegistraAntesDepoisAutorDataEfetivaESomenteAposCommit",
+        "invocacao": "atualizacaoCanonicaRegistraAntesDepoisAutorDataEfetivaESomenteAposCommit",
+        "estado": "PASSOU",
+        "segundos": 0.989,
+        "xml": "failsafe-reports/TEST-com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT.xml",
+        "xml_sha256": "b9ec83c02a1a16021bc633f22bae95f293c43abfcc60b2863d80cd644ec92038",
+        "mensagem": null
+      },
+      {
+        "classe": "com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT",
+        "metodo": "atualizacoesOpcionaisConcorrentesPreservamCampoOmitidoAposEsperaRealNoMysql",
+        "invocacao": "atualizacoesOpcionaisConcorrentesPreservamCampoOmitidoAposEsperaRealNoMysql",
+        "estado": "PASSOU",
+        "segundos": 0.723,
+        "xml": "failsafe-reports/TEST-com.example.siggtrat.auditoria20261029.ConclusaoApiCanonicaHttpIT.xml",
+        "xml_sha256": "b9ec83c02a1a16021bc633f22bae95f293c43abfcc60b2863d80cd644ec92038",
+        "mensagem": null
+      }
+    ]
+  },
+  "frontend_alterado": false,
+  "limites": [
+    "Empregado/Endereco persistidos e históricos negociais não são excluídos por esta matriz.",
+    "Ausência de roteamento não homologa por si só cada requisito; consultar a matriz final de 198 IDs.",
+    "Não atribuir esta remoção a uma mudança nova da candidata07."
+  ]
+}

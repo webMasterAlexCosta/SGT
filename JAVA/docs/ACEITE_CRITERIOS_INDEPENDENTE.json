@@ -1,0 +1,4479 @@
+{
+  "manifesto_fontes_sha256": "fc92555e0785d29ed9b8f2dd3c86235c7eec03992537f27b7f0bc8f5d3526f25",
+  "criterios_recebidos": 635,
+  "resultados_tecnicos": {
+    "TODAS_REFERENCIAS_APROVADAS": 635
+  },
+  "contagem_aceite_independente": {
+    "A": 613,
+    "B": 0,
+    "C": 0,
+    "D": 0,
+    "E": 22
+  },
+  "fontes": [
+    {
+      "grupo": "contratos",
+      "arquivo": "auditoria_independente/candidata07/contratos/REVISAO_REQUISITOS.json",
+      "sha256": "3ad7d9819b312b8b183c563cb3406f78c767ce94969a908d7fd3892432255a03"
+    },
+    {
+      "grupo": "pessoas",
+      "arquivo": "auditoria_independente/candidata07/pessoas/REVISAO_REQUISITOS.json",
+      "sha256": "c45e5072ee79d74e0f78103f527ef05198db9aaf3807e7a028c70f8cb680e285"
+    },
+    {
+      "grupo": "transversais",
+      "arquivo": "auditoria_independente/candidata07/transversais/REVISAO_REQUISITOS.json",
+      "sha256": "f617a2e484531048b64ef45a62227f208365c21fbf499a958021b4c3fc4a54e3"
+    }
+  ],
+  "criterios": [
+    {
+      "id": "GOV-003:001",
+      "id_no_parecer": "GOV-003:checkpoint:001",
+      "requisito": "GOV-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "GOV-003:002",
+      "id_no_parecer": "GOV-003:checkpoint:002",
+      "requisito": "GOV-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "GOV-003:003",
+      "id_no_parecer": "GOV-003:checkpoint:003",
+      "requisito": "GOV-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "GOV-004:001",
+      "id_no_parecer": "GOV-004:checkpoint:001",
+      "requisito": "GOV-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "GOV-004:002",
+      "id_no_parecer": "GOV-004:checkpoint:002",
+      "requisito": "GOV-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "GOV-004:003",
+      "id_no_parecer": "GOV-004:checkpoint:003",
+      "requisito": "GOV-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "GOV-004:004",
+      "id_no_parecer": "GOV-004:checkpoint:004",
+      "requisito": "GOV-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-001:001",
+      "id_no_parecer": "CON-001:checkpoint:001",
+      "requisito": "CON-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-001:002",
+      "id_no_parecer": "CON-001:checkpoint:002",
+      "requisito": "CON-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-001:003",
+      "id_no_parecer": "CON-001:checkpoint:003",
+      "requisito": "CON-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-001:004",
+      "id_no_parecer": "CON-001:checkpoint:004",
+      "requisito": "CON-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-002:001",
+      "id_no_parecer": "CON-002:checkpoint:001",
+      "requisito": "CON-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-002:002",
+      "id_no_parecer": "CON-002:checkpoint:002",
+      "requisito": "CON-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-002:003",
+      "id_no_parecer": "CON-002:checkpoint:003",
+      "requisito": "CON-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-003:001",
+      "id_no_parecer": "CON-003:checkpoint:001",
+      "requisito": "CON-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-003:002",
+      "id_no_parecer": "CON-003:checkpoint:002",
+      "requisito": "CON-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-003:003",
+      "id_no_parecer": "CON-003:checkpoint:003",
+      "requisito": "CON-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-003:004",
+      "id_no_parecer": "CON-003:checkpoint:004",
+      "requisito": "CON-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-003:005",
+      "id_no_parecer": "CON-003:checkpoint:005",
+      "requisito": "CON-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-004:001",
+      "id_no_parecer": "CON-004:checkpoint:001",
+      "requisito": "CON-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-004:002",
+      "id_no_parecer": "CON-004:checkpoint:002",
+      "requisito": "CON-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-004:003",
+      "id_no_parecer": "CON-004:checkpoint:003",
+      "requisito": "CON-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-005:001",
+      "id_no_parecer": "CON-005:checkpoint:001",
+      "requisito": "CON-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-005:002",
+      "id_no_parecer": "CON-005:checkpoint:002",
+      "requisito": "CON-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-005:003",
+      "id_no_parecer": "CON-005:checkpoint:003",
+      "requisito": "CON-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-006:001",
+      "id_no_parecer": "CON-006:checkpoint:001",
+      "requisito": "CON-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-006:002",
+      "id_no_parecer": "CON-006:checkpoint:002",
+      "requisito": "CON-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-006:003",
+      "id_no_parecer": "CON-006:checkpoint:003",
+      "requisito": "CON-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-006:004",
+      "id_no_parecer": "CON-006:checkpoint:004",
+      "requisito": "CON-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-007:001",
+      "id_no_parecer": "CON-007:checkpoint:001",
+      "requisito": "CON-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-007:002",
+      "id_no_parecer": "CON-007:checkpoint:002",
+      "requisito": "CON-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-007:003",
+      "id_no_parecer": "CON-007:checkpoint:003",
+      "requisito": "CON-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-007:004",
+      "id_no_parecer": "CON-007:checkpoint:004",
+      "requisito": "CON-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-008:001",
+      "id_no_parecer": "CON-008:checkpoint:001",
+      "requisito": "CON-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-008:002",
+      "id_no_parecer": "CON-008:checkpoint:002",
+      "requisito": "CON-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-008:003",
+      "id_no_parecer": "CON-008:checkpoint:003",
+      "requisito": "CON-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-008:004",
+      "id_no_parecer": "CON-008:checkpoint:004",
+      "requisito": "CON-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-009:001",
+      "id_no_parecer": "CON-009:checkpoint:001",
+      "requisito": "CON-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-009:002",
+      "id_no_parecer": "CON-009:checkpoint:002",
+      "requisito": "CON-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-009:003",
+      "id_no_parecer": "CON-009:checkpoint:003",
+      "requisito": "CON-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-009:004",
+      "id_no_parecer": "CON-009:checkpoint:004",
+      "requisito": "CON-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-010:001",
+      "id_no_parecer": "CON-010:checkpoint:001",
+      "requisito": "CON-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-010:002",
+      "id_no_parecer": "CON-010:checkpoint:002",
+      "requisito": "CON-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-010:003",
+      "id_no_parecer": "CON-010:checkpoint:003",
+      "requisito": "CON-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-010:004",
+      "id_no_parecer": "CON-010:checkpoint:004",
+      "requisito": "CON-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-011:001",
+      "id_no_parecer": "CON-011:checkpoint:001",
+      "requisito": "CON-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-011:002",
+      "id_no_parecer": "CON-011:checkpoint:002",
+      "requisito": "CON-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-011:003",
+      "id_no_parecer": "CON-011:checkpoint:003",
+      "requisito": "CON-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-011:004",
+      "id_no_parecer": "CON-011:checkpoint:004",
+      "requisito": "CON-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-012:001",
+      "id_no_parecer": "CON-012:checkpoint:001",
+      "requisito": "CON-012",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-012:002",
+      "id_no_parecer": "CON-012:checkpoint:002",
+      "requisito": "CON-012",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-012:003",
+      "id_no_parecer": "CON-012:checkpoint:003",
+      "requisito": "CON-012",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-012:004",
+      "id_no_parecer": "CON-012:checkpoint:004",
+      "requisito": "CON-012",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-013:001",
+      "id_no_parecer": "CON-013:checkpoint:001",
+      "requisito": "CON-013",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-013:002",
+      "id_no_parecer": "CON-013:checkpoint:002",
+      "requisito": "CON-013",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-013:003",
+      "id_no_parecer": "CON-013:checkpoint:003",
+      "requisito": "CON-013",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-013:004",
+      "id_no_parecer": "CON-013:checkpoint:004",
+      "requisito": "CON-013",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-013:005",
+      "id_no_parecer": "CON-013:checkpoint:005",
+      "requisito": "CON-013",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-014:001",
+      "id_no_parecer": "CON-014:checkpoint:001",
+      "requisito": "CON-014",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-014:002",
+      "id_no_parecer": "CON-014:checkpoint:002",
+      "requisito": "CON-014",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-014:003",
+      "id_no_parecer": "CON-014:checkpoint:003",
+      "requisito": "CON-014",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-014:004",
+      "id_no_parecer": "CON-014:checkpoint:004",
+      "requisito": "CON-014",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-015:001",
+      "id_no_parecer": "CON-015:checkpoint:001",
+      "requisito": "CON-015",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-015:002",
+      "id_no_parecer": "CON-015:checkpoint:002",
+      "requisito": "CON-015",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-015:003",
+      "id_no_parecer": "CON-015:checkpoint:003",
+      "requisito": "CON-015",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-015:004",
+      "id_no_parecer": "CON-015:checkpoint:004",
+      "requisito": "CON-015",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-016:001",
+      "id_no_parecer": "CON-016:checkpoint:001",
+      "requisito": "CON-016",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-016:002",
+      "id_no_parecer": "CON-016:checkpoint:002",
+      "requisito": "CON-016",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-016:003",
+      "id_no_parecer": "CON-016:checkpoint:003",
+      "requisito": "CON-016",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-016:004",
+      "id_no_parecer": "CON-016:checkpoint:004",
+      "requisito": "CON-016",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-016:005",
+      "id_no_parecer": "CON-016:checkpoint:005",
+      "requisito": "CON-016",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-016:006",
+      "id_no_parecer": "CON-016:checkpoint:006",
+      "requisito": "CON-016",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-017:001",
+      "id_no_parecer": "CON-017:checkpoint:001",
+      "requisito": "CON-017",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-017:002",
+      "id_no_parecer": "CON-017:checkpoint:002",
+      "requisito": "CON-017",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-017:003",
+      "id_no_parecer": "CON-017:checkpoint:003",
+      "requisito": "CON-017",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-017:004",
+      "id_no_parecer": "CON-017:checkpoint:004",
+      "requisito": "CON-017",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-018:001",
+      "id_no_parecer": "CON-018:checkpoint:001",
+      "requisito": "CON-018",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-018:002",
+      "id_no_parecer": "CON-018:checkpoint:002",
+      "requisito": "CON-018",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-018:003",
+      "id_no_parecer": "CON-018:checkpoint:003",
+      "requisito": "CON-018",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-018:004",
+      "id_no_parecer": "CON-018:checkpoint:004",
+      "requisito": "CON-018",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-019:001",
+      "id_no_parecer": "CON-019:checkpoint:001",
+      "requisito": "CON-019",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-019:002",
+      "id_no_parecer": "CON-019:checkpoint:002",
+      "requisito": "CON-019",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-019:003",
+      "id_no_parecer": "CON-019:checkpoint:003",
+      "requisito": "CON-019",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-020:001",
+      "id_no_parecer": "CON-020:checkpoint:001",
+      "requisito": "CON-020",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-020:002",
+      "id_no_parecer": "CON-020:checkpoint:002",
+      "requisito": "CON-020",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-020:003",
+      "id_no_parecer": "CON-020:checkpoint:003",
+      "requisito": "CON-020",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-020:004",
+      "id_no_parecer": "CON-020:checkpoint:004",
+      "requisito": "CON-020",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-021:001",
+      "id_no_parecer": "CON-021:checkpoint:001",
+      "requisito": "CON-021",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-021:002",
+      "id_no_parecer": "CON-021:checkpoint:002",
+      "requisito": "CON-021",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-021:003",
+      "id_no_parecer": "CON-021:checkpoint:003",
+      "requisito": "CON-021",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-021:004",
+      "id_no_parecer": "CON-021:checkpoint:004",
+      "requisito": "CON-021",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-021:005",
+      "id_no_parecer": "CON-021:checkpoint:005",
+      "requisito": "CON-021",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-022:001",
+      "id_no_parecer": "CON-022:checkpoint:001",
+      "requisito": "CON-022",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-022:002",
+      "id_no_parecer": "CON-022:checkpoint:002",
+      "requisito": "CON-022",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-022:003",
+      "id_no_parecer": "CON-022:checkpoint:003",
+      "requisito": "CON-022",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-022:004",
+      "id_no_parecer": "CON-022:checkpoint:004",
+      "requisito": "CON-022",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:001",
+      "id_no_parecer": "CON-023:checkpoint:001",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:002",
+      "id_no_parecer": "CON-023:checkpoint:002",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CON-023:003",
+      "id_no_parecer": "CON-023:checkpoint:003",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:004",
+      "id_no_parecer": "CON-023:checkpoint:004",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CON-023:005",
+      "id_no_parecer": "CON-023:checkpoint:005",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:006",
+      "id_no_parecer": "CON-023:checkpoint:006",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:007",
+      "id_no_parecer": "CON-023:checkpoint:007",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:008",
+      "id_no_parecer": "CON-023:checkpoint:008",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-023:009",
+      "id_no_parecer": "CON-023:checkpoint:009",
+      "requisito": "CON-023",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-024:001",
+      "id_no_parecer": "CON-024:checkpoint:001",
+      "requisito": "CON-024",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-024:002",
+      "id_no_parecer": "CON-024:checkpoint:002",
+      "requisito": "CON-024",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-024:003",
+      "id_no_parecer": "CON-024:checkpoint:003",
+      "requisito": "CON-024",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-024:004",
+      "id_no_parecer": "CON-024:checkpoint:004",
+      "requisito": "CON-024",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-025:001",
+      "id_no_parecer": "CON-025:checkpoint:001",
+      "requisito": "CON-025",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-025:002",
+      "id_no_parecer": "CON-025:checkpoint:002",
+      "requisito": "CON-025",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CON-025:003",
+      "id_no_parecer": "CON-025:checkpoint:003",
+      "requisito": "CON-025",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-001:001",
+      "id_no_parecer": "EMP-001:checkpoint:001",
+      "requisito": "EMP-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-001:002",
+      "id_no_parecer": "EMP-001:checkpoint:002",
+      "requisito": "EMP-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-001:003",
+      "id_no_parecer": "EMP-001:checkpoint:003",
+      "requisito": "EMP-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-002:001",
+      "id_no_parecer": "EMP-002:checkpoint:001",
+      "requisito": "EMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-002:002",
+      "id_no_parecer": "EMP-002:checkpoint:002",
+      "requisito": "EMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-002:003",
+      "id_no_parecer": "EMP-002:checkpoint:003",
+      "requisito": "EMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-002:004",
+      "id_no_parecer": "EMP-002:checkpoint:004",
+      "requisito": "EMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-003:001",
+      "id_no_parecer": "EMP-003:checkpoint:001",
+      "requisito": "EMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-003:002",
+      "id_no_parecer": "EMP-003:checkpoint:002",
+      "requisito": "EMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-003:003",
+      "id_no_parecer": "EMP-003:checkpoint:003",
+      "requisito": "EMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-003:004",
+      "id_no_parecer": "EMP-003:checkpoint:004",
+      "requisito": "EMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "EMP-003:005",
+      "id_no_parecer": "EMP-003:checkpoint:005",
+      "requisito": "EMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-001:001",
+      "id_no_parecer": "CMP-001:checkpoint:001",
+      "requisito": "CMP-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-001:002",
+      "id_no_parecer": "CMP-001:checkpoint:002",
+      "requisito": "CMP-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-001:003",
+      "id_no_parecer": "CMP-001:checkpoint:003",
+      "requisito": "CMP-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-002:001",
+      "id_no_parecer": "CMP-002:checkpoint:001",
+      "requisito": "CMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-002:002",
+      "id_no_parecer": "CMP-002:checkpoint:002",
+      "requisito": "CMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-002:003",
+      "id_no_parecer": "CMP-002:checkpoint:003",
+      "requisito": "CMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-002:004",
+      "id_no_parecer": "CMP-002:checkpoint:004",
+      "requisito": "CMP-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-003:001",
+      "id_no_parecer": "CMP-003:checkpoint:001",
+      "requisito": "CMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-003:002",
+      "id_no_parecer": "CMP-003:checkpoint:002",
+      "requisito": "CMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-003:003",
+      "id_no_parecer": "CMP-003:checkpoint:003",
+      "requisito": "CMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-003:004",
+      "id_no_parecer": "CMP-003:checkpoint:004",
+      "requisito": "CMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-003:005",
+      "id_no_parecer": "CMP-003:checkpoint:005",
+      "requisito": "CMP-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-004:001",
+      "id_no_parecer": "CMP-004:checkpoint:001",
+      "requisito": "CMP-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-004:002",
+      "id_no_parecer": "CMP-004:checkpoint:002",
+      "requisito": "CMP-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-004:003",
+      "id_no_parecer": "CMP-004:checkpoint:003",
+      "requisito": "CMP-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-005:001",
+      "id_no_parecer": "CMP-005:checkpoint:001",
+      "requisito": "CMP-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-005:002",
+      "id_no_parecer": "CMP-005:checkpoint:002",
+      "requisito": "CMP-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-005:003",
+      "id_no_parecer": "CMP-005:checkpoint:003",
+      "requisito": "CMP-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-005:004",
+      "id_no_parecer": "CMP-005:checkpoint:004",
+      "requisito": "CMP-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-006:001",
+      "id_no_parecer": "CMP-006:checkpoint:001",
+      "requisito": "CMP-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-006:002",
+      "id_no_parecer": "CMP-006:checkpoint:002",
+      "requisito": "CMP-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-006:003",
+      "id_no_parecer": "CMP-006:checkpoint:003",
+      "requisito": "CMP-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-006:004",
+      "id_no_parecer": "CMP-006:checkpoint:004",
+      "requisito": "CMP-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-007:001",
+      "id_no_parecer": "CMP-007:checkpoint:001",
+      "requisito": "CMP-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-007:002",
+      "id_no_parecer": "CMP-007:checkpoint:002",
+      "requisito": "CMP-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-007:003",
+      "id_no_parecer": "CMP-007:checkpoint:003",
+      "requisito": "CMP-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-007:004",
+      "id_no_parecer": "CMP-007:checkpoint:004",
+      "requisito": "CMP-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-008:001",
+      "id_no_parecer": "CMP-008:checkpoint:001",
+      "requisito": "CMP-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-008:002",
+      "id_no_parecer": "CMP-008:checkpoint:002",
+      "requisito": "CMP-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-008:003",
+      "id_no_parecer": "CMP-008:checkpoint:003",
+      "requisito": "CMP-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-009:001",
+      "id_no_parecer": "CMP-009:checkpoint:001",
+      "requisito": "CMP-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-009:002",
+      "id_no_parecer": "CMP-009:checkpoint:002",
+      "requisito": "CMP-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-009:003",
+      "id_no_parecer": "CMP-009:checkpoint:003",
+      "requisito": "CMP-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-009:004",
+      "id_no_parecer": "CMP-009:checkpoint:004",
+      "requisito": "CMP-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-010:001",
+      "id_no_parecer": "CMP-010:checkpoint:001",
+      "requisito": "CMP-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-010:002",
+      "id_no_parecer": "CMP-010:checkpoint:002",
+      "requisito": "CMP-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-010:003",
+      "id_no_parecer": "CMP-010:checkpoint:003",
+      "requisito": "CMP-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-011:001",
+      "id_no_parecer": "CMP-011:checkpoint:001",
+      "requisito": "CMP-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-011:002",
+      "id_no_parecer": "CMP-011:checkpoint:002",
+      "requisito": "CMP-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-011:003",
+      "id_no_parecer": "CMP-011:checkpoint:003",
+      "requisito": "CMP-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CMP-011:004",
+      "id_no_parecer": "CMP-011:checkpoint:004",
+      "requisito": "CMP-011",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-001:001",
+      "id_no_parecer": "RED-001:checkpoint:001",
+      "requisito": "RED-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-001:002",
+      "id_no_parecer": "RED-001:checkpoint:002",
+      "requisito": "RED-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-001:003",
+      "id_no_parecer": "RED-001:checkpoint:003",
+      "requisito": "RED-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-002:001",
+      "id_no_parecer": "RED-002:checkpoint:001",
+      "requisito": "RED-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-002:002",
+      "id_no_parecer": "RED-002:checkpoint:002",
+      "requisito": "RED-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-002:003",
+      "id_no_parecer": "RED-002:checkpoint:003",
+      "requisito": "RED-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-003:001",
+      "id_no_parecer": "RED-003:checkpoint:001",
+      "requisito": "RED-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-003:002",
+      "id_no_parecer": "RED-003:checkpoint:002",
+      "requisito": "RED-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-003:003",
+      "id_no_parecer": "RED-003:checkpoint:003",
+      "requisito": "RED-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-004:001",
+      "id_no_parecer": "RED-004:checkpoint:001",
+      "requisito": "RED-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-004:002",
+      "id_no_parecer": "RED-004:checkpoint:002",
+      "requisito": "RED-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-004:003",
+      "id_no_parecer": "RED-004:checkpoint:003",
+      "requisito": "RED-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-005:001",
+      "id_no_parecer": "RED-005:checkpoint:001",
+      "requisito": "RED-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-005:002",
+      "id_no_parecer": "RED-005:checkpoint:002",
+      "requisito": "RED-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-005:003",
+      "id_no_parecer": "RED-005:checkpoint:003",
+      "requisito": "RED-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-006:001",
+      "id_no_parecer": "RED-006:checkpoint:001",
+      "requisito": "RED-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-006:002",
+      "id_no_parecer": "RED-006:checkpoint:002",
+      "requisito": "RED-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-006:003",
+      "id_no_parecer": "RED-006:checkpoint:003",
+      "requisito": "RED-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-006:004",
+      "id_no_parecer": "RED-006:checkpoint:004",
+      "requisito": "RED-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-006:005",
+      "id_no_parecer": "RED-006:checkpoint:005",
+      "requisito": "RED-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-007:001",
+      "id_no_parecer": "RED-007:checkpoint:001",
+      "requisito": "RED-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-007:002",
+      "id_no_parecer": "RED-007:checkpoint:002",
+      "requisito": "RED-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-007:003",
+      "id_no_parecer": "RED-007:checkpoint:003",
+      "requisito": "RED-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-007:004",
+      "id_no_parecer": "RED-007:checkpoint:004",
+      "requisito": "RED-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-008:001",
+      "id_no_parecer": "RED-008:checkpoint:001",
+      "requisito": "RED-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-008:002",
+      "id_no_parecer": "RED-008:checkpoint:002",
+      "requisito": "RED-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-008:003",
+      "id_no_parecer": "RED-008:checkpoint:003",
+      "requisito": "RED-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-008:004",
+      "id_no_parecer": "RED-008:checkpoint:004",
+      "requisito": "RED-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "RED-008:005",
+      "id_no_parecer": "RED-008:checkpoint:005",
+      "requisito": "RED-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-001:001",
+      "id_no_parecer": "ADI-001:checkpoint:001",
+      "requisito": "ADI-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-001:002",
+      "id_no_parecer": "ADI-001:checkpoint:002",
+      "requisito": "ADI-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-001:003",
+      "id_no_parecer": "ADI-001:checkpoint:003",
+      "requisito": "ADI-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-002:001",
+      "id_no_parecer": "ADI-002:checkpoint:001",
+      "requisito": "ADI-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-002:002",
+      "id_no_parecer": "ADI-002:checkpoint:002",
+      "requisito": "ADI-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-002:003",
+      "id_no_parecer": "ADI-002:checkpoint:003",
+      "requisito": "ADI-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-002:004",
+      "id_no_parecer": "ADI-002:checkpoint:004",
+      "requisito": "ADI-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-003:001",
+      "id_no_parecer": "ADI-003:checkpoint:001",
+      "requisito": "ADI-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-003:002",
+      "id_no_parecer": "ADI-003:checkpoint:002",
+      "requisito": "ADI-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-004:001",
+      "id_no_parecer": "ADI-004:checkpoint:001",
+      "requisito": "ADI-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-004:002",
+      "id_no_parecer": "ADI-004:checkpoint:002",
+      "requisito": "ADI-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-004:003",
+      "id_no_parecer": "ADI-004:checkpoint:003",
+      "requisito": "ADI-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-004:004",
+      "id_no_parecer": "ADI-004:checkpoint:004",
+      "requisito": "ADI-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-005:001",
+      "id_no_parecer": "ADI-005:checkpoint:001",
+      "requisito": "ADI-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-005:002",
+      "id_no_parecer": "ADI-005:checkpoint:002",
+      "requisito": "ADI-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-005:003",
+      "id_no_parecer": "ADI-005:checkpoint:003",
+      "requisito": "ADI-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-005:004",
+      "id_no_parecer": "ADI-005:checkpoint:004",
+      "requisito": "ADI-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-006:001",
+      "id_no_parecer": "ADI-006:checkpoint:001",
+      "requisito": "ADI-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-006:002",
+      "id_no_parecer": "ADI-006:checkpoint:002",
+      "requisito": "ADI-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-006:003",
+      "id_no_parecer": "ADI-006:checkpoint:003",
+      "requisito": "ADI-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-006:004",
+      "id_no_parecer": "ADI-006:checkpoint:004",
+      "requisito": "ADI-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-007:001",
+      "id_no_parecer": "ADI-007:checkpoint:001",
+      "requisito": "ADI-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-007:002",
+      "id_no_parecer": "ADI-007:checkpoint:002",
+      "requisito": "ADI-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-007:003",
+      "id_no_parecer": "ADI-007:checkpoint:003",
+      "requisito": "ADI-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-007:004",
+      "id_no_parecer": "ADI-007:checkpoint:004",
+      "requisito": "ADI-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-008:001",
+      "id_no_parecer": "ADI-008:checkpoint:001",
+      "requisito": "ADI-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-008:002",
+      "id_no_parecer": "ADI-008:checkpoint:002",
+      "requisito": "ADI-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-008:003",
+      "id_no_parecer": "ADI-008:checkpoint:003",
+      "requisito": "ADI-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-008:004",
+      "id_no_parecer": "ADI-008:checkpoint:004",
+      "requisito": "ADI-008",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-009:001",
+      "id_no_parecer": "ADI-009:checkpoint:001",
+      "requisito": "ADI-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-009:002",
+      "id_no_parecer": "ADI-009:checkpoint:002",
+      "requisito": "ADI-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-009:003",
+      "id_no_parecer": "ADI-009:checkpoint:003",
+      "requisito": "ADI-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-009:004",
+      "id_no_parecer": "ADI-009:checkpoint:004",
+      "requisito": "ADI-009",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-010:001",
+      "id_no_parecer": "ADI-010:checkpoint:001",
+      "requisito": "ADI-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-010:002",
+      "id_no_parecer": "ADI-010:checkpoint:002",
+      "requisito": "ADI-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ADI-010:003",
+      "id_no_parecer": "ADI-010:checkpoint:003",
+      "requisito": "ADI-010",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-001:001",
+      "id_no_parecer": "REM-001:checkpoint:001",
+      "requisito": "REM-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-001:002",
+      "id_no_parecer": "REM-001:checkpoint:002",
+      "requisito": "REM-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-001:003",
+      "id_no_parecer": "REM-001:checkpoint:003",
+      "requisito": "REM-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-002:001",
+      "id_no_parecer": "REM-002:checkpoint:001",
+      "requisito": "REM-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-002:002",
+      "id_no_parecer": "REM-002:checkpoint:002",
+      "requisito": "REM-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-002:003",
+      "id_no_parecer": "REM-002:checkpoint:003",
+      "requisito": "REM-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-002:004",
+      "id_no_parecer": "REM-002:checkpoint:004",
+      "requisito": "REM-002",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-003:001",
+      "id_no_parecer": "REM-003:checkpoint:001",
+      "requisito": "REM-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-003:002",
+      "id_no_parecer": "REM-003:checkpoint:002",
+      "requisito": "REM-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-003:003",
+      "id_no_parecer": "REM-003:checkpoint:003",
+      "requisito": "REM-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-003:004",
+      "id_no_parecer": "REM-003:checkpoint:004",
+      "requisito": "REM-003",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-004:001",
+      "id_no_parecer": "REM-004:checkpoint:001",
+      "requisito": "REM-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-004:002",
+      "id_no_parecer": "REM-004:checkpoint:002",
+      "requisito": "REM-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-004:003",
+      "id_no_parecer": "REM-004:checkpoint:003",
+      "requisito": "REM-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-004:004",
+      "id_no_parecer": "REM-004:checkpoint:004",
+      "requisito": "REM-004",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-005:001",
+      "id_no_parecer": "REM-005:checkpoint:001",
+      "requisito": "REM-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-005:002",
+      "id_no_parecer": "REM-005:checkpoint:002",
+      "requisito": "REM-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-005:003",
+      "id_no_parecer": "REM-005:checkpoint:003",
+      "requisito": "REM-005",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-006:001",
+      "id_no_parecer": "REM-006:checkpoint:001",
+      "requisito": "REM-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-006:002",
+      "id_no_parecer": "REM-006:checkpoint:002",
+      "requisito": "REM-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-006:003",
+      "id_no_parecer": "REM-006:checkpoint:003",
+      "requisito": "REM-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-007:001",
+      "id_no_parecer": "REM-007:checkpoint:001",
+      "requisito": "REM-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-007:002",
+      "id_no_parecer": "REM-007:checkpoint:002",
+      "requisito": "REM-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-007:003",
+      "id_no_parecer": "REM-007:checkpoint:003",
+      "requisito": "REM-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-007:004",
+      "id_no_parecer": "REM-007:checkpoint:004",
+      "requisito": "REM-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REM-007:005",
+      "id_no_parecer": "REM-007:checkpoint:005",
+      "requisito": "REM-007",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-001:001",
+      "id_no_parecer": "HIS-001:checkpoint:001",
+      "requisito": "HIS-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-001:002",
+      "id_no_parecer": "HIS-001:checkpoint:002",
+      "requisito": "HIS-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-001:003",
+      "id_no_parecer": "HIS-001:checkpoint:003",
+      "requisito": "HIS-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "HIS-001:004",
+      "id_no_parecer": "HIS-001:checkpoint:004",
+      "requisito": "HIS-001",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "HIS-006:001",
+      "id_no_parecer": "HIS-006:checkpoint:001",
+      "requisito": "HIS-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-006:002",
+      "id_no_parecer": "HIS-006:checkpoint:002",
+      "requisito": "HIS-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-006:003",
+      "id_no_parecer": "HIS-006:checkpoint:003",
+      "requisito": "HIS-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "HIS-006:004",
+      "id_no_parecer": "HIS-006:checkpoint:004",
+      "requisito": "HIS-006",
+      "grupo": "contratos",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-001:001",
+      "id_no_parecer": "CAT-001:checkpoint:001",
+      "requisito": "CAT-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-001:002",
+      "id_no_parecer": "CAT-001:checkpoint:002",
+      "requisito": "CAT-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-002:001",
+      "id_no_parecer": "CAT-002:checkpoint:001",
+      "requisito": "CAT-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-002:002",
+      "id_no_parecer": "CAT-002:checkpoint:002",
+      "requisito": "CAT-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-003:001",
+      "id_no_parecer": "CAT-003:checkpoint:001",
+      "requisito": "CAT-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-003:002",
+      "id_no_parecer": "CAT-003:checkpoint:002",
+      "requisito": "CAT-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-004:001",
+      "id_no_parecer": "CAT-004:checkpoint:001",
+      "requisito": "CAT-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-004:002",
+      "id_no_parecer": "CAT-004:checkpoint:002",
+      "requisito": "CAT-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-004:003",
+      "id_no_parecer": "CAT-004:checkpoint:003",
+      "requisito": "CAT-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-004:004",
+      "id_no_parecer": "CAT-004:checkpoint:004",
+      "requisito": "CAT-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-005:001",
+      "id_no_parecer": "CAT-005:checkpoint:001",
+      "requisito": "CAT-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-005:002",
+      "id_no_parecer": "CAT-005:checkpoint:002",
+      "requisito": "CAT-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-006:001",
+      "id_no_parecer": "CAT-006:checkpoint:001",
+      "requisito": "CAT-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-006:002",
+      "id_no_parecer": "CAT-006:checkpoint:002",
+      "requisito": "CAT-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-007:001",
+      "id_no_parecer": "CAT-007:checkpoint:001",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:002",
+      "id_no_parecer": "CAT-007:checkpoint:002",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:003",
+      "id_no_parecer": "CAT-007:checkpoint:003",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:004",
+      "id_no_parecer": "CAT-007:checkpoint:004",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:005",
+      "id_no_parecer": "CAT-007:checkpoint:005",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:006",
+      "id_no_parecer": "CAT-007:checkpoint:006",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:007",
+      "id_no_parecer": "CAT-007:checkpoint:007",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-007:008",
+      "id_no_parecer": "CAT-007:checkpoint:008",
+      "requisito": "CAT-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "CAT-008:001",
+      "id_no_parecer": "CAT-008:checkpoint:001",
+      "requisito": "CAT-008",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-008:002",
+      "id_no_parecer": "CAT-008:checkpoint:002",
+      "requisito": "CAT-008",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-009:001",
+      "id_no_parecer": "CAT-009:checkpoint:001",
+      "requisito": "CAT-009",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "CAT-009:002",
+      "id_no_parecer": "CAT-009:checkpoint:002",
+      "requisito": "CAT-009",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-001:001",
+      "id_no_parecer": "COL-001:checkpoint:001",
+      "requisito": "COL-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-001:002",
+      "id_no_parecer": "COL-001:checkpoint:002",
+      "requisito": "COL-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-002:001",
+      "id_no_parecer": "COL-002:checkpoint:001",
+      "requisito": "COL-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-002:002",
+      "id_no_parecer": "COL-002:checkpoint:002",
+      "requisito": "COL-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-003:001",
+      "id_no_parecer": "COL-003:checkpoint:001",
+      "requisito": "COL-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-003:002",
+      "id_no_parecer": "COL-003:checkpoint:002",
+      "requisito": "COL-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-004:001",
+      "id_no_parecer": "COL-004:checkpoint:001",
+      "requisito": "COL-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-005:001",
+      "id_no_parecer": "COL-005:checkpoint:001",
+      "requisito": "COL-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-005:002",
+      "id_no_parecer": "COL-005:checkpoint:002",
+      "requisito": "COL-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-005:003",
+      "id_no_parecer": "COL-005:checkpoint:003",
+      "requisito": "COL-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-006:001",
+      "id_no_parecer": "COL-006:checkpoint:001",
+      "requisito": "COL-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-006:002",
+      "id_no_parecer": "COL-006:checkpoint:002",
+      "requisito": "COL-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-006:003",
+      "id_no_parecer": "COL-006:checkpoint:003",
+      "requisito": "COL-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-006:004",
+      "id_no_parecer": "COL-006:checkpoint:004",
+      "requisito": "COL-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-007:001",
+      "id_no_parecer": "COL-007:checkpoint:001",
+      "requisito": "COL-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-007:002",
+      "id_no_parecer": "COL-007:checkpoint:002",
+      "requisito": "COL-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-009:001",
+      "id_no_parecer": "COL-009:checkpoint:001",
+      "requisito": "COL-009",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-009:002",
+      "id_no_parecer": "COL-009:checkpoint:002",
+      "requisito": "COL-009",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-010:001",
+      "id_no_parecer": "COL-010:checkpoint:001",
+      "requisito": "COL-010",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "COL-010:002",
+      "id_no_parecer": "COL-010:checkpoint:002",
+      "requisito": "COL-010",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "COL-010:003",
+      "id_no_parecer": "COL-010:checkpoint:003",
+      "requisito": "COL-010",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "COL-010:004",
+      "id_no_parecer": "COL-010:checkpoint:004",
+      "requisito": "COL-010",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "E"
+    },
+    {
+      "id": "COL-011:001",
+      "id_no_parecer": "COL-011:checkpoint:001",
+      "requisito": "COL-011",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-011:002",
+      "id_no_parecer": "COL-011:checkpoint:002",
+      "requisito": "COL-011",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-012:001",
+      "id_no_parecer": "COL-012:checkpoint:001",
+      "requisito": "COL-012",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-012:002",
+      "id_no_parecer": "COL-012:checkpoint:002",
+      "requisito": "COL-012",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-013:001",
+      "id_no_parecer": "COL-013:checkpoint:001",
+      "requisito": "COL-013",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "COL-013:002",
+      "id_no_parecer": "COL-013:checkpoint:002",
+      "requisito": "COL-013",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-001:001",
+      "id_no_parecer": "MAT-001:checkpoint:001",
+      "requisito": "MAT-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-001:002",
+      "id_no_parecer": "MAT-001:checkpoint:002",
+      "requisito": "MAT-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-002:001",
+      "id_no_parecer": "MAT-002:checkpoint:001",
+      "requisito": "MAT-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-002:002",
+      "id_no_parecer": "MAT-002:checkpoint:002",
+      "requisito": "MAT-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-003:001",
+      "id_no_parecer": "MAT-003:checkpoint:001",
+      "requisito": "MAT-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-003:002",
+      "id_no_parecer": "MAT-003:checkpoint:002",
+      "requisito": "MAT-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-003:003",
+      "id_no_parecer": "MAT-003:checkpoint:003",
+      "requisito": "MAT-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-004:001",
+      "id_no_parecer": "MAT-004:checkpoint:001",
+      "requisito": "MAT-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-004:002",
+      "id_no_parecer": "MAT-004:checkpoint:002",
+      "requisito": "MAT-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-005:001",
+      "id_no_parecer": "MAT-005:checkpoint:001",
+      "requisito": "MAT-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-005:002",
+      "id_no_parecer": "MAT-005:checkpoint:002",
+      "requisito": "MAT-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "MAT-005:003",
+      "id_no_parecer": "MAT-005:checkpoint:003",
+      "requisito": "MAT-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-001:001",
+      "id_no_parecer": "VIN-001:checkpoint:001",
+      "requisito": "VIN-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-001:002",
+      "id_no_parecer": "VIN-001:checkpoint:002",
+      "requisito": "VIN-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-002:001",
+      "id_no_parecer": "VIN-002:checkpoint:001",
+      "requisito": "VIN-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-002:002",
+      "id_no_parecer": "VIN-002:checkpoint:002",
+      "requisito": "VIN-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-003:001",
+      "id_no_parecer": "VIN-003:checkpoint:001",
+      "requisito": "VIN-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-003:002",
+      "id_no_parecer": "VIN-003:checkpoint:002",
+      "requisito": "VIN-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-004:001",
+      "id_no_parecer": "VIN-004:checkpoint:001",
+      "requisito": "VIN-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-004:002",
+      "id_no_parecer": "VIN-004:checkpoint:002",
+      "requisito": "VIN-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-005:001",
+      "id_no_parecer": "VIN-005:checkpoint:001",
+      "requisito": "VIN-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-005:002",
+      "id_no_parecer": "VIN-005:checkpoint:002",
+      "requisito": "VIN-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-006:001",
+      "id_no_parecer": "VIN-006:checkpoint:001",
+      "requisito": "VIN-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-006:002",
+      "id_no_parecer": "VIN-006:checkpoint:002",
+      "requisito": "VIN-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-007:001",
+      "id_no_parecer": "VIN-007:checkpoint:001",
+      "requisito": "VIN-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-007:002",
+      "id_no_parecer": "VIN-007:checkpoint:002",
+      "requisito": "VIN-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-008:001",
+      "id_no_parecer": "VIN-008:checkpoint:001",
+      "requisito": "VIN-008",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-008:002",
+      "id_no_parecer": "VIN-008:checkpoint:002",
+      "requisito": "VIN-008",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-009:001",
+      "id_no_parecer": "VIN-009:checkpoint:001",
+      "requisito": "VIN-009",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-009:002",
+      "id_no_parecer": "VIN-009:checkpoint:002",
+      "requisito": "VIN-009",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-010:001",
+      "id_no_parecer": "VIN-010:checkpoint:001",
+      "requisito": "VIN-010",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-010:002",
+      "id_no_parecer": "VIN-010:checkpoint:002",
+      "requisito": "VIN-010",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-011:001",
+      "id_no_parecer": "VIN-011:checkpoint:001",
+      "requisito": "VIN-011",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-011:002",
+      "id_no_parecer": "VIN-011:checkpoint:002",
+      "requisito": "VIN-011",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-012:001",
+      "id_no_parecer": "VIN-012:checkpoint:001",
+      "requisito": "VIN-012",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-012:002",
+      "id_no_parecer": "VIN-012:checkpoint:002",
+      "requisito": "VIN-012",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-013:001",
+      "id_no_parecer": "VIN-013:checkpoint:001",
+      "requisito": "VIN-013",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-013:002",
+      "id_no_parecer": "VIN-013:checkpoint:002",
+      "requisito": "VIN-013",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-014:001",
+      "id_no_parecer": "VIN-014:checkpoint:001",
+      "requisito": "VIN-014",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-014:002",
+      "id_no_parecer": "VIN-014:checkpoint:002",
+      "requisito": "VIN-014",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-014:003",
+      "id_no_parecer": "VIN-014:checkpoint:003",
+      "requisito": "VIN-014",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-014:004",
+      "id_no_parecer": "VIN-014:checkpoint:004",
+      "requisito": "VIN-014",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-015:001",
+      "id_no_parecer": "VIN-015:checkpoint:001",
+      "requisito": "VIN-015",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "VIN-015:002",
+      "id_no_parecer": "VIN-015:checkpoint:002",
+      "requisito": "VIN-015",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-001:001",
+      "id_no_parecer": "ALO-001:checkpoint:001",
+      "requisito": "ALO-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-001:002",
+      "id_no_parecer": "ALO-001:checkpoint:002",
+      "requisito": "ALO-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-002:001",
+      "id_no_parecer": "ALO-002:checkpoint:001",
+      "requisito": "ALO-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-002:002",
+      "id_no_parecer": "ALO-002:checkpoint:002",
+      "requisito": "ALO-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-003:001",
+      "id_no_parecer": "ALO-003:checkpoint:001",
+      "requisito": "ALO-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-003:002",
+      "id_no_parecer": "ALO-003:checkpoint:002",
+      "requisito": "ALO-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-004:001",
+      "id_no_parecer": "ALO-004:checkpoint:001",
+      "requisito": "ALO-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-004:002",
+      "id_no_parecer": "ALO-004:checkpoint:002",
+      "requisito": "ALO-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-005:001",
+      "id_no_parecer": "ALO-005:checkpoint:001",
+      "requisito": "ALO-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-005:002",
+      "id_no_parecer": "ALO-005:checkpoint:002",
+      "requisito": "ALO-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-006:001",
+      "id_no_parecer": "ALO-006:checkpoint:001",
+      "requisito": "ALO-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-006:002",
+      "id_no_parecer": "ALO-006:checkpoint:002",
+      "requisito": "ALO-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-007:001",
+      "id_no_parecer": "ALO-007:checkpoint:001",
+      "requisito": "ALO-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-007:002",
+      "id_no_parecer": "ALO-007:checkpoint:002",
+      "requisito": "ALO-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-007:003",
+      "id_no_parecer": "ALO-007:checkpoint:003",
+      "requisito": "ALO-007",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-008:001",
+      "id_no_parecer": "ALO-008:checkpoint:001",
+      "requisito": "ALO-008",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "ALO-008:002",
+      "id_no_parecer": "ALO-008:checkpoint:002",
+      "requisito": "ALO-008",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-001:001",
+      "id_no_parecer": "DES-001:checkpoint:001",
+      "requisito": "DES-001",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-002:001",
+      "id_no_parecer": "DES-002:checkpoint:001",
+      "requisito": "DES-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-002:002",
+      "id_no_parecer": "DES-002:checkpoint:002",
+      "requisito": "DES-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-003:001",
+      "id_no_parecer": "DES-003:checkpoint:001",
+      "requisito": "DES-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-003:002",
+      "id_no_parecer": "DES-003:checkpoint:002",
+      "requisito": "DES-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-004:001",
+      "id_no_parecer": "DES-004:checkpoint:001",
+      "requisito": "DES-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-004:002",
+      "id_no_parecer": "DES-004:checkpoint:002",
+      "requisito": "DES-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-005:001",
+      "id_no_parecer": "DES-005:checkpoint:001",
+      "requisito": "DES-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-005:002",
+      "id_no_parecer": "DES-005:checkpoint:002",
+      "requisito": "DES-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-005:003",
+      "id_no_parecer": "DES-005:checkpoint:003",
+      "requisito": "DES-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-006:001",
+      "id_no_parecer": "DES-006:checkpoint:001",
+      "requisito": "DES-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DES-006:002",
+      "id_no_parecer": "DES-006:checkpoint:002",
+      "requisito": "DES-006",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-002:001",
+      "id_no_parecer": "HIS-002:checkpoint:001",
+      "requisito": "HIS-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-002:002",
+      "id_no_parecer": "HIS-002:checkpoint:002",
+      "requisito": "HIS-002",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-003:001",
+      "id_no_parecer": "HIS-003:checkpoint:001",
+      "requisito": "HIS-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-003:002",
+      "id_no_parecer": "HIS-003:checkpoint:002",
+      "requisito": "HIS-003",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-004:001",
+      "id_no_parecer": "HIS-004:checkpoint:001",
+      "requisito": "HIS-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-004:002",
+      "id_no_parecer": "HIS-004:checkpoint:002",
+      "requisito": "HIS-004",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-005:001",
+      "id_no_parecer": "HIS-005:checkpoint:001",
+      "requisito": "HIS-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-005:002",
+      "id_no_parecer": "HIS-005:checkpoint:002",
+      "requisito": "HIS-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "HIS-005:003",
+      "id_no_parecer": "HIS-005:checkpoint:003",
+      "requisito": "HIS-005",
+      "grupo": "pessoas",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-001:001",
+      "id_no_parecer": "TMP-001:checkpoint:001",
+      "requisito": "TMP-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-001:002",
+      "id_no_parecer": "TMP-001:checkpoint:002",
+      "requisito": "TMP-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-001:003",
+      "id_no_parecer": "TMP-001:checkpoint:003",
+      "requisito": "TMP-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-002:001",
+      "id_no_parecer": "TMP-002:checkpoint:001",
+      "requisito": "TMP-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-002:002",
+      "id_no_parecer": "TMP-002:checkpoint:002",
+      "requisito": "TMP-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-003:001",
+      "id_no_parecer": "TMP-003:checkpoint:001",
+      "requisito": "TMP-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-003:002",
+      "id_no_parecer": "TMP-003:checkpoint:002",
+      "requisito": "TMP-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-003:003",
+      "id_no_parecer": "TMP-003:checkpoint:003",
+      "requisito": "TMP-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-003:004",
+      "id_no_parecer": "TMP-003:checkpoint:004",
+      "requisito": "TMP-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-003:005",
+      "id_no_parecer": "TMP-003:checkpoint:005",
+      "requisito": "TMP-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-004:001",
+      "id_no_parecer": "TMP-004:checkpoint:001",
+      "requisito": "TMP-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-004:002",
+      "id_no_parecer": "TMP-004:checkpoint:002",
+      "requisito": "TMP-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-004:003",
+      "id_no_parecer": "TMP-004:checkpoint:003",
+      "requisito": "TMP-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-004:004",
+      "id_no_parecer": "TMP-004:checkpoint:004",
+      "requisito": "TMP-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-004:005",
+      "id_no_parecer": "TMP-004:checkpoint:005",
+      "requisito": "TMP-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-005:001",
+      "id_no_parecer": "TMP-005:checkpoint:001",
+      "requisito": "TMP-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-005:002",
+      "id_no_parecer": "TMP-005:checkpoint:002",
+      "requisito": "TMP-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-006:001",
+      "id_no_parecer": "TMP-006:checkpoint:001",
+      "requisito": "TMP-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-006:002",
+      "id_no_parecer": "TMP-006:checkpoint:002",
+      "requisito": "TMP-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-007:001",
+      "id_no_parecer": "TMP-007:checkpoint:001",
+      "requisito": "TMP-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-007:002",
+      "id_no_parecer": "TMP-007:checkpoint:002",
+      "requisito": "TMP-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-008:001",
+      "id_no_parecer": "TMP-008:checkpoint:001",
+      "requisito": "TMP-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-008:002",
+      "id_no_parecer": "TMP-008:checkpoint:002",
+      "requisito": "TMP-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-008:003",
+      "id_no_parecer": "TMP-008:checkpoint:003",
+      "requisito": "TMP-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-008:004",
+      "id_no_parecer": "TMP-008:checkpoint:004",
+      "requisito": "TMP-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-009:001",
+      "id_no_parecer": "TMP-009:checkpoint:001",
+      "requisito": "TMP-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-009:002",
+      "id_no_parecer": "TMP-009:checkpoint:002",
+      "requisito": "TMP-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-009:003",
+      "id_no_parecer": "TMP-009:checkpoint:003",
+      "requisito": "TMP-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-010:001",
+      "id_no_parecer": "TMP-010:checkpoint:001",
+      "requisito": "TMP-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-010:002",
+      "id_no_parecer": "TMP-010:checkpoint:002",
+      "requisito": "TMP-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-010:003",
+      "id_no_parecer": "TMP-010:checkpoint:003",
+      "requisito": "TMP-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-011:001",
+      "id_no_parecer": "TMP-011:checkpoint:001",
+      "requisito": "TMP-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-012:001",
+      "id_no_parecer": "TMP-012:checkpoint:001",
+      "requisito": "TMP-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-012:002",
+      "id_no_parecer": "TMP-012:checkpoint:002",
+      "requisito": "TMP-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-013:001",
+      "id_no_parecer": "TMP-013:checkpoint:001",
+      "requisito": "TMP-013",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-013:002",
+      "id_no_parecer": "TMP-013:checkpoint:002",
+      "requisito": "TMP-013",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-014:001",
+      "id_no_parecer": "TMP-014:checkpoint:001",
+      "requisito": "TMP-014",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-014:002",
+      "id_no_parecer": "TMP-014:checkpoint:002",
+      "requisito": "TMP-014",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-015:001",
+      "id_no_parecer": "TMP-015:checkpoint:001",
+      "requisito": "TMP-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-015:002",
+      "id_no_parecer": "TMP-015:checkpoint:002",
+      "requisito": "TMP-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-016:001",
+      "id_no_parecer": "TMP-016:checkpoint:001",
+      "requisito": "TMP-016",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-016:002",
+      "id_no_parecer": "TMP-016:checkpoint:002",
+      "requisito": "TMP-016",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-016:003",
+      "id_no_parecer": "TMP-016:checkpoint:003",
+      "requisito": "TMP-016",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-017:001",
+      "id_no_parecer": "TMP-017:checkpoint:001",
+      "requisito": "TMP-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-017:002",
+      "id_no_parecer": "TMP-017:checkpoint:002",
+      "requisito": "TMP-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "TMP-017:003",
+      "id_no_parecer": "TMP-017:checkpoint:003",
+      "requisito": "TMP-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-001:001",
+      "id_no_parecer": "DOC-001:checkpoint:001",
+      "requisito": "DOC-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-001:002",
+      "id_no_parecer": "DOC-001:checkpoint:002",
+      "requisito": "DOC-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-001:003",
+      "id_no_parecer": "DOC-001:checkpoint:003",
+      "requisito": "DOC-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-002:001",
+      "id_no_parecer": "DOC-002:checkpoint:001",
+      "requisito": "DOC-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-002:002",
+      "id_no_parecer": "DOC-002:checkpoint:002",
+      "requisito": "DOC-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-002:003",
+      "id_no_parecer": "DOC-002:checkpoint:003",
+      "requisito": "DOC-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-003:001",
+      "id_no_parecer": "DOC-003:checkpoint:001",
+      "requisito": "DOC-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-003:002",
+      "id_no_parecer": "DOC-003:checkpoint:002",
+      "requisito": "DOC-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-003:003",
+      "id_no_parecer": "DOC-003:checkpoint:003",
+      "requisito": "DOC-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-004:001",
+      "id_no_parecer": "DOC-004:checkpoint:001",
+      "requisito": "DOC-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-004:002",
+      "id_no_parecer": "DOC-004:checkpoint:002",
+      "requisito": "DOC-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-005:001",
+      "id_no_parecer": "DOC-005:checkpoint:001",
+      "requisito": "DOC-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-005:002",
+      "id_no_parecer": "DOC-005:checkpoint:002",
+      "requisito": "DOC-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-005:003",
+      "id_no_parecer": "DOC-005:checkpoint:003",
+      "requisito": "DOC-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-005:004",
+      "id_no_parecer": "DOC-005:checkpoint:004",
+      "requisito": "DOC-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-006:001",
+      "id_no_parecer": "DOC-006:checkpoint:001",
+      "requisito": "DOC-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-006:002",
+      "id_no_parecer": "DOC-006:checkpoint:002",
+      "requisito": "DOC-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-006:003",
+      "id_no_parecer": "DOC-006:checkpoint:003",
+      "requisito": "DOC-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-007:001",
+      "id_no_parecer": "DOC-007:checkpoint:001",
+      "requisito": "DOC-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-007:002",
+      "id_no_parecer": "DOC-007:checkpoint:002",
+      "requisito": "DOC-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-007:003",
+      "id_no_parecer": "DOC-007:checkpoint:003",
+      "requisito": "DOC-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-008:001",
+      "id_no_parecer": "DOC-008:checkpoint:001",
+      "requisito": "DOC-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-008:002",
+      "id_no_parecer": "DOC-008:checkpoint:002",
+      "requisito": "DOC-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-008:003",
+      "id_no_parecer": "DOC-008:checkpoint:003",
+      "requisito": "DOC-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-009:001",
+      "id_no_parecer": "DOC-009:checkpoint:001",
+      "requisito": "DOC-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-009:002",
+      "id_no_parecer": "DOC-009:checkpoint:002",
+      "requisito": "DOC-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-009:003",
+      "id_no_parecer": "DOC-009:checkpoint:003",
+      "requisito": "DOC-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-009:004",
+      "id_no_parecer": "DOC-009:checkpoint:004",
+      "requisito": "DOC-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-010:001",
+      "id_no_parecer": "DOC-010:checkpoint:001",
+      "requisito": "DOC-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-010:002",
+      "id_no_parecer": "DOC-010:checkpoint:002",
+      "requisito": "DOC-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-010:003",
+      "id_no_parecer": "DOC-010:checkpoint:003",
+      "requisito": "DOC-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-010:004",
+      "id_no_parecer": "DOC-010:checkpoint:004",
+      "requisito": "DOC-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "DOC-010:005",
+      "id_no_parecer": "DOC-010:checkpoint:005",
+      "requisito": "DOC-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-001:001",
+      "id_no_parecer": "FRE-001:checkpoint:001",
+      "requisito": "FRE-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-001:002",
+      "id_no_parecer": "FRE-001:checkpoint:002",
+      "requisito": "FRE-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-001:003",
+      "id_no_parecer": "FRE-001:checkpoint:003",
+      "requisito": "FRE-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-001:004",
+      "id_no_parecer": "FRE-001:checkpoint:004",
+      "requisito": "FRE-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-001:005",
+      "id_no_parecer": "FRE-001:checkpoint:005",
+      "requisito": "FRE-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-002:001",
+      "id_no_parecer": "FRE-002:checkpoint:001",
+      "requisito": "FRE-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-002:002",
+      "id_no_parecer": "FRE-002:checkpoint:002",
+      "requisito": "FRE-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-003:001",
+      "id_no_parecer": "FRE-003:checkpoint:001",
+      "requisito": "FRE-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-003:002",
+      "id_no_parecer": "FRE-003:checkpoint:002",
+      "requisito": "FRE-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-004:001",
+      "id_no_parecer": "FRE-004:checkpoint:001",
+      "requisito": "FRE-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-004:002",
+      "id_no_parecer": "FRE-004:checkpoint:002",
+      "requisito": "FRE-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-005:001",
+      "id_no_parecer": "FRE-005:checkpoint:001",
+      "requisito": "FRE-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-005:002",
+      "id_no_parecer": "FRE-005:checkpoint:002",
+      "requisito": "FRE-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-006:001",
+      "id_no_parecer": "FRE-006:checkpoint:001",
+      "requisito": "FRE-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-006:002",
+      "id_no_parecer": "FRE-006:checkpoint:002",
+      "requisito": "FRE-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-007:001",
+      "id_no_parecer": "FRE-007:checkpoint:001",
+      "requisito": "FRE-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-008:001",
+      "id_no_parecer": "FRE-008:checkpoint:001",
+      "requisito": "FRE-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-008:002",
+      "id_no_parecer": "FRE-008:checkpoint:002",
+      "requisito": "FRE-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-008:003",
+      "id_no_parecer": "FRE-008:checkpoint:003",
+      "requisito": "FRE-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-008:004",
+      "id_no_parecer": "FRE-008:checkpoint:004",
+      "requisito": "FRE-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-009:001",
+      "id_no_parecer": "FRE-009:checkpoint:001",
+      "requisito": "FRE-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-009:002",
+      "id_no_parecer": "FRE-009:checkpoint:002",
+      "requisito": "FRE-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-009:003",
+      "id_no_parecer": "FRE-009:checkpoint:003",
+      "requisito": "FRE-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-010:001",
+      "id_no_parecer": "FRE-010:checkpoint:001",
+      "requisito": "FRE-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-010:002",
+      "id_no_parecer": "FRE-010:checkpoint:002",
+      "requisito": "FRE-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-011:001",
+      "id_no_parecer": "FRE-011:checkpoint:001",
+      "requisito": "FRE-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-011:002",
+      "id_no_parecer": "FRE-011:checkpoint:002",
+      "requisito": "FRE-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-011:003",
+      "id_no_parecer": "FRE-011:checkpoint:003",
+      "requisito": "FRE-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-011:004",
+      "id_no_parecer": "FRE-011:checkpoint:004",
+      "requisito": "FRE-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-011:005",
+      "id_no_parecer": "FRE-011:checkpoint:005",
+      "requisito": "FRE-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-012:001",
+      "id_no_parecer": "FRE-012:checkpoint:001",
+      "requisito": "FRE-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-012:002",
+      "id_no_parecer": "FRE-012:checkpoint:002",
+      "requisito": "FRE-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-013:001",
+      "id_no_parecer": "FRE-013:checkpoint:001",
+      "requisito": "FRE-013",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-013:002",
+      "id_no_parecer": "FRE-013:checkpoint:002",
+      "requisito": "FRE-013",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-014:001",
+      "id_no_parecer": "FRE-014:checkpoint:001",
+      "requisito": "FRE-014",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-014:002",
+      "id_no_parecer": "FRE-014:checkpoint:002",
+      "requisito": "FRE-014",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-015:001",
+      "id_no_parecer": "FRE-015:checkpoint:001",
+      "requisito": "FRE-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-015:002",
+      "id_no_parecer": "FRE-015:checkpoint:002",
+      "requisito": "FRE-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-015:003",
+      "id_no_parecer": "FRE-015:checkpoint:003",
+      "requisito": "FRE-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-015:004",
+      "id_no_parecer": "FRE-015:checkpoint:004",
+      "requisito": "FRE-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-015:005",
+      "id_no_parecer": "FRE-015:checkpoint:005",
+      "requisito": "FRE-015",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-016:001",
+      "id_no_parecer": "FRE-016:checkpoint:001",
+      "requisito": "FRE-016",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-016:002",
+      "id_no_parecer": "FRE-016:checkpoint:002",
+      "requisito": "FRE-016",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-017:001",
+      "id_no_parecer": "FRE-017:checkpoint:001",
+      "requisito": "FRE-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-017:002",
+      "id_no_parecer": "FRE-017:checkpoint:002",
+      "requisito": "FRE-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-017:003",
+      "id_no_parecer": "FRE-017:checkpoint:003",
+      "requisito": "FRE-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-017:004",
+      "id_no_parecer": "FRE-017:checkpoint:004",
+      "requisito": "FRE-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-017:005",
+      "id_no_parecer": "FRE-017:checkpoint:005",
+      "requisito": "FRE-017",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-018:001",
+      "id_no_parecer": "FRE-018:checkpoint:001",
+      "requisito": "FRE-018",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-018:002",
+      "id_no_parecer": "FRE-018:checkpoint:002",
+      "requisito": "FRE-018",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-018:003",
+      "id_no_parecer": "FRE-018:checkpoint:003",
+      "requisito": "FRE-018",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-018:004",
+      "id_no_parecer": "FRE-018:checkpoint:004",
+      "requisito": "FRE-018",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-018:005",
+      "id_no_parecer": "FRE-018:checkpoint:005",
+      "requisito": "FRE-018",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-019:001",
+      "id_no_parecer": "FRE-019:checkpoint:001",
+      "requisito": "FRE-019",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-019:002",
+      "id_no_parecer": "FRE-019:checkpoint:002",
+      "requisito": "FRE-019",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-019:003",
+      "id_no_parecer": "FRE-019:checkpoint:003",
+      "requisito": "FRE-019",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "FRE-019:004",
+      "id_no_parecer": "FRE-019:checkpoint:004",
+      "requisito": "FRE-019",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:001",
+      "id_no_parecer": "REL-001:checkpoint:001",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:002",
+      "id_no_parecer": "REL-001:checkpoint:002",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:003",
+      "id_no_parecer": "REL-001:checkpoint:003",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:004",
+      "id_no_parecer": "REL-001:checkpoint:004",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:005",
+      "id_no_parecer": "REL-001:checkpoint:005",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:006",
+      "id_no_parecer": "REL-001:checkpoint:006",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:007",
+      "id_no_parecer": "REL-001:checkpoint:007",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-001:008",
+      "id_no_parecer": "REL-001:checkpoint:008",
+      "requisito": "REL-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-002:001",
+      "id_no_parecer": "REL-002:checkpoint:001",
+      "requisito": "REL-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-002:002",
+      "id_no_parecer": "REL-002:checkpoint:002",
+      "requisito": "REL-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-003:001",
+      "id_no_parecer": "REL-003:checkpoint:001",
+      "requisito": "REL-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-003:002",
+      "id_no_parecer": "REL-003:checkpoint:002",
+      "requisito": "REL-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-004:001",
+      "id_no_parecer": "REL-004:checkpoint:001",
+      "requisito": "REL-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-004:002",
+      "id_no_parecer": "REL-004:checkpoint:002",
+      "requisito": "REL-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-004:003",
+      "id_no_parecer": "REL-004:checkpoint:003",
+      "requisito": "REL-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-005:001",
+      "id_no_parecer": "REL-005:checkpoint:001",
+      "requisito": "REL-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-005:002",
+      "id_no_parecer": "REL-005:checkpoint:002",
+      "requisito": "REL-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-005:003",
+      "id_no_parecer": "REL-005:checkpoint:003",
+      "requisito": "REL-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-006:001",
+      "id_no_parecer": "REL-006:checkpoint:001",
+      "requisito": "REL-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-006:002",
+      "id_no_parecer": "REL-006:checkpoint:002",
+      "requisito": "REL-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "REL-006:003",
+      "id_no_parecer": "REL-006:checkpoint:003",
+      "requisito": "REL-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-001:001",
+      "id_no_parecer": "AUD-001:checkpoint:001",
+      "requisito": "AUD-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-001:002",
+      "id_no_parecer": "AUD-001:checkpoint:002",
+      "requisito": "AUD-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-001:003",
+      "id_no_parecer": "AUD-001:checkpoint:003",
+      "requisito": "AUD-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-001:004",
+      "id_no_parecer": "AUD-001:checkpoint:004",
+      "requisito": "AUD-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-001:005",
+      "id_no_parecer": "AUD-001:checkpoint:005",
+      "requisito": "AUD-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-002:001",
+      "id_no_parecer": "AUD-002:checkpoint:001",
+      "requisito": "AUD-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-002:002",
+      "id_no_parecer": "AUD-002:checkpoint:002",
+      "requisito": "AUD-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-002:003",
+      "id_no_parecer": "AUD-002:checkpoint:003",
+      "requisito": "AUD-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-002:004",
+      "id_no_parecer": "AUD-002:checkpoint:004",
+      "requisito": "AUD-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-003:001",
+      "id_no_parecer": "AUD-003:checkpoint:001",
+      "requisito": "AUD-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-003:002",
+      "id_no_parecer": "AUD-003:checkpoint:002",
+      "requisito": "AUD-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-003:003",
+      "id_no_parecer": "AUD-003:checkpoint:003",
+      "requisito": "AUD-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-003:004",
+      "id_no_parecer": "AUD-003:checkpoint:004",
+      "requisito": "AUD-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-004:001",
+      "id_no_parecer": "AUD-004:checkpoint:001",
+      "requisito": "AUD-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-004:002",
+      "id_no_parecer": "AUD-004:checkpoint:002",
+      "requisito": "AUD-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-004:003",
+      "id_no_parecer": "AUD-004:checkpoint:003",
+      "requisito": "AUD-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-004:004",
+      "id_no_parecer": "AUD-004:checkpoint:004",
+      "requisito": "AUD-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-005:001",
+      "id_no_parecer": "AUD-005:checkpoint:001",
+      "requisito": "AUD-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-005:002",
+      "id_no_parecer": "AUD-005:checkpoint:002",
+      "requisito": "AUD-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-005:003",
+      "id_no_parecer": "AUD-005:checkpoint:003",
+      "requisito": "AUD-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-005:004",
+      "id_no_parecer": "AUD-005:checkpoint:004",
+      "requisito": "AUD-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-005:005",
+      "id_no_parecer": "AUD-005:checkpoint:005",
+      "requisito": "AUD-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-006:001",
+      "id_no_parecer": "AUD-006:checkpoint:001",
+      "requisito": "AUD-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-006:002",
+      "id_no_parecer": "AUD-006:checkpoint:002",
+      "requisito": "AUD-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-006:003",
+      "id_no_parecer": "AUD-006:checkpoint:003",
+      "requisito": "AUD-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-006:004",
+      "id_no_parecer": "AUD-006:checkpoint:004",
+      "requisito": "AUD-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-006:005",
+      "id_no_parecer": "AUD-006:checkpoint:005",
+      "requisito": "AUD-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-006:006",
+      "id_no_parecer": "AUD-006:checkpoint:006",
+      "requisito": "AUD-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-007:001",
+      "id_no_parecer": "AUD-007:checkpoint:001",
+      "requisito": "AUD-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-007:002",
+      "id_no_parecer": "AUD-007:checkpoint:002",
+      "requisito": "AUD-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-007:003",
+      "id_no_parecer": "AUD-007:checkpoint:003",
+      "requisito": "AUD-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "AUD-007:004",
+      "id_no_parecer": "AUD-007:checkpoint:004",
+      "requisito": "AUD-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-001:001",
+      "id_no_parecer": "PER-001:checkpoint:001",
+      "requisito": "PER-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-001:002",
+      "id_no_parecer": "PER-001:checkpoint:002",
+      "requisito": "PER-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-001:003",
+      "id_no_parecer": "PER-001:checkpoint:003",
+      "requisito": "PER-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-001:004",
+      "id_no_parecer": "PER-001:checkpoint:004",
+      "requisito": "PER-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-001:005",
+      "id_no_parecer": "PER-001:checkpoint:005",
+      "requisito": "PER-001",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-002:001",
+      "id_no_parecer": "PER-002:checkpoint:001",
+      "requisito": "PER-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-002:002",
+      "id_no_parecer": "PER-002:checkpoint:002",
+      "requisito": "PER-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-002:003",
+      "id_no_parecer": "PER-002:checkpoint:003",
+      "requisito": "PER-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-002:004",
+      "id_no_parecer": "PER-002:checkpoint:004",
+      "requisito": "PER-002",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-003:001",
+      "id_no_parecer": "PER-003:checkpoint:001",
+      "requisito": "PER-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-003:002",
+      "id_no_parecer": "PER-003:checkpoint:002",
+      "requisito": "PER-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-003:003",
+      "id_no_parecer": "PER-003:checkpoint:003",
+      "requisito": "PER-003",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-004:001",
+      "id_no_parecer": "PER-004:checkpoint:001",
+      "requisito": "PER-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-004:002",
+      "id_no_parecer": "PER-004:checkpoint:002",
+      "requisito": "PER-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-004:003",
+      "id_no_parecer": "PER-004:checkpoint:003",
+      "requisito": "PER-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-004:004",
+      "id_no_parecer": "PER-004:checkpoint:004",
+      "requisito": "PER-004",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-005:001",
+      "id_no_parecer": "PER-005:checkpoint:001",
+      "requisito": "PER-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-005:002",
+      "id_no_parecer": "PER-005:checkpoint:002",
+      "requisito": "PER-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-005:003",
+      "id_no_parecer": "PER-005:checkpoint:003",
+      "requisito": "PER-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-005:004",
+      "id_no_parecer": "PER-005:checkpoint:004",
+      "requisito": "PER-005",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-006:001",
+      "id_no_parecer": "PER-006:checkpoint:001",
+      "requisito": "PER-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-006:002",
+      "id_no_parecer": "PER-006:checkpoint:002",
+      "requisito": "PER-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-006:003",
+      "id_no_parecer": "PER-006:checkpoint:003",
+      "requisito": "PER-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-006:004",
+      "id_no_parecer": "PER-006:checkpoint:004",
+      "requisito": "PER-006",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-007:001",
+      "id_no_parecer": "PER-007:checkpoint:001",
+      "requisito": "PER-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-007:002",
+      "id_no_parecer": "PER-007:checkpoint:002",
+      "requisito": "PER-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-007:003",
+      "id_no_parecer": "PER-007:checkpoint:003",
+      "requisito": "PER-007",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-008:001",
+      "id_no_parecer": "PER-008:checkpoint:001",
+      "requisito": "PER-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-008:002",
+      "id_no_parecer": "PER-008:checkpoint:002",
+      "requisito": "PER-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-008:003",
+      "id_no_parecer": "PER-008:checkpoint:003",
+      "requisito": "PER-008",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-009:001",
+      "id_no_parecer": "PER-009:checkpoint:001",
+      "requisito": "PER-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-009:002",
+      "id_no_parecer": "PER-009:checkpoint:002",
+      "requisito": "PER-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-009:003",
+      "id_no_parecer": "PER-009:checkpoint:003",
+      "requisito": "PER-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-009:004",
+      "id_no_parecer": "PER-009:checkpoint:004",
+      "requisito": "PER-009",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-010:001",
+      "id_no_parecer": "PER-010:checkpoint:001",
+      "requisito": "PER-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-010:002",
+      "id_no_parecer": "PER-010:checkpoint:002",
+      "requisito": "PER-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-010:003",
+      "id_no_parecer": "PER-010:checkpoint:003",
+      "requisito": "PER-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-010:004",
+      "id_no_parecer": "PER-010:checkpoint:004",
+      "requisito": "PER-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-010:005",
+      "id_no_parecer": "PER-010:checkpoint:005",
+      "requisito": "PER-010",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-011:001",
+      "id_no_parecer": "PER-011:checkpoint:001",
+      "requisito": "PER-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-011:002",
+      "id_no_parecer": "PER-011:checkpoint:002",
+      "requisito": "PER-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-011:003",
+      "id_no_parecer": "PER-011:checkpoint:003",
+      "requisito": "PER-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-011:004",
+      "id_no_parecer": "PER-011:checkpoint:004",
+      "requisito": "PER-011",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-012:001",
+      "id_no_parecer": "PER-012:checkpoint:001",
+      "requisito": "PER-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-012:002",
+      "id_no_parecer": "PER-012:checkpoint:002",
+      "requisito": "PER-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    },
+    {
+      "id": "PER-012:003",
+      "id_no_parecer": "PER-012:checkpoint:003",
+      "requisito": "PER-012",
+      "grupo": "transversais",
+      "classificacao_aceite_independente": "A"
+    }
+  ],
+  "limite": "Resultados técnicos não suprem acervo ausente. Pessoas conserva os critérios de seus três RF documentais sob E; contratos discrimina a lacuna por critério."
+}

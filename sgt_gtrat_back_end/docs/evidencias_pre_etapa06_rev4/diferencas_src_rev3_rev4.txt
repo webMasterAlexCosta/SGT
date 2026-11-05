@@ -1,2 +1,0 @@
-Files /mnt/data/sgt_rev3_original_compare/sgt_gtrat_backend/src/test/java/com/example/siggtrat/frequencia/FechamentoFrequenciaServicoTest.java and /mnt/data/sgt_boot3_rev3/sgt_gtrat_backend/src/test/java/com/example/siggtrat/frequencia/FechamentoFrequenciaServicoTest.java differ
-Files /mnt/data/sgt_rev3_original_compare/sgt_gtrat_backend/src/test/java/com/example/siggtrat/relatorio/RelatorioMensalAbsenteismoArchitectureTest.java and /mnt/data/sgt_boot3_rev3/sgt_gtrat_backend/src/test/java/com/example/siggtrat/relatorio/RelatorioMensalAbsenteismoArchitectureTest.java differ

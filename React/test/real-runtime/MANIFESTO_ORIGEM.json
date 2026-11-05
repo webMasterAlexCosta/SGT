@@ -1,0 +1,37 @@
+{
+  "source": "infraestrutura externa efetivamente utilizada; copiar para SGT_BASE/runtime antes de executar",
+  "files": [
+    {
+      "file": "manage.py",
+      "sha256": "1b8d15fa505a8f84cd72880a44a43d6c17620ddd0bd47bb94b6d7531923f64fe"
+    },
+    {
+      "file": "http-smoke.py",
+      "sha256": "82c802c839b3ae569ee388c97a7bd91aade17a95f5bc38eb4627e2c3cf5539b0"
+    },
+    {
+      "file": "api_client.py",
+      "sha256": "3bfb5d1a5839bd11d25ecf7ee34503683351b295c0de2ca0ae2389211f1ff251"
+    },
+    {
+      "file": "create-fixture.py",
+      "sha256": "76bcd2951d1446529a61b385bb248ecda4f94fdd7f0162872fdece88cdb1649e"
+    },
+    {
+      "file": "snapshot.py",
+      "sha256": "555c3c086e7d176526f0d37f640c77d047edcc9704e2efb6f5370fe4becc95b0"
+    },
+    {
+      "file": "restart-check.py",
+      "sha256": "ee1bffc8dc99945b01feb22ad508983144dd45ff0311243be965a8c600bc165e"
+    },
+    {
+      "file": "test_restart_readiness.py",
+      "sha256": "f868f11a71c6ee63b9f16e8427e29781e5a80cabcd74409a687f21db27a9cac8"
+    },
+    {
+      "file": "README.md",
+      "sha256": "f451559e14890f13cf18aa0444addc2766a3162cea23f6002a305bccce1452a0"
+    }
+  ]
+}

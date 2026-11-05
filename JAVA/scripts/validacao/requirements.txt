@@ -1,0 +1,2 @@
+# Apenas para capturar e comparar o schema/dados por consultas de diagnóstico.
+PyMySQL==1.1.2

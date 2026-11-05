@@ -1,0 +1,67 @@
+{
+  "gerado_utc": "2026-10-31T05:14:59.051839+00:00",
+  "manifesto_fontes_sha256": "fc92555e0785d29ed9b8f2dd3c86235c7eec03992537f27b7f0bc8f5d3526f25",
+  "rodadas": [
+    "regressao_integral_06",
+    "carga_final_01"
+  ],
+  "prova_mesclagem": "evidencias/COBERTURA_MESCLADA.json",
+  "prova_mesclagem_sha256": "6b7a6f2e85496cdaf7e6f8b135d3592b947bb3b5ee4a6927230f45342d9d4af7",
+  "entradas": [
+    {
+      "rodada": "regressao_integral_06",
+      "jacoco_sha256": "1dcf302ce2f04dd15b95149db79cf4da809f282589c33ddd211d3d42bcc4ae35"
+    },
+    {
+      "rodada": "carga_final_01",
+      "jacoco_sha256": "1268479e38bb880a3bf67d4e3c06f93e1489f40345698ec6e74c35f33a6a1a3c"
+    }
+  ],
+  "saida_exec_sha256": "eb29ad23a417d180ebdfc266bef70d6297879f92ff9c3e6d5f8b9fdc1b96ba78",
+  "jacoco_xml_sha256": "d4d459b8eff0fd1cef29f422ec4430efb7630c08a3734b59591f5f8087e81d3b",
+  "contadores": [
+    {
+      "tipo": "INSTRUCTION",
+      "cobertos": 138996,
+      "nao_cobertos": 21207,
+      "total": 160203,
+      "percentual": 86.7624
+    },
+    {
+      "tipo": "BRANCH",
+      "cobertos": 11669,
+      "nao_cobertos": 6804,
+      "total": 18473,
+      "percentual": 63.1679
+    },
+    {
+      "tipo": "LINE",
+      "cobertos": 23713,
+      "nao_cobertos": 2826,
+      "total": 26539,
+      "percentual": 89.3515
+    },
+    {
+      "tipo": "COMPLEXITY",
+      "cobertos": 9078,
+      "nao_cobertos": 6529,
+      "total": 15607,
+      "percentual": 58.1662
+    },
+    {
+      "tipo": "METHOD",
+      "cobertos": 5733,
+      "nao_cobertos": 584,
+      "total": 6317,
+      "percentual": 90.7551
+    },
+    {
+      "tipo": "CLASS",
+      "cobertos": 681,
+      "nao_cobertos": 9,
+      "total": 690,
+      "percentual": 98.6957
+    }
+  ],
+  "limite": "Cobertura de instrução não comprova requisito; sem limiar artificial ou cobertura de código externo."
+}

@@ -1,0 +1,7 @@
+Arquivos de origem - SHA-256
+sgt_gtrat_front_end-main.zip   5bf26b2f6984204005bce34a28223d69719861aeb15b098029fd92f449b4adf3
+node_modules-linux-node22(SGE).tar.gz   48ea7892cdc487c148a010c22912cbd350a8c7dc535a50cec7764eb3137c2021
+SGT_GTRAT_BACKEND_6_E_CONSOLIDADO.zip   6e5bbd2e1a96c303972d70fe8274898af092b86af85778435e470a91b0ee47be
+JAR congelado, dentro do ZIP Java   08d483d6e25105c62372efd4e0fd5f61a62ed9dee029745e0e35bd9d8f0ba63d
+
+O hash dos dois ZIPs desta nova distribuição é divulgado junto dos links de entrega.

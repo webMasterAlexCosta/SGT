@@ -1,0 +1,324 @@
+#!/usr/bin/env python3
+"""Isolated real-service runtime. Never writes to the frozen backend tree."""
+from __future__ import annotations
+
+import argparse
+import fcntl
+import hashlib
+import json
+import os
+from pathlib import Path
+import secrets
+import signal
+import socket
+import subprocess
+import sys
+import time
+
+ROOT = Path(__file__).resolve().parent
+PROJECT = ROOT.parent
+PRIVATE = (ROOT / "private").resolve()
+EVIDENCE = PROJECT / "evidence" / "infra"
+MYSQL = ROOT / "bin/mysql-8.4.11-linux-glibc2.28-x86_64-minimal"
+REDIS = ROOT / "bin/redis"
+JAR = PROJECT / "work/java-frozen/bin/sig-gtrat-backend-0.0.1-SNAPSHOT.jar"
+SCHEMA = "sgt_integration_20261101"
+MYSQL_PORT = 13317
+REDIS_PORT = 26389
+APP_PORT = 18080
+
+
+def private_write(path: Path, text: str) -> None:
+    path.parent.mkdir(mode=0o700, parents=True, exist_ok=True)
+    path.write_text(text)
+    path.chmod(0o600)
+
+
+def env() -> dict[str, str]:
+    value = os.environ.copy()
+    value["LD_LIBRARY_PATH"] = str(ROOT / "lib") + ":" + str(ROOT / "lib/ubuntu/usr/lib/x86_64-linux-gnu")
+    return value
+
+
+def creds() -> dict[str, str]:
+    return json.loads((PRIVATE / "secrets.json").read_text())
+
+
+def public_json(name: str, value: dict) -> None:
+    EVIDENCE.mkdir(parents=True, exist_ok=True)
+    (EVIDENCE / name).write_text(json.dumps(value, indent=2, ensure_ascii=False) + "\n")
+
+
+def configure() -> None:
+    PRIVATE.mkdir(mode=0o700, parents=True, exist_ok=True)
+    PRIVATE.chmod(0o700)
+    for name in ("mysql", "redis", "app", "uploads", "reports", "audit"):
+        (PRIVATE / name).mkdir(mode=0o700, exist_ok=True)
+    if not (PRIVATE / "secrets.json").exists():
+        values = {key: secrets.token_urlsafe(48) for key in ("mysql_root", "mysql_app", "redis", "jwt", "audit")}
+        values["bootstrap_password"] = secrets.token_urlsafe(24) + "aA1!"
+        values["admin_password"] = secrets.token_urlsafe(24) + "aA1!"
+        private_write(PRIVATE / "secrets.json", json.dumps(values, indent=2) + "\n")
+    values = creds()
+    mysql_config = f"""[mysqld]
+basedir={MYSQL}
+datadir={PRIVATE}/mysql/data
+socket={PRIVATE}/mysql/mysql.sock
+pid-file={PRIVATE}/mysql/mysql.pid
+log-error={PRIVATE}/mysql/error.log
+bind-address=127.0.0.1
+port={MYSQL_PORT}
+mysqlx=0
+user=root
+skip-name-resolve
+skip-log-bin
+performance-schema=ON
+max-connections=20
+table-open-cache=128
+table-definition-cache=512
+thread-cache-size=4
+innodb-buffer-pool-size=128M
+innodb-redo-log-capacity=64M
+innodb-log-buffer-size=8M
+tmp-table-size=16M
+max-heap-table-size=16M
+temptable-max-ram=32M
+temptable-max-mmap=0
+max-allowed-packet=32M
+character-set-server=utf8mb4
+collation-server=utf8mb4_0900_ai_ci
+"""
+    private_write(PRIVATE / "mysql/my.cnf", mysql_config)
+    private_write(PRIVATE / "mysql/root.cnf", f"[client]\nuser=root\npassword={values['mysql_root']}\nsocket={PRIVATE}/mysql/mysql.sock\nprotocol=SOCKET\n")
+    private_write(PRIVATE / "mysql/app.cnf", f"[client]\nuser=sgt_runtime\npassword={values['mysql_app']}\nhost=127.0.0.1\nport={MYSQL_PORT}\nprotocol=TCP\n")
+    redis_config = f"""bind 127.0.0.1
+protected-mode yes
+port {REDIS_PORT}
+daemonize no
+pidfile {PRIVATE}/redis/redis.pid
+logfile {PRIVATE}/redis/redis.log
+dir {PRIVATE}/redis
+save ""
+appendonly no
+maxmemory 64mb
+maxmemory-policy allkeys-lru
+maxclients 32
+requirepass {values['redis']}
+"""
+    private_write(PRIVATE / "redis/redis.conf", redis_config)
+    properties = {}
+    for line in (PROJECT / "work/java-frozen/backend/.env.example").read_text().splitlines():
+        if line and not line.lstrip().startswith("#") and "=" in line:
+            key, value = line.split("=", 1)
+            properties[key] = value
+    properties.update({
+        "DB_URL": f"jdbc:mysql://127.0.0.1:{MYSQL_PORT}/{SCHEMA}?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Sao_Paulo",
+        "DB_USER": "sgt_runtime", "DB_PASS": values["mysql_app"],
+        "DB_MAX_POOL_SIZE": "8", "DB_MIN_IDLE": "1", "DB_POOL_NAME": "SGT-Isolated",
+        "SERVER_ADDRESS": "127.0.0.1", "SERVER_PORT": str(APP_PORT),
+        "SSL_ENABLED": "false", "JWT_SECRET": values["jwt"], "AUDIT_SECRET": values["audit"],
+        "FILE_UPLOAD_DIR": str(PRIVATE / "uploads"), "AUDIT_FALLBACK_LOG": str(PRIVATE / "audit/fallback.jsonl"),
+        "RELATORIO_TEMP_DIR": str(PRIVATE / "reports"),
+        "CORS_ALLOWED_ORIGINS": "http://localhost:5173,http://127.0.0.1:5173,http://localhost:4173,http://127.0.0.1:4173",
+        "CACHE_TYPE": "redis", "REDIS_HOST": "127.0.0.1", "REDIS_PORT": str(REDIS_PORT),
+        "REDIS_PASSWORD": values["redis"], "REDIS_DATABASE": "7", "REDIS_MAXMEMORY": "64mb",
+        "REDIS_HTTP_GET_ENABLED": "true", "GMAIL_EMAIL_ENABLED": "false", "GMAIL_SMTP_USERNAME": "",
+        "APP_SEED_USUARIOS_GLOBAIS_ENABLED": "true", "APP_SEED_USUARIOS_GLOBAIS_INITIAL_PASSWORD": values["bootstrap_password"],
+        "APP_SEED_GESTORES_SE_GESTAO_LOCAL_ENABLED": "false",
+        "APP_SEED_UNIDADES_OPERACIONAIS_ENABLED": "false", "APP_SEED_JORNADAS_OPERACIONAIS_ENABLED": "false",
+        "spring.jpa.hibernate.ddl-auto": "update", "spring.sql.init.mode": "never",
+    })
+    private_write(PRIVATE / "app/app.env", "\n".join(f"{key}={value}" for key, value in properties.items()) + "\n")
+    public_json("runtime-config.json", {
+        "mysql": {"version": "8.4.11", "host": "127.0.0.1", "port": MYSQL_PORT, "schema": SCHEMA, "buffer_pool_bytes": 134217728, "max_connections": 20},
+        "redis": {"version": "8.2.11", "host": "127.0.0.1", "port": REDIS_PORT, "database": 7, "maxmemory_bytes": 67108864},
+        "java": {"http_port": APP_PORT, "heap_max": "768m", "metaspace_max": "256m", "jdbc_pool_max": 8},
+        "schema_management": "Hibernate/JPA only; ddl-auto=update; spring.sql.init.mode=never",
+        "database_creation": "MySQL Connector/J createDatabaseIfNotExist=true, scoped user grant; no application DDL in helper",
+        "fixtures": "Native opt-in global-user bootstrap; all subsequent synthetic domain records via HTTP",
+        "private_state": str(PRIVATE), "frozen_jar": str(JAR),
+    })
+
+
+def mysql(query: str, blank_password: bool = False) -> str:
+    if blank_password:
+        args = [str(MYSQL / "bin/mysql"), "--no-defaults", "--no-login-paths", "--user=root", "--protocol=SOCKET", f"--socket={PRIVATE}/mysql/mysql.sock"]
+    else:
+        args = [str(MYSQL / "bin/mysql"), f"--defaults-file={PRIVATE}/mysql/root.cnf", "--no-login-paths"]
+    result = subprocess.run(args + ["--batch", "--skip-column-names"], input=query, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, env=env())
+    if result.returncode:
+        raise RuntimeError(f"MySQL client failed with status {result.returncode}; query and credential output suppressed")
+    return result.stdout.strip()
+
+
+def wait_mysql(blank_password: bool = False, child: subprocess.Popen | None = None) -> None:
+    for _ in range(150):
+        if child is not None and child.poll() is not None:
+            raise RuntimeError("MySQL exited before readiness; inspect private/mysql/error.log")
+        try:
+            if mysql("SELECT 1;", blank_password) == "1":
+                return
+        except RuntimeError:
+            pass
+        time.sleep(0.2)
+    raise RuntimeError("MySQL readiness timed out; inspect private/mysql/error.log")
+
+
+def init() -> None:
+    configure()
+    data = PRIVATE / "mysql/data"
+    if data.exists() and any(data.iterdir()):
+        raise RuntimeError("Refusing initialization of a nonempty MySQL datadir")
+    data.mkdir(mode=0o700, exist_ok=True)
+    with (PRIVATE / "mysql/initialize.log").open("ab") as log:
+        subprocess.run([str(MYSQL / "bin/mysqld"), f"--defaults-file={PRIVATE}/mysql/my.cnf", "--initialize-insecure"], env=env(), stdout=log, stderr=log, check=True)
+    with (PRIVATE / "mysql/bootstrap.log").open("ab") as log:
+        process = subprocess.Popen([str(MYSQL / "bin/mysqld"), f"--defaults-file={PRIVATE}/mysql/my.cnf", "--skip-networking"], env=env(), stdout=log, stderr=log)
+        try:
+            wait_mysql(blank_password=True, child=process)
+            value = creds()
+            mysql(f"ALTER USER 'root'@'localhost' IDENTIFIED BY '{value['mysql_root']}';\nCREATE USER 'sgt_runtime'@'127.0.0.1' IDENTIFIED BY '{value['mysql_app']}';\nGRANT ALL PRIVILEGES ON `{SCHEMA}`.* TO 'sgt_runtime'@'127.0.0.1';\nGRANT PROCESS ON *.* TO 'sgt_runtime'@'127.0.0.1';\nGRANT SELECT ON performance_schema.* TO 'sgt_runtime'@'127.0.0.1';", blank_password=True)
+            tables = int(mysql(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='{SCHEMA}';"))
+            schema_count = int(mysql(f"SELECT COUNT(*) FROM information_schema.schemata WHERE schema_name='{SCHEMA}';"))
+            public_json("mysql-before-application.json", {"application_table_count": tables, "application_schema_exists": bool(schema_count), "admin_operations": ["native initialize", "root password", "scoped application user and grants"], "application_ddl_executed_by_helper": False})
+            print("Initialized isolated MySQL; application database absent, application tables=0.", flush=True)
+        finally:
+            process.terminate()
+            process.wait(timeout=30)
+
+
+def redis_ping() -> str:
+    result = subprocess.run([str(REDIS / "redis-cli"), "-h", "127.0.0.1", "-p", str(REDIS_PORT), "-n", "7", "PING"], env={**os.environ, "REDISCLI_AUTH": creds()["redis"]}, text=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE, check=True)
+    return result.stdout.strip()
+
+
+def process_rss(pid: int) -> int:
+    try:
+        for line in Path(f"/proc/{pid}/status").read_text().splitlines():
+            if line.startswith("VmRSS:"):
+                return int(line.split()[1]) * 1024
+    except OSError:
+        pass
+    return 0
+
+
+def supervise(processes: list[subprocess.Popen], name: str) -> None:
+    private_write(PRIVATE / f"{name}-supervisor.pid", str(os.getpid()) + "\n")
+    stopping = False
+    def stop(_signum, _frame):
+        nonlocal stopping
+        stopping = True
+    signal.signal(signal.SIGTERM, stop)
+    signal.signal(signal.SIGINT, stop)
+    try:
+        while not stopping:
+            if any(p.poll() is not None for p in processes):
+                raise RuntimeError(f"A {name} child exited; inspect private logs")
+            time.sleep(0.25)
+    finally:
+        for child in reversed(processes):
+            if child.poll() is None:
+                child.terminate()
+        for child in reversed(processes):
+            try:
+                child.wait(timeout=30)
+            except subprocess.TimeoutExpired:
+                child.kill()
+                child.wait()
+        (PRIVATE / f"{name}-supervisor.pid").unlink(missing_ok=True)
+
+
+def serve() -> None:
+    children = []
+    with (PRIVATE / "services.log").open("ab") as log:
+        try:
+            children.append(subprocess.Popen([str(MYSQL / "bin/mysqld"), f"--defaults-file={PRIVATE}/mysql/my.cnf"], env=env(), stdout=log, stderr=log))
+            wait_mysql(child=children[0])
+            children.append(subprocess.Popen([str(REDIS / "redis-server"), str(PRIVATE / "redis/redis.conf")], stdout=log, stderr=log))
+            for _ in range(50):
+                try:
+                    if redis_ping() == "PONG":
+                        break
+                except subprocess.CalledProcessError:
+                    pass
+                time.sleep(0.1)
+            else:
+                raise RuntimeError("Redis readiness timed out")
+            private_write(PRIVATE / "service-pids.json", json.dumps({"mysql": children[0].pid, "redis": children[1].pid}) + "\n")
+            print("MySQL and Redis are ready on loopback; Java is not started.", flush=True)
+            status()
+            supervise(children, "services")
+        finally:
+            for child in children:
+                if child.poll() is None:
+                    child.terminate()
+                    child.wait(timeout=30)
+
+
+def serve_app(expected_sha256: str) -> None:
+    actual = hashlib.sha256(JAR.read_bytes()).hexdigest()
+    if actual != expected_sha256:
+        raise RuntimeError("Frozen JAR SHA-256 differs from the reviewed baseline")
+    javas = list((ROOT / "bin").glob("jdk-*/bin/java"))
+    if len(javas) != 1:
+        raise RuntimeError("Exactly one supplied JDK must be extracted")
+    with (PRIVATE / "heavy-java.lock").open("a") as lock, (PRIVATE / "app/java.log").open("ab") as log:
+        fcntl.flock(lock, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        command = [str(javas[0]), "-Xms128m", "-Xmx768m", "-XX:MaxMetaspaceSize=256m", "-XX:ActiveProcessorCount=2", f"-Djava.io.tmpdir={PRIVATE}/reports", "-Duser.timezone=America/Sao_Paulo", "-jar", str(JAR), f"--env-file={PRIVATE}/app/app.env", "--spring.jpa.hibernate.ddl-auto=update", "--spring.sql.init.mode=never", "--logging.level.org.springframework.boot.availability=DEBUG"]
+        child = subprocess.Popen(command, cwd=PRIVATE / "app", env=env(), stdout=log, stderr=log)
+        private_write(PRIVATE / "java.pid", str(child.pid) + "\n")
+        public_json("jar-process.json", {"pid": child.pid, "jar_sha256": actual, "command": command, "started_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()), "frozen_jar_modified": False})
+        print(f"Frozen JAR launched with baseline SHA-256 {actual}; PID {child.pid}.", flush=True)
+        supervise([child], "app")
+
+
+def status() -> None:
+    result = {
+        "mysql_version": mysql("SELECT VERSION();"),
+        "application_table_count": int(mysql(f"SELECT COUNT(*) FROM information_schema.tables WHERE table_schema='{SCHEMA}';")),
+        "mysql_buffer_pool_bytes": int(mysql("SELECT @@innodb_buffer_pool_size;")),
+        "mysql_max_connections": int(mysql("SELECT @@max_connections;")),
+        "redis_ping": redis_ping(),
+        "checked_utc": time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime()),
+    }
+    if (PRIVATE / "service-pids.json").exists():
+        result["rss_bytes"] = {name: process_rss(pid) for name, pid in json.loads((PRIVATE / "service-pids.json").read_text()).items()}
+    if (PRIVATE / "java.pid").exists():
+        result["java_rss_bytes"] = process_rss(int((PRIVATE / "java.pid").read_text()))
+    public_json("runtime-status.json", result)
+    print(json.dumps(result, indent=2), flush=True)
+
+
+def stop(name: str) -> None:
+    path = PRIVATE / f"{name}-supervisor.pid"
+    if path.exists():
+        pid = int(path.read_text())
+        command = Path(f"/proc/{pid}/cmdline").read_bytes().decode(errors="replace").split("\0")
+        expected_action = "serve-app" if name == "app" else "serve"
+        if not any(part.endswith("/manage.py") for part in command) or expected_action not in command:
+            raise RuntimeError("Refusing to signal a PID that does not match this runtime supervisor")
+        os.kill(pid, signal.SIGTERM)
+        print(f"Requested graceful stop of this runtime's {name} supervisor.")
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("action", choices=["configure", "init", "serve", "serve-app", "status", "stop-app", "stop-services"])
+    parser.add_argument("--expected-jar-sha256")
+    args = parser.parse_args()
+    if args.action == "serve-app":
+        if not args.expected_jar_sha256:
+            parser.error("serve-app requires the persisted baseline JAR SHA-256")
+        serve_app(args.expected_jar_sha256)
+    elif args.action.startswith("stop-"):
+        stop(args.action.removeprefix("stop-"))
+    else:
+        globals()[args.action]()
+
+
+if __name__ == "__main__":
+    try:
+        main()
+    except Exception as exc:
+        print(f"Runtime action failed: {type(exc).__name__}: {exc}", file=sys.stderr)
+        sys.exit(1)

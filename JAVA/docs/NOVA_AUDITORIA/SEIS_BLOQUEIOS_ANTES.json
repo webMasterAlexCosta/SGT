@@ -1,0 +1,2520 @@
+{
+  "estado": "antes_da_implementacao_java",
+  "total_requisitos": 6,
+  "total_criterios": 33,
+  "linhas": [
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:001",
+      "texto_criterio": "Sem autorização ou mapa completo bloqueia",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "prepararMapeamentos",
+          "metodo_recebido": "prepararMapeamentos",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 401,
+              "linha_fim": 465,
+              "sha256_metodo": "c739ecfc3fc1328a195d32c252eee5bac0e71bbe5a2bd90245c01a8a3d8c894a"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "validarCoberturaDoContexto",
+          "metodo_recebido": "validarCoberturaDoContexto",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 473,
+              "linha_fim": 483,
+              "sha256_metodo": "27bcfe49fe2209ef810e6450c46183dc656d31d04eb228c7b805d4a0b7331f77"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.TransferenciaConcessaoObrigatoriaHttpIT#transferenciaSemConcessaoPreservaTodaOrigemEPassaSomenteAposAutorizacaoEspecifica",
+        "com.example.siggtrat.etapa07.TransferenciaGestaoContratoServicoEtapa07Test#bloqueiaTransferenciaSemMapeamentoDoContextoPosterior"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:002",
+      "texto_criterio": "Tipo de contratação posterior deve ser válido na Gestão destino",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "obterTipoDestino",
+          "metodo_recebido": "obterTipoDestino",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 371,
+              "linha_fim": 383,
+              "sha256_metodo": "d3355fd45217564624248f8c28759dc55f0a0d85d2fff431e7daf4b8fd288d38"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "validarContextoNasPosicoesPosteriores",
+          "metodo_recebido": "validarTiposNasPosicoesPosteriores",
+          "resolucao_da_referencia": "Método atual valida tanto Tipo quanto composição posterior; referência antiga foi atualizada por inspeção do corpo atual.",
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 304,
+              "linha_fim": 338,
+              "sha256_metodo": "a1e916c764262694b0b520b20da6ba241539d79205c785ff4d8822a7dc9a3c9d"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "reconstruirDadosNegociais",
+          "metodo_recebido": "reconstruirDadosNegociais",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": [
+            {
+              "linha_inicio": 437,
+              "linha_fim": 644,
+              "sha256_metodo": "050ea2bed621686180c45dd073cadb0f3e261024f65f58c1fdd1ab90ae99dbd9"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTransferenciaLacunasHttpIT#transferenciaExigeMapeamentoExplicitoDoTipoLocalDeDestino",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransferenciaLacunasHttpIT#transferenciaRejeitaTipoQuePertenceAGestaoDeOrigem",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransferenciaLacunasHttpIT#transferenciaUsaTipoMapeadoNoDestinoEPreservaTipoAnterior",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#transferenciaLegadaSemTipoDestinoNaoDeclaraTipoDaGestaoAnterior",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#aditamentoQueDependeDoTipoLegadoExigeRegularizacaoExplicitaDoDestino",
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#aditamentoPosteriorDeTipoDaOrigemExigeTratamentoAntesDaTransferencia"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:003",
+      "texto_criterio": "Composições e alocações mapeadas sem apagar anteriores",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "transferir",
+          "metodo_recebido": "transferir",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 115,
+              "linha_fim": 164,
+              "sha256_metodo": "62806dc18ac10b033d0e3be8d5dab0f17c621b25de2a42d7498ddb338a2d5477"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratosCrudHttpIT#transferenciaExcepcionalPreservaGestaoAnteriorEMapeiaComposicaoPosterior",
+        "com.example.siggtrat.auditoria20261029.PessoasRetificacaoAposTransferenciaHttpIT#ampliarTerminoAlemDaTransferenciaUsaMapeamentoDocumentadoSemRecontratar",
+        "com.example.siggtrat.auditoria20261029.ConclusaoAud03VinculosTransferenciaProgramadaHttpIT#cadastroPosteriorAoAgendamentoAplicaMapaNasDuasFaixasSemAnteciparProjecao",
+        "com.example.siggtrat.auditoria20261029.ConclusaoAud03VinculosTransferenciaProgramadaHttpIT#antecipacaoDoInicioAtravessaTransferenciaReconstroiOrigemEPreservaConhecimentoAnterior",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#fotografiaDeTransferenciaSemOrigemNaoAntecipaDestinoMasProvaDestinoDesdeADataDoAto"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:004",
+      "texto_criterio": "Histórico de origem não muda após renomear cadastros",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 390,
+              "linha_fim": 399,
+              "sha256_metodo": "b9314e24a18b00e73bdf26633be38fc6c3f472a1e15bc47b2f97420a4cc0d055"
+            },
+            {
+              "linha_inicio": 562,
+              "linha_fim": 570,
+              "sha256_metodo": "22c07c9db499fc4c2cbb8c0e224b46cd1c7a8b19c5dee0efa6ad0c84ccc42f71"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "prepararMapeamentos",
+          "metodo_recebido": "prepararMapeamentos",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 401,
+              "linha_fim": 465,
+              "sha256_metodo": "c739ecfc3fc1328a195d32c252eee5bac0e71bbe5a2bd90245c01a8a3d8c894a"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/MapeamentoTransferenciaGestao.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6e42cac53ae1b252f722926d6739a164206d1504396a6d85a6f8735136c4a524",
+          "sha256_recebido": "6e42cac53ae1b252f722926d6739a164206d1504396a6d85a6f8735136c4a524",
+          "sobrecargas": [
+            {
+              "linha_inicio": 70,
+              "linha_fim": 82,
+              "sha256_metodo": "c667ed35799044ed76a7143d1b2e49b5b9b9fa48315e43cd3c3612d5601e8396"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTransferenciaLacunasHttpIT#historicoDaTransferenciaNaoReescreveNomesAposRenomearCatalogosEGestoes",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#transferenciaLegadaNaoSubstituiFotografiasAusentesPorNomesAtuais",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#transferenciaNovaContinuaExibindoFotografiasETipoComprovados",
+        "com.example.siggtrat.auditoria20261029.ContratosFotografiaAusenteHttpIT#novoMapaConservaProvaOuAusenciaDaOrigemECapturaDestinoDoAto",
+        "com.example.siggtrat.contrato.ComposicaoFotografiaLegadaTest#callbackDeNovoMapaPreservaOrigemDesconhecidaECapturaDestinoDocumentado"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:005",
+      "texto_criterio": "A política de matrícula resultante da transferência deve ser compatível com vínculos vigentes e programados atingidos; respeita override contratual false comprovado e matrícula válida já informada.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "transferir",
+          "metodo_recebido": "transferir",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 115,
+              "linha_fim": 164,
+              "sha256_metodo": "62806dc18ac10b033d0e3be8d5dab0f17c621b25de2a42d7498ddb338a2d5477"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "fotografiaComGestaoDestino",
+          "metodo_recebido": "fotografiaComGestaoDestino",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "sha256_recebido": "4fd101bc300f1616d1eec872ab14c8e5dbef17d96c0c9709d9546322452fb555",
+          "sobrecargas": [
+            {
+              "linha_inicio": 340,
+              "linha_fim": 369,
+              "sha256_metodo": "1e5e5badf98827813fc578c8e8d1a4f706104b7ef22a96991232d0ad9afcdcd0"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "exigirMatriculasCompativeisAposTransferencia",
+          "metodo_recebido": "exigirMatriculasCompativeisAposTransferencia",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": [
+            {
+              "linha_inicio": 778,
+              "linha_fim": 787,
+              "sha256_metodo": "d36f55ebdb1d0fa00569f6f151f37884c7a3350cc541c94cd1c41d6593b862a6"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "vinculosSemMatriculaNaPoliticaProjetada",
+          "metodo_recebido": "vinculosSemMatriculaNaPoliticaProjetada",
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": true,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": [
+            {
+              "linha_inicio": 789,
+              "linha_fim": 815,
+              "sha256_metodo": "1dcd6f2ce56bdd86a61fe67624ad58a6f8143b07a79f07bffde7d5cd1eec450d"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#transferenciaParaTipoObrigatorioRecusaVinculoSemMatriculaSemMudarFatos",
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#overrideContratualOpcionalPermiteTransferirParaTipoObrigatorio",
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#matriculaInformadaPermiteTransferenciaComHerancaObrigatoria",
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#regularizarMatriculaAposRecusaPermiteMesmaTransferenciaSemConsumirConcessaoDuasVezes",
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#aditamentoPosteriorDispensandoMatriculaAntesDoInicioProgramadoEhRespeitadoNaTransferencia",
+        "com.example.siggtrat.auditoria20261029.TransferenciaPoliticaMatriculaHttpIT#restauracaoPosteriorDaHerancaObrigatoriaImpedeTransferenciaMesmoComOverrideOpcionalInicial"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:006",
+      "texto_criterio": "Retificacao preserva transferencia anterior e reaplica ato posterior valido no corte efetivo e de conhecimento.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#retificarTransferenciaProgramadaReconstroiOrigemEReaplicaAditamentoPosterior"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:007",
+      "texto_criterio": "Cancelamento futuro e explicito, preserva original e posteriores validos; posterior incompativel implica rollback.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#cancelarTransferenciaFuturaPreservaOriginalEPosteriorSemEfeitoDeResponsabilidade",
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#cancelarTransferenciaComTipoPosteriorIncompativelFazRollbackIntegral"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:008",
+      "texto_criterio": "Transferencia usa vigencia reconstruida, incluindo prorrogacao e encurtamento programados.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#transferenciaPodeUsarVigenciaProrrogadaPorAditamentoFuturo",
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#transferenciaForaDaVigenciaEncurtadaPorAditamentoFuturoNaoPersiste"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CON-023",
+      "enunciado_literal": "Transferência excepcional de Gestão Local preserva contexto histórico anterior, exige validação/mapeamento explícito do contexto posterior e autorização administrativa específica para Gestor Local autorizado.",
+      "criterio": "CON-023:009",
+      "texto_criterio": "Contexto posterior inclui todas composicoes e tentativas concorrentes nao publicam fatos conflitantes.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#transferenciaRecusaComposicaoPosteriorAindaReferenteAGestaoOrigem",
+        "com.example.siggtrat.auditoria20261029.ConclusaoTransferenciaContratoHttpIT#duasTransferenciasConflitantesConcorrentesNaoPublicamDuasCadeias"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaDaTransferenciaRestauraTipoEMapaSomenteDepoisDoConhecimento"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-004",
+      "enunciado_literal": "Consulta histórica mostra o nome/fotografia que valia no período, não reescreve o passado com o nome atual.",
+      "criterio": "CAT-004:001",
+      "texto_criterio": "Novos fatos de alocação/vínculo capturam rótulos e configurações da origem efetivamente escolhida.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 71,
+              "linha_fim": 90,
+              "sha256_metodo": "642557cc398336fe446073eb8879daf85296ed4dc427c79e469c1ccbfb60a846"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "aplicarFotografiaDoMapeamento",
+          "metodo_recebido": "aplicarFotografiaDoMapeamento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 116,
+              "linha_fim": 124,
+              "sha256_metodo": "d64d74da424af65ec3428599294cc1cc597c347fd79a0b0f5b67d671f28c1c47"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AlocacaoVinculoServico.java",
+          "metodo": "registrarEvento",
+          "metodo_recebido": "registrarEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "17875fde35c2ea3b6813e31fd27483b28bf6bc3254095eaf360d10165ca51d47",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1504,
+              "linha_fim": 1512,
+              "sha256_metodo": "f5123d5bc7732adb8f5dc742900d84d3d2b114dedf3817937f23c059284ed64a"
+            },
+            {
+              "linha_inicio": 1514,
+              "linha_fim": 1551,
+              "sha256_metodo": "a6b638a2235d4de683d4a8746cf6bc69da1a63008c5e64f830d8958699193782"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AlocacaoVinculoServico.java",
+          "metodo": "novaFaixa",
+          "metodo_recebido": "novaFaixa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "17875fde35c2ea3b6813e31fd27483b28bf6bc3254095eaf360d10165ca51d47",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1196,
+              "linha_fim": 1218,
+              "sha256_metodo": "e2eee7a75219b248fdacbef555de2b67eb8d3bf385d2403a94061a9f716270bf"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "aplicarFotografiaDocumentada",
+          "metodo_recebido": "aplicarFotografiaDocumentada",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 105,
+              "linha_fim": 115,
+              "sha256_metodo": "6afdbf4e524a6e01a662540b5e04806219eaea16eebb5763094c833f27f0d868"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 71,
+              "linha_fim": 90,
+              "sha256_metodo": "642557cc398336fe446073eb8879daf85296ed4dc427c79e469c1ccbfb60a846"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "nomeGestaoFotografadoParaEvento",
+          "metodo_recebido": "nomeGestaoFotografadoParaEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1080,
+              "linha_fim": 1093,
+              "sha256_metodo": "04f39212014d9234f8bdf7f0acf9ae048b5ac61bccf104ea782f3d90b6c8aa52"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "montarEvento",
+          "metodo_recebido": "montarEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1039,
+              "linha_fim": 1078,
+              "sha256_metodo": "23698d1d457df6dcccd96b6b23c5a8736e799fc3e74496efd0951c17ca0e42c6"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.PessoasLacunasHttpIT#alocacoesHistoricasNaoSaoRenomeadasPelosCatalogosAtuais",
+        "com.example.siggtrat.auditoria20261029.PessoasFotografiaTransferenciaRestauradaHttpIT#sucessoraRestauradaUsaMunicipioEGradeDocumentadosNaTransferencia",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaRotuloAuditoriaIndependenteHttpIT#inclusaoFotografaRotuloComprovadoParaDataEfetiva",
+        "com.example.siggtrat.auditoria20261029.RevisaoNomeGestaoEventoVinculoHttpIT#atoDeMatriculaPreservaNomeDaGestaoDoRecorteComFonteOriginal",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#novaAlocacaoRetroativaNaoTransformaGradeEMunicipioAtuaisEmConfiguracaoPassada",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#novoAtoDeHojeOuFuturoContinuaCapturandoAConfiguracaoAtual",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#composicaoLegadaSemFonteNaoCapturaMestreNemEmPreUpdate",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#municipioOriginalLegitimamenteNuloNaoECompletadoPeloMestrePosterior",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#publicacaoCongelaConfiguracaoDefinitivaERevalidaMudancaAposPrevia",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoPreservaConfiguracaoPropriaDepoisDaMudancaDoMestre",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoSomenteQuantitativoNaoRedefineConfiguracaoDaCombinacaoExistente",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoQuantitativoPreservaAusenciaDeConfiguracaoDaComposicaoLegada",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoLegadoNaoEmprestaConfiguracaoDeOutraComposicao",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#calendarioMunicipalUsaMunicipioOriginalDaNovaAlocacaoRetroativa",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#instrumentoSomenteQuantitativoNaoTrocaOsTresRotulosPublicadosPelosMestresAtuais",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#instrumentoQuantitativoNaoCompletaRotulosLegadosAusentesComOsMestresAtuais",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#combinacaoRealmenteNovaDeAditamentoPreservaSeusPropriosRotulosDocumentados"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaRestauraConfiguracaoSemUsarCatalogosAtuaisEReaplicaAditamento",
+        "MotivosProvaContextoHistoricoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-004",
+      "enunciado_literal": "Consulta histórica mostra o nome/fotografia que valia no período, não reescreve o passado com o nome atual.",
+      "criterio": "CAT-004:002",
+      "texto_criterio": "Renomear Gestão/Lotação/Turno/Cargo/Tipo posteriormente não modifica as fotografias dos fatos anteriores.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/ComposicaoContratual.java",
+          "metodo": "fotografarCatalogosEmRascunho",
+          "metodo_recebido": "fotografarCatalogosEmRascunho",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "05915be6a93498f845bde5000a32364de14595acb1e840f9482b3e47d4f2f6eb",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 73,
+              "linha_fim": 83,
+              "sha256_metodo": "db57708769f018e96717020c4ef7da01481b438f3783f4a0922304561becca81"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": "projetarEntidades",
+          "metodo_recebido": "projetarEntidades",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 88,
+              "linha_fim": 90,
+              "sha256_metodo": "5be9ad8512d6ecaa164ea94b85487230ab081ec37402fd7252342d00c90da701"
+            },
+            {
+              "linha_inicio": 92,
+              "linha_fim": 96,
+              "sha256_metodo": "77378a246a1f91880e7c01d64c2c43607262876187e72f519850f7475655f18e"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "descricaoTipoFotografada",
+          "metodo_recebido": "descricaoTipoFotografada",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1272,
+              "linha_fim": 1279,
+              "sha256_metodo": "6c278be6fa02e6b6e6bd9808e9713dadd6529c30cb9fca59f66fee431ccc19cc"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 390,
+              "linha_fim": 399,
+              "sha256_metodo": "b9314e24a18b00e73bdf26633be38fc6c3f472a1e15bc47b2f97420a4cc0d055"
+            },
+            {
+              "linha_inicio": 562,
+              "linha_fim": 570,
+              "sha256_metodo": "22c07c9db499fc4c2cbb8c0e224b46cd1c7a8b19c5dee0efa6ad0c84ccc42f71"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "exigeMatriculaNoVinculoEm",
+          "metodo_recebido": "exigeMatriculaNoVinculoEm",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 399,
+              "linha_fim": 408,
+              "sha256_metodo": "76272f58d2e438c1b6088150f08d37228af0e4f05bd82d8c9ee0136686823fdf"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": "projetarDTO",
+          "metodo_recebido": "projetarDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 249,
+              "linha_fim": 263,
+              "sha256_metodo": "fe8b8b31adf369c26a611b0f0bea835461105be955d853e52328a365d6698ad2"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/RemanejamentoContratualServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "5b0c0946519eab7634ecf782a9dc86275515a2556e013040db3775c20f5beaf2",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 476,
+              "linha_fim": 496,
+              "sha256_metodo": "43f7f2e6dd75f242bf2bad6746163c20ce25a49e02e6e97c8846f1b8f43c564f"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AlocacaoVinculoServico.java",
+          "metodo": "novaFaixa",
+          "metodo_recebido": "novaFaixa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "17875fde35c2ea3b6813e31fd27483b28bf6bc3254095eaf360d10165ca51d47",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1196,
+              "linha_fim": 1218,
+              "sha256_metodo": "e2eee7a75219b248fdacbef555de2b67eb8d3bf385d2403a94061a9f716270bf"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "aplicarFotografiaDocumentada",
+          "metodo_recebido": "aplicarFotografiaDocumentada",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 105,
+              "linha_fim": 115,
+              "sha256_metodo": "6afdbf4e524a6e01a662540b5e04806219eaea16eebb5763094c833f27f0d868"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 71,
+              "linha_fim": 90,
+              "sha256_metodo": "642557cc398336fe446073eb8879daf85296ed4dc427c79e469c1ccbfb60a846"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "nomeGestaoFotografadoParaEvento",
+          "metodo_recebido": "nomeGestaoFotografadoParaEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1080,
+              "linha_fim": 1093,
+              "sha256_metodo": "04f39212014d9234f8bdf7f0acf9ae048b5ac61bccf104ea782f3d90b6c8aa52"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "montarEvento",
+          "metodo_recebido": "montarEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1039,
+              "linha_fim": 1078,
+              "sha256_metodo": "23698d1d457df6dcccd96b6b23c5a8736e799fc3e74496efd0951c17ca0e42c6"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.PessoasLacunasHttpIT#alocacoesHistoricasNaoSaoRenomeadasPelosCatalogosAtuais",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#transferenciaNovaContinuaExibindoFotografiasETipoComprovados",
+        "com.example.siggtrat.auditoria20261029.InstrumentosFotografiaCatalogoHttpIT#historicoDoRemanejamentoPreservaNomeFotografadoDoCargoAposRenomearCatalogo",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#transferenciaRetroativaNaoTrocaNomeComprovadoDaOrigemPeloMestreRenomeado",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaRotuloAuditoriaIndependenteHttpIT#inclusaoFotografaRotuloComprovadoParaDataEfetiva",
+        "com.example.siggtrat.auditoria20261029.RevisaoNomeGestaoEventoVinculoHttpIT#atoDeMatriculaPreservaNomeDaGestaoDoRecorteComFonteOriginal",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#novaAlocacaoRetroativaNaoTransformaGradeEMunicipioAtuaisEmConfiguracaoPassada",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#publicacaoCongelaConfiguracaoDefinitivaERevalidaMudancaAposPrevia",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoPreservaConfiguracaoPropriaDepoisDaMudancaDoMestre",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoSomenteQuantitativoNaoRedefineConfiguracaoDaCombinacaoExistente",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#instrumentoSomenteQuantitativoNaoTrocaOsTresRotulosPublicadosPelosMestresAtuais"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaRestauraConfiguracaoSemUsarCatalogosAtuaisEReaplicaAditamento",
+        "MotivosProvaContextoHistoricoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-004",
+      "enunciado_literal": "Consulta histórica mostra o nome/fotografia que valia no período, não reescreve o passado com o nome atual.",
+      "criterio": "CAT-004:003",
+      "texto_criterio": "Uma fotografia antiga nula/vazia continua desconhecida; nenhum nome/configuração é preenchido pelo mestre atual.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/ComposicaoContratual.java",
+          "metodo": "fotografarCatalogosEmRascunho",
+          "metodo_recebido": "fotografarCatalogosEmRascunho",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "05915be6a93498f845bde5000a32364de14595acb1e840f9482b3e47d4f2f6eb",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 73,
+              "linha_fim": 83,
+              "sha256_metodo": "db57708769f018e96717020c4ef7da01481b438f3783f4a0922304561becca81"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": "projetarEntidades",
+          "metodo_recebido": "projetarEntidades",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 88,
+              "linha_fim": 90,
+              "sha256_metodo": "5be9ad8512d6ecaa164ea94b85487230ab081ec37402fd7252342d00c90da701"
+            },
+            {
+              "linha_inicio": 92,
+              "linha_fim": 96,
+              "sha256_metodo": "77378a246a1f91880e7c01d64c2c43607262876187e72f519850f7475655f18e"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "descricaoTipoFotografada",
+          "metodo_recebido": "descricaoTipoFotografada",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1272,
+              "linha_fim": 1279,
+              "sha256_metodo": "6c278be6fa02e6b6e6bd9808e9713dadd6529c30cb9fca59f66fee431ccc19cc"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 390,
+              "linha_fim": 399,
+              "sha256_metodo": "b9314e24a18b00e73bdf26633be38fc6c3f472a1e15bc47b2f97420a4cc0d055"
+            },
+            {
+              "linha_inicio": 562,
+              "linha_fim": 570,
+              "sha256_metodo": "22c07c9db499fc4c2cbb8c0e224b46cd1c7a8b19c5dee0efa6ad0c84ccc42f71"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "exigeMatriculaNoVinculoEm",
+          "metodo_recebido": "exigeMatriculaNoVinculoEm",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 399,
+              "linha_fim": 408,
+              "sha256_metodo": "76272f58d2e438c1b6088150f08d37228af0e4f05bd82d8c9ee0136686823fdf"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": "projetarDTO",
+          "metodo_recebido": "projetarDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 249,
+              "linha_fim": 263,
+              "sha256_metodo": "fe8b8b31adf369c26a611b0f0bea835461105be955d853e52328a365d6698ad2"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/RemanejamentoContratualServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "5b0c0946519eab7634ecf782a9dc86275515a2556e013040db3775c20f5beaf2",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 476,
+              "linha_fim": 496,
+              "sha256_metodo": "43f7f2e6dd75f242bf2bad6746163c20ce25a49e02e6e97c8846f1b8f43c564f"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 71,
+              "linha_fim": 90,
+              "sha256_metodo": "642557cc398336fe446073eb8879daf85296ed4dc427c79e469c1ccbfb60a846"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.PessoasFotografiasHistoricasAusentesHttpIT#listaDeAlocacoesNaoCompletaRotulosAusentesPeloCadastroAtual",
+        "com.example.siggtrat.auditoria20261029.PessoasFotografiasHistoricasAusentesHttpIT#motorSemEventosNaoInfereRotulosHistoricosDoMestre",
+        "com.example.siggtrat.auditoria20261029.PessoasFotografiaTransferenciaRestauradaHttpIT#mapaLegadoSemFotografiaBloqueiaReconstrucaoSemInventarGradeDoCadastroAtual",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#transferenciaLegadaNaoSubstituiFotografiasAusentesPorNomesAtuais",
+        "com.example.siggtrat.auditoria20261029.ConclusaoAud03VinculosTransferenciaProgramadaHttpIT#mapaSemFotografiaDeJornadaRecusaCadastroSemInventarDestinoENaoDeixaRegistrosParciais",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#ausenciaLegitimaDaGradeNaoEPreenchidaPelaAlteracaoAtualDoMestre",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#composicaoLegadaSemFonteNaoCapturaMestreNemEmPreUpdate",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#municipioOriginalLegitimamenteNuloNaoECompletadoPeloMestrePosterior",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoQuantitativoPreservaAusenciaDeConfiguracaoDaComposicaoLegada",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoLegadoNaoEmprestaConfiguracaoDeOutraComposicao",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#instrumentoQuantitativoNaoCompletaRotulosLegadosAusentesComOsMestresAtuais"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaRestauraConfiguracaoSemUsarCatalogosAtuaisEReaplicaAditamento",
+        "MotivosProvaContextoHistoricoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-004",
+      "enunciado_literal": "Consulta histórica mostra o nome/fotografia que valia no período, não reescreve o passado com o nome atual.",
+      "criterio": "CAT-004:004",
+      "texto_criterio": "Documentos/relatórios/exportações consomem fotografias por fato; a prova transversal depende também dos lotes contratos e frequência.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/ComposicaoContratual.java",
+          "metodo": "fotografarCatalogosEmRascunho",
+          "metodo_recebido": "fotografarCatalogosEmRascunho",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "05915be6a93498f845bde5000a32364de14595acb1e840f9482b3e47d4f2f6eb",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 73,
+              "linha_fim": 83,
+              "sha256_metodo": "db57708769f018e96717020c4ef7da01481b438f3783f4a0922304561becca81"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": "projetarEntidades",
+          "metodo_recebido": "projetarEntidades",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 88,
+              "linha_fim": 90,
+              "sha256_metodo": "5be9ad8512d6ecaa164ea94b85487230ab081ec37402fd7252342d00c90da701"
+            },
+            {
+              "linha_inicio": 92,
+              "linha_fim": 96,
+              "sha256_metodo": "77378a246a1f91880e7c01d64c2c43607262876187e72f519850f7475655f18e"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "descricaoTipoFotografada",
+          "metodo_recebido": "descricaoTipoFotografada",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1272,
+              "linha_fim": 1279,
+              "sha256_metodo": "6c278be6fa02e6b6e6bd9808e9713dadd6529c30cb9fca59f66fee431ccc19cc"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransferenciaGestaoContratoServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "6db73609345b50ca55ab3c496e420d80152a7d52bf9410c7f653c23f63db4977",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 390,
+              "linha_fim": 399,
+              "sha256_metodo": "b9314e24a18b00e73bdf26633be38fc6c3f472a1e15bc47b2f97420a4cc0d055"
+            },
+            {
+              "linha_inicio": 562,
+              "linha_fim": 570,
+              "sha256_metodo": "22c07c9db499fc4c2cbb8c0e224b46cd1c7a8b19c5dee0efa6ad0c84ccc42f71"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": "exigeMatriculaNoVinculoEm",
+          "metodo_recebido": "exigeMatriculaNoVinculoEm",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 399,
+              "linha_fim": 408,
+              "sha256_metodo": "76272f58d2e438c1b6088150f08d37228af0e4f05bd82d8c9ee0136686823fdf"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": "projetarDTO",
+          "metodo_recebido": "projetarDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 249,
+              "linha_fim": 263,
+              "sha256_metodo": "fe8b8b31adf369c26a611b0f0bea835461105be955d853e52328a365d6698ad2"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/RemanejamentoContratualServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "5b0c0946519eab7634ecf782a9dc86275515a2556e013040db3775c20f5beaf2",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 476,
+              "linha_fim": 496,
+              "sha256_metodo": "43f7f2e6dd75f242bf2bad6746163c20ce25a49e02e6e97c8846f1b8f43c564f"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/entidade/AlocacaoVinculo.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "bc497514e52f8431f330dc7a7c95d2985d86a01abbe187e599fc7f69b07c4ddd",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 71,
+              "linha_fim": 90,
+              "sha256_metodo": "642557cc398336fe446073eb8879daf85296ed4dc427c79e469c1ccbfb60a846"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratoCatalogoFotografiaHttpIT#renomearTipoAposAditamentoPreservaFotografiaHistoricaEInstrumento",
+        "com.example.siggtrat.auditoria20261029.InstrumentosFotografiaCatalogoHttpIT#historicoDoAditamentoPreservaNomeFotografadoDoCargoAposRenomearCatalogo",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#novaAlocacaoRetroativaNaoTransformaGradeEMunicipioAtuaisEmConfiguracaoPassada",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#ausenciaLegitimaDaGradeNaoEPreenchidaPelaAlteracaoAtualDoMestre",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#composicaoLegadaSemFonteNaoCapturaMestreNemEmPreUpdate",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoPreservaConfiguracaoPropriaDepoisDaMudancaDoMestre",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoSomenteQuantitativoNaoRedefineConfiguracaoDaCombinacaoExistente",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoQuantitativoPreservaAusenciaDeConfiguracaoDaComposicaoLegada",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoLegadoNaoEmprestaConfiguracaoDeOutraComposicao",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#calendarioMunicipalUsaMunicipioOriginalDaNovaAlocacaoRetroativa"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT#fonteTardiaRestauraConfiguracaoSemUsarCatalogosAtuaisEReaplicaAditamento",
+        "MotivosProvaContextoHistoricoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:001",
+      "texto_criterio": "Fato retroativo aceita item hoje inativo quando a trilha comprova atividade na data efetiva.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/DisponibilidadeCatalogoTemporalServico.java",
+          "metodo": "ativoEm",
+          "metodo_recebido": "ativoEm",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "fde9fffc892c2f40e64d09de6f9391c7f3a874f0d2052724ba97901acd51a284",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 92,
+              "linha_fim": 117,
+              "sha256_metodo": "ecfc83602efd52af69fe90933e176291f5d46152cad87b30eb822402b4ce561a"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTemporalHttpIT#catalogoInativoPermiteFatoNoPeriodoValidoMasBloqueiaProgramacaoFutura",
+        "com.example.siggtrat.auditoria20261029.ContratosCatalogosEmpresaHttpIT#composicaoOriginalRetroativaUsaCatalogosValidosNoPeriodo",
+        "com.example.siggtrat.auditoria20261029.ContratosCatalogosEmpresaHttpIT#contratoRetroativoUsaTipoValidoNaDataMesmoInativoHoje"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:002",
+      "texto_criterio": "Corte de conhecimento exclui transições registradas depois do instante consultado.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/DisponibilidadeCatalogoTemporalServico.java",
+          "metodo": "consultar",
+          "metodo_recebido": "consultar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "fde9fffc892c2f40e64d09de6f9391c7f3a874f0d2052724ba97901acd51a284",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 148,
+              "linha_fim": 169,
+              "sha256_metodo": "8dce4ee3e5b30112f63ecd100258fc4adff34ef6e143f35e5d0fd33f794c7b73"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/controlador/DisponibilidadeCatalogoControlador.java",
+          "metodo": "consultar",
+          "metodo_recebido": "consultar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "f51fa871cd146deaadbfc8420c2554ab875ca58afc97a571987f4305a858e44e",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 25,
+              "linha_fim": 29,
+              "sha256_metodo": "dabd16d02e8e60b34964cdcb830d5a2fcaa83f8816f41186468d7be246d323eb"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosPessoasConclusaoHttpIT#disponibilidadeDistingueDataEfetivaDeDataDeConhecimentoEAutorizaEscopo",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#disponibilidadeSemOrigemNaoUsaFlagAtualEAceitaFonteRetroativaExplicita",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#corteDeConhecimentoDaDisponibilidadeExcluiOrigemRegistradaDepois"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:003",
+      "texto_criterio": "Antes da primeira origem comprovada, ou sem fonte de origem, disponibilidade é desconhecida e o uso negocial dependente é recusado.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/DisponibilidadeCatalogoTemporalServico.java",
+          "metodo": "ativoEm",
+          "metodo_recebido": "ativoEm",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "fde9fffc892c2f40e64d09de6f9391c7f3a874f0d2052724ba97901acd51a284",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 92,
+              "linha_fim": 117,
+              "sha256_metodo": "ecfc83602efd52af69fe90933e176291f5d46152cad87b30eb822402b4ce561a"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/DisponibilidadeCatalogoTemporalServico.java",
+          "metodo": "registrarTransicao",
+          "metodo_recebido": "registrarTransicao",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "fde9fffc892c2f40e64d09de6f9391c7f3a874f0d2052724ba97901acd51a284",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 43,
+              "linha_fim": 52,
+              "sha256_metodo": "3dfb98297f0d5c5adb79520b35f964f1b9810e386f39683bd34d2f196b487440"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosPessoasConclusaoHttpIT#estadoAtualOuAnteriorSemMarcoDeOrigemNaoProvaDisponibilidadeRetroativa",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#disponibilidadeSemEventoPermaneceDesconhecidaAtePrimeiroFatoDocumentado",
+        "com.example.siggtrat.auditoria20261029.ContratosLegadoSemProvaHttpIT#aditamentoAntesDoPrimeiroFatoSemEstadoAnteriorRetornaConflitoDeConhecimento",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransferenciaLacunasHttpIT#primeiraInativacaoSemFonteNaoInventaDisponibilidadeAnterior",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#disponibilidadeSemOrigemNaoUsaFlagAtualEAceitaFonteRetroativaExplicita",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#corteDeConhecimentoDaDisponibilidadeExcluiOrigemRegistradaDepois"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:004",
+      "texto_criterio": "Primeira transição concorrente produz uma única origem e rejeita estado anterior obsoleto sem gravação parcial.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/DisponibilidadeCatalogoTemporalServico.java",
+          "metodo": "registrarTransicaoComOrigem",
+          "metodo_recebido": "registrarTransicaoComOrigem",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "fde9fffc892c2f40e64d09de6f9391c7f3a874f0d2052724ba97901acd51a284",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 54,
+              "linha_fim": 70,
+              "sha256_metodo": "cb4e8ebed90695060f875491d30da78ac89d446143a90647809d16f93e959092"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/DisponibilidadeCatalogoTemporalServico.java",
+          "metodo": "validarEstadoAnterior",
+          "metodo_recebido": "validarEstadoAnterior",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "fde9fffc892c2f40e64d09de6f9391c7f3a874f0d2052724ba97901acd51a284",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 72,
+              "linha_fim": 78,
+              "sha256_metodo": "350da3f7989796738cf6558bcf6382ca143f28db49ead44cb04d9f2878fd1358"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/repositorio/EventoDisponibilidadeCatalogoRepositorio.java",
+          "metodo": "buscarTrilhaParaAtualizacao",
+          "metodo_recebido": "buscarTrilhaParaAtualizacao",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "4363548ad397040223f5fc50cb9650cd7d2076b2c6183b3de2f2795fe834c644",
+          "tipo_localizacao": "DECLARACAO_REPOSITORIO_JPA",
+          "trechos": [
+            {
+              "linha_inicio": 34,
+              "linha_fim": 35,
+              "sha256_metodo": "d1059a70bd3e2e386ece95ecf81275627498e357da77809e207134b5a337c0d7"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosPessoasConclusaoHttpIT#primeiraTransicaoConcorrenteTemUmaOrigemERejeitaEstadoAnteriorObsoleto"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:005",
+      "texto_criterio": "Disponibilidade retroativa é documentada por comando canônico escopado com motivo, fonte, autorização e versão esperada, sem certificar período anterior à fonte.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "previa",
+          "metodo_recebido": "previa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 45,
+              "linha_fim": 53,
+              "sha256_metodo": "cdc8a9c9ed82b0433072f10fc4a26d76fe4cfc60bd32ed69136dc6035ad9e26c"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "registrar",
+          "metodo_recebido": "registrar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 55,
+              "linha_fim": 109,
+              "sha256_metodo": "e7923339d1bc3d2c9a14aaebec457a19977e324a67561ca442715f594993cdad"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "validar",
+          "metodo_recebido": "validar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 231,
+              "linha_fim": 239,
+              "sha256_metodo": "89ee6f0984b89d0cd15ea0189a4cf0c45506dca2e78419cef87e806b6254a0fb"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "exigirExecutor",
+          "metodo_recebido": "exigirExecutor",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 211,
+              "linha_fim": 216,
+              "sha256_metodo": "a8442acec9978584d7a95113b4810492105f3159d4a91e32f3adee42b7c08889"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#fonteRetroativaDocumentadaPermiteVinculoPassadoComCargoHojeInativo",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#primeiraTransicaoAtualEReativacaoConservamIdEHistoriaSemInventarOrigem",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#somenteGestorLocalDaPropriaGestaoPodeRegistrarOuPrepararTransicao",
+        "com.example.siggtrat.auditoria20261029.CatalogosVersaoCanonicaAuditoriaIndependenteHttpIT#edicaoExpoeVersaoConfirmadaEPermiteTransicaoSemAdivinhacao"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:006",
+      "texto_criterio": "A inserção retroativa respeita a ordem efetiva e conserva reativação posterior na projeção atual.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "preparar",
+          "metodo_recebido": "preparar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 111,
+              "linha_fim": 144,
+              "sha256_metodo": "7b0815690d2f189cdfba68bf42803a6fe4df341c7c5e5600706058413eeb2d28"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "aplicarEstado",
+          "metodo_recebido": "aplicarEstado",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 266,
+              "linha_fim": 270,
+              "sha256_metodo": "0b9fc3eea4a05f7da10909f86c3721813a4d0d9c7c94bd0f37d23f947ed76792"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#transicaoRetroativaPreservaReativacaoEfetivaPosteriorMesmoRegistradaAntes"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:007",
+      "texto_criterio": "Confirmação de ato retroativo exige prévia vigente de versão, trilha e dependências; reenvio da mesma intenção não duplica fato ou versão.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "preparar",
+          "metodo_recebido": "preparar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 111,
+              "linha_fim": 144,
+              "sha256_metodo": "7b0815690d2f189cdfba68bf42803a6fe4df341c7c5e5600706058413eeb2d28"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "intencao",
+          "metodo_recebido": "intencao",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 201,
+              "linha_fim": 204,
+              "sha256_metodo": "4b3eb0bf70bcd1d7bbdb49523695f07348a1ba38ffdde1dfeed3bf7d68658d50"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "registrar",
+          "metodo_recebido": "registrar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 55,
+              "linha_fim": 109,
+              "sha256_metodo": "e7923339d1bc3d2c9a14aaebec457a19977e324a67561ca442715f594993cdad"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "recibo",
+          "metodo_recebido": "recibo",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 206,
+              "linha_fim": 209,
+              "sha256_metodo": "5fb0b77ec6c42d6a670f58435491fa720af9d8cba6255bca6c02b6aff9f0b745"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#reenvioDaMesmaIntencaoRetornaMesmoEventoSemExigirVersaoJaConsumida",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#previaObsoletaPorNovoVinculoExigeNovaAnaliseMesmoSemMudarVersaoDoCatalogo",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#requisicaoIncompletaOuNaoConfirmadaNaoProduzFatos"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "CAT-007",
+      "enunciado_literal": "Cadastro hoje inativo pode ser usado em fato retroativo se estava válido na data efetiva.",
+      "criterio": "CAT-007:008",
+      "texto_criterio": "Ato incompatível com fatos posteriores ou com programação futura é recusado atomicamente, preservando as fontes existentes.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "validarFatosPosteriores",
+          "metodo_recebido": "validarFatosPosteriores",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 146,
+              "linha_fim": 184,
+              "sha256_metodo": "4633383624fd92c1919d0df0514a4c8b4a030dcd099e936ea9a9e5e80a2c70e4"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/TransicaoDisponibilidadeCatalogoServico.java",
+          "metodo": "registrar",
+          "metodo_recebido": "registrar",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "b9dcbf1ab3d75106132bdc055ebd966b2bd60614504340405fe3b7ec7d159ae8",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 55,
+              "linha_fim": 109,
+              "sha256_metodo": "e7923339d1bc3d2c9a14aaebec457a19977e324a67561ca442715f594993cdad"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#atoRetroativoNaoPodeInvalidarEscolhaPosteriorNemApagarSuaFonte",
+        "com.example.siggtrat.auditoria20261029.CatalogosTransicoesOperacionaisHttpIT#inativacaoAtualPelaNovaRotaRespeitaProgramacaoFutura"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "SegurancaCacheUriCodificadaRedIT#transicaoDeCatalogoConfirmadaDeveInvalidarCacheDaProjecaoEDaDisponibilidade"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "COL-010",
+      "enunciado_literal": "Cadastro atual mostra nome atual; históricos/documentos preservam fotografia do nome da época.",
+      "criterio": "COL-010:001",
+      "texto_criterio": "Cadastro atual e projeção operacional mostram o nome corrigido.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/PessoaServico.java",
+          "metodo": "corrigirIdentidade",
+          "metodo_recebido": "corrigirIdentidade",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "422a98b1b349362aa89a60316a5b135dc2162ae5273f8ade254df689eca4652b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 127,
+              "linha_fim": 172,
+              "sha256_metodo": "57df9e217f646f624163b8a3d9776888c49b5950b240190a048d01776574b374"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/PessoaServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "422a98b1b349362aa89a60316a5b135dc2162ae5273f8ade254df689eca4652b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 308,
+              "linha_fim": 318,
+              "sha256_metodo": "1602482a154b67769dd4b93dfb08d6a21230944acf7eaa8b423a17beb1041915"
+            },
+            {
+              "linha_inicio": 319,
+              "linha_fim": 329,
+              "sha256_metodo": "3756eb28695bbc82319798e20a56fa46e869859a72b26d047f70cc12bbbede94"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "montarEvento",
+          "metodo_recebido": "montarEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1039,
+              "linha_fim": 1078,
+              "sha256_metodo": "23698d1d457df6dcccd96b6b23c5a8736e799fc3e74496efd0951c17ca0e42c6"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1159,
+              "linha_fim": 1163,
+              "sha256_metodo": "75ee3beb82c4ab5257d42fd124d44367ff5d87964b711cb71aeace1834d7c2b4"
+            },
+            {
+              "linha_inicio": 1165,
+              "linha_fim": 1178,
+              "sha256_metodo": "b77b82cc341960eef8bd11e89fb5e68a56db317341e41adba39c85fdbb7e191a"
+            },
+            {
+              "linha_inicio": 1196,
+              "linha_fim": 1212,
+              "sha256_metodo": "bc2b92be2d199bfbe4a23fdf6996574b0ec1783c629749b7c6d34800519d6849"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/FrequenciaServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "9edb54412a3b88904b3ada840d0d7e28ba5a5dacb3724e32c5630cd93497190b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1441,
+              "linha_fim": 1478,
+              "sha256_metodo": "0f58b1c30a8283823141cdf36db4c973beb537a505d8722b86374678282eeac9"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/FrequenciaServico.java",
+          "metodo": "capturarRetratoCanonico",
+          "metodo_recebido": "capturarRetratoCanonico",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "9edb54412a3b88904b3ada840d0d7e28ba5a5dacb3724e32c5630cd93497190b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1032,
+              "linha_fim": 1106,
+              "sha256_metodo": "a95f6459c52b0eb5cfda6304ba8fed98b586afe3426c0753483bf055965f470b"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/OcorrenciaServico.java",
+          "metodo": "paraResumoDTO",
+          "metodo_recebido": "paraResumoDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "5f85fb2af544f76cd4e7a83c3ab264293dadfd4adf8691e9b03800e9549220aa",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 793,
+              "linha_fim": 795,
+              "sha256_metodo": "18fd43e84cf9ca8a6e21712296d05c6837251d19b7549ad9fa3fa7bfbb72fe7b"
+            },
+            {
+              "linha_inicio": 797,
+              "linha_fim": 819,
+              "sha256_metodo": "acbdc79ac86cb5cee6ea319986582a7349f1e6b941f547fe8ef7c6b4e14ef0ed"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/EmpregadoServico.java",
+          "metodo": "obterHistoricoContratos",
+          "metodo_recebido": "obterHistoricoContratos",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "c10f0c09bcd916de034d00458da015b61a6134d97a2f46a0b3aa7af68e5d8586",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 75,
+              "linha_fim": 146,
+              "sha256_metodo": "29c84379c5ceed6c00e618ec22c54bd676bcf9f59f6c8923bc93555046deb7d4"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "posicaoPessoa",
+          "metodo_recebido": "posicaoPessoa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 171,
+              "linha_fim": 200,
+              "sha256_metodo": "8782e4a6061944d15256c7f17b2058fa5f7196552d368b688e1645e932b6bfd5"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.PessoasVinculosContratoHttpIT#correcaoExcepcionalMantemPessoaEAuditoriaSemReescreverCriacao",
+        "com.example.siggtrat.auditoria20261029.CatalogosPessoasConclusaoHttpIT#posicaoTemporalSeparaCadastroAtualDaFotografiaDoEvento"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "NovaAuditoriaFotografiasTardiasPessoasHttpIT",
+        "PessoasProvaNomeHistoricoHttpIT",
+        "TransversaisIdentidadeRetroativaRedIT",
+        "TransversaisRelatorioFonteFuturaRedIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "COL-010",
+      "enunciado_literal": "Cadastro atual mostra nome atual; históricos/documentos preservam fotografia do nome da época.",
+      "criterio": "COL-010:002",
+      "texto_criterio": "Novos fatos preservam o nome fotografado e a correção atual não muda eventos/documentos anteriores.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/PessoaServico.java",
+          "metodo": "corrigirIdentidade",
+          "metodo_recebido": "corrigirIdentidade",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "422a98b1b349362aa89a60316a5b135dc2162ae5273f8ade254df689eca4652b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 127,
+              "linha_fim": 172,
+              "sha256_metodo": "57df9e217f646f624163b8a3d9776888c49b5950b240190a048d01776574b374"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/PessoaServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "422a98b1b349362aa89a60316a5b135dc2162ae5273f8ade254df689eca4652b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 308,
+              "linha_fim": 318,
+              "sha256_metodo": "1602482a154b67769dd4b93dfb08d6a21230944acf7eaa8b423a17beb1041915"
+            },
+            {
+              "linha_inicio": 319,
+              "linha_fim": 329,
+              "sha256_metodo": "3756eb28695bbc82319798e20a56fa46e869859a72b26d047f70cc12bbbede94"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "montarEvento",
+          "metodo_recebido": "montarEvento",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1039,
+              "linha_fim": 1078,
+              "sha256_metodo": "23698d1d457df6dcccd96b6b23c5a8736e799fc3e74496efd0951c17ca0e42c6"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1159,
+              "linha_fim": 1163,
+              "sha256_metodo": "75ee3beb82c4ab5257d42fd124d44367ff5d87964b711cb71aeace1834d7c2b4"
+            },
+            {
+              "linha_inicio": 1165,
+              "linha_fim": 1178,
+              "sha256_metodo": "b77b82cc341960eef8bd11e89fb5e68a56db317341e41adba39c85fdbb7e191a"
+            },
+            {
+              "linha_inicio": 1196,
+              "linha_fim": 1212,
+              "sha256_metodo": "bc2b92be2d199bfbe4a23fdf6996574b0ec1783c629749b7c6d34800519d6849"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/FrequenciaServico.java",
+          "metodo": "paraDTO",
+          "metodo_recebido": "paraDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "9edb54412a3b88904b3ada840d0d7e28ba5a5dacb3724e32c5630cd93497190b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1441,
+              "linha_fim": 1478,
+              "sha256_metodo": "0f58b1c30a8283823141cdf36db4c973beb537a505d8722b86374678282eeac9"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/FrequenciaServico.java",
+          "metodo": "capturarRetratoCanonico",
+          "metodo_recebido": "capturarRetratoCanonico",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "9edb54412a3b88904b3ada840d0d7e28ba5a5dacb3724e32c5630cd93497190b",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 1032,
+              "linha_fim": 1106,
+              "sha256_metodo": "a95f6459c52b0eb5cfda6304ba8fed98b586afe3426c0753483bf055965f470b"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/OcorrenciaServico.java",
+          "metodo": "paraResumoDTO",
+          "metodo_recebido": "paraResumoDTO",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "5f85fb2af544f76cd4e7a83c3ab264293dadfd4adf8691e9b03800e9549220aa",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 793,
+              "linha_fim": 795,
+              "sha256_metodo": "18fd43e84cf9ca8a6e21712296d05c6837251d19b7549ad9fa3fa7bfbb72fe7b"
+            },
+            {
+              "linha_inicio": 797,
+              "linha_fim": 819,
+              "sha256_metodo": "acbdc79ac86cb5cee6ea319986582a7349f1e6b941f547fe8ef7c6b4e14ef0ed"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/EmpregadoServico.java",
+          "metodo": "obterHistoricoContratos",
+          "metodo_recebido": "obterHistoricoContratos",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "c10f0c09bcd916de034d00458da015b61a6134d97a2f46a0b3aa7af68e5d8586",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 75,
+              "linha_fim": 146,
+              "sha256_metodo": "29c84379c5ceed6c00e618ec22c54bd676bcf9f59f6c8923bc93555046deb7d4"
+            }
+          ]
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "posicaoPessoa",
+          "metodo_recebido": "posicaoPessoa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 171,
+              "linha_fim": 200,
+              "sha256_metodo": "8782e4a6061944d15256c7f17b2058fa5f7196552d368b688e1645e932b6bfd5"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.PessoasVinculosContratoHttpIT#correcaoExcepcionalMantemPessoaEAuditoriaSemReescreverCriacao",
+        "com.example.siggtrat.auditoria20261029.PessoasFotografiasHistoricasAusentesHttpIT#historicoContratualNaoCompletaNomeAusenteAposCorrecaoDaPessoa",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#atoDeMatriculaRetroativoNaoEmprestaNomeAtualAoPeriodoAnterior"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "NovaAuditoriaFotografiasTardiasPessoasHttpIT",
+        "PessoasProvaNomeHistoricoHttpIT",
+        "TransversaisIdentidadeRetroativaRedIT",
+        "TransversaisRelatorioFonteFuturaRedIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "COL-010",
+      "enunciado_literal": "Cadastro atual mostra nome atual; históricos/documentos preservam fotografia do nome da época.",
+      "criterio": "COL-010:003",
+      "texto_criterio": "Consulta temporal separa nomeAtual de nomeFotografia e aplica os cortes efetivo e de conhecimento.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "posicaoPessoa",
+          "metodo_recebido": "posicaoPessoa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 171,
+              "linha_fim": 200,
+              "sha256_metodo": "8782e4a6061944d15256c7f17b2058fa5f7196552d368b688e1645e932b6bfd5"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosPessoasConclusaoHttpIT#posicaoTemporalSeparaCadastroAtualDaFotografiaDoEvento",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#atoDeMatriculaRetroativoNaoEmprestaNomeAtualAoPeriodoAnterior"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "NovaAuditoriaFotografiasTardiasPessoasHttpIT",
+        "PessoasProvaNomeHistoricoHttpIT",
+        "TransversaisIdentidadeRetroativaRedIT",
+        "TransversaisRelatorioFonteFuturaRedIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "COL-010",
+      "enunciado_literal": "Cadastro atual mostra nome atual; históricos/documentos preservam fotografia do nome da época.",
+      "criterio": "COL-010:004",
+      "texto_criterio": "Registro antigo sem fotografia nominal permanece desconhecido; não se alega recuperação de dado ausente.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/VinculoContratualServico.java",
+          "metodo": "posicaoPessoa",
+          "metodo_recebido": "posicaoPessoa",
+          "arquivo_existe": true,
+          "metodo_localizado": true,
+          "sha256_arquivo": "68013df8ec1bb0060028b973ce6d24cdd9a1f4e610df242571693f60e4c77a01",
+          "tipo_localizacao": "METODO_CONCRETO",
+          "trechos": [
+            {
+              "linha_inicio": 171,
+              "linha_fim": 200,
+              "sha256_metodo": "8782e4a6061944d15256c7f17b2058fa5f7196552d368b688e1645e932b6bfd5"
+            }
+          ]
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.CatalogosPessoasConclusaoHttpIT#posicaoSemEventoIdentitarioNaoUsaNomeAtualComoFonteHistorica",
+        "com.example.siggtrat.auditoria20261029.PessoasFotografiasHistoricasAusentesHttpIT#historicoContratualNaoCompletaNomeAusenteAposCorrecaoDaPessoa",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaCatalogosIdentidadeHttpIT#ausenciaTotalDeFotoNominalPermaneceDesconhecidaDepoisDaCorrecaoAtual",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaNominalHttpIT#ausenciaNominalRecusaRetroatividadeEPreservaCapturaContemporanea"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "NovaAuditoriaFotografiasTardiasPessoasHttpIT",
+        "PessoasProvaNomeHistoricoHttpIT",
+        "TransversaisIdentidadeRetroativaRedIT",
+        "TransversaisRelatorioFonteFuturaRedIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-001",
+      "enunciado_literal": "Consulta histórica do contrato deve responder como estava sua configuração completa em uma data: vigência, empresa, tipo, composição, efetivo, aditamentos/remanejamentos efetivos e origem dos eventos.",
+      "criterio": "HIS-001:001",
+      "texto_criterio": "Posição contratual apresenta empresa, tipo, composição, efetivo e origem de eventos da data.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "648cdb592b2c37994b23f8b4992d043b8c8f1832b0a6df62b74ee4f719d5456c",
+          "sha256_recebido": "7d0c945c50d5242426c23cfc06553211194d63788e7752d6299afc7e5018ef49",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "a83404bb28e8cb35ce609b4a2bf41e23695859e5d071a6f8c4dac1545bdefaa8",
+          "sha256_recebido": "02e53d3873c981608f3b0575a64b120b699bff98caa3a9ff20ef782a6817b641",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "sha256_recebido": "0bac6fca887b63fdded5f3864d3461c391f41c07e71376bce8c258664393207e",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": []
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratoCatalogoFotografiaHttpIT#renomearTipoAposAditamentoPreservaFotografiaHistoricaEInstrumento",
+        "com.example.siggtrat.auditoria20261029.ContratosRegrasHttpIT#empresaAlteradaTemporalmenteNaoReescreveOutroContratoNemFotografiaAnterior",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#instrumentoSomenteQuantitativoNaoTrocaOsTresRotulosPublicadosPelosMestresAtuais",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#combinacaoRealmenteNovaDeAditamentoPreservaSeusPropriosRotulosDocumentados",
+        "com.example.siggtrat.auditoria20261029.AuditoriaCancelamentoRemanejamentoReplayHttpIT#cancelarRemanejamentoFuturoDeveSinalizarOInstrumentoPosteriorQueFicaIncompativel",
+        "com.example.siggtrat.auditoria20261029.AuditoriaCancelamentoRemanejamentoReplayHttpIT#cancelamentoComPosteriorCompativelPreservaDeltasEHistoricoSemCriarPendencia"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-001",
+      "enunciado_literal": "Consulta histórica do contrato deve responder como estava sua configuração completa em uma data: vigência, empresa, tipo, composição, efetivo, aditamentos/remanejamentos efetivos e origem dos eventos.",
+      "criterio": "HIS-001:002",
+      "texto_criterio": "Novas publicações/aditamentos fotografam política de matrícula e redução de jornada.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "648cdb592b2c37994b23f8b4992d043b8c8f1832b0a6df62b74ee4f719d5456c",
+          "sha256_recebido": "7d0c945c50d5242426c23cfc06553211194d63788e7752d6299afc7e5018ef49",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "a83404bb28e8cb35ce609b4a2bf41e23695859e5d071a6f8c4dac1545bdefaa8",
+          "sha256_recebido": "02e53d3873c981608f3b0575a64b120b699bff98caa3a9ff20ef782a6817b641",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "sha256_recebido": "0bac6fca887b63fdded5f3864d3461c391f41c07e71376bce8c258664393207e",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": []
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratosLacunasFuncionaisHttpIT#publicacaoFotografaMatriculaEDiaReduzidoSemDependerDoCadastroAtual",
+        "com.example.siggtrat.auditoria20261029.ContratosLacunasFuncionaisHttpIT#alterarTipoMestreNaoDispensaMatriculaExigidaNaPublicacao",
+        "com.example.siggtrat.auditoria20261029.ContratosLacunasFuncionaisHttpIT#aditamentoAlteraConfiguracoesNegociaisPreservandoFotoOriginal"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-001",
+      "enunciado_literal": "Consulta histórica do contrato deve responder como estava sua configuração completa em uma data: vigência, empresa, tipo, composição, efetivo, aditamentos/remanejamentos efetivos e origem dos eventos.",
+      "criterio": "HIS-001:003",
+      "texto_criterio": "Consulta legada sem configuração original explicita desconhecimento e não adota o mestre atual.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "648cdb592b2c37994b23f8b4992d043b8c8f1832b0a6df62b74ee4f719d5456c",
+          "sha256_recebido": "7d0c945c50d5242426c23cfc06553211194d63788e7752d6299afc7e5018ef49",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "a83404bb28e8cb35ce609b4a2bf41e23695859e5d071a6f8c4dac1545bdefaa8",
+          "sha256_recebido": "02e53d3873c981608f3b0575a64b120b699bff98caa3a9ff20ef782a6817b641",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "sha256_recebido": "0bac6fca887b63fdded5f3864d3461c391f41c07e71376bce8c258664393207e",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": []
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratoConfiguracaoLegadaHttpIT#posicaoLegadaNaoApresentaConfiguracaoAtualComoConhecimentoHistorico",
+        "com.example.siggtrat.auditoria20261029.ContratoConfiguracaoLegadaHttpIT#legadoSemPoliticaComprovadaExigeTratarMatriculaAntesDeCriarVinculoSemEla",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaVersaoHttpIT#ausenciaTotalOuCamposVaziosNaoAutorizaProjecaoAtualComoPassado",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaVersaoHttpIT#ausenciaDaPublicacaoNaoPromoveFotografiaDeAditamentoABaseOriginal",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaVersaoHttpIT#fotografiaRegistradaDepoisDoCorteNaoPodeAparecerComoConhecida",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#ausenciaTotalDeFotografiaNaoUsaGestaoMaterializadaComoProvaDoPassado",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#corteDeConhecimentoAnteriorAFonteNaoPodeUsarResponsabilidadeConhecidaDepois",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#fotografiaDeTransferenciaSemOrigemNaoAntecipaDestinoMasProvaDestinoDesdeADataDoAto",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#fotografiaLegadaPosteriorProvaSomenteSeuProprioPeriodo",
+        "com.example.siggtrat.auditoria20261029.InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT#instrumentoQuantitativoNaoCompletaRotulosLegadosAusentesComOsMestresAtuais",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoQuantitativoPreservaAusenciaDeConfiguracaoDaComposicaoLegada",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoLegadoNaoEmprestaConfiguracaoDeOutraComposicao",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#composicaoLegadaSemFonteNaoCapturaMestreNemEmPreUpdate"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-001",
+      "enunciado_literal": "Consulta histórica do contrato deve responder como estava sua configuração completa em uma data: vigência, empresa, tipo, composição, efetivo, aditamentos/remanejamentos efetivos e origem dos eventos.",
+      "criterio": "HIS-001:004",
+      "texto_criterio": "Habilitacao original ausente permanece desconhecida; ato posterior define somente seu periodo comprovado.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ConclusaoFotografiaContratoHttpIT#habilitacaoNaoFotografadaPermaneceDesconhecidaMesmoComProjecaoAtual",
+        "com.example.siggtrat.auditoria20261029.ConclusaoFotografiaContratoHttpIT#primeiroAtoComprovadoDefineHabilitacaoSomenteDesdeSuaData"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-006",
+      "enunciado_literal": "A publicação preserva fotografia integral da versão original: identificação, empresa, vigência, tipo, composição, efetivo e demais dados negociais, base para eventos posteriores.",
+      "criterio": "HIS-006:001",
+      "texto_criterio": "Publicação fotografa o cargo efetivamente selecionado no rascunho e a base quantitativa original.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "648cdb592b2c37994b23f8b4992d043b8c8f1832b0a6df62b74ee4f719d5456c",
+          "sha256_recebido": "7d0c945c50d5242426c23cfc06553211194d63788e7752d6299afc7e5018ef49",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "a83404bb28e8cb35ce609b4a2bf41e23695859e5d071a6f8c4dac1545bdefaa8",
+          "sha256_recebido": "02e53d3873c981608f3b0575a64b120b699bff98caa3a9ff20ef782a6817b641",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "sha256_recebido": "0bac6fca887b63fdded5f3864d3461c391f41c07e71376bce8c258664393207e",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": []
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ComposicaoFotografiaRascunhoHttpIT#editarCargoNoRascunhoPublicaFotografiaDoCargoEfetivamenteEscolhido",
+        "com.example.siggtrat.auditoria20261029.AditamentosRemanejamentosHttpIT#aumentoEReducoesUsamBaseOriginalGlobalEPisoArredondado"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-006",
+      "enunciado_literal": "A publicação preserva fotografia integral da versão original: identificação, empresa, vigência, tipo, composição, efetivo e demais dados negociais, base para eventos posteriores.",
+      "criterio": "HIS-006:002",
+      "texto_criterio": "Novas fotografias preservam todas as configurações operacionais contratuais e ADI conserva a original.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "648cdb592b2c37994b23f8b4992d043b8c8f1832b0a6df62b74ee4f719d5456c",
+          "sha256_recebido": "7d0c945c50d5242426c23cfc06553211194d63788e7752d6299afc7e5018ef49",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "a83404bb28e8cb35ce609b4a2bf41e23695859e5d071a6f8c4dac1545bdefaa8",
+          "sha256_recebido": "02e53d3873c981608f3b0575a64b120b699bff98caa3a9ff20ef782a6817b641",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "sha256_recebido": "0bac6fca887b63fdded5f3864d3461c391f41c07e71376bce8c258664393207e",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": []
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratosLacunasFuncionaisHttpIT#publicacaoFotografaMatriculaEDiaReduzidoSemDependerDoCadastroAtual",
+        "com.example.siggtrat.auditoria20261029.ContratosLacunasFuncionaisHttpIT#aditamentoAlteraConfiguracoesNegociaisPreservandoFotoOriginal",
+        "com.example.siggtrat.auditoria20261029.ContratosLacunasFuncionaisHttpIT#alterarTipoMestreNaoDispensaMatriculaExigidaNaPublicacao",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#publicacaoCongelaConfiguracaoDefinitivaERevalidaMudancaAposPrevia",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#novaAlocacaoRetroativaNaoTransformaGradeEMunicipioAtuaisEmConfiguracaoPassada",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoPreservaConfiguracaoPropriaDepoisDaMudancaDoMestre",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoSomenteQuantitativoNaoRedefineConfiguracaoDaCombinacaoExistente"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-006",
+      "enunciado_literal": "A publicação preserva fotografia integral da versão original: identificação, empresa, vigência, tipo, composição, efetivo e demais dados negociais, base para eventos posteriores.",
+      "criterio": "HIS-006:003",
+      "texto_criterio": "Legado incompleto não recebe configuração atual retroativamente como se fosse a publicação original.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "648cdb592b2c37994b23f8b4992d043b8c8f1832b0a6df62b74ee4f719d5456c",
+          "sha256_recebido": "7d0c945c50d5242426c23cfc06553211194d63788e7752d6299afc7e5018ef49",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/MotorTemporalContratoServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "a83404bb28e8cb35ce609b4a2bf41e23695859e5d071a6f8c4dac1545bdefaa8",
+          "sha256_recebido": "02e53d3873c981608f3b0575a64b120b699bff98caa3a9ff20ef782a6817b641",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/ComposicaoContratualTemporalServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "4f5d42e79d2961f392476480e6c01e71d47e0bf73920b3d3c4e7eb5ef884a5cd",
+          "sha256_recebido": "0bac6fca887b63fdded5f3864d3461c391f41c07e71376bce8c258664393207e",
+          "sobrecargas": []
+        },
+        {
+          "arquivo": "src/main/java/com/example/siggtrat/servico/AditamentoContratualServico.java",
+          "metodo": null,
+          "metodo_recebido": null,
+          "resolucao_da_referencia": null,
+          "arquivo_localizado": true,
+          "metodo_localizado": null,
+          "sha256_arquivo_atual": "f9bc96b331d3f8e323e4c8a97af4c4dcb45f417f1f6848a88c37fc32c4a4ea3c",
+          "sha256_recebido": "bf0ae0be643b8d279a78047e56e584bd695aa136c2929c9f62ae1008070cd3af",
+          "sobrecargas": []
+        }
+      ],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ContratoConfiguracaoLegadaHttpIT#posicaoLegadaNaoApresentaConfiguracaoAtualComoConhecimentoHistorico",
+        "com.example.siggtrat.auditoria20261029.ContratoConfiguracaoLegadaHttpIT#legadoSemPoliticaComprovadaExigeTratarMatriculaAntesDeCriarVinculoSemEla",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaVersaoHttpIT#ausenciaTotalOuCamposVaziosNaoAutorizaProjecaoAtualComoPassado",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaVersaoHttpIT#ausenciaDaPublicacaoNaoPromoveFotografiaDeAditamentoABaseOriginal",
+        "com.example.siggtrat.auditoria20261029.RevisaoHistoricaAusenciaVersaoHttpIT#fotografiaRegistradaDepoisDoCorteNaoPodeAparecerComoConhecida",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#ausenciaTotalDeFotografiaNaoUsaGestaoMaterializadaComoProvaDoPassado",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#corteDeConhecimentoAnteriorAFonteNaoPodeUsarResponsabilidadeConhecidaDepois",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#fotografiaDeTransferenciaSemOrigemNaoAntecipaDestinoMasProvaDestinoDesdeADataDoAto",
+        "com.example.siggtrat.auditoria20261029.RevisaoGestaoSemOrigemHttpIT#fotografiaLegadaPosteriorProvaSomenteSeuProprioPeriodo",
+        "com.example.siggtrat.auditoria20261029.AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT#composicaoLegadaSemFonteNaoCapturaMestreNemEmPreUpdate",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#instrumentoQuantitativoPreservaAusenciaDeConfiguracaoDaComposicaoLegada",
+        "com.example.siggtrat.auditoria20261029.InstrumentosConfiguracaoHistoricaHttpIT#combinacaoNovaDeAditamentoLegadoNaoEmprestaConfiguracaoDeOutraComposicao"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    },
+    {
+      "id": "HIS-006",
+      "enunciado_literal": "A publicação preserva fotografia integral da versão original: identificação, empresa, vigência, tipo, composição, efetivo e demais dados negociais, base para eventos posteriores.",
+      "criterio": "HIS-006:004",
+      "texto_criterio": "Habilitacao original ausente permanece desconhecida; ato posterior define somente seu periodo comprovado.",
+      "prova_necessaria": "Cenário com fonte íntegra, cenário com ausência explicitada e incorporação posterior com cortes efetivo/conhecimento, autorização e imutabilidade verificadas no MySQL.",
+      "evidencia_existente": "Fontes e testes recebidos preservados por hash. Resultado histórico não aceito como execução nova. Baseline em execução.",
+      "codigo_recebido": [],
+      "testes_recebidos_a_reexecutar": [
+        "com.example.siggtrat.auditoria20261029.ConclusaoFotografiaContratoHttpIT#habilitacaoNaoFotografadaPermaneceDesconhecidaMesmoComProjecaoAtual",
+        "com.example.siggtrat.auditoria20261029.ConclusaoFotografiaContratoHttpIT#primeiroAtoComprovadoDefineHabilitacaoSomenteDesdeSuaData"
+      ],
+      "testes_novos_positivos_negativos_propostos": [
+        "ProvaHistoricaContratoHttpIT"
+      ],
+      "decisao_antes_da_implementacao": "E documental provisório: nenhuma declaração de recuperação de fato histórico ausente. Eventual lacuna técnica será implementada e reavaliada separadamente.",
+      "condicao_objetiva": "Comportamento técnico íntegro comprovado em fonte congelada e documento autêntico com valores/período para cada campo legado cuja recuperação integral seja exigida."
+    }
+  ]
+}

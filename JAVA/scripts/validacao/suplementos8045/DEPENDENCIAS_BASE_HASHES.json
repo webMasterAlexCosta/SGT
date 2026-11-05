@@ -1,0 +1,50 @@
+{
+  "scope": "Hash de dependências atuais lidas, sem copiar ou alterar a base.",
+  "files": [
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/pom.xml",
+      "sha256": "c19a938c87b08af977aae95c6a006a51e1d2ab29ae31b398a12c6a1b636b34b2",
+      "bytes": 18559
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/AGENTS.md",
+      "sha256": "9dd4bc857d3d4bc4e391e85a77ca835daf032ecbeaa930846aa370fe757aa39f",
+      "bytes": 1413
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/test/resources/auditoria-endpoints.env",
+      "sha256": "74191082957638e72d755f5e07577321ae8a0e31fd4d40894e12e8d5fbe74934",
+      "bytes": 4754
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/main/java/com/example/siggtrat/configuracao/VerificadorAmbienteMysql8045.java",
+      "sha256": "beb475fe890db4c25decf7445633ddc8bafd79b1509a4b1476350e8b7dd72e9d",
+      "bytes": 3137
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/test/java/com/example/siggtrat/auditoria20261029/AuditoriaHttpSuporte.java",
+      "sha256": "95c9dca4840c9cecf593879871964638afaf0204f5091ac6a7fbaaf5eb5fd106",
+      "bytes": 35946
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/test/java/com/example/siggtrat/auditoria20261029/ContratosHttpBase.java",
+      "sha256": "eb8a4dbeaf2acde96bf9f42bc29cbb314ad9301c55b54afd9f88a5b8f01d721d",
+      "bytes": 8182
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/test/java/com/example/siggtrat/auditoria20261029/FonteMotivoSintetica.java",
+      "sha256": "5d1f26dda689db53290609de864f02239d4b755930984bdab359e60c2aad4614",
+      "bytes": 4175
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/test/java/com/example/siggtrat/infra/ConfiguracaoMysqlIntegracao.java",
+      "sha256": "35f742dd766c9778a1bb31d844703c7021049bba6dd94c785578756d93709b88",
+      "bytes": 4529
+    },
+    {
+      "path": "/workspace/scratch/db1992738cfa/sgt/work/backend/src/test/java/com/example/siggtrat/infra/GuardaMysql8045.java",
+      "sha256": "54b5ac66233cbc9060ea99e5ef8b51865695d95747b773f5576095ef031bf9f2",
+      "bytes": 2066
+    }
+  ]
+}

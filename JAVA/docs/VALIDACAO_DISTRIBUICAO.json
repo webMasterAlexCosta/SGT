@@ -1,0 +1,28 @@
+{
+  "gerado_utc": "2026-10-31T05:14:59.067791+00:00",
+  "candidata": "candidata07",
+  "manifesto_fontes_sha256": "fc92555e0785d29ed9b8f2dd3c86235c7eec03992537f27b7f0bc8f5d3526f25",
+  "rodada_integral": "regressao_integral_06",
+  "rodada_carga": "carga_final_01",
+  "prova_classes_jar": "evidencias/jar/CLASSES_JAR_EXERCITADAS.json",
+  "prova_classes_jar_sha256": "acd0938c6d0c3102231ce30679c0e7c20eb66ca34915fe0cba7f6cb56f251a62",
+  "prova_http_reinicio": "evidencias/jar/PROVA_HTTP_REINICIO.json",
+  "prova_http_reinicio_sha256": "373e2c8a5a68283a9aff9f2a7004a2b8ab1ae1aaea5e3ad95b895d8e77f9db6a",
+  "provas_tcp": [
+    "evidencias/jar/basico/criar.json",
+    "evidencias/jar/basico/reinicio.json",
+    "evidencias/jar/auditorias/criar.json",
+    "evidencias/jar/auditorias/reinicio.json"
+  ],
+  "jar_sha256": "582dfe319873c94d58ad4b4ccea47311e98c9528ed8a24d18d01de4fad168946",
+  "gates": "evidencias/GATES_FINAIS.json",
+  "gates_sha256": "9a2e549492c6d613dc76e70e91eababec16a9fd95863bc1445842c89b0c3adff",
+  "classificacao_requisitos": {
+    "A": 192,
+    "B": 0,
+    "C": 0,
+    "D": 0,
+    "E": 6
+  },
+  "limite": "Índice das provas já conferidas; não transforma pendências documentais em aprovação funcional."
+}

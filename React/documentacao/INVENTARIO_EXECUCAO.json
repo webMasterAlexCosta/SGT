@@ -1,0 +1,62 @@
+{
+  "tipo": "preparacao_frontend_offline",
+  "projeto": "sig-gtrat-front",
+  "versao": "1.4.1D",
+  "node": "22.16.0",
+  "npm": "10.9.2",
+  "origem_original_sha256": "5bf26b2f6984204005bce34a28223d69719861aeb15b098029fd92f449b4adf3",
+  "origem_dependencias_sha256": "48ea7892cdc487c148a010c22912cbd350a8c7dc535a50cec7764eb3137c2021",
+  "build_vite": {
+    "resultado": "aprovado",
+    "environ": "valores sinteticos do .env.example",
+    "duracao_aproximada_s": 2.87,
+    "warning": "vendor-face acima de 1 MB",
+    "http_preview": "200 OK"
+  },
+  "smoke_local": {
+    "executados": 4,
+    "aprovados": 4,
+    "falhas": 0
+  },
+  "integracao_real_java": "nao executada nesta preparacao",
+  "vitest_e2e": "nao executados: pacotes/configuracoes ausentes no original",
+  "dependencias_pendentes": {
+    "@vitejs/plugin-basic-ssl": "2.3.0",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.3",
+    "@vitest/coverage-v8": "4.1.11",
+    "jsdom": "27.4.0",
+    "vitest": "4.1.11"
+  },
+  "runtime_deps": {
+    "@vladmandic/face-api": "1.7.15",
+    "axios": "1.20.0",
+    "jspdf": "4.2.1",
+    "jspdf-autotable": "5.0.7",
+    "lucide-react": "1.11.0",
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "react-router-dom": "7.18.3",
+    "react-toastify": "11.0.5",
+    "recharts": "3.8.1"
+  },
+  "dev_deps": {
+    "@vitejs/plugin-basic-ssl": "2.3.0",
+    "@vitejs/plugin-react": "6.1.1",
+    "vite": "8.2.2",
+    "@testing-library/jest-dom": "6.9.1",
+    "@testing-library/react": "16.3.3",
+    "@vitest/coverage-v8": "4.1.11",
+    "jsdom": "27.4.0",
+    "vitest": "4.1.11"
+  },
+  "backend_jar_sha256": "08d483d6e25105c62372efd4e0fd5f61a62ed9dee029745e0e35bd9d8f0ba63d",
+  "atualizacao_react": [
+    "pins de libs locais",
+    "troca de icones em quatro componentes",
+    "bloqueio de sync Java",
+    "env de exemplo",
+    "smoke",
+    "docs"
+  ]
+}

@@ -1,9 +1,0 @@
-SGT/GTRAT backend - Etapa 01
-Data: 2026-09-08
-Java declarado: 21
-Classes produção: 363
-Classes teste: 94
-Controllers: 32
-Services: 69
-Repositories: 44
-Entidades: 41

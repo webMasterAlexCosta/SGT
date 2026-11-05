@@ -1,0 +1,24 @@
+const { baseFrontend, contratoDaFixture } = require('./contexto-fixture.cjs');
+const { execute } = require('./ambiente-real.cjs');
+execute('paginacao-contrato-real', async ({ page, context, fixture, check, open, screenshot }) => {
+  const contratoAlvo = contratoDaFixture(fixture);
+  const base = baseFrontend();
+  await open('/contratos');
+  const response = await context.request.get(base + `${contratoAlvo.api}/versoes`);
+  const versions = (await response.json()).data;
+  check('Cadeia real tem mais de cinco fotografias persistidas', response.status() === 200 && versions.length > 5, { total: versions.length });
+  await page.getByRole('button', { name: contratoAlvo.botaoAbrir, exact: true }).click();
+  const detail = page.getByRole('dialog', { name: contratoAlvo.titulo, exact: true });
+  const section = detail.getByRole('heading', { name: /Versões negociais/ }).locator('..');
+  const navigation = detail.getByRole('navigation', { name: 'Páginas das versões negociais' });
+  await navigation.waitFor();
+  check('Primeira página mostra exatamente cinco fotografias reais', await section.getByRole('listitem').count() === 5);
+  await screenshot('primeira-pagina');
+  await navigation.getByRole('button', { name: 'Próxima', exact: true }).click();
+  check('Fotografias restantes continuam acessíveis na segunda página', await section.getByRole('listitem').count() === Math.min(5, versions.length - 5));
+  await screenshot('segunda-pagina');
+  await navigation.getByRole('button', { name: 'Anterior', exact: true }).click();
+  check('Retorno não perde os cinco primeiros registros', await section.getByRole('listitem').count() === 5);
+  await page.keyboard.press('Escape');
+  await detail.waitFor({ state: 'hidden' });
+});
