@@ -1,0 +1,33 @@
+{
+  "status": "PACOTE_E_ENSAIOS_OPERACIONAIS_APROVADOS_NO_LABORATORIO",
+  "production_release": false,
+  "reviewed_code_commit": "9c8bf1864cb2d3e9a2dc7eeedb0be8ae0c755f05",
+  "package_local_path": "/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/.homologacao/20261109-sgt-final/prod70-delivery01/SGT-operacional-laboratorio-revisado-20261111.zip",
+  "package_sha256": "972b5cb8e01efa02f07b692650adb5e6be48b157d19f760712c3fefe69c85dbd",
+  "package_bytes": 79402241,
+  "allowlisted_public_members": 12,
+  "member_CRC_and_SHA256_verified": true,
+  "private_lab_values_scanned_and_absent": true,
+  "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+  "support_tool_sha256": "c1af414d9389faff1d001836a8b6b8e97755e480f35db33d590bc33e659b336a",
+  "independent_decisions": "PARECERES.json",
+  "test_snapshot": "ENSAIOS_LABORATORIO.json",
+  "delivery_wrapper_receipt_sha256": "4b0e0bb213550502fe433d19ccecc39e1496356ed3c3ed334b4226beca4fad7d",
+  "delivery_ram_plus_swap_peak_bytes": 11133480960,
+  "tests_ram_plus_swap_peak_bytes": 10470993920,
+  "human_aggregate_cap_bytes": 15000000000,
+  "preventive_ram_plus_swap_bytes": 12000000000,
+  "one_heavy_batch_at_a_time": true,
+  "checkpoint_before_each_heavy_batch": true,
+  "intended_test_batch_size": "2-4 related classes/files when useful; native phases sequential",
+  "current_package_contains_corrected_restore_tool": true,
+  "older_package69": "SUPERSEDED_NOT_FOR_DISTRIBUTION",
+  "no_external_backup_or_deploy_performed": true,
+  "external_release_conditions": [
+    "Windows10 native runtime/PowerShell/ACL/service and support of target components",
+    "Real target hostname/certificate and Chrome HTTPS journey",
+    "Off-computer protected backup destination and restore from that copy",
+    "Named accountable production acceptance owner",
+    "Real SMTP delivery if enabled"
+  ]
+}

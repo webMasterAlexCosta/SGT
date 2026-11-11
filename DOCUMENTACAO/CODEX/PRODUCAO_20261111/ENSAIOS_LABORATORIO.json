@@ -1,5 +1,5 @@
 {
-  "scope": "Operational preparation and synthetic laboratory rehearsals; production release pending external conditions and current independent reviews",
+  "scope": "Operational preparation and synthetic laboratory rehearsals APPROVED in independent Java and frontend reviews; production release pending external conditions",
   "current_jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
   "binding": {
     "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
@@ -193,8 +193,10 @@
     "new institutional acceptance"
   ],
   "independent_reviews": {
-    "Java_initial": "PENDING: two P2 found in76baa29d, corrected and revalidated; independent recheck still pending",
-    "frontend": "PENDING_CURRENT_DIFF"
+    "Java": "APPROVED_LAB: recheck turn01a1cb66-fb30-72c0-be4a-2997587b6ecb closed both P2; no P0-P3 remaining in reviewed delta",
+    "frontend": "APPROVED_LAB: turn01a1cb69-e850-7fc0-abbd-579660fd4843 no P0-P3 in reviewed delta",
+    "reviewed_code_commit": "9c8bf1864cb2d3e9a2dc7eeedb0be8ae0c755f05",
+    "receipt": "PARECERES.json"
   },
   "no_sonar": true,
   "frontend_lint": "NO_SCRIPT_AVAILABLE",

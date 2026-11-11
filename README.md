@@ -19,4 +19,4 @@ O SGT é um único projeto com backend Java/Spring em `JAVA/` e frontend React/T
 | JAVA/target | Saída gerada de Maven/testes; não integra a fonte versionada. |
 | .homologacao | Acervo local privado; não publicar nem usar como configuração operacional. |
 
-A cópia de segurança anterior à limpeza e o commit correspondente estão descritos no [índice de arquivo](DOCUMENTACAO/ARQUIVO/README.md). O histórico Git foi preservado; não houve push.
+A cópia de segurança anterior à limpeza e o commit correspondente estão descritos no [índice de arquivo](DOCUMENTACAO/ARQUIVO/README.md). O histórico anterior e a main permanecem preservados. O progresso foi publicado na branch limpa `codex/sgt-progresso-seguro-20261111`; veja [preparação operacional, ensaios e limites](DOCUMENTACAO/CODEX/PRODUCAO_20261111/ENSAIOS_LABORATORIO.json) e [pareceres independentes](DOCUMENTACAO/CODEX/PRODUCAO_20261111/PARECERES.json). A aprovação do laboratório não libera produção.

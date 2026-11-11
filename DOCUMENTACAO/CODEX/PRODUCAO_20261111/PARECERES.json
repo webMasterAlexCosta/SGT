@@ -1,0 +1,35 @@
+{
+  "scope": "Preparation and rehearsals in synthetic laboratory only; no production release or deployment approval",
+  "reviewed_code_commit": "9c8bf1864cb2d3e9a2dc7eeedb0be8ae0c755f05",
+  "Java": {
+    "approved_lab": true,
+    "thread_id": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+    "turn_id": "01a1cb66-fb30-72c0-be4a-2997587b6ecb",
+    "completed_at_epoch": 1794414022,
+    "model": "gpt-6.1-sol",
+    "effort": "xhigh",
+    "findings_remaining_in_reviewed_delta": [],
+    "closed_findings": [
+      "P2 restore paths overlap backup tree",
+      "P2 non-global database source identity"
+    ],
+    "decision": "APROVADO o recheque do commit 9c8bf186…. Os dois P2 estão fechados. Não identifiquei novos achados P0–P3 no delta examinado. Sobreposição com o backup: _restore_layout verifica os destinos e a configuração dos marcadores por caminhos resolvidos, antes de instanciar Database ou gravar arquivos, inclusive na retomada. Identidade do banco: _database_identity_key usa system_identifier lido do servidor e OID normalizado. Preserva a recusa da fonte e rejeita manifesto sem identidade comprovada, sem fallback ou concessão de privilégios. Os recibos dos 31 testes isolados estão vinculados à ferramenta e aos testes atuais. O novo ensaio real registra igualdade de 72 tabelas, 7.383 linhas, 68 sequências, seis uploads e cinco materiais privados, oito recusas de sobreposição, fonte preservada e retomada sem repetir SQL. A colisão entre clusters distintos tem contraprova unitária; não foi executado um segundo cluster físico. A preparação operacional e os ensaios de laboratório ficam aprovados no escopo revisado, reutilizando a análise anterior dos caminhos preservados. Java, frontend, JAR e teste protegido permaneceram inalterados. O pacote atualizado deve incorporar a ferramenta SHA-256 c1af414d9389faff1d001836a8b6b8e97755e480f35db33d590bc33e659b336a; o pacote69 permanece superado. Revisão Sol/xhigh, somente leitura, sem novas execuções. Produção continua pendente de Windows nativo, HTTPS institucional, backup externo com restore, responsável pelo aceite e SMTP real caso ativado. Frontend conserva seu parecer separado."
+  },
+  "frontend": {
+    "approved_lab": true,
+    "thread_id": "01a1c50d-6d2d-74e3-910d-86635b797156",
+    "turn_id": "01a1cb69-e850-7fc0-abbd-579660fd4843",
+    "completed_at_epoch": 1794414294,
+    "model": "gpt-6.1-sol",
+    "effort": "xhigh",
+    "findings_remaining_in_reviewed_delta": [],
+    "decision": "APROVADO para a extensão frontend operacional no laboratório, no commit 9c8bf1864cb2d3e9a2dc7eeedb0be8ae0c755f05. Nenhum achado P0–P3 no delta examinado. BUILD_PRODUCAO recebe o modo real de import.meta.env.PROD. O badge e o modal ficam ocultos no release, os hooks permanecem incondicionais e o efeito retorna antes de acessar localStorage em produção. O comportamento de desenvolvimento está preservado. Configuração · Modal Conferi, por leitura e hashes: 12 testes em três arquivos aprovados, typecheck strict e build vinculados às 433 fontes React atuais. Não há script lint. 102 arquivos do dist íntegros no JAR, com grafo de imports completo. 595 arquivos estáticos, preservando 546 anteriores, com 48 novos e alteração do index.html. As 49 mudanças intencionais foram reconciliadas separadamente do recibo que recusou a mutação. JAR com SHA-256 6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944. Os recibos sustentam ausência dos avisos no release, primeiro acesso com troca obrigatória de senha, controle da API, rotas profundas, recarga e logout, sem erro JavaScript. O Chrome foi executado por HTTP loopback. As 44 verificações TLS pertencem ao cliente HTTPS separado. Ensaios do laboratório Produção permanece pendente de execução Windows, domínio/certificado e jornada Chrome HTTPS institucional, backup protegido fora do computador com restauração, responsável pelo aceite e SMTP caso ativado. A aprovação anterior permanece aplicável aos bytes preservados."
+  },
+  "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+  "support_tool_sha256": "c1af414d9389faff1d001836a8b6b8e97755e480f35db33d590bc33e659b336a",
+  "read_only_reviews": true,
+  "reviewers_did_not_execute_new_suites": true,
+  "previous_approvals_reused_only_for_preserved_bytes": true,
+  "production_approved": false,
+  "native_Windows_approved": false
+}
