@@ -728,5 +728,13 @@
   "current_matrix": {
     "path": "DOCUMENTACAO/CODEX/CAMPANHA_20261109/MATRIZ_ACEITE.json",
     "sha256": "2aeeed639f57edf732bd93e0f223ff2a56058facd32b1e27b37c21ea11a8f0cd"
+  },
+  "code_backup": {
+    "state": "CLEAN_SOURCE_SNAPSHOT_PUSH_CONFIRMED",
+    "receipt": "DOCUMENTACAO/CODEX/CAMPANHA_20261109/PROTECAO_GIT.json",
+    "receipt_sha256": "9fc8450ba4b790f917b8da7337724cbb2879d67f9e6db7164990656774a2aa29",
+    "branch": "codex/sgt-progresso-seguro-20261111",
+    "first_published_snapshot_commit": "9e6a4b85058e15717c2b184cdb0c57790d806cd3",
+    "private_runtime_backup_not_included": true
   }
 }

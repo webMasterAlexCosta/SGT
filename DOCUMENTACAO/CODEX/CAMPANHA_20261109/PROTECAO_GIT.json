@@ -1,0 +1,24 @@
+{
+  "state": "CLEAN_SOURCE_SNAPSHOT_PUSH_CONFIRMED",
+  "branch": "codex/sgt-progresso-seguro-20261111",
+  "url": "https://github.com/webMasterAlexCosta/SGT/tree/codex/sgt-progresso-seguro-20261111",
+  "first_published_snapshot_commit": "9e6a4b85058e15717c2b184cdb0c57790d806cd3",
+  "first_published_snapshot_tree": "7ff955bcc5c2ccf8aa355ac65d473103490505ff",
+  "verification": "git ls-remote origin: remote branch hash matched the local commit after push",
+  "local_main_preserved": "eb66b0cfaaad8e13b09f5218831b46978c9ef70a",
+  "remote_main_unchanged": "2de46a6ed11b331445fcae7c9ef257ce0d0158d8",
+  "source_files_preserved": 2852,
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "no_force_or_hook_bypass": true,
+  "old_private_unpublished_commits_not_in_branch_ancestry": true,
+  "private_runtime_db_uploads_credentials_not_backed_up_in_git": true,
+  "local_progress_commits": [
+    "6f72bd3a4d59babdb38d48c55a7cf8153f4c7296",
+    "6238ea9a9bf8f4f86b3dd887de6ac576278aa9df",
+    "759f09dd09eae8d466c67cbb16ba3f03a55cfb6d",
+    "604e3bcd77f225fb4864555ff7699cc77254cf75",
+    "eb66b0cfaaad8e13b09f5218831b46978c9ef70a"
+  ],
+  "scope": "Code, tests, documentation and selected safe evidence. Generated JAR/dependencies and private database/uploads/configurations/sessions require separate backup.",
+  "snapshot_preserves_existing_source_without_claiming_all_historical_implementation_was_authored_in_this_campaign": true
+}
