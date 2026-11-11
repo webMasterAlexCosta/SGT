@@ -21,7 +21,7 @@ class PainelEscalaGrandeArchitectureTest {
         assertTrue(controller.contains("ResponseEntity.status"));
         assertTrue(entidade.contains("@Entity"));
         assertTrue(entidade.contains("painel_calculo"));
-        assertTrue(entidade.contains("LONGTEXT"));
+        assertTrue(entidade.contains("columnDefinition = \"text\""));
     }
 
     @Test

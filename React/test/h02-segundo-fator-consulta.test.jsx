@@ -5,8 +5,8 @@ import { act, cleanup, fireEvent, render, screen } from '@testing-library/react'
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar }));
-import { GerenciadorSegundoFator } from '../src/modules/perfil/components/GerenciadorSegundoFator/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar }));
+import { GerenciadorSegundoFator } from '../src/modules/perfil/components/GerenciadorSegundoFator/index.tsx';
 
 // UI e serviço reais; só a fronteira de transporte usa DTOs sintéticos.
 // O pai reproduz o callback inline da página que sincroniza o perfil e renderiza

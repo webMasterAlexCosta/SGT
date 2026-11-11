@@ -40,8 +40,8 @@ class InstrumentosFronteiraCicloVidaHttpIT extends ContratosHttpBase {
     void exigirPersistenciaPermitida() throws Exception {
         try (var conexao = dataSource.getConnection()) {
             var meta = conexao.getMetaData();
-            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
-            assertThat(meta.getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
+            assertThat(meta.getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");

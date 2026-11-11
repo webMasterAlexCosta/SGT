@@ -1,5 +1,7 @@
 # Regras temporais e de autorização — contrato e rastreabilidade
 
+> **Reconciliação vigente de09/11/2026:** este documento preserva os textos/resultados do corte histórico. A [decisão humana vigente](../../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) substitui sete dias fixos por N configurável, padrão30, limite exclusivo D+N; preserva as outras permissões, IDs e namespaces. MySQL/recibos antigos não aprovam PostgreSQL ou os bytes atuais. Governança de Terceiros permanece removida; Sonar está fora desta missão. Consulte o [plano atual](../CODEX/CAMPANHA_20261109/PLANO.md) para gates/evidências atuais.
+
 ## Escopo desta leitura
 
 Este documento organiza os oráculos obrigatórios do mestre e aponta as fontes da candidata 04. Ele não transforma leitura de código em execução. Os resultados pertencem às matrizes de critérios, ROP, módulos e posições transversais, vinculadas aos recibos frescos de cada camada.

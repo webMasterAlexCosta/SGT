@@ -3,7 +3,7 @@
 set -Eeuo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")/.."
 if ! command -v node >/dev/null || ! command -v npm >/dev/null; then
-  echo 'ERRO: Node.js e npm necessários. Preferência: Node 22.16.x' >&2
+  echo 'ERRO: Node.js e npm necessários. Requisitos: Node 26.13.0 e npm 12.2.2' >&2
   exit 2
 fi
 printf 'Node: '; node --version

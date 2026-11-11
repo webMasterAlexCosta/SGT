@@ -21,7 +21,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.multipart;
 
-/** DOC-010: expiração temporal de uma concessão antes válida, com bytes e MySQL reais. */
+/** DOC-010: expiração temporal de uma concessão antes válida, com bytes e PostgreSQL reais. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class RevisaoDownloadExpiracaoHttpIT extends ContratosHttpBase {
     @Test
@@ -50,7 +50,7 @@ class RevisaoDownloadExpiracaoHttpIT extends ContratosHttpBase {
         var concessao = enviar(c.admin, rota + "/permissoes", mapa("usuarioId", c.nacional.getId(),
                 "finalidade", "auditoria temporal", "justificativa", "Concessão válida até o prazo declarado",
                 "autorizacaoAdministrativa", "ATO-EXPIRACAO", "validoAte", expira), 200,
-                "A concessão é criada ainda válida e confirmada no MySQL");
+                "A concessão é criada ainda válida e confirmada no PostgreSQL");
         long permissaoId = concessao.path("id").asLong();
         byte[] permitido = executar(c.nacional, get(rota + "/arquivo").param("finalidade", "auditoria temporal"),
                 200, "Controle positivo anterior à expiração").getResponse().getContentAsByteArray();

@@ -12,7 +12,11 @@ import java.util.List;
 @RestController
 @InvalidaCacheNegocio
 @RequestMapping("/api/contratos/{contratoId}/provas-historicas")
-public class ProvaHistoricaContratoControlador {
+public class ProvaHistoricaContratoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ProvaHistoricaContratoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ProvaHistoricaContratoServico servico;
     public ProvaHistoricaContratoControlador(ProvaHistoricaContratoServico servico){this.servico=servico;}
     @PostMapping("/previa")

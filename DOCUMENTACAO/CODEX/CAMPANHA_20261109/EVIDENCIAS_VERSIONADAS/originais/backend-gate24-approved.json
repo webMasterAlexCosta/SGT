@@ -1,0 +1,16 @@
+{
+  "state": "NATIVE24_SOL_BACKEND_SUPPLIER_DELTA_APPROVED_FOR_TECHNICAL_INTEGRATION",
+  "review_directory": "review-java-supplier24",
+  "runtime_model": "gpt-6.1-sol",
+  "runtime_effort": "xhigh",
+  "thread_id": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+  "turn_id": "01a1c820-b567-7fb3-8383-2a1262b2701a",
+  "cursor": "35b56430-583c-4408-bcd5-7dcbecc6cd38:235",
+  "parecer_sha256": "6685f64de5a9bfdcc0cef8e5b7284be246fc393e5b1a658b2e02f9b8f20c2bf1",
+  "freeze_sha256": "b5f703a4c189162893e6950e54deb7ce3429a22d79f5888c3f830817f7480ca4",
+  "bytecode_delta_sha256": "31e00e3e40d47b6d5758ee1cc0cf0bd529b5de71e242b164ccfb42e47680fbf1",
+  "compiled_receipt": "java-compile-supplier13",
+  "postgres_tests_approved": 23,
+  "no_p0_p3_findings": true,
+  "no_global_acceptance": true
+}

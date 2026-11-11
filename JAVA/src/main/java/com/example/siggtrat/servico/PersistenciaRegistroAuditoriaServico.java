@@ -10,7 +10,11 @@ import java.util.List;
 
 /** Persistência isolada da transação de negócio, inclusive após seu commit. */
 @Service
-public class PersistenciaRegistroAuditoriaServico {
+public class PersistenciaRegistroAuditoriaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PersistenciaRegistroAuditoriaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final RegistroAuditoriaRepositorio repositorio;
 
     public PersistenciaRegistroAuditoriaServico(RegistroAuditoriaRepositorio repositorio) {

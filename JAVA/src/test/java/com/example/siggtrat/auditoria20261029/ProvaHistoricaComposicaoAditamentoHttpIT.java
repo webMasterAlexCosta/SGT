@@ -36,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * CAT-004/HIS-001/HIS-006: fonte posterior da combinação criada em ADI.
- * O documento e a perda são sintéticos e exclusivos da fixture MySQL.
+ * O documento e a perda são sintéticos e exclusivos da fixture PostgreSQL.
  * As ações são HTTP reais da aplicação; releituras usam novas transações.
  * Não depende da nova classe de fragmento para compilar e demonstrar o RED.
  */
@@ -59,7 +59,7 @@ class ProvaHistoricaComposicaoAditamentoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirMySqlReal() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
         }
     }
 

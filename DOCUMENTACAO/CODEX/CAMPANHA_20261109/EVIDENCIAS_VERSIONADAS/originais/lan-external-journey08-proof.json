@@ -1,0 +1,66 @@
+{
+  "verified": true,
+  "scope": "OTHER_PHYSICAL_WINDOWS_PC_CHROME_HTTP_LAN_HUMAN_ATTESTATION_WITH_DISTINCT_SOURCE_IP_HTTP_CORROBORATION_NOT_GLOBAL_ACCEPTANCE",
+  "url": "http://10.152.118.58:5000",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "server_ip": "10.152.118.58",
+  "client_ip": "10.152.118.106",
+  "same_server_ip_not_used_as_external_proof": true,
+  "human_confirmed": {
+    "login": true,
+    "history_reload": true,
+    "frequency_page": true,
+    "logout": true
+  },
+  "human_confirmation": "Sim, todos esses passos funcionaram — resposta explícita ao roteiro completo neste chat.",
+  "screenshot": {
+    "path": "/tmp/codex-clipboard-98d97258-9d5b-491f-8251-9b8e465761a3.png",
+    "sha256": "2921aaf5573e22e0872337ace50bb4c85feff8e0f7811cba59a06f0292dfb1ed",
+    "scope": "Initial Chrome Windows login page, before authenticated steps"
+  },
+  "safe_http_observations": [
+    {
+      "method": "GET",
+      "path": "/api/autenticacao/sessao",
+      "status": "401",
+      "count": 2
+    },
+    {
+      "method": "POST",
+      "path": "/api/autenticacao/encerrar-sessao",
+      "status": "200",
+      "count": 4
+    },
+    {
+      "method": "GET",
+      "path": "/frequencia",
+      "status": "200",
+      "count": 1
+    },
+    {
+      "method": "POST",
+      "path": "/api/autenticacao/autenticar",
+      "status": "401",
+      "count": 4
+    },
+    {
+      "method": "POST",
+      "path": "/api/autenticacao/autenticar",
+      "status": "200",
+      "count": 2
+    },
+    {
+      "method": "GET",
+      "path": "/api/autenticacao/sessao",
+      "status": "200",
+      "count": 4
+    }
+  ],
+  "private_credentials_not_copied": true,
+  "csrf_cors_authentication_preserved": true,
+  "limits": [
+    "Authenticated steps attested by the user on another physical PC; no remote UI control or secret/session capture.",
+    "HTTP log is corroboration, not a DOM assertion for every route or a replacement for human attestation.",
+    "No deployment or institutional/production acceptance."
+  ]
+}

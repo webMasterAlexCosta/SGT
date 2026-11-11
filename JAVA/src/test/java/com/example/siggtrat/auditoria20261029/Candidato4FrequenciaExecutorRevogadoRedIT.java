@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
@@ -34,7 +37,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Autoria: revisor independente transversal C4, hipótese C4-TR-H01.
  * Fonte lida: manifesto 13c84fd30b668335228704fd1028ddea11adad6f607458a7b7fa993dcbc64a89.
- * Teste proposto; não compilado nem executado pelo autor. MySQL/HTTP reais;
+ * Teste proposto; não compilado nem executado pelo autor. PostgreSQL/HTTP reais;
  * nenhuma substituição de persistência/autorização, nenhum DDL manual.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -69,7 +72,7 @@ class Candidato4FrequenciaExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, c.contratoA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Limite da fixture: raiz não liberada");
@@ -79,8 +82,11 @@ class Candidato4FrequenciaExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("frequencia-" + (lote ? "lote" : "individual") + (replay ? "-replay" : ""));
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    "Frequência/replay: Contrato da fixture", tentativa);
             Map<String,Object> revogacao = rebaixarPerfil ? mapa("perfil", "GESTOR_NACIONAL") : mapa("active", false);
             executar(c.admin, put("/api/usuarios/" + c.localA.getId()).contentType(APPLICATION_JSON)
                     .content(json(revogacao)), 200, "Revogação administrativa confirmada antes de liberar o lock");
@@ -99,7 +105,7 @@ class Candidato4FrequenciaExecutorRevogadoRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
                     "hipotese", "C4-TR-H01", "lote", lote, "rebaixarPerfil", rebaixarPerfil, "replay", replay,
-                    "esperaMySqlObservada", true, "revogacaoCommitadaAntesDaLiberacao", true,
+                    "esperaPostgresObservada", espera, "revogacaoCommitadaAntesDaLiberacao", true,
                     "status", resultado.getResponse().getStatus(), "antes", antes, "depois", depois)));
             assertAll("FRE-018/PER-010/AUD-005: autorização presente vale também após espera e em replay",
                     () -> assertThat(resultado.getResponse().getStatus()).isIn(401, 403, 404, 409),
@@ -123,26 +129,6 @@ class Candidato4FrequenciaExecutorRevogadoRedIT extends ContratosHttpBase {
                         .setParameter("v", vinculoId).getSingleResult(),
                 em.createQuery("select coalesce(sum(f.versaoNegocial),0) from Frequencia f where f.vinculoContratual.id=:v", Long.class)
                         .setParameter("v", vinculoId).getSingleResult()));
-    }
-
-    private void aguardarBloqueioReal(long conexaoBloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<Void> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
-                if (esperas != null && esperas > 0) observada.complete(null);
-                else if (tentativa.isDone()) observada.completeExceptionally(
-                        new AssertionError("Comando não alcançou a espera real no Contrato"));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { observada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
     }
 
     private record Estado(long frequencias, long eventos, long somaVersoes) { }

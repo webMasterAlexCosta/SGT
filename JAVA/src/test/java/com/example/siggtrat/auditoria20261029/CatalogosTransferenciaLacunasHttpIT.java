@@ -129,7 +129,8 @@ class CatalogosTransferenciaLacunasHttpIT extends ContratosHttpBase {
     }
 
     private Map<String, Object> transferencia(Cenario c, NovoContrato n, LocalDate data) {
-        return mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Transferência com contexto documental completo",
                 "referenciaSei", "SEI-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", n.composicao1(), "lotacaoDestinoId", c.lotacaoB.getId(),

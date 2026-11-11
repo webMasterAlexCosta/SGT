@@ -15,7 +15,11 @@ import java.util.*;
  * lançamento de frequência por este serviço.
  */
 @Service
-public class EscopoAcessoUsuarioServico {
+public class EscopoAcessoUsuarioServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(EscopoAcessoUsuarioServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     public record Escopo(
             Long superintendenciaId,

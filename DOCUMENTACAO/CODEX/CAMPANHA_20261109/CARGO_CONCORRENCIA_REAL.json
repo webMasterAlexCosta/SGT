@@ -1,0 +1,85 @@
+{
+  "state": "SOURCE19_SELECTED_CASES_AND_CODE_ACCEPTED_NATIVE08_GLOBAL_PENDING",
+  "criterion": "CANONICAL198::CAT-002:002",
+  "main_manifest_sha256": "30cb0806ca7ee912eaeeb544fb3e719f80dfb48154fab232ea7a1da8a077bc46",
+  "compile_receipt": "compile-contextual-19",
+  "current_integration_tests": 18,
+  "current_integration_classes": 4,
+  "current_receipts": [
+    {
+      "batch": "it-cargo-ordem-green-01",
+      "receipt_sha256": "2b9a4254de2118e926273c233bcaf6542068b92933bb608f9a7d5d09733c6179",
+      "classes": 1,
+      "tests": 1,
+      "peak_aggregate_bytes": 7152001024,
+      "seconds": 36.49002766609192,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "source_drift": [],
+      "leftover_processes": []
+    },
+    {
+      "batch": "it-cargo-final-focais-01",
+      "receipt_sha256": "6ad4578e3b82e1a29d2ed49ed5e4182ca975d110438f7d6c8166be0e79255dc6",
+      "classes": 3,
+      "tests": 17,
+      "peak_aggregate_bytes": 7181697024,
+      "seconds": 69.62690448760986,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      },
+      "source_drift": [],
+      "leftover_processes": []
+    }
+  ],
+  "red_counterexamples": [
+    {
+      "batch": "it-cargo-identidade-red-01",
+      "proof_sha256": "f9a7ced75e0606d2356c431b7d5d78f5eca3752f130f741df978a5fb70f96138",
+      "acceptance": false
+    },
+    {
+      "batch": "it-cargo-ciclo-red-01",
+      "proof_sha256": "369653f97892d229d2a9a1267f54f740f77207aa9704e78792ef9df998552c88",
+      "acceptance": false
+    },
+    {
+      "batch": "it-cargo-ordem-red-01",
+      "proof_sha256": "e8c06019bd67d34af1f8c258042b7d8f1094b933e28568129fb209074c1b5ea9",
+      "acceptance": false
+    }
+  ],
+  "production_changes": [
+    "CargoRepositorio: scoped namespace row lock and fresh active scalar",
+    "CargoServico: existing item lock before namespace on PUT, validation/all changes after namespace; create only new private item",
+    "AcessoOrganizacionalServico: nonblocking original-executor revalidation only on Cargo create/update; original default retained"
+  ],
+  "limits": [
+    "MockMvc/real service/JPA/PostgreSQL, fresh synthetic corpus; not Chrome/LAN",
+    "18 selected tests do not approve 350 classes/635 criteria/global gate",
+    "Old Jar ae4 does not contain the current main",
+    "Statistics are sampled/complementary; no universal deadlock-absence claim",
+    "No schema/name/API/rights change or automatic mutation retry",
+    "Native08 accepted only code/oracles/current executions in stated scope; global backend matrix/coverage/JAR/UI/LAN pending"
+  ],
+  "independent_review": {
+    "turn": "01a1c232-9e99-7d51-a1ae-c6c4568d05f8",
+    "source": ".homologacao/20261109-sgt-final/review-java-cargo-ciclo-08/parecer.md",
+    "sha256": "209c80d7b05c474f3279970ffc8a5a2148b350c419f25e352a5fa53411fce1f9",
+    "outcome": "NO_NEW_P0_P3; cycles closed in scope; CAT002002 supported",
+    "global_acceptance": "PENDING"
+  }
+}

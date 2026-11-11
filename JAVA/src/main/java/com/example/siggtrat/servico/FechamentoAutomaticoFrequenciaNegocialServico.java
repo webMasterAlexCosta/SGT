@@ -16,7 +16,11 @@ import java.util.List;
 
 /** Persiste FECHADA; não é apenas um estado calculado na resposta HTTP. */
 @Service
-public class FechamentoAutomaticoFrequenciaNegocialServico {
+public class FechamentoAutomaticoFrequenciaNegocialServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FechamentoAutomaticoFrequenciaNegocialServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final FrequenciaRepositorio repositorio;
     private final PoliticaTemporalFrequenciaServico politica;
     private final AuditoriaFrequenciaServico auditoria;
@@ -41,7 +45,7 @@ public class FechamentoAutomaticoFrequenciaNegocialServico {
 
     @Scheduled(cron = "${frequencia.fechamento-negocial.cron:0 * * * * *}", zone = "America/Sao_Paulo")
     public int fecharVencidas() {
-        LocalDate limite = LocalDate.now(politica.zona()).minusDays(7);
+        LocalDate limite = politica.limiteFechamento(null);
         int total = 0;
         long ultimoId = 0;
         while (true) {
@@ -65,7 +69,7 @@ public class FechamentoAutomaticoFrequenciaNegocialServico {
             frequencia.setVersaoNegocial(frequencia.getVersaoNegocial() == null ? 2 : frequencia.getVersaoNegocial() + 1);
             repositorio.save(frequencia);
             auditoria.registrar(frequencia, TipoEventoFrequencia.FECHAMENTO_AUTOMATICO, antes,
-                    "Fechamento negocial automático no início do 8º dia em America/Sao_Paulo", null, null, null);
+                    politica.motivoFechamento(), null, null, null);
             fechadas++;
         }
         // O estado e seus eventos são confirmados juntos. O contexto JPA é

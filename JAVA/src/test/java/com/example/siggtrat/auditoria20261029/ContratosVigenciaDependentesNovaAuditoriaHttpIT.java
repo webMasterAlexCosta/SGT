@@ -19,7 +19,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Nova auditoria sobre a fonte a695a0af05c2b2878bdbeafcd07648b91dd882ab1aeaa164ccf070733014405f.
  * CON-017 / ADI-006 / TMP-014: uma prorrogação futura pode ser a fonte de
  * cobertura de outros instrumentos, mesmo sem haver qualquer vínculo humano.
- * MySQL real, sem transação externa envolvendo o comando sob auditoria.
+ * PostgreSQL real, sem transação externa envolvendo o comando sob auditoria.
  * Instalar apenas em checkout de trabalho; não alterar a fonte congelada.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)

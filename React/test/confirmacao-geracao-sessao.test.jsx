@@ -1,9 +1,9 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen } from '@testing-library/react';
-import { useConfirmacaoSenha } from '../src/core/security/useConfirmacaoSenha.jsx';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { twoFactorEnabled: false } }) }));
+import { useConfirmacaoSenha } from '../src/core/security/useConfirmacaoSenha.tsx';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { twoFactorEnabled: false } }) }));
 let dialogo, confirmacao;
 vi.mock('../src/core/security/ModalConfirmacaoSenha', () => ({ ModalConfirmacaoSenha: props => { dialogo = props; return props.aberto ? <div role="dialog">{props.titulo}</div> : null; } }));
 const Observador = () => { confirmacao = useConfirmacaoSenha(); const Modal = confirmacao.ModalConfirmacao; return <Modal />; };

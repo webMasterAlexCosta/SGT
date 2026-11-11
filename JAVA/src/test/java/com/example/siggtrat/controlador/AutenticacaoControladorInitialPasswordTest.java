@@ -116,7 +116,7 @@ class AutenticacaoControladorInitialPasswordTest {
                 jwtAuthenticationFilter,
                 totpServico,
                 new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas.")
-        );
+        , org.mockito.Mockito.mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie(ConstantesDominio.COOKIE_AUTH, "jwt-atual"));
@@ -191,7 +191,7 @@ class AutenticacaoControladorInitialPasswordTest {
                 jwtAuthenticationFilter,
                 totpServico,
                 new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas.")
-        );
+        , org.mockito.Mockito.mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
 
         ResponseEntity<?> response = servico.autenticar(
                 new CredenciaisLoginDTO("8.961.474-5", "senha", null),
@@ -243,7 +243,7 @@ class AutenticacaoControladorInitialPasswordTest {
                 jwtAuthenticationFilter,
                 totpServico,
                 new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas.")
-        );
+        , org.mockito.Mockito.mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
 
         ResponseEntity<?> response = servico.autenticar(
                 new CredenciaisLoginDTO("8.961.474-5", "senha", null),
@@ -299,7 +299,7 @@ class AutenticacaoControladorInitialPasswordTest {
                 jwtAuthenticationFilter,
                 totpServico,
                 new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas.")
-        );
+        , org.mockito.Mockito.mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
 
         ResponseEntity<?> response = servico.autenticar(
                 new CredenciaisLoginDTO("1.234.567-8", "senha", "123456"),

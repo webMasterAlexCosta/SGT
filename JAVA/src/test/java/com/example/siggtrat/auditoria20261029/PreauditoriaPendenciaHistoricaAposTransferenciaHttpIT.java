@@ -34,7 +34,8 @@ class PreauditoriaPendenciaHistoricaAposTransferenciaHttpIT extends ContratosHtt
                         "select p.id from PendenciaAdministrativa p where p.frequenciaId=:id order by p.id", Long.class)
                 .setParameter("id", frequencia).setMaxResults(1).getSingleResult());
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.plusDays(1), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência documentada posterior ao dia da frequência pendente",

@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.Pessoa;
@@ -33,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Hipótese independente C2-PES-03, derivada da leitura do candidato2 congelado.
  * Não usa mocks de autorização ou persistência. A espera no Contrato é observada
- * no MySQL performance_schema antes de desativar/rebaixar o executor por HTTP.
+ * no PostgreSQL pg_stat_activity/pg_locks antes de desativar/rebaixar o executor por HTTP.
  * A concessão excepcional continua ativa: revogar a identidade/perfil do seu
  * beneficiário deve impedir um novo ato após a revogação administrativa concluir.
  * Não executado pelo revisor; reservado à rodada real serializada pela raiz.
@@ -73,7 +76,7 @@ class Candidato2RevogacaoExecutorProvaHttpIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, c.contratoA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarContrato.await(25, TimeUnit.SECONDS))
@@ -85,8 +88,17 @@ class Candidato2RevogacaoExecutorProvaHttpIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("confirmacao-prova-nome");
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    "Confirmação de prova nominal: Contrato da fixture", tentativa);
+            var evidenciaEspera = java.nio.file.Path.of("target/auditoria-http/ator-prova-nome-" + rebaixarPerfil + ".json");
+            java.nio.file.Files.createDirectories(evidenciaEspera.getParent());
+            java.nio.file.Files.writeString(evidenciaEspera,
+                    mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
+                            "contratoId", c.contratoA.getId(), "esperaPostgresObservada", espera)));
+
 
             Map<String, Object> revogacao = rebaixarPerfil
                     ? mapa("perfil", "OPERACIONAL", "gestaoLocalId", c.gestaoA.getId(),
@@ -119,20 +131,6 @@ class Candidato2RevogacaoExecutorProvaHttpIT extends ContratosHttpBase {
             pool.shutdownNow();
             pool.awaitTermination(10, TimeUnit.SECONDS);
         }
-    }
-
-    private void aguardarBloqueioReal(long conexaoBloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < limite) {
-            Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                    + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                    + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
-            if (esperas != null && esperas >= 1) return;
-            if (tentativa.isDone()) throw new AssertionError("Confirmação não alcançou a espera real no Contrato");
-            Thread.sleep(25);
-        }
-        throw new AssertionError("Nenhuma espera do Contrato observada no MySQL performance_schema");
     }
 
     private Estado estado(Cenario c) {

@@ -54,7 +54,8 @@ class PessoasRetificacaoAposTransferenciaHttpIT extends ContratosHttpBase {
         enviar(f.c().localA, V + "/" + id + "/desligar", termino, 200, "DES003 término original precede a transferência");
         LocalDate transferencia = RelogioSistema.hoje().minusDays(5);
         conceder(f.c(), f.contrato().id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa("dataEfetiva", transferencia,
+        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", transferencia,
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(), "tipoContratacaoDestinoId", f.c().tipoB.getId(),
                 "motivo", "Transferência posterior ao término registrado", "referenciaSei", "SEI-EXTENSAO-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", f.contrato().composicao1(), "lotacaoDestinoId", f.c().lotacaoB.getId(),
@@ -128,7 +129,8 @@ class PessoasRetificacaoAposTransferenciaHttpIT extends ContratosHttpBase {
         enviar(f.c().localA, V + "/" + id + "/desligar", fim, 200, "Término individual original");
         LocalDate transferencia = RelogioSistema.hoje().minusDays(5);
         conceder(f.c(), f.contrato().id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa("dataEfetiva", transferencia,
+        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", transferencia,
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(), "tipoContratacaoDestinoId", f.c().tipoB.getId(),
                 "motivo", "Transferência com limite de uma vaga", "referenciaSei", "SEI-EXTENSAO-CAPACIDADE", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", f.contrato().composicao1(), "lotacaoDestinoId", f.c().lotacaoB.getId(),

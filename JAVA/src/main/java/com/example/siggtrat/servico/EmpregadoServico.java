@@ -25,7 +25,11 @@ import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
 @Transactional(readOnly = true)
-public class EmpregadoServico {
+public class EmpregadoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(EmpregadoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final EmpregadoRepositorio empregadoRepositorio;
     private final EmpregadoListaConsultaRepositorio empregadoListaConsultaRepositorio;
@@ -51,7 +55,7 @@ public class EmpregadoServico {
         this.motorIdentidadeHistorica = motor;
     }
 
-    @org.springframework.beans.factory.annotation.Autowired(required = false)
+    @org.springframework.beans.factory.annotation.Autowired
     public void configurarGradeCanonica(GradeFrequenciaCanonicaServico servico) { this.gradeCanonica = servico; }
 
     @org.springframework.beans.factory.annotation.Autowired
@@ -320,44 +324,14 @@ public class EmpregadoServico {
         if (contratoId != null) contratosNormalizados.add(contratoId);
         if (contratoIds != null) contratosNormalizados.addAll(contratoIds.stream().filter(Objects::nonNull).toList());
 
-        Specification<Empregado> spec = criarEspecificacaoEmpregados(
-                user, searchTerm, ConstantesDominio.STATUS_ATIVO, lotacaoId, null, null, false, null);
-        spec = spec.and((root, query, cb) -> cb.and(
-                cb.equal(root.get("jornada").get("id"), turnoId),
-                cb.or(cb.isNull(root.get("dataAdmissao")),
-                        cb.lessThanOrEqualTo(root.get("dataAdmissao"), dataRef))));
-
-        ZonedDateTime inicioDia = dataRef.atStartOfDay(zoneBR);
-        ZonedDateTime fimDiaExclusivo = dataRef.plusDays(1).atStartOfDay(zoneBR);
-        spec = spec.and((root, query, cb) -> {
-            var historicoVigente = query.subquery(Long.class);
-            var hist = historicoVigente.from(HistoricoVinculoContrato.class);
-            List<jakarta.persistence.criteria.Predicate> filtrosHistorico = new ArrayList<>();
-            filtrosHistorico.add(cb.equal(hist.get("empregado").get("id"), root.get("id")));
-            filtrosHistorico.add(cb.lessThan(hist.get("dataInicio"), fimDiaExclusivo));
-            filtrosHistorico.add(cb.or(
-                    cb.isNull(hist.get("dataFim")),
-                    cb.greaterThanOrEqualTo(hist.get("dataFim"), inicioDia)));
-            if (!contratosNormalizados.isEmpty()) {
-                filtrosHistorico.add(hist.get("contrato").get("id").in(contratosNormalizados));
-            }
-            historicoVigente.select(hist.get("id"));
-            historicoVigente.where(filtrosHistorico.toArray(new jakarta.persistence.criteria.Predicate[0]));
-
-            return cb.exists(historicoVigente);
-        });
-        GradeFrequenciaCanonicaServico.Consulta consultaCanonica = gradeCanonica == null ? null
-                : gradeCanonica.preparar(user, dataRef, lotacaoId, turnoId, contratosNormalizados, searchTerm);
-        if (consultaCanonica != null) {
-            Specification<Empregado> somenteLegados = (root, query, cb) -> cb.isNull(root.get("pessoaCanonica"));
-            spec = spec.and(somenteLegados).or(consultaCanonica.especificacao());
-        }
+        GradeFrequenciaCanonicaServico.Consulta consultaCanonica = gradeCanonica.preparar(
+                user, dataRef, lotacaoId, turnoId, contratosNormalizados, searchTerm);
         Pageable paginaSegura = com.example.siggtrat.utilitario.UtilitarioPaginacao.limitarComOrdenacaoFixa(
                 pageable, org.springframework.data.domain.Sort.by("nome").ascending().and(
                         org.springframework.data.domain.Sort.by("id").ascending()));
-        Specification<Empregado> especificacaoFinal = spec;
+        Specification<Empregado> especificacaoFinal = consultaCanonica.especificacao();
         String chaveCache = redisCacheKeyServico.consulta(
-                "empregados-frequencia-canonica-v2",
+                "empregados-frequencia-elegivel-v3",
                 dataRef, contratosNormalizados, lotacaoId, turnoId, searchTerm, skipCount,
                 paginaSegura.getPageNumber(), paginaSegura.getPageSize(), paginaSegura.getSort());
         PaginaCacheDTO<EmpregadoFrequenciaDTO> paginaCache = redisQueryCacheServico.empregadosFrequencia(
@@ -365,7 +339,7 @@ public class EmpregadoServico {
                 () -> {
                     Page<EmpregadoFrequenciaDTO> pagina = empregadoFrequenciaConsultaRepositorio.buscar(
                             especificacaoFinal, paginaSegura, skipCount);
-                    return PaginaCacheDTO.dePagina(consultaCanonica == null ? pagina : gradeCanonica.projetar(pagina, consultaCanonica));
+                    return PaginaCacheDTO.dePagina(gradeCanonica.projetar(pagina, consultaCanonica));
                 });
         return paginaCache.paraPagina(paginaSegura).map(dto -> minimizarFrequencia(dto, user));
     }

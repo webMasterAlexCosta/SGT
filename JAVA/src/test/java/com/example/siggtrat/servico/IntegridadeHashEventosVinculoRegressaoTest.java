@@ -23,19 +23,19 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Regra pura: repositórios fornecem listas em memória; motores e entidades são
  * reais. Os digests literais foram calculados separadamente em SHA-256/UTF-8,
- * a partir dos materiais históricos dos geradores C25. Não é prova JPA/MySQL.
+ * a partir do contrato tipado atual. Vetores históricos preservados em 53/proposals/before e nos recibos anteriores. Não é prova JPA/PostgreSQL.
  */
 class IntegridadeHashEventosVinculoRegressaoTest {
     private static final LocalDate INICIO = LocalDate.of(2026, 6, 1);
     private static final LocalDate FIM = LocalDate.of(2026, 6, 30);
     private static final String CADASTRO = "Cadastro integrado de Pessoa, Vínculo e Alocação inicial";
-    private static final String V_ORIGEM = "48b1c1c35649535a84cbf4f007178be3133e18a9c6cfdc548f234da9014f376f";
-    private static final String V_MATRICULA = "90e041905a2bdf1e15424345c738b64d58ed25245f1d53a5ba89950eb361ea7d";
-    private static final String V_EXCEDENTE = "d279887a01b002e653ec13b2c89a3de2735de7ae1b0f6356ad63956bd21b2f63";
-    private static final String V_RETIFICACAO = "0391b3ad0b42ca62574661fba6faa46ccc80fbfbc7de00f96cd98e55f2dcde68";
-    private static final String A_ORIGEM = "a853308d27183ca5ca4dc1d254ec83c2ef3e7f0ef5d9c629040c73106c44feef";
-    private static final String A_TRANSFERENCIA = "1316c8231ce0f78eba7df25c8eb9635c48707cb045d8bcccffda770385ce308e";
-    private static final String A_EXCEDENTE = "7f9fb9f49721a291dfb7473ec909ee07c6a3b3424baad6c32d7864cc1781fca2";
+    private static final String V_ORIGEM = "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158";
+    private static final String V_MATRICULA = "5d46cb8af0393e951ed8206c2ff4bc27bd9ee18656487fcb09cbd6445057a0d9";
+    private static final String V_EXCEDENTE = "531972581e0b28a4a0209a07b5daa48afa62f44e53a9acb25090caca12266a81";
+    private static final String V_RETIFICACAO = "9b57e83374e1565a74175fc2c98df0a526c480fa52b9c3f70b4043aaaee5eca6";
+    private static final String A_ORIGEM = "9da662f6783ad11cb3c34db55bd36f399b587f6b66bf441d2a724280c0bc1061";
+    private static final String A_TRANSFERENCIA = "99d66ffae8ece9c0a88ec87ebc31c09a63e3cedaa2c70436ab77f5cc66ce644f";
+    private static final String A_EXCEDENTE = "0afbadb8415cb0b90f798046fc2d330c35ac1a1a3e6ac7319b7a525382b5f289";
 
     @Test
     void vinculoPreservaCadeiaValidaMesmoAposCorrecaoDoCpfCadastral() {
@@ -68,7 +68,7 @@ class IntegridadeHashEventosVinculoRegressaoTest {
         EventoVinculoContratual a = origemVinculo(), b = matricula(a);
         b.setHashAnterior("b".repeat(64));
         // Digest válido para o conteúdo adulterado: a recusa exige conferir o predecessor real.
-        b.setHashEvento("81e3c84acd643bc3568c05b092b69615a7c270ac6863d15cc10bd0bb50b74164");
+        b.setHashEvento("7a900defc990a30ec1ff834f6ee08e68aad99cf06929968ce7f56d0cecafea83");
         assertFalse(integraVinculo(a, b));
     }
 
@@ -103,7 +103,7 @@ class IntegridadeHashEventosVinculoRegressaoTest {
         b.setMotivoDesligamentoIdFotografia(71L);
         b.setMotivoDesligamentoDescricaoFotografia("Desligamento sintético");
         b.setMotivoDesligamentoCategoriaFotografia(CategoriaTerminoVinculo.DESLIGAMENTO_INDIVIDUAL);
-        b.setHashEvento("11c79605b6b01e8aef0a3bf1f37d74b1f41d254f2aaa87c3be5e5907fbb3b34e");
+        b.setHashEvento("c3b627feaec1870bf721af7a9342b5f6a8c40050ad8c51126a13dee132b8633a");
         assertTrue(integraVinculo(a, b));
         b.setMotivoDesligamentoDescricaoFotografia("Descrição adulterada");
         assertFalse(integraVinculo(a, b));
@@ -139,7 +139,7 @@ class IntegridadeHashEventosVinculoRegressaoTest {
     void alocacaoContinuaRecusandoEncadeamentoQuebrado() throws Exception {
         EventoAlocacaoVinculo a = origemAlocacao(), b = transferencia(a);
         b.setHashAnterior("b".repeat(64));
-        b.setHashEvento("e0696f3634c42fd31b4be8722dacc439bc49a20c62b1e4eb37bb40c118b9630e");
+        b.setHashEvento("089195cbc0a5fbc02bca9bda866ab3b69cf268bd669169b0565b995ea1e8c35f");
         assertFalse(integraAlocacao(a, b));
     }
 
@@ -155,7 +155,7 @@ class IntegridadeHashEventosVinculoRegressaoTest {
     }
 
     @Test
-    void vetoresDeVinculoCorrespondemAoGeradorC25SemAlterarOsBytesHistoricos() throws Exception {
+    void vetoresDeVinculoCorrespondemAoFormatoTipadoAtual() throws Exception {
         EventoVinculoContratualRepositorio repo = repositorio(EventoVinculoContratualRepositorio.class, List.of());
         VinculoContratualServico gerador = new VinculoContratualServico(null, null, null, null, null, null,
                 repo, null, null, null, null);
@@ -186,7 +186,7 @@ class IntegridadeHashEventosVinculoRegressaoTest {
     }
 
     @Test
-    void vetoresDeAlocacaoCorrespondemAoGeradorC25SemAlterarOsBytesHistoricos() throws Exception {
+    void vetoresDeAlocacaoCorrespondemAoFormatoTipadoAtual() throws Exception {
         EventoAlocacaoVinculoRepositorio repo = repositorio(EventoAlocacaoVinculoRepositorio.class, List.of());
         AlocacaoVinculoServico gerador = new AlocacaoVinculoServico(null, repo, null, null, null, null, null, null);
         Class<?> fotoTipo = Class.forName(AlocacaoVinculoServico.class.getName() + "$FotoAlocacao");

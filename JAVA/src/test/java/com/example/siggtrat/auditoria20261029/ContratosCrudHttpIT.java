@@ -28,6 +28,10 @@ class ContratosCrudHttpIT extends ContratosHttpBase {
                 200, "CON-002 número/ano do rascunho editáveis"));
         assertThat(editado.path("numeroContrato").asText()).isEqualTo(numero.toUpperCase(java.util.Locale.ROOT));
         assertThat(editado.path("anoContrato").asInt()).isEqualTo(inicio.getYear());
+        var detalhe=consultar(c.localA,base(id),"CON-009:001 leitura do próprio contrato completa o CRUD autorizado");
+        assertThat(detalhe.path("id").asLong()).isEqualTo(id);
+        assertThat(detalhe.path("gestaoLocalId").asLong()).isEqualTo(c.gestaoA.getId());
+        assertThat(detalhe.path("numeroContrato").asText()).isEqualTo(numero.toUpperCase(java.util.Locale.ROOT));
         JsonNode comp = enviar(c.localA, base(id) + "/composicoes", composicao(c, c.cargoA.getId(), 10), 201,
                 "CMP-001 composição explícita no rascunho");
         long compId = comp.path("id").asLong();
@@ -139,7 +143,8 @@ class ContratosCrudHttpIT extends ContratosHttpBase {
         var c = criarCenario();
         var n = publicado(c, 100, null, false);
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        var req = mapa("dataEfetiva", RelogioSistema.hoje(), "dataAto", RelogioSistema.hoje(),
+        var req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", RelogioSistema.hoje(), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Reorganização administrativa documentada",
                 "referenciaSei", "SEI-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", n.composicao1(), "lotacaoDestinoId", c.lotacaoB.getId(),

@@ -5,6 +5,8 @@ import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.SuperintendenciaEstadual;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -12,7 +14,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.support.TransactionTemplate;
@@ -100,12 +102,13 @@ class SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT extends ContratosHttp
                 });
                 conferirSe(controleId, true);
             }
-            MockHttpServletRequestBuilder pedido = autenticar((criar ? post(rota) : put(rota))
+            AbstractMockHttpServletRequestBuilder<?> pedido = autenticar((criar ? post(rota) : put(rota))
                     .contentType(APPLICATION_JSON).content(json(mapa("uf", UF, "ativo", criar))), ator);
             JsonNode antes = estado(seed, ator.getId(), rota);
             var pool = Executors.newFixedThreadPool(2);
             CountDownLatch liberar = new CountDownLatch(1);
             CompletableFuture<Barreira> pronta = new CompletableFuture<>();
+            var atorJdbc=new Ator("cadastro-se-"+fluxo);
             seguroRestaurar = false;
             try {
                 Future<?> bloqueador = pool.submit(() -> new TransactionTemplate(transactionManager).execute(status -> {
@@ -119,21 +122,21 @@ class SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT extends ContratosHttp
                                             "update SuperintendenciaEstadual set uf=:uf,nome=:nome where id=:id")
                                     .setParameter("uf", UF).setParameter("nome", "SE/" + UF)
                                     .setParameter("id", seed.id()).executeUpdate();
-                            assertThat(alteradas).as("A barreira alterou apenas a linha reservada no MySQL").isEqualTo(1);
+                            assertThat(alteradas).as("A barreira alterou apenas a linha reservada no PostgreSQL").isEqualTo(1);
                             String ufConfirmada = String.valueOf(em.createNativeQuery(
                                             "select uf from superintendencia_estadual where id_superintendencia=:id")
                                     .setParameter("id", seed.id()).getSingleResult());
                             assertThat(ufConfirmada).as("SELECT escalar confirma a UF efetivamente escrita").isEqualTo(UF);
                             long linhaNoIndice = ((Number) em.createNativeQuery(
                                             "select id_superintendencia from superintendencia_estadual "
-                                                    + "force index (uk_superintendencia_estadual_uf) where uf=:uf for update")
+                                                    + "where uf=:uf for update")
                                     .setParameter("uf", UF).getSingleResult()).longValue();
                             assertThat(linhaNoIndice).as("A UNIQUE disputada aponta para o seed reservado").isEqualTo(seed.id());
                         } else {
                             alvo = em.find(SuperintendenciaEstadual.class, controleId, LockModeType.PESSIMISTIC_WRITE);
                         }
                         assertThat(alvo).isNotNull();
-                        long conexao = ((Number) em.createNativeQuery("select connection_id()")
+                        long conexao = ((Number) em.createNativeQuery("select pg_backend_pid()")
                                 .getSingleResult()).longValue();
                         if (criar) {
                             gravar("superintendencia-criacao-barreira-confirmada", mapa(
@@ -156,8 +159,11 @@ class SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT extends ContratosHttp
                     }
                 }));
                 Barreira b = pronta.get(10, TimeUnit.SECONDS);
-                Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-                List<Map<String, Object>> espera = aguardarBloqueioReal(b, criar, tentativa);
+                Future<MvcResult> tentativa = pool.submit(() -> atorJdbc.executar(() -> mvc.perform(pedido).andReturn()));
+                List<Map<String, Object>> espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource),b.conexao(),atorJdbc,
+                        sql->criar ? sql.insercao("superintendencia_estadual","uf",UF)
+                                : sql.selecaoChave("superintendencia_estadual","id_superintendencia",b.id()),
+                        criar ? "superintendencia/UF sintética reservada" : "superintendencia/"+b.id(),tentativa);
                 Instant esperaObservadaEm = Instant.now();
                 executar(c.admin, put("/api/usuarios/" + ator.getId()).contentType(APPLICATION_JSON)
                         .content(json(mapa("perfil", "GESTOR_NACIONAL"))), 200,
@@ -186,7 +192,7 @@ class SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT extends ContratosHttp
                         "executorId", ator.getId(), "revogadorId", c.admin.getId(), "controlePositivoId", controleId,
                         "seedId", seed.id(), "ufOficial", UF, "ufTemporariaSeed", seed.ufTemporaria(),
                         "barreiraId", b.id(), "barreiraSofreuRollback", true,
-                        "esperaMySqlObservada", true, "esperaDataLockWaits", espera,
+                        "esperaPostgresObservada", true, "esperaDataLockWaits", espera,
                         "esperaObservadaEm", esperaObservadaEm, "revogacaoConferidaEm", revogacaoConferidaEm,
                         "liberacaoEm", liberacaoEm, "revogacaoCommitadaAntesDaLiberacao", true,
                         "executorAposRevogacao", executorDepois, "status", resultado.getResponse().getStatus(),
@@ -282,11 +288,9 @@ class SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT extends ContratosHttp
     }
 
     private void exigirIndiceUnico() {
-        Long quantidade = new JdbcTemplate(dataSource).queryForObject(
-                "select count(*) from information_schema.statistics where table_schema=database() "
-                        + "and table_name='superintendencia_estadual' and index_name='uk_superintendencia_estadual_uf' "
-                        + "and non_unique=0 and column_name='uf' and seq_in_index=1", Long.class);
-        assertThat(quantidade).as("Premissa de schema Hibernate: UNIQUE física da UF").isEqualTo(1L);
+        assertThat(EsperaJdbcPostgres.indiceUnico(new JdbcTemplate(dataSource),"superintendencia_estadual",
+                "uk_superintendencia_estadual_uf","uf"))
+                .as("UNIQUE física simples, válida e pronta de UF gerada pelo Hibernate").isTrue();
     }
 
     private JsonNode estado(SeedReservado seed, long atorId, String rota) {
@@ -302,38 +306,7 @@ class SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT extends ContratosHttp
         });
     }
 
-    private List<Map<String, Object>> aguardarBloqueioReal(Barreira b, boolean criar, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        CompletableFuture<List<Map<String, Object>>> observada = new CompletableFuture<>();
-        String indice = criar ? "uk_superintendencia_estadual_uf" : "PRIMARY";
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                List<Map<String, Object>> esperas = jdbc.queryForList(
-                        "select rt.PROCESSLIST_ID as requisitante,bt.PROCESSLIST_ID as bloqueador,"
-                                + "r.OBJECT_NAME as tabela,r.INDEX_NAME as indice,r.LOCK_TYPE as tipo,"
-                                + "r.LOCK_MODE as modo,r.LOCK_DATA as registro,b.LOCK_MODE as modoBloqueador,"
-                                + "b.LOCK_DATA as registroBloqueador from performance_schema.data_lock_waits w "
-                                + "join performance_schema.threads bt on bt.THREAD_ID=w.BLOCKING_THREAD_ID "
-                                + "join performance_schema.threads rt on rt.THREAD_ID=w.REQUESTING_THREAD_ID "
-                                + "join performance_schema.data_locks r on r.ENGINE=w.ENGINE and r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID "
-                                + "join performance_schema.data_locks b on b.ENGINE=w.ENGINE and b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID "
-                                + "where bt.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() and r.OBJECT_NAME='superintendencia_estadual' "
-                                + "and b.INDEX_NAME=? and b.LOCK_TYPE='RECORD'", b.conexao(), indice);
-                List<Map<String, Object>> exatas = esperas.stream().filter(e -> {
-                    String dado = String.valueOf(e.get("registroBloqueador"));
-                    return criar ? dado.contains("'" + UF + "'") : dado.equals(Long.toString(b.id()));
-                }).toList();
-                if (!exatas.isEmpty()) observada.complete(exatas);
-                else if (tentativa.isDone()) observada.completeExceptionally(new AssertionError(
-                        "Tentativa terminou sem espera no índice/registro esperado: " + indice + "/" + (criar ? UF : b.id())));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
+
 
     private void gravar(String nome, Object conteudo) throws Exception {
         Path p = Path.of("target/auditoria-http/" + nome + ".json");

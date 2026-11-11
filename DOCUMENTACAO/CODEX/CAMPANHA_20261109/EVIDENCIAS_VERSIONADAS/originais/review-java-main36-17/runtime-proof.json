@@ -1,0 +1,9 @@
+{
+  "turn_id": "01a1c568-f8f4-7b20-9870-b88ddb14e62d",
+  "model": "gpt-6-astra",
+  "effort": "xhigh",
+  "state": "EXCLUDED_FROM_REQUIRED_SOL_GATE",
+  "actual_runtime_observed": true,
+  "freeze_intact": true,
+  "corrective_action": "Repeat same narrow review in same native chat with explicit gpt-6.1-sol/xhigh; no source changes"
+}

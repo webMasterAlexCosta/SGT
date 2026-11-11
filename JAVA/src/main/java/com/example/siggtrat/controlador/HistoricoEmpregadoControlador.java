@@ -12,7 +12,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/historicos-empregados")
-public class HistoricoEmpregadoControlador {
+public class HistoricoEmpregadoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(HistoricoEmpregadoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final HistoricoEmpregadoConsultaServico servico;
     public HistoricoEmpregadoControlador(HistoricoEmpregadoConsultaServico servico) { this.servico = servico; }
 

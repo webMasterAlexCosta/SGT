@@ -46,7 +46,7 @@ class FrequenciaHistoricoEscopoTransferidoHttpIT extends ContratosHttpBase {
 
     private Preparado preparar() throws Exception {
         Cenario c = criarCenario();
-        // Registro e consulta usam MySQL/HTTP reais. O relógio contratual na
+        // Registro e consulta usam PostgreSQL/HTTP reais. O relógio contratual na
         // preparação apenas torna a transferência programada: DATA continua
         // passada para o lançamento real de frequência, sem mockar LocalDate.
         LocalDate momentoPreparacao = DATA.minusDays(10);
@@ -67,7 +67,8 @@ class FrequenciaHistoricoEscopoTransferidoHttpIT extends ContratosHttpBase {
             adi.put("novaDescricao", "Descrição posterior que não altera a Gestão Local");
             registrarAditamento(c, contrato.id(), adi);
             conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-            JsonNode contratoAtualizado = enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(
+            JsonNode contratoAtualizado = enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                     "dataEfetiva", dataTransferencia, "dataAto", momentoPreparacao,
                     "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Transferência anterior ao efeito do ADI já conhecido",
                     "referenciaSei", "SEI-TRANSFERENCIA-ADI-FREQUENCIA", "autorizacaoAdministrativa", "ATO-HTTP",

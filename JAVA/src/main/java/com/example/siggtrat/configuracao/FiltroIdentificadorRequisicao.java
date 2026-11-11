@@ -9,7 +9,6 @@ import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
 import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
-import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
@@ -42,9 +41,11 @@ public class FiltroIdentificadorRequisicao extends OncePerRequestFilter {
                                     @NonNull FilterChain filterChain)
             throws ServletException, IOException {
 
+        var contextoAnterior = MDC.getCopyOfContextMap();
+        MDC.clear();
         try {
             String requestId = request.getHeader(REQUEST_ID_HEADER);
-            if (!StringUtils.hasText(requestId)) {
+            if (requestId == null || !requestId.matches("[A-Za-z0-9][A-Za-z0-9._:-]{0,63}")) {
                 requestId = UUID.randomUUID().toString();
             }
 
@@ -52,26 +53,29 @@ public class FiltroIdentificadorRequisicao extends OncePerRequestFilter {
             request.setAttribute(REQUEST_ID_ATTR, requestId);
 
             String clientOrigin = request.getHeader(CLIENT_HEADER);
-            MDC.put(MDC_CLIENT_KEY, StringUtils.hasText(clientOrigin) ? clientOrigin : "unknown");
+            MDC.put(MDC_CLIENT_KEY, metadadoSeguro(clientOrigin, "unknown"));
 
             String clientVersion = request.getHeader(CLIENT_VERSION_HEADER);
-            MDC.put(MDC_CLIENT_VERSION_KEY, StringUtils.hasText(clientVersion) ? clientVersion : "unknown");
+            MDC.put(MDC_CLIENT_VERSION_KEY, metadadoSeguro(clientVersion, "unknown"));
 
-            String remoteAddr = request.getHeader("X-Forwarded-For");
-            if (!StringUtils.hasText(remoteAddr)) {
-                remoteAddr = request.getRemoteAddr();
-            }
-            MDC.put(MDC_USER_IP, remoteAddr);
+            // A resolução de proxy confiável pertence ao servidor; este filtro
+            // não confia no X-Forwarded-For arbitrário enviado pelo cliente.
+            MDC.put(MDC_USER_IP, metadadoSeguro(request.getRemoteAddr(), "unknown"));
 
             String timezone = request.getHeader(TIMEZONE_HEADER);
-            MDC.put(MDC_USER_TIMEZONE, StringUtils.hasText(timezone) ? timezone : "UTC");
+            MDC.put(MDC_USER_TIMEZONE, metadadoSeguro(timezone, "UTC"));
 
             response.setHeader(REQUEST_ID_HEADER, requestId);
 
             filterChain.doFilter(request, response);
 
         } finally {
-            MDC.clear();
+            if (contextoAnterior == null) MDC.clear();
+            else MDC.setContextMap(contextoAnterior);
         }
+    }
+
+    private static String metadadoSeguro(String valor, String padrao) {
+        return valor != null && valor.matches("[A-Za-z0-9._:/+-]{1,64}") ? valor : padrao;
     }
 }

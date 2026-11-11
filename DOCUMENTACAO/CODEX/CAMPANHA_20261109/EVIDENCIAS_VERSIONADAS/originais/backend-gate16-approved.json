@@ -1,0 +1,10 @@
+{
+  "state": "BACKEND_APPROVED_DELIMITED_SYNTHETIC_SCOPE",
+  "reviewer_thread": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+  "turn": "01a1c48d-b218-7bc0-8d0e-a8c210bc9394",
+  "parecer_sha256": "cc893b18080eb2be0c80289bd6418f4509353faea60fa9e0804bb7bdc191bc2c",
+  "freeze": "61f0855250e50f79a6d96656d221c2d61ee7465d69f3f657dfdd65f6b378c48c",
+  "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+  "main_classes": 823,
+  "frontend_chrome_lan_global_approved": false
+}

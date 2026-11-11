@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { prepararAcaoAuditavel, prepararDesligamento, prepararRetificacaoInicio } from '../src/services/rh/ServicoDominioPessoaVinculo.js';
-import { prepararAlteracaoAlocacao } from '../src/services/rh/ServicoDominioAlocacaoVinculo.js';
+import { prepararAcaoAuditavel, prepararDesligamento, prepararRetificacaoInicio } from '../src/services/rh/ServicoDominioPessoaVinculo.ts';
+import { prepararAlteracaoAlocacao } from '../src/services/rh/ServicoDominioAlocacaoVinculo.ts';
 
 describe('Consentimentos explícitos dos DTOs Java de RH', () => {
   it.each([

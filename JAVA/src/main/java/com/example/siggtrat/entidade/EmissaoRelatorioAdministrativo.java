@@ -2,6 +2,8 @@ package com.example.siggtrat.entidade;
 
 import com.example.siggtrat.dominio.relatorio.*;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -63,17 +65,17 @@ public class EmissaoRelatorioAdministrativo {
     @Column(name = "aviso_revisao", nullable = false, length = 300, updatable = false)
     private String avisoRevisao;
 
-    @Lob
+    @JdbcTypeCode(SqlTypes.VARBINARY)
     @Basic(fetch = FetchType.LAZY)
     @Column(name = "conteudo_snapshot_gzip", nullable = false, updatable = false,
-            columnDefinition = "LONGBLOB")
+            columnDefinition = "bytea")
     private byte[] conteudoSnapshotGzip;
     @Column(name = "hash_conteudo", nullable = false, length = 64, updatable = false)
     private String hashConteudo;
     @Column(name = "tamanho_conteudo_bytes", nullable = false, updatable = false)
     private long tamanhoConteudoBytes;
-    @Lob
-    @Column(name = "filtros_json", nullable = false, updatable = false)
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(name = "filtros_json", nullable = false, updatable = false, columnDefinition = "text")
     private String filtrosJson;
     @Column(name = "contrato_ids_csv", length = 2000, updatable = false)
     private String contratoIdsCsv;

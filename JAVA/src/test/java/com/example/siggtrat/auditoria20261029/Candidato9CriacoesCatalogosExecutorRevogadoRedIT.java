@@ -5,6 +5,8 @@ import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.entidade.GestaoLocal;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -61,7 +63,7 @@ class Candidato9CriacoesCatalogosExecutorRevogadoRedIT extends ContratosHttpBase
     @Timeout(value = 75, unit = TimeUnit.SECONDS)
     void criacaoDeCatalogoExigeExecutorCorrenteDepoisDaEsperaNaGestao(String fluxo) throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
         }
         Plano p = preparar(criarCenarioPersistido(), fluxo);
         Cenario c = p.cenario();
@@ -79,10 +81,13 @@ class Candidato9CriacoesCatalogosExecutorRevogadoRedIT extends ContratosHttpBase
         var pool = Executors.newFixedThreadPool(3);
         CountDownLatch liberar = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBloqueadora = new CompletableFuture<>();
+        var atorJdbc = new Ator("Candidato9CriacoesCatalogosExecutorRevogadoRedIT-" + fluxo);
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
-                assertThat(em.find(GestaoLocal.class, c.gestaoA.getId(), LockModeType.PESSIMISTIC_WRITE)).isNotNull();
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                // FOR UPDATE conflita também com KEY SHARE da FK; NO KEY UPDATE não conflita.
+                assertThat(em.createNativeQuery("select id_gestao_local from gestao_local where id_gestao_local=:id for update")
+                        .setParameter("id",c.gestaoA.getId()).getSingleResult()).isNotNull();
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(40, TimeUnit.SECONDS))
@@ -93,9 +98,17 @@ class Candidato9CriacoesCatalogosExecutorRevogadoRedIT extends ContratosHttpBase
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            List<Map<String, Object>> espera = aguardarBloqueioReal(
-                    conexao, "gestao_local", c.gestaoA.getId(), tentativa);
+            Future<MvcResult> tentativa = pool.submit(() -> atorJdbc.executar(() -> mvc.perform(pedido).andReturn()));
+            List<Map<String, Object>> espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource),conexao,atorJdbc,
+                    sql -> sql.selecaoChave("gestao_local","id_gestao_local",c.gestaoA.getId())
+                            || sql.insercao(switch(fluxo) {
+                                case "TIPO" -> "tipo_contratacao";
+                                case "LOTACAO" -> "lotacao";
+                                case "JORNADA" -> "jornada";
+                                case "MOTIVO" -> "motivo_desligamento";
+                                default -> throw new AssertionError(fluxo);
+                            },"id_gestao_local",c.gestaoA.getId()),
+                    "gestao_local/"+c.gestaoA.getId(),tentativa);
             Instant esperaObservadaEm = Instant.now();
             Future<?> revogacao = pool.submit(() -> {
                 executar(c.admin, put("/api/usuarios/" + c.localA.getId()).contentType(APPLICATION_JSON)
@@ -129,7 +142,7 @@ class Candidato9CriacoesCatalogosExecutorRevogadoRedIT extends ContratosHttpBase
                     "metodo", "POST", "rota", p.rota(), "controlePositivoStatus", 201,
                     "executorId", c.localA.getId(), "revogadorId", c.admin.getId(),
                     "tabelaBloqueada", "gestao_local", "registroBloqueado", c.gestaoA.getId(),
-                    "esperaMySqlObservada", true, "esperaFisica", espera,
+                    "esperaPostgresObservada", true, "esperaFisica", espera,
                     "esperaObservadaEm", esperaObservadaEm, "revogacaoConferidaEm", revogacaoConferidaEm,
                     "liberacaoEm", liberacaoEm, "executorAposRevogacao", executorAposRevogacao,
                     "revogacaoCommitadaAntesDaLiberacao", true,
@@ -275,39 +288,7 @@ class Candidato9CriacoesCatalogosExecutorRevogadoRedIT extends ContratosHttpBase
 
     private List<String> nomes(Plano p) { return List.of(p.controle(), p.tentativa()); }
 
-    private List<Map<String, Object>> aguardarBloqueioReal(long bloqueadora, String tabela, long id,
-                                                          Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<List<Map<String, Object>>> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                List<Map<String, Object>> linhas = jdbc.queryForList("select w.REQUESTING_THREAD_ID as solicitante, "
-                        + "w.BLOCKING_THREAD_ID as bloqueador, r.OBJECT_SCHEMA as esquema, r.OBJECT_NAME as tabela, "
-                        + "r.INDEX_NAME as indice, r.LOCK_DATA as registro, r.LOCK_MODE as modo_solicitado, "
-                        + "b.LOCK_MODE as modo_detido, r.LOCK_STATUS as estado "
-                        + "from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "join performance_schema.data_locks r on r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID and r.ENGINE=w.ENGINE "
-                        + "join performance_schema.data_locks b on b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID and b.ENGINE=w.ENGINE "
-                        + "where t.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() and r.OBJECT_NAME=? "
-                        + "and r.INDEX_NAME='PRIMARY' and r.LOCK_TYPE='RECORD' and r.LOCK_DATA=? "
-                        + "and r.LOCK_STATUS='WAITING' and b.LOCK_STATUS='GRANTED' "
-                        + "and b.OBJECT_SCHEMA=r.OBJECT_SCHEMA and b.OBJECT_NAME=r.OBJECT_NAME "
-                        + "and b.INDEX_NAME=r.INDEX_NAME and b.LOCK_DATA=r.LOCK_DATA",
-                        bloqueadora, tabela, Long.toString(id));
-                if (!linhas.isEmpty()) observada.complete(List.copyOf(linhas));
-                else if (tentativa.isDone()) observada.completeExceptionally(
-                        new AssertionError("Comando não alcançou espera física em " + tabela + "/" + id));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true);
-            observador.shutdownNow();
-            observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
+
 
 
     private record Plano(String hipotese, Cenario cenario, String fluxo, String rota,

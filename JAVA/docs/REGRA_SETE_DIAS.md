@@ -1,5 +1,7 @@
 # Regra real dos sete dias da frequência
 
+> **Investigação histórica de01/11/2026. Duração fixa superada pela decisão humana de09/11/2026:** a [regra vigente](REGRA_JANELA_FREQUENCIA.md) usa N configurável, padrão30, limite exclusivo D+N. As afirmações abaixo sobre inexistência de decisão posterior, código fixo e duração não configurável descrevem somente aquela baseline. Autorização, autoria, retificação, proibição de futuro e eixos independentes permanecem conforme a norma vigente; este histórico não concede aceite atual.
+
 Data documental: **01/11/2026 — America/Sao_Paulo**, conforme referência local do cliente. Carimbos de execução histórica, quando citados, permanecem em UTC de **02/11/2026**. Escopo: leitura da especificação, Java e React da baseline. Nenhum teste ou navegador foi executado nesta investigação e nenhuma regra foi alterada.
 
 Raízes consultadas:

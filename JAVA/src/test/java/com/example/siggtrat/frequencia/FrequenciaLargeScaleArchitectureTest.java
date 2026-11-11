@@ -32,11 +32,14 @@ class FrequenciaLargeScaleArchitectureTest {
     void workerUsaBlocosConfiguraveisEKeyset() throws Exception {
         String processor = ler("com/example/siggtrat/servico/FechamentoFrequenciaProcessador.java");
         String itens = ler("com/example/siggtrat/repositorio/FechamentoFrequenciaItemRepositorio.java");
-        String empregados = ler("com/example/siggtrat/repositorio/EmpregadoRepositorio.java");
+        String elegibilidade = ler("com/example/siggtrat/servico/ElegibilidadeFechamentoFrequenciaServico.java");
         assertTrue(processor.contains("properties.chunkSize()"));
         assertTrue(processor.contains("aposId"));
         assertTrue(itens.contains("i.empregado.id > :aposId"));
-        assertTrue(empregados.contains("e.id > :aposId"));
+        assertTrue(processor.contains("elegibilidade.buscarPendentesApos("));
+        assertTrue(elegibilidade.contains("where e.id > :apos"));
+        assertTrue(elegibilidade.contains("order by e.id"));
+        assertTrue(elegibilidade.contains(".setMaxResults(PAGINA)"));
     }
 
     @Test

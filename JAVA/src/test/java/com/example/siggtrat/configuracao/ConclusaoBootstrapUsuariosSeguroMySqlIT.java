@@ -25,7 +25,7 @@ import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Efeito persistido do bootstrap explícito; usa transações e repos reais do MySQL. */
+/** Efeito persistido do bootstrap explícito; usa transações e repos reais do PostgreSQL. */
 class ConclusaoBootstrapUsuariosSeguroMySqlIT extends AuditoriaHttpSuporte {
     @Autowired private ApplicationContext contexto;
 

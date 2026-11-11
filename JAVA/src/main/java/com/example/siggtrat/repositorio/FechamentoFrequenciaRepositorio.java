@@ -34,8 +34,11 @@ public interface FechamentoFrequenciaRepositorio extends JpaRepository<Fechament
 
     List<FechamentoFrequencia> findTop50ByStatusOrderByCriadoEmAsc(FechamentoFrequenciaStatus status);
 
+    // A seleção e a transição do lease pertencem à mesma transação. Dois
+    // recuperadores não podem carregar a mesma versão para reenfileirá-la.
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT f FROM FechamentoFrequencia f WHERE f.status = :status AND " +
-            "(f.heartbeatEm IS NULL OR f.heartbeatEm < :limite)")
+            "(f.heartbeatEm IS NULL OR f.heartbeatEm < :limite) ORDER BY f.id")
     List<FechamentoFrequencia> buscarTravados(
             @Param("status") FechamentoFrequenciaStatus status,
             @Param("limite") LocalDateTime limite);

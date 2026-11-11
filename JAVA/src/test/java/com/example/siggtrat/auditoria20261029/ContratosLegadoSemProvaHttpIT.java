@@ -234,7 +234,8 @@ class ContratosLegadoSemProvaHttpIT extends ContratosHttpBase {
     private TransferenciaSintetica transferir(Cenario c) throws Exception {
         var n = publicado(c, 5, null, false); conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
         LocalDate data = RelogioSistema.hoje().minusDays(2);
-        Map<String, Object> req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        Map<String, Object> req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência sintética documentada", "referenciaSei", "SEI-LEGADO",
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(mapa("composicaoOrigemId", n.composicao1(),

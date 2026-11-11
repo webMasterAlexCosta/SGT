@@ -1,0 +1,28 @@
+const fs=require('node:fs'),path=require('node:path'),crypto=require('node:crypto');
+const {execute}=require('./ambiente-real.cjs');const {baseFrontend}=require('./contexto-fixture.cjs');
+const unwrap=x=>x&&Object.hasOwn(x,'data')?x.data:x;
+execute('frequencia-futura-recusa-real',async({page,context,fixture,account,check,report,open,screenshot})=>{
+ const b=JSON.parse(fs.readFileSync(path.join(process.env.SGT_TEST_RUNTIME,'private/e2e-business.json'))),base=baseFrontend(),day=fixture.dates.future;
+ check('GL atual e vínculo real do contrato200',account.perfil==='GESTOR_LOCAL'&&b.jobs200People.length===200&&b.jobs200GradeConcluido);
+ await open('/frequencia');await page.getByLabel('Data de referência da frequência',{exact:true}).fill(day);
+ await page.getByRole('combobox',{name:'Lotação',exact:true}).selectOption(String(fixture.ids.lotacao));await page.getByRole('combobox',{name:'Turno',exact:true}).selectOption(String(fixture.ids.jornada));
+ const active=unwrap(await(await context.request.get(base+'/api/contratos')).json()).filter(x=>x.ativo===true),index=active.findIndex(x=>x.id===b.jobs200ContratoId);
+ check('Contrato correto consta do catálogo real',index>=0);
+ await page.getByRole('button',{name:'Selecionar contratos',exact:true}).click();const boxes=page.locator('[data-tour="freq-filters"]').getByRole('checkbox');await boxes.first().click();await boxes.nth(index+1).check();await page.getByRole('button',{name:'Selecionar contratos',exact:true}).click();
+ await page.getByText('SINTETICO JOBS200 FINAL03 001',{exact:true}).waitFor({timeout:15000});
+ await page.getByText('Data futura não permitida. Regras de retroatividade são validadas pelo backend.',{exact:true}).waitFor();
+ const save=page.getByRole('button',{name:'SALVAR ALTERAÇÕES',exact:true});check('UI bloqueia salvar na data futura',await save.isDisabled());
+ const presence=page.getByTitle('Confirmar Presença Integral para SINTETICO JOBS200 FINAL03 001',{exact:true});
+ const initialClass=await presence.getAttribute('class');await presence.focus();await presence.press('Enter');await page.waitForTimeout(200);
+ check('Tentativa por teclado não seleciona presença, pede senha nem envia mutação',await presence.getAttribute('class')===initialClass&&await save.isDisabled()&&await page.getByLabel('Senha de Acesso',{exact:true}).count()===0&&!report.http.some(x=>x.method==='POST'&&['/api/frequencias','/api/frequencias/lote'].includes(x.path)));
+ check('Aviso contextual explica a data futura ao usuário',await page.getByText('Data futura não permitida. Selecione hoje ou uma data anterior.',{exact:true}).isVisible());
+ const csrf=unwrap(await(await context.request.get(base+'/api/autenticacao/csrf')).json());
+ const response=await context.request.post(base+'/api/frequencias',{headers:{[csrf.headerName]:csrf.token,'X-User-Password':account.password,Origin:base},data:{vinculoContratualId:b.jobs200People[0].vinculoId,dataReferencia:day,status:'PRESENCA',observacao:'SINTETICO E2E09: tentativa futura deliberadamente recusada.',justificativaRetificacao:'Conferência sintética da recusa futura paraGestorLocal.',chaveIdempotencia:crypto.randomUUID()}});
+ const error=await response.json();check('Java real recusa400/HTTP_400 com motivo futuro mesmo paraGL',response.status()===400&&error.code==='HTTP_400'&&/datas? futuras?/i.test(error.message));
+ report.http.push({method:'POST',path:'/api/frequencias',status:response.status(),code:error.code,driver:'APIRequestContext real — controle futuroGL'});
+ const query=new URLSearchParams({data:day,lotacaoId:String(fixture.ids.lotacao),jornadaId:String(fixture.ids.jornada),contratoId:String(b.jobs200ContratoId),page:'0',size:'5'});
+ const read=await context.request.get(base+'/api/frequencias?'+query),body=unwrap(await read.json()),rows=Array.isArray(body)?body:body.content;
+ check('GET real confirma ausência de frequência no recorte futuro',read.status()===200&&Array.isArray(rows)&&rows.length===0&&(Array.isArray(body)||body.totalElements===0));
+ const session=await context.request.get(base+'/api/usuarios/meu-perfil');check('Recusa negocial conserva sessão legítima',session.status()===200&&unwrap(await session.json()).id===account.id);
+ report.scope='AUXILIARY_E2E09_UI_AND_REAL_JAVA_REFUSAL_NOT_NEW_ORIGINAL_DRIVER';report.conditions={date:day,contract:b.jobs200ContratoId,vinculo:b.jobs200People[0].vinculoId,noClockChange:true,noMock:true,noManualSQLWrite:true};await screenshot('futuro-bloqueado-e-api400');
+},{accountName:'gestor_local',reuse:false});

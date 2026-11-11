@@ -29,7 +29,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
- * Spies apenas colocam barreiras no fluxo real. As duas transações e o MySQL são
+ * Spies apenas colocam barreiras no fluxo real. As duas transações e o PostgreSQL são
  * reais. Aceita serialização por lock, rejeição por conflito ou revalidação.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -65,12 +65,12 @@ class EmissaoRetificacaoConcorrenciaAuditoriaHttpIT extends AuditoriaHttpSuporte
             Collection<Long> ids = invocacao.getArgument(2);
             if (ids != null && ids.contains(c.contratoA.getId()) && primeira.compareAndSet(true, false)) {
                 assertEquals(1, resultado.totais().presencas(), "A barreira vem depois do cálculo antigo real.");
-                conteudoPronto.complete(((Number) em.createNativeQuery("select connection_id()")
+                conteudoPronto.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 if (!liberarEmissao.await(25, TimeUnit.SECONDS)) throw new AssertionError("Barreira não liberada.");
             }
             return resultado;
-        }).when(relatorio).gerar(eq(DATA), eq(DATA), anyCollection(), isNull(), isNull());
+        }).when(org.springframework.test.util.AopTestUtils.<RelatorioFrequenciaConsolidadoServico>getUltimateTargetObject(relatorio)).gerar(eq(DATA), eq(DATA), anyCollection(), isNull(), isNull());
 
         ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
@@ -82,10 +82,8 @@ class EmissaoRetificacaoConcorrenciaAuditoriaHttpIT extends AuditoriaHttpSuporte
             while (System.nanoTime() < limite) {
                 if (retificacao.isDone()) { intercalacaoObservada = true; break; }
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexaoEmissao).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexaoEmissao).getSingleResult()).longValue());
                 if (esperas > 0) { intercalacaoObservada = true; break; }
                 TimeUnit.MILLISECONDS.sleep(20);
             }
@@ -152,12 +150,12 @@ class EmissaoRetificacaoConcorrenciaAuditoriaHttpIT extends AuditoriaHttpSuporte
             Object resultado = invocacao.callRealMethod();
             if (Long.valueOf(frequenciaId).equals(f.getId()) && "FALTA".equals(f.getStatus())
                     && primeira.compareAndSet(true, false)) {
-                fonteBloqueada.complete(((Number) em.createNativeQuery("select connection_id()")
+                fonteBloqueada.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 if (!liberarRetificacao.await(25, TimeUnit.SECONDS)) throw new AssertionError("Barreira não liberada.");
             }
             return resultado;
-        }).when(calculo).processarCalculos(any(Frequencia.class));
+        }).when(org.springframework.test.util.AopTestUtils.<CalculoFrequenciaServico>getUltimateTargetObject(calculo)).processarCalculos(any(Frequencia.class));
         ExecutorService executor = Executors.newFixedThreadPool(2);
         try {
             Future<MvcResult> retificacao = executor.submit(() -> mvc.perform(reqRetificacao).andReturn());
@@ -168,10 +166,8 @@ class EmissaoRetificacaoConcorrenciaAuditoriaHttpIT extends AuditoriaHttpSuporte
             while (System.nanoTime() < limite) {
                 if (emissao.isDone()) { observada = true; break; }
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexaoRetificacao).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexaoRetificacao).getSingleResult()).longValue());
                 if (esperas > 0) { observada = true; break; }
                 TimeUnit.MILLISECONDS.sleep(20);
             }
@@ -189,7 +185,7 @@ class EmissaoRetificacaoConcorrenciaAuditoriaHttpIT extends AuditoriaHttpSuporte
                     200, "Após espera por correção, uma emissão vigente usa a fonte confirmada"));
             if ("VIGENTE".equals(persistida.path("metadados").path("estado").asText())) {
                 assertEquals(1, persistida.path("conteudo").path("totais").path("faltas").asInt(),
-                        "Uma leitura anterior ao lock não pode fixar o snapshot antigo do MySQL.");
+                        "Uma leitura anterior ao lock não pode fixar o snapshot antigo do PostgreSQL.");
                 assertEquals(0, persistida.path("conteudo").path("totais").path("presencas").asInt());
             }
         } finally {

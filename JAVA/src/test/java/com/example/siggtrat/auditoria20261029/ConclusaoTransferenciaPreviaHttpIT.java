@@ -125,17 +125,19 @@ class ConclusaoTransferenciaPreviaHttpIT extends ContratosHttpBase {
     void cancelamentoDeTransferenciaMantemRestricaoDePerfilEAtoEspecifico() throws Exception {
         var f = preparar(true); LocalDate efeito = f.n().inicio().plusDays(2); transferir(f, efeito);
         long transferencia = transferenciaId(f);
-        var req = mapa("dataEfetiva", efeito, "dataAto", RelogioSistema.hoje(), "motivo", "Cancelamento documentado",
+        var req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", efeito, "dataAto", RelogioSistema.hoje(), "motivo", "Cancelamento documentado",
                 "referenciaSei", "SEI-CANCELAMENTO-CONTROLE", "autorizacaoAdministrativa", "ATO-HTTP");
         String rota = base(f.n().id()) + "/transferencias-gestao/" + transferencia + "/cancelar";
         for (var usuario : List.of(f.c().estadualA, f.c().nacional, f.c().admin, f.c().operacionalA))
             enviar(usuario, rota, req, 403, "PER012 cancelamento excepcional não concede escrita a outro perfil");
         enviar(f.c().localB, rota, req, 404, "PER012 Gestão externa não cancela transferência alheia");
         req.put("autorizacaoAdministrativa", "OUTRO-ATO");
-        enviar(f.c().localA, rota, req, 409, "PER012 autorização específica não pode ser substituída por texto livre");
+        req.put("conferenciaDocumentalConfirmada", false);
+        enviar(f.c().localA, rota, req, 400, "PER012 capacidade genérica não dispensa nova conferência específica do cancelamento");
         assertThat(contar(f, "EventoCicloVidaContrato")).isEqualTo(2L);
-        req.put("autorizacaoAdministrativa", "ATO-HTTP");
-        enviar(f.c().localA, rota, req, 200, "PER012 gestor responsável com autorização específica pode cancelar");
+        req.put("conferenciaDocumentalConfirmada", true);
+        enviar(f.c().localA, rota, req, 200, "PER012 nova conferência humana do ato; referência própria pode diferir da capacidade");
         assertThat(contar(f, "EventoCicloVidaContrato")).isEqualTo(3L);
     }
 
@@ -150,7 +152,8 @@ class ConclusaoTransferenciaPreviaHttpIT extends ContratosHttpBase {
                 "CON023 transferência inicial comprovada antes da correção");
     }
     private Map<String, Object> transferencia(Preparado f, LocalDate data) {
-        return mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(),
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(),
                 "tipoContratacaoDestinoId", f.c().tipoB.getId(), "motivo", "Transferência documentada da responsabilidade",
                 "referenciaSei", "SEI-PREVIA-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", f.n().composicao1(), "lotacaoDestinoId", f.c().lotacaoB.getId(),

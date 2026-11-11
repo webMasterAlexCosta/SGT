@@ -2,6 +2,8 @@ package com.example.siggtrat.entidade;
 
 import com.example.siggtrat.dominio.frequencia.TipoEventoFrequencia;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -35,12 +37,12 @@ public class EventoFrequencia {
     @Column(name = "data_referencia", nullable = false)
     private LocalDate dataReferencia;
 
-    @Lob
-    @Column(name = "snapshot_anterior", columnDefinition = "LONGTEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(name = "snapshot_anterior", columnDefinition = "text")
     private String snapshotAnterior;
 
-    @Lob
-    @Column(name = "snapshot_novo", nullable = false, columnDefinition = "LONGTEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(name = "snapshot_novo", nullable = false, columnDefinition = "text")
     private String snapshotNovo;
 
     @Column(name = "motivo", length = 1000)

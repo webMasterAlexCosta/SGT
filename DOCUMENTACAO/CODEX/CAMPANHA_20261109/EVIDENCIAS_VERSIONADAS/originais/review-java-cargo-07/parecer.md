@@ -1,0 +1,11 @@
+Encontrei **um novo P2**. A duplicidade original está corrigida nos cenários examinados, mas o incremento ainda precisa tratar a ordem dos locks.
+
+**[P2] O lock da Gestão pode formar ciclo com a edição administrativa do executor.** [CargoServico.java:76](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/JAVA/src/main/java/com/example/siggtrat/servico/CargoServico.java:76) passa a segurar a Gestão antes de adquirir o lock do executor na revalidação; `atualizar` segue a mesma ordem. Entretanto, um Admin pode alterar esse executor com `perfil=GESTOR_ESTADUAL`, `active=false` e a SE da sua Gestão atual. [UsuarioAplicacaoServico.java:170](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/JAVA/src/main/java/com/example/siggtrat/servico/UsuarioAplicacaoServico.java:170) primeiro bloqueia o usuário e, pela inativação do perfil final, chega a [GestaoAcessoHierarquicoServico.java:61](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/JAVA/src/main/java/com/example/siggtrat/servico/GestaoAcessoHierarquicoServico.java:61), que atualiza as Gestões da SE na mesma transação. A intercalação permite **Gestão→usuário contra usuário→Gestão**, causando deadlock e rollback de um comando legítimo. Os controles novos revogam apenas `active`, preservando o perfil, e não cobrem esse caminho. É achado estático, sem reprodução nesta revisão; requer ordem compatível e contraprova concorrente pertinente.
+
+Os demais resultados estão suportados:
+
+- **Identidade de Cargo:** RED3 confirma200+200 e duas identidades; GREEN reproduz as mesmas disputas com200+409, uma identidade, caixa preservada e perdedora integralmente inalterada. Conferi também bindings, espera física e auditorias por request ID.
+- **Autorização e escopo:** os controles específicos passaram, assim como a regressão10/10. Isso não elimina o ciclo descrito acima.
+- **Surefire sobre compilação conferida:** sem achados no delta. Fontes, classes, recibos e POM conferem;9/9 executados. A tentativa anterior continua falha. O comando direto não comprova geração do relatório final de cobertura.
+
+O freeze1352 fontes/6 documentos/2 scripts permanece íntegro; o patch corresponde exatamente ao snapshot RED. Não executei testes nem alterei arquivos. O JAR `ae4…` continua anterior à candidata; empacotamento, demais gates, UI/LAN e homologação global permanecem pendentes.

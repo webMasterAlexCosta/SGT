@@ -5,9 +5,9 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
-import { SecaoMenu } from '../src/Leiaute/BarraLateral/components/SecaoMenu.jsx';
-import { SecaoSubMenu } from '../src/Leiaute/BarraLateral/components/SecaoSubMenu.jsx';
-import BarraLateral from '../src/Leiaute/BarraLateral/index.jsx';
+import { SecaoMenu } from '../src/Leiaute/BarraLateral/components/SecaoMenu.tsx';
+import { SecaoSubMenu } from '../src/Leiaute/BarraLateral/components/SecaoSubMenu.tsx';
+import BarraLateral from '../src/Leiaute/BarraLateral/index.tsx';
 
 afterEach(cleanup);
 

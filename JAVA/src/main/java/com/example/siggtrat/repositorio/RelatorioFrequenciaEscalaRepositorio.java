@@ -9,7 +9,7 @@ import java.time.ZonedDateTime;
 import java.time.LocalDate;
 import java.time.ZoneId;
 import java.time.Instant;
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -67,7 +67,7 @@ public class RelatorioFrequenciaEscalaRepositorio {
         return jdbc.queryForList("""
                 SELECT c.id_contrato FROM contrato c
                 LEFT JOIN gestao_local gl ON gl.id_gestao_local = c.id_gestao_local
-                WHERE ((:gestaoLocalId IS NULL AND :superintendenciaId IS NULL)
+                WHERE ((CAST(:gestaoLocalId AS BIGINT) IS NULL AND CAST(:superintendenciaId AS BIGINT) IS NULL)
                     OR c.id_gestao_local = :gestaoLocalId OR gl.id_superintendencia = :superintendenciaId
                     OR EXISTS (SELECT 1 FROM contrato_versao_negocial cv
                         JOIN gestao_local gh ON gh.id_gestao_local = cv.gestao_local_id
@@ -166,10 +166,11 @@ public class RelatorioFrequenciaEscalaRepositorio {
         MapSqlParameterSource parametros = legado.parametros();
         parametros.addValue("inicioDia", java.sql.Date.valueOf(inicio.toLocalDate()))
                 .addValue("fimDia", java.sql.Date.valueOf(fimExclusivo.toLocalDate().minusDays(1)))
-                // Instant é persistido em UTC pelo Hibernate. Timestamp sem
-                // Calendar seria serializado no fuso da JVM (UTC-3 nos testes).
-                .addValue("conhecidoAte", LocalDateTime.ofInstant(
-                        PrecisaoTemporal.limiteInclusivoMicros(escopo.conhecidoAte()), ZoneOffset.UTC));
+                // O offset acompanha o parâmetro timestamptz: LocalDateTime UTC
+                // seria reinterpretado pelo fuso da sessão, ampliando a janela de K.
+                .addValue("conhecidoAte", OffsetDateTime.ofInstant(
+                        PrecisaoTemporal.limiteInclusivoMicros(escopo.conhecidoAte()), ZoneOffset.UTC),
+                        java.sql.Types.TIMESTAMP_WITH_TIMEZONE);
         List<String> faixas = new ArrayList<>();
         for (int i = 0; i < escopo.faixas().size(); i++) {
             FaixaResponsabilidade faixa = escopo.faixas().get(i);
@@ -180,9 +181,12 @@ public class RelatorioFrequenciaEscalaRepositorio {
                     .addValue(prefixo + "Inicio", java.sql.Date.valueOf(faixa.inicio()))
                     .addValue(prefixo + "Fim", java.sql.Date.valueOf(faixa.fim()))
                     .addValue(prefixo + "Numero", faixa.numeroContrato());
-            faixas.add("SELECT :" + prefixo + "Contrato contrato_id, :" + prefixo + "Gestao gestao_id, :"
-                    + prefixo + "Se se_id, :" + prefixo + "Inicio inicio, :" + prefixo + "Fim fim, :"
-                    + prefixo + "Numero numero");
+            // SELECT/UNION sem contexto resolve parâmetros desconhecidos como text;
+            // os casts preservam datas civis e identificadores, inclusive campos nulos.
+            faixas.add("SELECT CAST(:" + prefixo + "Contrato AS BIGINT) contrato_id, CAST(:" + prefixo
+                    + "Gestao AS BIGINT) gestao_id, CAST(:" + prefixo + "Se AS BIGINT) se_id, CAST(:"
+                    + prefixo + "Inicio AS DATE) inicio, CAST(:" + prefixo + "Fim AS DATE) fim, CAST(:"
+                    + prefixo + "Numero AS VARCHAR) numero");
         }
         String consultaLegada = """
                 SELECT h.id_empregado, e.nome, h.id historico_id, NULL vinculo_id, NULL alocacao_id,

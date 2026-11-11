@@ -24,7 +24,7 @@ public record FechamentoFrequenciaDTO(
         int tentativa,
         boolean cancelamentoSolicitado,
         String mensagem,
-        String detalheErro,
+        @com.fasterxml.jackson.annotation.JsonIgnore String detalheErro,
         LocalDateTime criadoEm,
         LocalDateTime iniciadoEm,
         LocalDateTime atualizadoEm,

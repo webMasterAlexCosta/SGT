@@ -42,7 +42,13 @@ public interface TokenAtivoRepositorio extends JpaRepository<TokenAtivo, Long> {
 
     @Modifying
     @Transactional
-    @Query(value = "DELETE FROM token_ativo WHERE expire_at < :now LIMIT :limit", nativeQuery = true)
+    @Query(value = """
+            WITH lote AS MATERIALIZED (
+                SELECT id FROM token_ativo WHERE expire_at < :now
+                ORDER BY expire_at, id LIMIT :limit FOR UPDATE SKIP LOCKED
+            )
+            DELETE FROM token_ativo WHERE id IN (SELECT id FROM lote)
+            """, nativeQuery = true)
     int excluirLoteTokensExpirados(@Param("now") LocalDateTime now, @Param("limit") int limit);
 
     @Modifying

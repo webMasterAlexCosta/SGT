@@ -1,0 +1,9 @@
+{
+  "state": "VERIFIED_AFTER_NATIVE_REVIEW_RELEASED_FOR_CORRECTIONS_ONLY",
+  "freeze_sha256": "9f30ac8ebe0e0ba0d1ca82d6dacaaf5c7ee189b14bd3e76bf947cecef075259f",
+  "all_source_input_bytecode_unchanged": true,
+  "JAR07_unchanged": true,
+  "parecer_sha256": "9bd12fee1c38162d34024c8515cd0a8eeda047139b451c687134e3cb7fc925e0",
+  "review": "PENDENTE",
+  "p2": 1
+}

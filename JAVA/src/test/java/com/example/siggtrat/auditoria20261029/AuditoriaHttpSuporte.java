@@ -3,7 +3,7 @@ package com.example.siggtrat.auditoria20261029;
 import com.example.siggtrat.AplicacaoBackendSigGtrat;
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.*;
-import com.example.siggtrat.infra.ConfiguracaoMysqlIntegracao;
+import com.example.siggtrat.infra.ConfiguracaoPostgresIntegracao;
 import com.example.siggtrat.servico.ProjecaoOperacionalPessoaServico;
 import com.example.siggtrat.utilitario.RelogioSistema;
 import com.example.siggtrat.utilitario.UtilitarioHashSeguranca;
@@ -15,7 +15,7 @@ import jakarta.servlet.http.Cookie;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.scheduling.TaskScheduler;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -25,14 +25,13 @@ import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.support.TransactionTemplate;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.mvc.method.annotation.RequestMappingHandlerMapping;
-import org.testcontainers.containers.MySQLContainer;
 
 import java.nio.file.*;
 import java.time.*;
@@ -42,13 +41,14 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.junit.jupiter.api.Assertions.*;
 
 /** Full MVC/security/service/JPA chain. Only background scheduling is suppressed. */
-@org.springframework.context.annotation.Import(com.example.siggtrat.infra.GuardaMysql8045.class)
+@org.springframework.context.annotation.Import({com.example.siggtrat.infra.GuardaPostgres186.class, com.example.siggtrat.infra.ConfiguracaoObservacaoLocksPostgres.class})
 @SpringBootTest(classes = AplicacaoBackendSigGtrat.class, webEnvironment = SpringBootTest.WebEnvironment.MOCK,
         properties = {"env-file=./src/test/resources/auditoria-endpoints.env", "spring.cache.type=none",
                 "spring.jpa.open-in-view=false", "spring.jpa.show-sql=false", "logging.level.root=WARN",
                 "app.email.enabled=false", "app.documentos.diretorio=target/auditoria-http/documentos",
                 "app.audit.fallback-log=target/auditoria-http/fallback.jsonl"})
 @AutoConfigureMockMvc
+@org.springframework.test.context.TestPropertySource(properties = "frequencia.janela-operacional-dias=7")
 @Transactional
 public abstract class AuditoriaHttpSuporte {
     protected static final String SENHA = "Auditoria@2026";
@@ -72,22 +72,13 @@ public abstract class AuditoriaHttpSuporte {
     private String metodoTeste;
     private String casoTeste;
 
-    private static final ConfiguracaoMysqlIntegracao CONFIGURACAO_MYSQL = ConfiguracaoMysqlIntegracao.carregar();
-    private static final MySQLContainer<?> MYSQL = criarMysql();
-    private static MySQLContainer<?> criarMysql() {
-        if (!CONFIGURACAO_MYSQL.usaTestcontainers()) return null;
-        // Docker só é iniciado por opção explícita. A aplicação sempre usa uma
-        // conta de schema; observabilidade ausente falha sem ampliar privilégios.
-        MySQLContainer<?> c = new MySQLContainer<>("mysql:8.0.45").withDatabaseName("sgt_auditoria_http")
-                .withUsername("sgt_test").withPassword("sgt_test");
-        c.start(); return c;
-    }
+    private static final ConfiguracaoPostgresIntegracao CONFIGURACAO_POSTGRES = ConfiguracaoPostgresIntegracao.carregar();
     @DynamicPropertySource static void banco(DynamicPropertyRegistry p) {
-        p.add("spring.datasource.url", () -> MYSQL == null ? CONFIGURACAO_MYSQL.url() : MYSQL.getJdbcUrl());
-        p.add("spring.datasource.username", () -> MYSQL == null
-                ? CONFIGURACAO_MYSQL.usuario() : MYSQL.getUsername());
-        p.add("spring.datasource.password", () -> MYSQL == null
-                ? CONFIGURACAO_MYSQL.senha() : MYSQL.getPassword());
+        p.add("spring.datasource.url", CONFIGURACAO_POSTGRES::url);
+        p.add("spring.datasource.username", CONFIGURACAO_POSTGRES::usuario);
+        p.add("spring.datasource.password", CONFIGURACAO_POSTGRES::senha);
+        p.add("spring.datasource.driver-class-name", () -> "org.postgresql.Driver");
+        p.add("spring.jpa.properties.hibernate.dialect", () -> "org.hibernate.dialect.PostgreSQLDialect");
         p.add("spring.datasource.hikari.maximum-pool-size", () -> "8");
         p.add("spring.datasource.hikari.minimum-idle", () -> "2");
         p.add("spring.jpa.hibernate.ddl-auto", () -> "update");
@@ -119,7 +110,7 @@ public abstract class AuditoriaHttpSuporte {
         Path path = Path.of("target/auditoria-http/endpoints-runtime.json"); Files.createDirectories(path.getParent());
         Files.writeString(path, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(endpoints));
         Path tipos = path.resolveSibling("contratos-dto-runtime.json");
-        if (Files.notExists(tipos)) {
+        { // Regerar dos tipos efetivos: arquivo antigo não comprova o bytecode atual.
             Map<String,Object> schemas = new TreeMap<>();
             mappings.getHandlerMethods().forEach((info, handler) -> {
                 if (!handler.getBeanType().getPackageName().startsWith("com.example.siggtrat.controlador")) return;
@@ -209,7 +200,7 @@ public abstract class AuditoriaHttpSuporte {
         JsonNode root = mapper.readTree(result.getResponse().getContentAsString(java.nio.charset.StandardCharsets.UTF_8));
         return root != null && root.has("data") && !root.get("data").isNull() ? root.get("data") : root;
     }
-    protected MockHttpServletRequestBuilder autenticar(MockHttpServletRequestBuilder request, UsuarioAplicacao usuario) {
+    protected AbstractMockHttpServletRequestBuilder<?> autenticar(AbstractMockHttpServletRequestBuilder<?> request, UsuarioAplicacao usuario) {
         if (usuario == null) return request;
         Cookie[] cookies = sessoes.computeIfAbsent(usuario.getId(), id -> {
             String raw = jwt.gerarToken(id), device = "dispositivo-auditoria-" + id;
@@ -222,7 +213,7 @@ public abstract class AuditoriaHttpSuporte {
         });
         return request.cookie(cookies).header("X-XSRF-TOKEN", cookies[2].getValue()).header("X-User-Password", SENHA);
     }
-    protected MvcResult executar(UsuarioAplicacao usuario, MockHttpServletRequestBuilder request,
+    protected MvcResult executar(UsuarioAplicacao usuario, AbstractMockHttpServletRequestBuilder<?> request,
                                 int esperado, String cenario) throws Exception {
         if (TransactionSynchronizationManager.isActualTransactionActive()) em.flush();
         MvcResult result = mvc.perform(autenticar(request, usuario)).andReturn();
@@ -414,7 +405,7 @@ public abstract class AuditoriaHttpSuporte {
         // os testes HTTP das27 UFs oficiais continuam usando o serviço próprio.
         // 57 símbolos ASCII, sem aspas, barras, espaços ou equivalentes por caixa.
         // 57² = 3.249 pares; 3.221 disponíveis após reservar as 27 UFs e YY.
-        // A IT de capacidade confere a unicidade na collation real do MySQL.
+        // A IT de capacidade confere a unicidade na collation real do PostgreSQL.
         String alfabeto = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()+,-.;=@[]^_{}~";
         int base = alfabeto.length();
         int quantidade = base * base;

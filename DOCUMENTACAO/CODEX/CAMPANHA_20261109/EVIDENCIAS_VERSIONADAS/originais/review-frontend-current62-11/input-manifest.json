@@ -1,0 +1,23 @@
+{
+  ".homologacao/20261109-sgt-final/fe-aditamento-review-red01/result.json": "cc8e4845969b1069e40640c4e0637d4745c7ba806ab137299f1503eb45cf52f3",
+  ".homologacao/20261109-sgt-final/fe-aditamento-review-green01/result.json": "4e3f4995618ab9d8c5bcf1bc352dfa5dc95bfaab06221d5af571f70be0afeb43",
+  ".homologacao/20261109-sgt-final/fe-aditamento-review-green02/result.json": "0f69991e13d4ffc3dcc89bf40439c9e05759ac12b3f00464d0114f8743096f0b",
+  ".homologacao/20261109-sgt-final/fe-aditamento-review-consumidores01/result.json": "9d6aebf7f9cd9233c9bb11c3956073d644582f7d6405ff33799a3369b11d9afe",
+  ".homologacao/20261109-sgt-final/fe-build12/result.json": "6f4d25d11b9860f2c74c2786190739b43e73a72242dddfa0294e4c4848305798",
+  ".homologacao/20261109-sgt-final/fe-assets-check12/result.json": "ac5a0bec97caa7930b9210e13641ff766c848b6c2ef5a2e295fc9765a07876fc",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/parecer.md": "c622ca121be1cc3e63f290087dece69048b9053f76164565b1e98a7cbd760178",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/freeze-ended.json": "6dc5ac7d6bb563c4e10b69449fe61183f6adfa4a506dfd0c7ddcddd3a00c2913",
+  ".homologacao/20261109-sgt-final/backend-gate24-approved.json": "212a1483960b3725c2861515bcd194cb1f88c632fad663533221404a8f564397",
+  ".homologacao/20261109-sgt-final/review-java-supplier24/parecer.md": "6685f64de5a9bfdcc0cef8e5b7284be246fc393e5b1a658b2e02f9b8f20c2bf1",
+  ".homologacao/20261109-sgt-final/frontend-final07-jar-binding.json": "de548cec400a2edb4e65184fc1f6cfb9479edc5b2439d4e2101b6e791383f2fa",
+  ".homologacao/20261109-sgt-final/frontend-build12-dist/manifest.json": "66d405f33df795adeae2899c682674e0f9cc347c4c524591825f0f82a47edcfa",
+  ".homologacao/20261109-sgt-final/frontend-build12-dist/dist.zip": "f4b1fa420c33d5cd1b377ef7523dd8b8d18addd921d5a140ecbbf156f70f37f5",
+  ".homologacao/20261109-sgt-final/pdf-bundle12-static-green.json": "a9bdaec4f7a3a5f4eb7ed81a064dcb89640bcb276b149f7e5a116efef99b4272",
+  ".homologacao/20261109-sgt-final/runtime-stop-before-aditamento-ui01/stop-proof.json": "35c8b13ff1f7851bfecbb0929510b8f3fc7cbcdef7664d8a20e8fc62ab5c949f",
+  ".homologacao/20261109-sgt-final/sync_final_assets.py": "c39bf2ae56cdf4093256f57ab9acefac27cb305740771dbffa937b46150e936a",
+  ".homologacao/20261109-sgt-final/bind_integrated_frontend.py": "1f805d7a3ae113d5f71923f375c7a6442a1d52cb90c6c1d38af6f7388e227126",
+  ".homologacao/20261109-sgt-final/probe_final_static_http.py": "796d14a6f2407d4dbbd66efcf622c18f3e6cb15bd79b632bfe8086f8dfe42ca7",
+  ".homologacao/20261109-sgt-final/run_browser.py": "2c7523d16820b7ed47288771464becf6e172149b74eb2eb1d507fefbe9b59352",
+  ".homologacao/20261109-sgt-final/review-frontend-current62-11/brief.md": "5481521da18ab3d1950cf0e3936b65b07b3af07013898c8f236f08ae45e3820f",
+  ".homologacao/20261109-sgt-final/review-frontend-current62-11/increment.patch": "f7ec6a65a610346602d1a14a6fd6f322655352f15f8a931245de15bc2d06955a"
+}

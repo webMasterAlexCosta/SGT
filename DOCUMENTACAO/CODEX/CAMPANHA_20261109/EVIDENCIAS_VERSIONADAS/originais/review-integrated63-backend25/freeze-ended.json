@@ -1,0 +1,7 @@
+{
+  "state": "ENDED_ALL_SOURCE_INPUT_AND_JAR_HASHES_VERIFIED",
+  "scope_approved": true,
+  "global_approved": false,
+  "parecer_sha256": "146c5d6ea4eabf1db21b16911d4eb42c1a2f3968719586124a381a4b0fd7a452",
+  "release": "Only new tests/preparation/document reconciliation for three exact demonstration gaps; product changes require impact checks/re-review."
+}

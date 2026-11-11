@@ -42,7 +42,12 @@ import java.util.*;
 
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
-public class FrequenciaServico {
+public class FrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FrequenciaServico.class);
+    private static final int EMPREGADOS_POR_CONTEXTO_FECHAMENTO = 25;
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final IdentidadeHistoricaServico identidadeHistorica;
     private final FrequenciaRepositorio repositorio;
@@ -71,6 +76,12 @@ public class FrequenciaServico {
     private PendenciaAdministrativaServico pendencias;
     private InvalidacaoEmissaoRelatorioServico invalidacaoRelatorios;
     private ProjecaoOperacionalPessoaServico projecaoOperacionalPessoa;
+    private ClassificacaoOcorrenciaFrequenciaServico classificacaoOcorrencias;
+
+    @Autowired
+    public void configurarClassificacaoOcorrencias(ClassificacaoOcorrenciaFrequenciaServico servico) {
+        this.classificacaoOcorrencias = servico;
+    }
 
     private final long maxRangeDays;
     private final int maxBatchSize;
@@ -399,58 +410,83 @@ public class FrequenciaServico {
                         "Usuário criador do fechamento não foi encontrado."));
         acessoOrganizacionalServico.exigirFrequenciaDiaria(user);
 
-        ContextoLote contexto = prepararContextoLote(empregadoIds, dataReferencia, dataReferencia);
-        acessoOrganizacionalServico.revalidarAposEspera(user);
-        acessoOrganizacionalServico.exigirFrequenciaDiaria(user);
-        Set<Long> empregadosComFaltaRecente = new HashSet<>(
-                repositorio.buscarIdsEmpregadosComFaltaNoPeriodo(
-                        empregadoIds, dataReferencia.minusDays(6), dataReferencia.minusDays(1)));
+        boolean limitarContexto = empregadoIds.size() > EMPREGADOS_POR_CONTEXTO_FECHAMENTO;
+        if (limitarContexto) {
+            // Adquirir todos os locks na ordem canônica antes de processar.
+            // clear apenas desanexa entidades; os locks permanecem na transação.
+            bloqueioEscrita.bloquearEmpregados(empregadoIds);
+            entityManager.flush();
+            entityManager.clear();
+        }
+        Set<Long> empregadosComFaltaRecente = null;
 
         long inseridos = 0;
         long atualizados = 0;
         long preservados = 0;
         Map<Long, FrequenciaDTO> alteracoesSeguras = alteracoes == null ? Map.of() : alteracoes;
-        FechamentoFrequencia fechamento = fechamentoFrequenciaRepositorio.findById(fechamentoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
-                        "Fechamento de frequência não encontrado."));
-        // Esta leitura fornece apenas a intenção, imutável enquanto o job está ativo.
-        // O cancelamento pode avançar a versão antes do lock que confirma o bloco;
-        // retire somente esta entidade ainda não alterada para relê-la nesse lock.
-        entityManager.detach(fechamento);
-
-        for (Long empregadoId : empregadoIds) {
-            Empregado empregado = contexto.empregados().get(empregadoId);
-            if (empregado == null) {
-                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "Colaborador do fechamento não foi encontrado: " + empregadoId + ".");
+        FechamentoFrequencia fechamento = null;
+        for (int inicio = 0; inicio < empregadoIds.size(); inicio += EMPREGADOS_POR_CONTEXTO_FECHAMENTO) {
+            List<Long> pagina = empregadoIds.subList(inicio,
+                    Math.min(inicio + EMPREGADOS_POR_CONTEXTO_FECHAMENTO, empregadoIds.size()));
+            if (limitarContexto) {
+                user = appUserRepositorio.findById(usuarioCriadorId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED,
+                                "Usuário criador do fechamento não foi encontrado."));
+            }
+            ContextoLote contexto = prepararContextoLote(pagina, dataReferencia, dataReferencia);
+            acessoOrganizacionalServico.revalidarAposEspera(user);
+            acessoOrganizacionalServico.exigirFrequenciaDiaria(user);
+            if (empregadosComFaltaRecente == null) {
+                empregadosComFaltaRecente = new HashSet<>(repositorio.buscarIdsEmpregadosComFaltaNoPeriodo(
+                        empregadoIds, dataReferencia.minusDays(6), dataReferencia.minusDays(1)));
+                fechamento = fechamentoFrequenciaRepositorio.findById(fechamentoId)
+                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND,
+                                "Fechamento de frequência não encontrado."));
+                // Somente a intenção é conservada. A versão corrente do job será
+                // relida sob lock ao confirmar todo o bloco, incluindo cancelamento.
+                entityManager.detach(fechamento);
             }
 
-            ChaveFrequencia chave = new ChaveFrequencia(empregadoId, dataReferencia);
-            Frequencia existente = contexto.frequencias().get(chave);
-            FrequenciaDTO alteracao = alteracoesSeguras.get(empregadoId);
+            for (Long empregadoId : pagina) {
+                Empregado empregado = contexto.empregados().get(empregadoId);
+                if (empregado == null) {
+                    throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                            "Colaborador do fechamento não foi encontrado: " + empregadoId + ".");
+                }
 
-            if (existente != null && alteracao == null) {
-                preservados++;
-                continue;
+                ChaveFrequencia chave = new ChaveFrequencia(empregadoId, dataReferencia);
+                Frequencia existente = contexto.frequencias().get(chave);
+                FrequenciaDTO alteracao = alteracoesSeguras.get(empregadoId);
+
+                if (existente != null && alteracao == null) {
+                    preservados++;
+                    continue;
+                }
+
+                boolean alteracaoExplicita = alteracao != null;
+                FrequenciaDTO dto = alteracaoExplicita
+                        ? copiarAlteracaoFechamento(alteracao, empregadoId, dataReferencia)
+                        : criarFrequenciaPadraoFechamento(empregado, dataReferencia, contexto,
+                        empregadosComFaltaRecente.contains(empregadoId));
+
+                if (acessoOrganizacionalServico.ehGestaoLocal(user)
+                        && (dto.getJustificativaRetificacao() == null || dto.getJustificativaRetificacao().isBlank())) {
+                    dto.setJustificativaRetificacao(fechamento.getJustificativaRetificacao());
+                    dto.setChaveIdempotencia("fechamento:" + fechamentoId + ":" + UtilitarioHashSeguranca.sha256Hexadecimal(
+                            String.valueOf(fechamento.getChaveIdempotencia()) + "|" + empregadoId + "|" + dataReferencia));
+                }
+
+                salvarOuAtualizarInterno(dto, user, contexto.calendario(), contexto,
+                        alteracaoExplicita, true);
+                if (existente == null) inseridos++;
+                else atualizados++;
             }
-
-            boolean alteracaoExplicita = alteracao != null;
-            FrequenciaDTO dto = alteracaoExplicita
-                    ? copiarAlteracaoFechamento(alteracao, empregadoId, dataReferencia)
-                    : criarFrequenciaPadraoFechamento(empregado, dataReferencia, contexto,
-                    empregadosComFaltaRecente.contains(empregadoId));
-
-            if (acessoOrganizacionalServico.ehGestaoLocal(user)
-                    && (dto.getJustificativaRetificacao() == null || dto.getJustificativaRetificacao().isBlank())) {
-                dto.setJustificativaRetificacao(fechamento.getJustificativaRetificacao());
-                dto.setChaveIdempotencia("fechamento:" + fechamentoId + ":" + UtilitarioHashSeguranca.sha256Hexadecimal(
-                        String.valueOf(fechamento.getChaveIdempotencia()) + "|" + empregadoId + "|" + dataReferencia));
+            if (limitarContexto) {
+                // Flush não confirma uma página: qualquer falha posterior reverte
+                // todo o chunk, seus eventos e os contadores confirmados abaixo.
+                entityManager.flush();
+                entityManager.clear();
             }
-
-            salvarOuAtualizarInterno(dto, user, contexto.calendario(), contexto,
-                    alteracaoExplicita, true);
-            if (existente == null) inseridos++;
-            else atualizados++;
         }
 
         atualizarProgressoDoFechamentoNaMesmaTransacao(
@@ -642,7 +678,8 @@ public class FrequenciaServico {
             }
         } else if (!gestor && fechadaPeloTempo) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "A frequência está FECHADA desde o início do 8º dia; somente o Gestor Local pode retificar.");
+                    "A frequência está FECHADA; a janela operacional de " + politicaTemporal.diasJanela()
+                            + " dias encerrou. Somente o Gestor Local pode retificar.");
         }
 
         boolean intervencaoGerencial = gestor;
@@ -681,6 +718,10 @@ public class FrequenciaServico {
             entity.setVersaoNegocial(1);
             capturarRetratoCanonico(entity, temporal, dataRef, true);
         } else {
+            // Nova intenção manual confirmada: o replay já retornou sem mutação.
+            // Preserva a fonte de Ocorrência e sua história; somente desfaz a projeção automática neste registro.
+            entity.setOcorrenciaOverrideAtivo(false);
+            entity.setStatusBaseAntesOcorrencia(null);
             entity.setVersaoNegocial(entity.getVersaoNegocial() == null ? 2 : entity.getVersaoNegocial() + 1);
             if (intervencaoGerencial) {
                 entity.setEstadoAuditoria(EstadoAuditoriaFrequencia.RETIFICADA_GESTOR);
@@ -718,6 +759,14 @@ public class FrequenciaServico {
         entity.setHorasNoturnas(dto.getHorasNoturnas());
 
         calculoFrequenciaServico.processarCalculos(entity);
+        List<Long> ocorrenciasAplicadas = List.of();
+        if (!isUpdate) {
+            var derivada = classificacaoOcorrencias.paraNovaFrequencia(entity, temporal);
+            if (derivada.statusDerivado() != null) {
+                classificacaoOcorrencias.aplicar(entity, derivada);
+                ocorrenciasAplicadas = derivada.fontes();
+            }
+        }
         Frequencia saved = repositorio.saveAndFlush(entity);
         if (contexto != null) contexto.frequencias().put(chave, saved);
         reconciliarRt(saved, empregado, calendarioCache, contexto);
@@ -728,6 +777,14 @@ public class FrequenciaServico {
         auditoriaFrequencia.registrar(saved, tipoEvento, snapshotAnterior,
                 intervencaoGerencial ? dto.getJustificativaRetificacao() : null, usuarioAtual,
                 dto.getChaveIdempotencia(), hashIntencao);
+        if (!ocorrenciasAplicadas.isEmpty()) {
+            auditLogServico.registrarAcaoComoUsuario("FREQUENCIA_OCORRENCIA_PROJETADA", "Frequencia", saved.getId(),
+                    "Classificação por fonte de Ocorrência já registrada no recorte",
+                    RegistroAuditoriaServico.detalhes("ocorrenciaIds", ocorrenciasAplicadas,
+                            "pessoaId", temporal.pessoa().getId(), "vinculoId", temporal.vinculo().getId(),
+                            "contratoId", temporal.vinculo().getContrato().getId(), "alocacaoId", temporal.alocacao().getId(),
+                            "data", dataRef), usuarioAtual);
+        }
 
         // Tanto a retificação gerencial quanto a alteração operacional válida
         // mudam a fonte de uma emissão. Reenvios inócuos já retornaram antes da
@@ -794,6 +851,10 @@ public class FrequenciaServico {
                                                      LocalDate data,
                                                      Contrato contratoInformado,
                                                      ClassificacaoOcorrencia classificacao) {
+        if (data == null || data.isAfter(LocalDate.now(politicaTemporal.zona()))) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Não é permitido registrar frequência em data futura.");
+        }
         UsuarioAplicacao usuario = usuarioAtual();
         if (!acessoOrganizacionalServico.ehGestaoLocal(usuario)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
@@ -919,7 +980,8 @@ public class FrequenciaServico {
     }
 
     private void validarEdicaoOperacional(Frequencia frequencia, LocalDate dataRef) {
-        if (!politicaTemporal.abertaParaOperacional(dataRef, null)) {
+        if (frequencia.getEstadoNegocial() == EstadoNegocialFrequencia.FECHADA
+                || !politicaTemporal.abertaParaOperacional(dataRef, null)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "A frequência está FECHADA; alteração posterior exige retificação do Gestor Local.");
         }
@@ -998,7 +1060,7 @@ public class FrequenciaServico {
             frequencia.setVersaoNegocial(frequencia.getVersaoNegocial() == null ? 2 : frequencia.getVersaoNegocial() + 1);
             repositorio.saveAndFlush(frequencia);
             auditoriaFrequencia.registrar(frequencia, TipoEventoFrequencia.FECHAMENTO_AUTOMATICO, antes,
-                    "Fechamento negocial automático no início do 8º dia em America/Sao_Paulo", null, null, null);
+                    politicaTemporal.motivoFechamento(), null, null, null);
         }
     }
 

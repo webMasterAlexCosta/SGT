@@ -13,7 +13,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api")
-public class RegraAdicionalControlador {
+public class RegraAdicionalControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RegraAdicionalControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final RegraAdicionalServico servico;
     public RegraAdicionalControlador(RegraAdicionalServico servico) { this.servico = servico; }
 

@@ -60,7 +60,7 @@ class AutenticacaoPrimeiroAcessoRegressaoTest {
                 mock(JornadaRepositorio.class), mock(SuperintendenciaEstadualRepositorio.class),
                 mock(GestaoLocalRepositorio.class), mock(EscopoAcessoUsuarioServico.class),
                 mock(FiltroAutenticacaoJwt.class), mock(TotpServico.class),
-                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."));
+                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."), mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
 
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie(ConstantesDominio.COOKIE_AUTH, "jwt-atual"));

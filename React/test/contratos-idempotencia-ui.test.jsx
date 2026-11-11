@@ -5,11 +5,11 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar, confirmarComSenha } = vi.hoisted(() => ({ requisitar: vi.fn(), confirmarComSenha: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: (r) => Array.isArray(r) ? r : r?.content || [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha, ModalConfirmacao: () => null, fechar: vi.fn() }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: (r) => Array.isArray(r) ? r : r?.content || [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha, ModalConfirmacao: () => null, fechar: vi.fn() }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.tsx';
 
 beforeEach(() => {
   requisitar.mockReset();

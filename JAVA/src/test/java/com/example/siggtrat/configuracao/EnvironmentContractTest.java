@@ -35,8 +35,7 @@ class EnvironmentContractTest {
                 "APP_SEED_USUARIOS_GLOBAIS_INITIAL_PASSWORD",
                 "PAINEL_CACHE_MINUTOS",
                 "PAINEL_TIMEOUT_MINUTOS",
-                "PAINEL_RECUPERACAO_INTERVALO_MS",
-                "REDIS_MAXMEMORY"
+                "PAINEL_RECUPERACAO_INTERVALO_MS"
         }) {
             assertTrue(example.contains(key + "="), () -> "Variável ausente no .env.example: " + key);
         }
@@ -46,7 +45,15 @@ class EnvironmentContractTest {
                 .map(line -> line.substring("JWT_SECRET=".length()))
                 .findFirst()
                 .orElseThrow();
-        assertTrue(jwtSecret.length() >= 64,
-                "O exemplo de JWT_SECRET precisa satisfazer a validação mínima da aplicação.");
+        assertTrue(jwtSecret.isBlank(), "O exemplo público não fornece uma chave JWT utilizável.");
+        try (var factory=jakarta.validation.Validation.buildDefaultValidatorFactory()) {
+            var validator=factory.getValidator();
+            assertFalse(validator.validate(new com.example.siggtrat.configuracao.propriedades.PropriedadesTokenJwt(
+                    "",3600)).isEmpty(), "Aplicação recusa a chave ainda não configurada.");
+            assertFalse(validator.validate(new com.example.siggtrat.configuracao.propriedades.PropriedadesTokenJwt(
+                    "A".repeat(63),3600)).isEmpty(), "Limite mínimo64continua obrigatório.");
+            assertTrue(validator.validate(new com.example.siggtrat.configuracao.propriedades.PropriedadesTokenJwt(
+                    "A".repeat(64),3600)).isEmpty());
+        }
     }
 }

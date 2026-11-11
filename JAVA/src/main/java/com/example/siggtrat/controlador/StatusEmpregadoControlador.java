@@ -14,7 +14,11 @@ import org.springframework.web.bind.annotation.*;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/status-empregados")
-public class StatusEmpregadoControlador {
+public class StatusEmpregadoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(StatusEmpregadoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final StatusEmpregadoServico servico;
     public StatusEmpregadoControlador(StatusEmpregadoServico servico) { this.servico = servico; }
 
@@ -24,7 +28,9 @@ public class StatusEmpregadoControlador {
     @GetMapping("/{id}")
     public ResponseEntity<StatusEmpregadoDTO> buscarPorId(@PathVariable Long id) {
         StatusEmpregadoDTO dto = servico.buscarPorId(id);
-        return dto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dto);
+        if (dto == null) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Status do empregado não encontrado no seu escopo.");
+        return ResponseEntity.ok(dto);
     }
 
     @PreAuthorize("hasAuthority(T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_ADMINISTRADOR)")

@@ -18,7 +18,9 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
-public class FechamentoFrequenciaEstadoServico {
+public class FechamentoFrequenciaEstadoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(FechamentoFrequenciaEstadoServico.class);
     private static final ZoneId ZONE_ID = ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO);
@@ -61,7 +63,7 @@ public class FechamentoFrequenciaEstadoServico {
     @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void definirTotalPrevisto(Long id, long totalPrevisto) {
         if (totalPrevisto <= 0) {
-            throw new IllegalArgumentException("O fechamento não possui colaboradores elegíveis.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O fechamento não possui colaboradores elegíveis.");
         }
         FechamentoFrequencia f = repositorio.buscarPorIdParaAtualizacao(id).orElse(null);
         if (f == null || f.getStatus() != FechamentoFrequenciaStatus.PROCESSANDO) return;
@@ -114,14 +116,12 @@ public class FechamentoFrequenciaEstadoServico {
         f.setStatus(FechamentoFrequenciaStatus.ERRO);
         f.setHeartbeatEm(agora);
         f.setConcluidoEm(agora);
-        String mensagem = erro == null || erro.getMessage() == null || erro.getMessage().isBlank()
-                ? "Falha inesperada no processamento do fechamento."
-                : erro.getMessage();
-        f.setMensagem(mensagem.length() > 500 ? mensagem.substring(0, 500) : mensagem);
-        f.setDetalheErro(detalhar(erro));
+        f.setMensagem(com.example.siggtrat.diagnostico.MensagemFalhaAssincrona.criar(
+                "o fechamento de frequência", "FECHAMENTO-" + f.getId(), erro));
+        f.setDetalheErro(com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erro));
         repositorio.save(f);
-        log.error("Fechamento de frequência falhou: id={} processados={} mensagem={}",
-                f.getId(), f.getTotalProcessado(), f.getMensagem(), erro);
+        log.error("Fechamento de frequência falhou: referencia=FECHAMENTO-{} processados={} falha={}",
+                f.getId(), f.getTotalProcessado(), com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erro));
     }
 
     @Transactional(propagation = Propagation.REQUIRES_NEW)
@@ -161,21 +161,6 @@ public class FechamentoFrequenciaEstadoServico {
                 f.getTotalPrevisto(),
                 f.getUltimoEmpregadoIdProcessado() == null ? 0L : f.getUltimoEmpregadoIdProcessado()
         );
-    }
-
-    private String detalhar(Throwable erro) {
-        if (erro == null) return null;
-        StringBuilder detalhe = new StringBuilder();
-        Throwable atual = erro;
-        int nivel = 0;
-        while (atual != null && nivel < 8) {
-            if (nivel > 0) detalhe.append("\nCausado por: ");
-            detalhe.append(atual.getClass().getSimpleName()).append(": ")
-                    .append(atual.getMessage() == null ? "sem mensagem" : atual.getMessage());
-            atual = atual.getCause();
-            nivel++;
-        }
-        return detalhe.length() > 8000 ? detalhe.substring(0, 8000) : detalhe.toString();
     }
 
     public record DescritorProcessamento(

@@ -6,13 +6,13 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom/vitest';
 
 const { requisitarControlado } = vi.hoisted(() => ({ requisitarControlado: vi.fn() }));
-vi.mock('../src/core/http.js', async importarOriginal => ({
+vi.mock('../src/core/http.ts', async importarOriginal => ({
   ...await importarOriginal(), requisitar: requisitarControlado,
 }));
-vi.mock('../src/modules/auth/context.jsx', () => ({
+vi.mock('../src/modules/auth/context.tsx', () => ({
   useAutenticacao: () => ({ user: { id: 71, perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }),
 }));
-import { PainelAlteracoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.jsx';
+import { PainelAlteracoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx';
 
 const contrato = { id: 41, numeroContrato: 'H02-SINTETICO', anoContrato: 2026,
   estadoNegocial: 'PUBLICADO', situacaoTemporal: 'VIGENTE', habilitacaoAdministrativa: 'ATIVO' };
@@ -35,7 +35,7 @@ beforeEach(() => {
     if (pedido.method === 'GET' && leiturasPermitidas.has(pedido.url)) return [];
     if (pedido.method === 'POST' && pedido.url === '/contratos/41/aditamentos/previa') {
       expect(pedido.data).toMatchObject({ identificacao: 'ADI-SINTETICO-H02',
-        dataEfetiva: '2026-11-02', novoEfetivoTotal: 75, justificativa: 'Teste local de orientação do piso.' });
+        dataDocumento: '2026-11-01', dataEfetiva: '2026-11-02', novoEfetivoTotal: 75, justificativa: 'Teste local de orientação do piso.' });
       return previa;
     }
     throw new Error(`Requisição fora do escopo deste teste: ${pedido.method} ${pedido.url}`);
@@ -63,6 +63,9 @@ it('a prévia rotula 75% da base original e exibe o piso numérico recebido sem 
   fireEvent.change(screen.getByLabelText(/Data efetiva/), { target: { value: '2026-11-02' } });
   fireEvent.change(screen.getByLabelText(/Justificativa/), { target: { value: 'Teste local de orientação do piso.' } });
   fireEvent.change(screen.getByLabelText('Novo efetivo total'), { target: { value: '75' } });
+  fireEvent.click(screen.getByRole('button', { name: 'Calcular prévia', exact: true }));
+  expect(requisitarControlado.mock.calls.some(([pedido]) => pedido.method === 'POST')).toBe(false);
+  fireEvent.change(screen.getByLabelText('Data do documento'), { target: { value: '2026-11-01' } });
   fireEvent.click(screen.getByRole('button', { name: 'Calcular prévia', exact: true }));
   await screen.findByRole('heading', { name: 'Prévia calculada no servidor' });
   const piso = screen.getByText(/^Piso normal/);

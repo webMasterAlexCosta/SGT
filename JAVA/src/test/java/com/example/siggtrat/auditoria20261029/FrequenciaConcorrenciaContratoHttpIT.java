@@ -1,5 +1,9 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.Frequencia;
 import com.example.siggtrat.servico.CalculoFrequenciaServico;
@@ -27,6 +31,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /** O spy apenas sincroniza o ponto pré-INSERT; todo cálculo, HTTP e commit são reais. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class FrequenciaConcorrenciaContratoHttpIT extends AuditoriaHttpSuporte {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSource;
     @MockitoSpyBean CalculoFrequenciaServico calculo;
 
     @ParameterizedTest
@@ -58,29 +63,22 @@ class FrequenciaConcorrenciaContratoHttpIT extends AuditoriaHttpSuporte {
             Frequencia f = invocacao.getArgument(0);
             if (f.getVinculoContratual() != null && c.vinculoA.getId().equals(f.getVinculoContratual().getId())
                     && sincronizar.compareAndSet(true, false)) {
-                contextoPronto.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                contextoPronto.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 if (!liberarInsercao.await(25, TimeUnit.SECONDS)) throw new AssertionError("Concorrência não chegou ao ponto observável.");
             }
             return invocacao.callRealMethod();
-        }).when(calculo).processarCalculos(any(Frequencia.class));
+        }).when(org.springframework.test.util.AopTestUtils.<CalculoFrequenciaServico>getUltimateTargetObject(calculo)).processarCalculos(any(Frequencia.class));
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
             Future<MvcResult> frequencia = pool.submit(() -> mvc.perform(requisicaoFrequencia).andReturn());
             long conexao = contextoPronto.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> contrato = pool.submit(() -> mvc.perform(requisicaoContrato).andReturn());
-            long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-            boolean observado = false;
-            while (System.nanoTime() < limite) {
-                if (contrato.isDone()) { observado = true; break; }
-                long bloqueios = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexao).getSingleResult()).longValue());
-                if (bloqueios > 0) { observado = true; break; }
-                TimeUnit.MILLISECONDS.sleep(20);
-            }
-            assertThat(observado).as("Confirmação deve concluir ou disputar um lock real antes de liberar a escrita").isTrue();
+            var atorContrato = new Ator("inativacao-FRE017");
+            Future<MvcResult> contrato = pool.submit(() -> atorContrato.executar(() -> mvc.perform(requisicaoContrato).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, atorContrato,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    "FRE017 inativação/Contrato " + c.contratoA.getId(), contrato);
+            assertThat(espera).as("PID do ator, SQL e PK do Contrato vinculados à espera física").isNotEmpty();
+            assertThat(contrato.isDone()).isFalse();
             liberarInsercao.countDown();
             MvcResult rf = frequencia.get(20, TimeUnit.SECONDS), rc = contrato.get(20, TimeUnit.SECONDS);
             assertThat(List.of(rf.getResponse().getStatus(), rc.getResponse().getStatus()))

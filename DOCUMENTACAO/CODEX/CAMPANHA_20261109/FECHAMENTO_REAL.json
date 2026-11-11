@@ -1,0 +1,175 @@
+{
+  "state": "CURRENT_MAIN35_FOUR_METHODS_AND_PHASED_RECOVERY_PASS_NATIVE_REVIEW_PENDING",
+  "phases": [
+    {
+      "phase": "CHUNK1",
+      "batch": "it-job-current40-01",
+      "status": "PASS",
+      "receipt_sha256": "cc941be20e0804c62c12ea3d99320c1521a90aa862bb5fc22d460d27c57c8936",
+      "reports": [
+        {
+          "name": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT",
+          "tests": "1",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "218.235",
+          "effective_test_context_cache_max_size": "1",
+          "xml_sha256": "2b47e287560a412303b121f5116330d7b24fb7263e9ad77ec4e8bbed49276956"
+        }
+      ],
+      "selector": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT#controleDuzentosChunkUmConcluiEmAteCentoEVinteSegundos",
+      "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+      "scenario_index_sha256": "94d8f3b28c60d64abad4c60c2fc81d66a4dbb920bb4011379a8c8f89ec92774c",
+      "durable_binding_sha256": "8764558b0daef04ba1abf175ec7f77af694fe571d98b474d1439b2e7362967b8",
+      "elapsed_full_batch_seconds": 223.37820959091187,
+      "peak_aggregate_bytes": 7771127808,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      }
+    },
+    {
+      "phase": "CHUNK500",
+      "batch": "it-job-current40-02",
+      "status": "PASS",
+      "receipt_sha256": "0d5a472030f979675dd504d6407eed930a7286dfce0fa9111a0a79d362ba65d7",
+      "reports": [
+        {
+          "name": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT",
+          "tests": "1",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "244.51",
+          "effective_test_context_cache_max_size": "1",
+          "xml_sha256": "0a031fb515e5fb2652439562ec03396872557c578af597f6fdb624dd640dbbe2"
+        }
+      ],
+      "selector": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT#controleDuzentosChunkQuinhentosConcluiEmAteCentoEVinteSegundos",
+      "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+      "scenario_index_sha256": "e4dd51ac7f727259f20a20c997e622d72b12c4992d269acd8f69f0707e61c238",
+      "durable_binding_sha256": "63c3e2b5a5ed8692c437201f7a148369a3b78a49a5613057a176985c5e3616a8",
+      "elapsed_full_batch_seconds": 249.57032132148743,
+      "peak_aggregate_bytes": 7785811968,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      }
+    },
+    {
+      "phase": "REVOGACAO_CRIADOR",
+      "batch": "it-job-current40-03",
+      "status": "PASS",
+      "receipt_sha256": "240ed92e9886dfc14abe7704e418781420da14f79395914d1ab7ef6e9a373a82",
+      "reports": [
+        {
+          "name": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT",
+          "tests": "1",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "172.126",
+          "effective_test_context_cache_max_size": "1",
+          "xml_sha256": "d5ea5b0371d188ac0d8f0d846e3a77d5b3e52b50d864d84e7d8170bf550a0b38"
+        }
+      ],
+      "selector": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT#revogacaoRealDoCriadorDuranteBlocoRecusaNovosEfeitosEPreservaPrefixo",
+      "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+      "scenario_index_sha256": "29b44efa30443440ed20bd8bb80f3d130aa214579a1785ca993aa7e6c6658d47",
+      "durable_binding_sha256": "352368507c1bd081bbe89f61fde4275d9fde516f0f7e3c81baa003665433bf77",
+      "elapsed_full_batch_seconds": 177.22942423820496,
+      "peak_aggregate_bytes": 7766183936,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      }
+    },
+    {
+      "phase": "ATOMICIDADE_CHUNK500_APOS_FLUSH",
+      "batch": "it-job-current40-04",
+      "status": "PASS",
+      "receipt_sha256": "7e22e4bcaba47e5bb586c5af0128dccc8977a7571bc6f01db4cafca274bacfb8",
+      "reports": [
+        {
+          "name": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT",
+          "tests": "1",
+          "errors": "0",
+          "failures": "0",
+          "skipped": "0",
+          "time": "211.288",
+          "effective_test_context_cache_max_size": "1",
+          "xml_sha256": "31cff027f032520cf104ca306c84834a8633fdf9f781ec19941ccadf12be246a"
+        }
+      ],
+      "selector": "com.example.siggtrat.auditoria20261029.FechamentoJarRecuperacaoIT#morteDuranteChunkQuinhentosReverteFlushesIntermediariosSemCommitParcial",
+      "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+      "scenario_index_sha256": "2f70c34ed3c63466f69f5ab919e9a14bcb8871f18778be3f798956bd37deb887",
+      "durable_binding_sha256": "9f3d9c27c328932254aa906772166d65289ebbde549cc0da3abf3fe4600537a9",
+      "elapsed_full_batch_seconds": 217.24296593666077,
+      "peak_aggregate_bytes": 7791771648,
+      "memory_events_delta": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      }
+    },
+    {
+      "phase": "CANCELAMENTO_REINICIO_DOIS_EXECUTORES",
+      "status": "PASS_IN_PHASES",
+      "preparation_batch": "it-recovery-prep41-01",
+      "observer_batch": "it-recovery-phase2-current41-01",
+      "full_junit_executed": false,
+      "preparation_is_acceptance": false,
+      "proof_sha256": "69602f46b2a3a66c91ec5e625c658bcbadc7daca2d2c2ecd84679be6a3aaf711",
+      "receipt_sha256": "764274e3354119889d30d4907954b5d5b86e281332f8af5124285bded79faa41",
+      "checks": {
+        "identidadeRoleOwnershipPg180006": true,
+        "hashesJarTemplateEClasses": true,
+        "configuracaoEquivalente": true,
+        "handoffEEstadoInicial": true,
+        "semConexoesDoPreparadorAntesDosFilhos": true,
+        "doisExecutoresEmDisputaFisica": true,
+        "retomadaAutomaticaSemPost": true,
+        "mesmoIdTentativaEPrefixo": true,
+        "duzentasFrequenciasEEventosUnicos": true,
+        "contadoresPorTentativa": true,
+        "doisServidoresSaudaveisAteTerminalMaisTresSegundos": true,
+        "terminalCanonicoEstavel": true,
+        "mesmosBytesJar": true,
+        "filhosPropriosEncerrados": true
+      },
+      "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+      "population": 200,
+      "automatic_resume_to_terminal_ms": 65891,
+      "peak_aggregate_bytes": 7777947648,
+      "review": "PENDING_NATIVE15"
+    }
+  ],
+  "environment": "ExclusivePostgreSQL18.6/Valkey9.0.7;JPAonly;realJARdcbHTTP",
+  "limits": [
+    "200frequencias/chunk1and500/source120scriteriaunchanged.",
+    "Eachmethodhasowncheckpointandsequentialreceipt;fullFechamentoJarRecuperacaoITclassNOTcounted.",
+    "Phasedrecovery14checks/samejob/tentativa2;preparerendedbeforeobserver+2JARs;noRedisflush/bankchangebetweenphases.",
+    "NoChrome/LAN/national/productionapproval."
+  ]
+}

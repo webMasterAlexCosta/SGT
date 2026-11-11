@@ -14,7 +14,11 @@ import static com.example.siggtrat.servico.SuporteProvaHistoricaServico.*;
 
 @Service
 @Transactional(readOnly = true)
-public class MotivoDesligamentoHistoricoServico {
+public class MotivoDesligamentoHistoricoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(MotivoDesligamentoHistoricoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EntityManager em;
     private final ProvaMotivoDesligamentoHistoricoRepositorio provas;
     private final SuporteProvaHistoricaServico suporte;
@@ -134,11 +138,11 @@ public class MotivoDesligamentoHistoricoServico {
                 throw erro(HttpStatus.CONFLICT,"Contextos conflitantes exigem provaAnteriorId explícito.");
         }
         String fontes=trilha.stream().map(p->p.getId()+":"+p.getHashConteudo()).toList().toString();
-        return new PreviaProvaHistoricaDTO(hash(intencao(m.getId(),r,u),c.getVersion(),m.getVersion(),fontes,d==null?null:d.id(),d==null?null:d.version(),d==null?null:d.estado()),
+        return new PreviaProvaHistoricaDTO(hash("sgt.previa.prova-motivo.v1", intencao(m.getId(),r,u),c.getVersion(),m.getVersion(),fontes,d==null?null:d.id(),d==null?null:d.version(),d==null?null:d.estado()),
                 List.of("A prova não altera disponibilidade, cadastro mestre ou fotografias anteriores do motivo."));
     }
     private String intencao(Long id,RegistroProvaMotivoHistoricoRequisicao r,UsuarioAplicacao u) {
-        return hash("motivo-v1",id,r.contratoId(),u.getId(),r.descricaoComprovada().trim(),r.categoriaComprovada(),r.dataInicioEfetiva(),r.dataFimEfetiva(),normalizar(r.referenciaSei()),r.documentoComprobatorioId(),normalizar(r.finalidadeAcessoDocumento()),r.motivo().trim(),r.autorizacao().trim(),r.provaAnteriorId());
+        return hash("sgt.prova-motivo.intencao.v1",id,r.contratoId(),u.getId(),r.descricaoComprovada().trim(),r.categoriaComprovada(),r.dataInicioEfetiva(),r.dataFimEfetiva(),normalizar(r.referenciaSei()),r.documentoComprobatorioId(),normalizar(r.finalidadeAcessoDocumento()),r.motivo().trim(),r.autorizacao().trim(),r.provaAnteriorId());
     }
     private Map<String,Object> dto(ProvaMotivoDesligamentoHistorico p,UsuarioAplicacao u,boolean reenvio) {
         boolean completo=minimizador.completo(minimizador.nivelPadrao(u)); Map<String,Object>d=new LinkedHashMap<>();

@@ -40,6 +40,21 @@
     0 1px 3px rgba(15, 23, 42, 0.03);
 }
 
+.botaoCancelar {
+  border: 1px solid var(--px-primary);
+  border-radius: 8px;
+  background: var(--px-surface-card);
+  color: var(--px-primary);
+  padding: 8px 12px;
+  min-height: 40px;
+  font: inherit;
+  cursor: pointer;
+}
+.botaoCancelar:hover { background: var(--px-surface-active); }
+.botaoCancelar:focus-visible { outline: 2px solid var(--px-primary); outline-offset: 3px; }
+.botaoCancelar:disabled { opacity: .65; cursor: wait; }
+.erroCancelamento { color: var(--px-danger-text); font-size: .875rem; overflow-wrap: anywhere; }
+
 /* Container Flutuante */
 .painel {
   position: fixed;

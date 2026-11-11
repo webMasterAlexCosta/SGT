@@ -20,7 +20,11 @@ import com.example.siggtrat.utilitario.UtilitarioPaginacao;
 
 @Service
 @Transactional(readOnly = true)
-public class PessoaServico {
+public class PessoaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PessoaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final PessoaRepositorio pessoaRepositorio;
     private final CorrecaoPessoaRepositorio correcaoRepositorio;
     private final VinculoContratualRepositorio vinculoRepositorio;

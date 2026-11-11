@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * SEG-001 candidato: exclusão de cache por URI bruta versus rota MVC decodificada.
- * Usa MySQL/Redis reais, JWT e filtros reais. Nenhum relógio, banco, Redis ou
+ * Usa PostgreSQL/Redis reais, JWT e filtros reais. Nenhum relógio, banco, Redis ou
  * serviço de autorização é substituído. A concessão vence pelo tempo real.
  * Uma recusa do firewall na primeira URI codificada descarta o caminho proposto;
  * não deve ser contada como reprodução da exposição.
@@ -166,7 +166,7 @@ class SegurancaCacheUriCodificadaRedIT extends ContratosHttpBase {
                 "Transição canônica confirmada precisa atualizar os consumidores");
         assertFalse(recibo.path("ativoAtualAposRegistro").asBoolean());
         boolean persistido = emTransacao(() -> Boolean.TRUE.equals(em.find(Cargo.class, cargoId).getAtivo()));
-        assertFalse(persistido, "Controle: nova transação confirma que o MySQL mudou.");
+        assertFalse(persistido, "Controle: nova transação confirma que o PostgreSQL mudou.");
         var depoisCadastro = executar(c.localA, get(cadastro), 200, "Cadastro imediatamente após commit");
         var depoisDisponibilidade = executar(c.localA, get(disponibilidade), 200,
                 "Disponibilidade imediatamente após commit");

@@ -16,7 +16,11 @@ import java.util.*;
 /** Ciclo completo de concessão, validação, uso e revogação de privilégios excepcionais. */
 @Service
 @Transactional
-public class PermissaoExcepcionalServico {
+public class PermissaoExcepcionalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PermissaoExcepcionalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final EnumSet<TipoPermissaoExcepcional> PERMISSOES_NEGOCIAIS_LOCAIS = EnumSet.of(
             TipoPermissaoExcepcional.CORRECAO_IDENTIFICADOR_CONTRATO,
             TipoPermissaoExcepcional.REDUCAO_CONTRATUAL_EXCEPCIONAL,
@@ -58,7 +62,28 @@ public class PermissaoExcepcionalServico {
 
     @Transactional(isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED)
     public PermissaoExcepcionalDTO conceder(ConcessaoPermissaoExcepcionalRequisicao requisicao) {
-        if (requisicao == null) throw new IllegalArgumentException("Informe a concessão.");
+        if (requisicao != null && requisicao.ocorrenciaId() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "A concessão para ocorrência exige validação do seu contexto histórico.");
+        }
+        return registrarConcessao(requisicao, null);
+    }
+
+    /** Chamado pelo coordenador contextual, na mesma transação e sob seus locks. */
+    PermissaoExcepcionalDTO concederParaOcorrencia(ConcessaoPermissaoExcepcionalRequisicao requisicao,
+                                                   Ocorrencia ocorrencia) {
+        if (ocorrencia == null || !Objects.equals(ocorrencia.getId(), requisicao.ocorrenciaId())
+                || requisicao.tipo() != TipoPermissaoExcepcional.ACESSO_DADOS_PESSOAIS_RESTRITOS
+                || requisicao.contratoId() != null || requisicao.gestaoLocalId() != null) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Informe somente a ocorrência como alvo da concessão de leitura restrita.");
+        }
+        return registrarConcessao(requisicao, ocorrencia);
+    }
+
+    private PermissaoExcepcionalDTO registrarConcessao(ConcessaoPermissaoExcepcionalRequisicao requisicao,
+                                                       Ocorrencia ocorrencia) {
+        if (requisicao == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe a concessão.");
         UsuarioAplicacao administrador = acesso.usuarioAtual();
         exigirAdministrador(administrador);
 
@@ -93,13 +118,14 @@ public class PermissaoExcepcionalServico {
                 || !Objects.equals(gestaoAtualContrato.getId(), gestaoLocal.getId())) && !designacaoDocumental) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O contrato não pertence à Gestão Local informada.");
         }
-        validarConcessao(requisicao, beneficiario, contrato, gestaoLocal);
+        validarConcessao(requisicao, beneficiario, contrato, gestaoLocal, ocorrencia);
         // Designação administrativa explícita permite conferir acervo cuja origem
         // está ausente. Ela não se transforma em fato histórico sobre a Gestão.
         GestaoLocal escopoGestaoLocal = contrato == null || designacaoDocumental ? gestaoLocal : null;
 
-        boolean duplicada = permissoesAtivas(beneficiario, requisicao.tipo()).stream()
-                .anyMatch(p -> mesmoEscopo(p, contrato, escopoGestaoLocal));
+        boolean duplicada = candidatasAtivas(beneficiario, requisicao.tipo(),
+                ocorrencia == null ? null : ocorrencia.getId()).stream()
+                .anyMatch(p -> mesmoEscopo(p, contrato, escopoGestaoLocal, ocorrencia));
         if (duplicada) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
                     "Já existe permissão vigente deste tipo para o mesmo usuário e escopo.");
@@ -110,6 +136,7 @@ public class PermissaoExcepcionalServico {
         permissao.setUsuarioBeneficiario(beneficiario);
         permissao.setContrato(contrato);
         permissao.setGestaoLocal(escopoGestaoLocal);
+        permissao.setOcorrencia(ocorrencia);
         permissao.setFinalidade(textoObrigatorio(requisicao.finalidade(), "Informe a finalidade."));
         permissao.setJustificativa(textoObrigatorio(requisicao.justificativa(), "Informe a justificativa."));
         permissao.setAutorizacaoAdministrativa(textoObrigatorio(
@@ -195,7 +222,7 @@ public class PermissaoExcepcionalServico {
     public PermissaoExcepcional exigirERegistrarUso(UsuarioAplicacao usuario, TipoPermissaoExcepcional tipo,
                                                       Contrato contrato, GestaoLocal gestaoLocal,
                                                       String finalidade, String tipoRecurso, Long recursoId) {
-        return exigirERegistrarUso(usuario, tipo, contrato, gestaoLocal, finalidade, tipoRecurso, recursoId, false);
+        return registrarUsoComRecibo(usuario, tipo, contrato, gestaoLocal, finalidade, tipoRecurso, recursoId, false, null).permissao();
     }
 
     /** Audita o uso sem trocar o escopo histórico pelo destino atual do contrato. */
@@ -203,20 +230,39 @@ public class PermissaoExcepcionalServico {
                                                                     TipoPermissaoExcepcional tipo,
                                                                     Contrato contrato, GestaoLocal gestaoHistorica,
                                                                     String finalidade, String tipoRecurso, Long recursoId) {
-        return exigirERegistrarUso(usuario, tipo, contrato, gestaoHistorica, finalidade, tipoRecurso, recursoId, true);
+        return registrarUsoComRecibo(usuario, tipo, contrato, gestaoHistorica, finalidade, tipoRecurso, recursoId, true, null).permissao();
     }
 
-    private PermissaoExcepcional exigirERegistrarUso(UsuarioAplicacao usuario, TipoPermissaoExcepcional tipo,
+    public PermissaoExcepcional exigirERegistrarUsoDaOcorrencia(UsuarioAplicacao usuario,
+            TipoPermissaoExcepcional tipo, Contrato contrato, GestaoLocal gestaoHistorica,
+            String finalidade, String tipoRecurso, Long recursoId, Long ocorrenciaId) {
+        if (ocorrenciaId == null || ocorrenciaId <= 0
+                || !Set.of("Ocorrencia", "AnexoOcorrencia").contains(tipoRecurso)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Recurso de ocorrência inválido.");
+        }
+        return registrarUsoComRecibo(usuario, tipo, contrato, gestaoHistorica, finalidade,
+                tipoRecurso, recursoId, true, ocorrenciaId).permissao();
+    }
+
+    public record ConsumoPermissao(PermissaoExcepcional permissao, UsoPermissaoExcepcional uso) { }
+
+    /** Retorna exatamente o uso inserido nesta transação, sem procurar o último uso por horário. */
+    public ConsumoPermissao exigirERegistrarUsoComRecibo(UsuarioAplicacao usuario, TipoPermissaoExcepcional tipo,
+            Contrato contrato, GestaoLocal gestaoLocal, String finalidade, String tipoRecurso, Long recursoId) {
+        return registrarUsoComRecibo(usuario, tipo, contrato, gestaoLocal, finalidade, tipoRecurso, recursoId, false, null);
+    }
+
+    private ConsumoPermissao registrarUsoComRecibo(UsuarioAplicacao usuario, TipoPermissaoExcepcional tipo,
                                                      Contrato contrato, GestaoLocal gestaoLocal,
                                                      String finalidade, String tipoRecurso, Long recursoId,
-                                                     boolean escopoHistorico) {
+                                                     boolean escopoHistorico, Long ocorrenciaId) {
         if (usuario == null || usuario.getId() == null) {
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado.");
         }
         acesso.revalidarAposEspera(usuario);
-        PermissaoExcepcional permissao = permissoesAtivas(usuario, tipo).stream()
-                .filter(p -> escopoHistorico ? aplicaAoEscopoHistorico(p, contrato, gestaoLocal)
-                        : aplicaAoEscopo(p, contrato, gestaoLocal))
+        PermissaoExcepcional permissao = candidatasAtivas(usuario, tipo, ocorrenciaId).stream()
+                .filter(p -> aplicaAoRecurso(p, contrato, gestaoLocal, escopoHistorico, ocorrenciaId))
+                .filter(p -> finalidadeCompativel(p, finalidade))
                 .findFirst()
                 .orElseThrow(() -> new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "A operação exige permissão excepcional específica, vigente e compatível com o escopo."));
@@ -229,8 +275,8 @@ public class PermissaoExcepcionalServico {
         if (!Boolean.TRUE.equals(permissao.getAtivo()) || permissao.getRevogadoEm() != null
                 || !permissao.getValidoAte().isAfter(Instant.now())
                 || !Objects.equals(permissao.getUsuarioBeneficiario().getId(), usuario.getId())
-                || !(escopoHistorico ? aplicaAoEscopoHistorico(permissao, contrato, gestaoLocal)
-                        : aplicaAoEscopo(permissao, contrato, gestaoLocal))) {
+                || !finalidadeCompativel(permissao, finalidade)
+                || !aplicaAoRecurso(permissao, contrato, gestaoLocal, escopoHistorico, ocorrenciaId)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "A concessão foi revogada, expirou ou deixou de corresponder ao escopo.");
         }
@@ -247,18 +293,24 @@ public class PermissaoExcepcionalServico {
         auditoria.registrarAcao("USAR_PERMISSAO_EXCEPCIONAL", tipoRecurso, recursoId,
                 tipo.name(), Map.of("permissaoId", permissao.getId(), "usoId", uso.getId(),
                         "finalidade", uso.getFinalidade()));
-        return permissao;
+        return new ConsumoPermissao(permissao, uso);
     }
 
     private List<PermissaoExcepcional> permissoesAtivas(UsuarioAplicacao usuario, TipoPermissaoExcepcional tipo) {
         return permissaoRepositorio.buscarAtivas(usuario.getId(), tipo, Instant.now());
     }
 
+    private List<PermissaoExcepcional> candidatasAtivas(UsuarioAplicacao usuario,
+            TipoPermissaoExcepcional tipo, Long ocorrenciaId) {
+        return ocorrenciaId == null ? permissoesAtivas(usuario, tipo)
+                : permissaoRepositorio.buscarAtivasParaOcorrencia(usuario.getId(), tipo, Instant.now(), ocorrenciaId);
+    }
+
     private void validarConcessao(ConcessaoPermissaoExcepcionalRequisicao r, UsuarioAplicacao beneficiario,
-                                  Contrato contrato, GestaoLocal gestaoLocal) {
-        if (r.tipo() == null) throw new IllegalArgumentException("Informe o tipo da permissão.");
+                                  Contrato contrato, GestaoLocal gestaoLocal, Ocorrencia ocorrencia) {
+        if (r.tipo() == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe o tipo da permissão.");
         if (r.validoAte() == null || !r.validoAte().isAfter(Instant.now())) {
-            throw new IllegalArgumentException("A validade da permissão deve estar no futuro.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A validade da permissão deve estar no futuro.");
         }
         PerfilAcesso perfil = beneficiario.getPerfil();
         if (PERMISSOES_NEGOCIAIS_LOCAIS.contains(r.tipo())) {
@@ -285,7 +337,7 @@ public class PermissaoExcepcionalServico {
             return;
         }
         if (r.tipo() == TipoPermissaoExcepcional.ACESSO_DADOS_PESSOAIS_RESTRITOS) {
-            if (contrato == null && gestaoLocal == null) {
+            if (contrato == null && gestaoLocal == null && ocorrencia == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "O acesso a dados pessoais restritos exige contrato ou Gestão Local específica.");
             }
@@ -295,7 +347,7 @@ public class PermissaoExcepcionalServico {
                         "Este acesso restrito é destinado aos perfis de auditoria ou consulta institucional.");
             }
             GestaoLocal alvo = contrato != null ? gestaoAtual(contrato) : gestaoLocal;
-            if (perfil == PerfilAcesso.GESTOR_ESTADUAL && (alvo == null || alvo.getSuperintendencia() == null
+            if (ocorrencia == null && perfil == PerfilAcesso.GESTOR_ESTADUAL && (alvo == null || alvo.getSuperintendencia() == null
                     || beneficiario.getSuperintendencia() == null
                     || !Objects.equals(alvo.getSuperintendencia().getId(), beneficiario.getSuperintendencia().getId()))) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
@@ -305,6 +357,7 @@ public class PermissaoExcepcionalServico {
     }
 
     private boolean aplicaAoEscopo(PermissaoExcepcional p, Contrato contrato, GestaoLocal gestaoLocal) {
+        if (p.getOcorrencia() != null) return false;
         if (p.getContrato() != null) {
             return contrato != null && Objects.equals(p.getContrato().getId(), contrato.getId());
         }
@@ -316,6 +369,7 @@ public class PermissaoExcepcionalServico {
     }
 
     private boolean aplicaAoEscopoHistorico(PermissaoExcepcional p, Contrato contrato, GestaoLocal gestaoHistorica) {
+        if (p.getOcorrencia() != null) return false;
         if (p.getContrato() != null) {
             return contrato != null && Objects.equals(p.getContrato().getId(), contrato.getId());
         }
@@ -324,7 +378,23 @@ public class PermissaoExcepcionalServico {
                 && Objects.equals(p.getGestaoLocal().getId(), gestaoHistorica.getId());
     }
 
-    private boolean mesmoEscopo(PermissaoExcepcional p, Contrato contrato, GestaoLocal gestaoLocal) {
+    private boolean aplicaAoRecurso(PermissaoExcepcional p, Contrato contrato, GestaoLocal gestaoLocal,
+                                     boolean historico, Long ocorrenciaId) {
+        if (p.getOcorrencia() != null) return ocorrenciaId != null
+                && Objects.equals(p.getOcorrencia().getId(), ocorrenciaId);
+        return historico ? aplicaAoEscopoHistorico(p, contrato, gestaoLocal) : aplicaAoEscopo(p, contrato, gestaoLocal);
+    }
+
+    private boolean finalidadeCompativel(PermissaoExcepcional p, String finalidade) {
+        return p.getOcorrencia() == null || finalidade != null
+                && Objects.equals(p.getFinalidade(), finalidade.trim().replaceAll("\\s+", " "));
+    }
+
+    private boolean mesmoEscopo(PermissaoExcepcional p, Contrato contrato, GestaoLocal gestaoLocal, Ocorrencia ocorrencia) {
+        if (ocorrencia != null || p.getOcorrencia() != null) {
+            return Objects.equals(p.getOcorrencia() == null ? null : p.getOcorrencia().getId(),
+                    ocorrencia == null ? null : ocorrencia.getId());
+        }
         if (contrato != null || p.getContrato() != null) {
             return Objects.equals(id(p.getContrato()), id(contrato));
         }
@@ -352,7 +422,7 @@ public class PermissaoExcepcionalServico {
     }
 
     private String textoObrigatorio(String valor, String mensagem) {
-        if (valor == null || valor.isBlank()) throw new IllegalArgumentException(mensagem);
+        if (valor == null || valor.isBlank()) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(mensagem);
         return valor.trim().replaceAll("\\s+", " ");
     }
 
@@ -363,6 +433,7 @@ public class PermissaoExcepcionalServico {
         detalhes.put("perfilBeneficiario", p.getUsuarioBeneficiario().getPerfil());
         detalhes.put("contratoId", id(p.getContrato()));
         detalhes.put("gestaoLocalId", id(p.getGestaoLocal()));
+        detalhes.put("ocorrenciaId", p.getOcorrencia() == null ? null : p.getOcorrencia().getId());
         detalhes.put("validoAte", p.getValidoAte());
         detalhes.put("autorizacaoAdministrativa", p.getAutorizacaoAdministrativa());
         return detalhes;
@@ -380,7 +451,7 @@ public class PermissaoExcepcionalServico {
                 p.getConcedidoPorUsername(), p.getValidoAte(), Boolean.TRUE.equals(p.getAtivo())
                         && p.getValidoAte().isAfter(Instant.now()),
                 p.getRevogadoEm(), p.getRevogadoPorId(), p.getRevogadoPorUsername(),
-                p.getMotivoRevogacao(), p.getVersion());
+                p.getMotivoRevogacao(), p.getVersion(), p.getOcorrencia() == null ? null : p.getOcorrencia().getId());
     }
 
     private UsoPermissaoExcepcionalDTO paraDTO(UsoPermissaoExcepcional uso) {

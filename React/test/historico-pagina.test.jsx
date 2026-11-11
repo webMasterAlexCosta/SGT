@@ -4,9 +4,9 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' } }) }));
-import { PaginaHistorico } from '../src/modules/historico/PaginaHistorico.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' } }) }));
+import { PaginaHistorico } from '../src/modules/historico/PaginaHistorico.tsx';
 
 beforeEach(() => { requisitar.mockReset(); requisitar.mockResolvedValue([]); });
 afterEach(() => cleanup());

@@ -61,40 +61,46 @@ class Candidato10CapacidadeFixtureUfMySqlIT extends AuditoriaHttpSuporte {
     void criaDuasSEsNovasPorCenarioAposEsgotarTodosOsParesBase36() throws Exception {
         assertTrue(TransactionSynchronizationManager.isActualTransactionActive());
         try (var connection = dataSource.getConnection()) {
-            assertEquals("MySQL", connection.getMetaData().getDatabaseProductName());
-            assertTrue(connection.getMetaData().getDatabaseProductVersion().equals("8.0.45"));
+            assertEquals("PostgreSQL", connection.getMetaData().getDatabaseProductName());
+            // pgJDBC pode retornar "18.6" sem sufixo de distribuição; exigir a versão real exata.
+            assertEquals(180006, jdbc.queryForObject(
+                    "SELECT current_setting('server_version_num')::integer", Integer.class));
         }
-        Map<String, Object> coluna = jdbc.queryForMap("""
-                SELECT c.DATA_TYPE AS tipo, c.CHARACTER_MAXIMUM_LENGTH AS largura,
-                       c.COLLATION_NAME AS collation, c.CHARACTER_SET_NAME AS charset,
-                       x.PAD_ATTRIBUTE AS padding
-                  FROM information_schema.COLUMNS c
-                  JOIN information_schema.COLLATIONS x ON x.COLLATION_NAME=c.COLLATION_NAME
-                 WHERE c.TABLE_SCHEMA=DATABASE() AND c.TABLE_NAME='superintendencia_estadual'
-                   AND c.COLUMN_NAME='uf'
+        Map<String,Object> coluna=jdbc.queryForMap("""
+                SELECT c.data_type AS tipo,c.character_maximum_length AS largura,
+                       current_setting('server_encoding') AS charset,
+                       cn.nspname AS collation_schema,co.collname AS collation,
+                       co.collprovider::text AS provider,co.collisdeterministic AS deterministica
+                  FROM information_schema.columns c
+                  JOIN pg_namespace n ON n.nspname=c.table_schema
+                  JOIN pg_class t ON t.relnamespace=n.oid AND t.relname=c.table_name
+                  JOIN pg_attribute a ON a.attrelid=t.oid AND a.attname=c.column_name AND NOT a.attisdropped
+                  JOIN pg_collation co ON co.oid=a.attcollation
+                  JOIN pg_namespace cn ON cn.oid=co.collnamespace
+                 WHERE c.table_schema=current_schema() AND c.table_name='superintendencia_estadual'
+                   AND c.column_name='uf'
                 """);
-        assertEquals("varchar", coluna.get("tipo"));
-        assertEquals(2, ((Number) coluna.get("largura")).intValue());
-        assertEquals("utf8mb4", coluna.get("charset"));
-        assertEquals("utf8mb4_0900_ai_ci", coluna.get("collation"));
-        assertEquals("NO PAD", coluna.get("padding"));
-        assertEquals(1L, jdbc.queryForObject("""
-                SELECT COUNT(*) FROM information_schema.STATISTICS
-                 WHERE TABLE_SCHEMA=DATABASE() AND TABLE_NAME='superintendencia_estadual'
-                   AND INDEX_NAME='uk_superintendencia_estadual_uf' AND NON_UNIQUE=0 AND COLUMN_NAME='uf'
-                """, Long.class));
+        assertEquals("character varying",coluna.get("tipo"));
+        assertEquals(2,((Number)coluna.get("largura")).intValue());
+        assertEquals("UTF8",coluna.get("charset"));
+        assertTrue(com.example.siggtrat.infra.EsperaJdbcPostgres.indiceUnico(jdbc,
+                "superintendencia_estadual","uk_superintendencia_estadual_uf","uf"));
+        String collation=identificador(coluna.get("collation_schema").toString())+"."
+                +identificador(coluna.get("collation").toString());
+        assertTrue(Boolean.TRUE.equals(jdbc.queryForObject(
+                "select (cast(? as varchar(2)) collate "+collation+") <> (cast(? as varchar(2)) collate "+collation+")",
+                Boolean.class,"A","A ")),"VARCHAR mantém distinção de espaço final nesta collation real");
         List<String> namespace = new ArrayList<>();
         for (char primeiro : ALFABETO_PROPOSTO.toCharArray())
             for (char segundo : ALFABETO_PROPOSTO.toCharArray())
                 namespace.add("" + primeiro + segundo);
         assertEquals(3249, new HashSet<>(namespace).size());
         // Verifica TODOS os pares sob a collation efetiva, sem inserir a expansão inteira.
-        Long distintos = jdbc.queryForObject("""
-                SELECT COUNT(DISTINCT CONVERT(j.uf USING utf8mb4) COLLATE utf8mb4_0900_ai_ci)
-                  FROM JSON_TABLE(?, '$[*]' COLUMNS(uf VARCHAR(2) PATH '$')) AS j
-                """, Long.class, json(namespace));
-        assertEquals(3249L, distintos);
-        evidencia.put("colunaMySql", coluna);
+        Long distintos=jdbc.queryForObject(
+                "SELECT count(DISTINCT cast(j.uf AS varchar(2)) COLLATE "+collation+") "
+                        +"FROM jsonb_array_elements_text(cast(? AS jsonb)) AS j(uf)",Long.class,json(namespace));
+        assertEquals(3249L,distintos);
+        evidencia.put("colunaPostgres",coluna);
         evidencia.put("paresDistintosNaCollationReal", distintos);
 
         Set<String> reservadas = new HashSet<>(ConstantesDominio.UFS_BRASIL);
@@ -167,6 +173,10 @@ class Candidato10CapacidadeFixtureUfMySqlIT extends AuditoriaHttpSuporte {
         gravarEvidencia();
         assertEquals(superintendenciasAntes, depois, "Nenhuma SE temporária pode vazar para os demais casos");
         assertEquals(contagensAntes, contagensDepois, "Os dois cenários também precisam ser revertidos");
+    }
+
+    private String identificador(String nome) {
+        return "\""+nome.replace("\"","\"\"")+"\"";
     }
 
     private List<Map<String, Object>> fotografarSuperintendencias() {

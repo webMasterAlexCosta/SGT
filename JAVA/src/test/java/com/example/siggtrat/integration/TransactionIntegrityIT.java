@@ -27,8 +27,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integração MySQL: integridade transacional e concorrência")
-class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: integridade transacional e concorrência")
+class TransactionIntegrityIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -67,7 +67,7 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
     }
 
     @Test
-    @DisplayName("unique constraint rejeita duplicidade no próprio MySQL")
+    @DisplayName("unique constraint rejeita duplicidade no próprio PostgreSQL")
     void uniqueConstraintEhAplicadaPeloBanco() {
         String descricao = identificadorCurto("UNQ");
         try {
@@ -75,7 +75,7 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
 
             DataIntegrityViolationException erro = assertThrows(DataIntegrityViolationException.class,
                     () -> statusEmpregados.saveAndFlush(new StatusEmpregado(descricao)));
-            assertErroMysql(erro, 1062);
+            assertErroPostgres(erro, "23505");
 
             Integer count = jdbc.queryForObject(
                     "SELECT COUNT(*) FROM status_empregado WHERE descricao = ?", Integer.class, descricao);
@@ -90,7 +90,7 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
     void notNullEhAplicadoPeloBanco() {
         String chave = "it.notnull." + UUID.randomUUID();
         // HQL de mutação mantém o INSERT inválido no schema mapeado. Persistir
-        // uma entidade nula poderia falhar na validação Java antes do MySQL;
+        // uma entidade nula poderia falhar na validação Java antes do PostgreSQL;
         // não desabilitamos essa validação nem aceitamos tal falha como prova.
         // A operação é traduzida pelo Hibernate, sem SQL nativo/manual.
         DataIntegrityViolationException erro = assertThrows(DataIntegrityViolationException.class, () ->
@@ -109,7 +109,7 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
                         throw failure;
                     }
                 }));
-        assertErroMysql(erro, 1048);
+        assertErroPostgres(erro, "23502");
         assertEquals(0, jdbc.queryForObject(
                 "SELECT COUNT(*) FROM configuracao_sistema WHERE chave = ?", Integer.class, chave));
     }
@@ -176,7 +176,7 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
                 statusEmpregados.saveAndFlush(new StatusEmpregado(descricao));
                 success.incrementAndGet();
             } catch (DataIntegrityViolationException ex) {
-                assertErroMysql(ex, 1062);
+                assertErroPostgres(ex, "23505");
                 duplicate.incrementAndGet();
             }
             return null;
@@ -204,7 +204,7 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
         statusEmpregados.deleteAllById(ids);
     }
 
-    private static void assertErroMysql(Throwable erro, int codigoEsperado) {
+    private static void assertErroPostgres(Throwable erro, String estadoEsperado) {
         SQLException sql = null;
         for (Throwable causa = erro; causa != null && causa.getCause() != causa; causa = causa.getCause()) {
             if (causa instanceof SQLException exception) {
@@ -212,9 +212,9 @@ class TransactionIntegrityIT extends MySqlIntegrationTestSupport {
                 break;
             }
         }
-        assertNotNull(sql, "A rejeição precisa ter origem no MySQL, não apenas na validação Java/Hibernate.");
-        assertEquals(codigoEsperado, sql.getErrorCode(), "Código da restrição rejeitada pelo MySQL.");
-        assertEquals("23000", sql.getSQLState(), "SQLState de integridade física no MySQL.");
+        assertNotNull(sql, "A rejeição precisa ter origem no PostgreSQL, não apenas na validação Java/Hibernate.");
+        assertEquals(0, sql.getErrorCode(), "pgJDBC transmite o SQLState da restrição.");
+        assertEquals(estadoEsperado, sql.getSQLState(), "SQLState de integridade física no PostgreSQL.");
     }
 
     private static String identificadorCurto(String prefixo) {

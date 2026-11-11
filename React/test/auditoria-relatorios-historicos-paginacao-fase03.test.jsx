@@ -6,13 +6,13 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import '@testing-library/jest-dom/vitest';
 import { MemoryRouter } from 'react-router-dom';
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: r => Array.isArray(r) ? r : [], extrairPagina: r => r }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' } }) }));
-vi.mock('../src/core/exportacao/context.jsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao: vi.fn() }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-vi.mock('../src/modules/rh/pages/PaginaRelatoriosTerceirizados/components/GraficosRelatorios/index.jsx', () => ({ GraficosRelatorios: () => null }));
-import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.jsx';
-import { PaginaRelatoriosTerceirizados } from '../src/modules/rh/pages/PaginaRelatoriosTerceirizados/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: r => Array.isArray(r) ? r : [], extrairPagina: r => r }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' } }) }));
+vi.mock('../src/core/exportacao/context.tsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao: vi.fn() }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+vi.mock('../src/modules/rh/pages/PaginaRelatoriosTerceirizados/components/GraficosRelatorios/index.tsx', () => ({ GraficosRelatorios: () => null }));
+import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.tsx';
+import { PaginaRelatoriosTerceirizados } from '../src/modules/rh/pages/PaginaRelatoriosTerceirizados/index.tsx';
 const paginaVazia = { content: [], number: 0, totalPages: 0, totalElements: 0, first: true, last: true };
 const colaboradores = Array.from({ length: 13 }, (_, i) => ({ id: i + 1, nome: `Pessoa sintética ${i + 1}`, cpf: '***', active: true, status: 'ATIVO' }));
 beforeEach(() => {

@@ -32,7 +32,9 @@ import java.util.stream.Stream;
  * um relatório íntegro.</p>
  */
 @Service
-public class ArmazenamentoTemporarioRelatorioServico {
+public class ArmazenamentoTemporarioRelatorioServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOGGER; }
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ArmazenamentoTemporarioRelatorioServico.class);
     private static final int BUFFER_IO_BYTES = 1024 * 1024;
@@ -62,7 +64,7 @@ public class ArmazenamentoTemporarioRelatorioServico {
      * Em falha, remove tanto o {@code .part} quanto qualquer arquivo final.
      */
     public Path gerarArquivoConcluido(String prefixo, String extensao, GeradorArquivo gerador) throws IOException {
-        if (gerador == null) throw new IllegalArgumentException("Gerador da exportação é obrigatório.");
+        if (gerador == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Gerador da exportação é obrigatório.");
 
         garantirDiretorio();
         String extensaoSegura = normalizarExtensao(extensao);
@@ -100,8 +102,8 @@ public class ArmazenamentoTemporarioRelatorioServico {
      * interrompa o download depois que o relatório já foi gerado com sucesso.
      */
     public void transferir(Path arquivoConcluido, OutputStream destino) throws IOException {
-        if (arquivoConcluido == null) throw new IllegalArgumentException("Arquivo da exportação é obrigatório.");
-        if (destino == null) throw new IllegalArgumentException("Destino da exportação é obrigatório.");
+        if (arquivoConcluido == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Arquivo da exportação é obrigatório.");
+        if (destino == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Destino da exportação é obrigatório.");
         arquivosAtivos.add(arquivoConcluido);
         try (InputStream arquivo = new BufferedInputStream(Files.newInputStream(arquivoConcluido), BUFFER_IO_BYTES)) {
             arquivo.transferTo(destino);
@@ -165,7 +167,7 @@ public class ArmazenamentoTemporarioRelatorioServico {
                     .filter(caminho -> !arquivosAtivos.contains(caminho))
                     .forEach(caminho -> excluirSeExpirado(caminho, limite));
         } catch (IOException e) {
-            LOGGER.warn("Não foi possível varrer temporários de relatórios em {}: {}", diretorio, e.getMessage());
+            LOGGER.warn("ArmazenamentoTemporarioRelatorioServico: Não foi possível varrer temporários de relatórios em falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         }
     }
 
@@ -175,7 +177,7 @@ public class ArmazenamentoTemporarioRelatorioServico {
                 Files.deleteIfExists(caminho);
             }
         } catch (IOException e) {
-            LOGGER.warn("Não foi possível remover temporário expirado de relatório {}: {}", caminho, e.getMessage());
+            LOGGER.warn("ArmazenamentoTemporarioRelatorioServico: Não foi possível remover temporário expirado de relatório falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         }
     }
 
@@ -195,7 +197,7 @@ public class ArmazenamentoTemporarioRelatorioServico {
         try {
             Files.deleteIfExists(caminho);
         } catch (IOException e) {
-            LOGGER.warn("Não foi possível remover temporário de relatório {}: {}", caminho, e.getMessage());
+            LOGGER.warn("ArmazenamentoTemporarioRelatorioServico: Não foi possível remover temporário de relatório falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         }
     }
 

@@ -2,8 +2,8 @@ import React from 'react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { ModalVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalVinculo.jsx';
-import { podeVisualizarPessoasVinculos, podeGerenciarPessoasVinculos } from '../src/core/security/roles.js';
+import { ModalVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalVinculo.tsx';
+import { podeVisualizarPessoasVinculos, podeGerenciarPessoasVinculos } from '../src/core/security/roles.ts';
 
 afterEach(cleanup);
 

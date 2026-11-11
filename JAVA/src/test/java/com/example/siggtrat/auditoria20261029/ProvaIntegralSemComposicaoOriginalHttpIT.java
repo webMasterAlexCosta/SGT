@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * HIS-006/HIS-001 e seções 5.1/5.4 do levantamento: uma fonte integral não
  * certifica uma publicação cuja composição original inteira permanece ausente.
- * A perda é simulada exclusivamente em uma fixture MySQL descartável.
+ * A perda é simulada exclusivamente em uma fixture PostgreSQL descartável.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ProvaIntegralSemComposicaoOriginalHttpIT extends ContratosHttpBase {
@@ -37,7 +37,7 @@ class ProvaIntegralSemComposicaoOriginalHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirMySqlReal() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
         }
     }
 

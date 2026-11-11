@@ -18,7 +18,11 @@ import java.util.*;
 
 /** Invalida somente consolidações cujo período e escopo são atingidos. */
 @Service
-public class InvalidacaoEmissaoRelatorioServico {
+public class InvalidacaoEmissaoRelatorioServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(InvalidacaoEmissaoRelatorioServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int TAMANHO_LOTE = 200;
     private final EmissaoRelatorioAdministrativoRepositorio repositorio;
     private final RegistroAuditoriaServico auditoria;

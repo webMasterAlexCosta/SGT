@@ -34,7 +34,7 @@ class SessaoJwtSegurancaRegressaoTest {
     private final FiltroAutenticacaoJwt filtro = new FiltroAutenticacaoJwt(jwt,
             new DetalhesUsuarioPersonalizadoServico(usuarios), tokens,
             new PropriedadesSegurancaJwt(30, 10, 60_000, 60_000,
-                    new PropriedadesSegurancaJwt.Limpeza("0 0 * * * *", 100)));
+                    new PropriedadesSegurancaJwt.Limpeza("0 0 * * * *", 100)), mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
 
     @AfterEach void limpar() { SecurityContextHolder.clearContext(); }
 

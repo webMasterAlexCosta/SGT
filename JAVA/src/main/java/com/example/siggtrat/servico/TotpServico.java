@@ -8,7 +8,11 @@ import java.util.Locale;
 import java.util.regex.Pattern;
 
 @Service
-public class TotpServico {
+public class TotpServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(TotpServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final Pattern BASE32 = Pattern.compile("^[A-Z2-7]+={0,6}$");
     private static final int TAMANHO_MINIMO_SEGREDO = 16;
@@ -54,12 +58,12 @@ public class TotpServico {
 
     private String normalizarEValidar(String segredo) {
         if (segredo == null || segredo.isBlank()) {
-            throw new IllegalArgumentException("Segredo de segurança não configurado.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Segredo de segurança não configurado.");
         }
         String normalizado = segredo.replace(" ", "").trim().toUpperCase(Locale.ROOT);
         if (normalizado.length() < TAMANHO_MINIMO_SEGREDO
                 || !BASE32.matcher(normalizado).matches()) {
-            throw new IllegalArgumentException("Segredo TOTP inválido.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Segredo TOTP inválido.");
         }
         return normalizado;
     }

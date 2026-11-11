@@ -10,6 +10,8 @@ import com.example.siggtrat.dto.OcorrenciaResumoDTO;
 import com.example.siggtrat.constante.ConstantesDominio;
 import com.example.siggtrat.dominio.acesso.NivelExposicaoDadosPessoais;
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
+import com.example.siggtrat.dominio.frequencia.ValidadeOperacionalFrequencia;
+import com.example.siggtrat.dominio.frequencia.EstadoAuditoriaFrequencia;
 import com.example.siggtrat.dominio.documento.ClassificacaoAcessoDocumento;
 import com.example.siggtrat.utilitario.RelogioSistema;
 import org.springframework.data.domain.PageImpl;
@@ -61,7 +63,9 @@ import java.util.UUID;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
-public class OcorrenciaServico {
+public class OcorrenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(OcorrenciaServico.class);
 
@@ -79,6 +83,13 @@ public class OcorrenciaServico {
     private final HistoricoIntegridadeServico historicoIntegridadeServico;
     private final MinimizadorDadosPessoaisServico minimizador;
     private final AutorizacaoTemporalOcorrenciaServico autorizacaoTemporal;
+    private ClassificacaoOcorrenciaFrequenciaServico classificacaoOcorrencias;
+    private enum ModoReconciliacao { REGISTRO, REENVIO, CANCELAMENTO }
+
+    @org.springframework.beans.factory.annotation.Autowired
+    public void configurarClassificacaoOcorrencias(ClassificacaoOcorrenciaFrequenciaServico servico) {
+        this.classificacaoOcorrencias = servico;
+    }
 
     private final long maxFileSizeBytes;
     private final long maxTotalUploadBytes;
@@ -143,7 +154,7 @@ public class OcorrenciaServico {
             Files.createDirectories(uploadRoot);
             Files.createDirectories(uploadTempRoot);
         } catch (IOException e) {
-            throw new RuntimeException("Não foi possível criar o diretório de uploads!");
+            throw new RuntimeException("Não foi possível criar o diretório de uploads!", e);
         }
     }
 
@@ -282,7 +293,7 @@ public class OcorrenciaServico {
     @Transactional(rollbackFor = Exception.class, isolation = Isolation.READ_COMMITTED)
     public OcorrenciaResumoDTO criar(CriacaoOcorrenciaDTO dto, List<MultipartFile> arquivos) {
         if (dto == null) {
-            throw new IllegalArgumentException("Dados da ocorrência são obrigatórios.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Dados da ocorrência são obrigatórios.");
         }
         Long empregadoId = dto.empregadoId();
         String motivo = dto.motivo();
@@ -292,14 +303,14 @@ public class OcorrenciaServico {
         String numeroSei = dto.numeroSei();
         Integer dias = dto.dias();
         if (dataOcorrencia == null) {
-            throw new IllegalArgumentException("Data da ocorrência é obrigatória.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Data da ocorrência é obrigatória.");
         }
         if (dataOcorrencia.isAfter(LocalDate.now(ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO)))) {
-            throw new IllegalArgumentException("Não é permitido registrar ocorrência em data futura.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Não é permitido registrar ocorrência em data futura.");
         }
-        if (dias != null && dias <= 0) throw new IllegalArgumentException("A duração deve ser maior que zero.");
+        if (dias != null && dias <= 0) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A duração deve ser maior que zero.");
         if (dias != null && dias > maxPeriodDays) {
-            throw new IllegalArgumentException("O período máximo permitido é de " + maxPeriodDays + " dias.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O período máximo permitido é de " + maxPeriodDays + " dias.");
         }
 
         Empregado empregado = frequenciaServico.bloquearContextoOcorrencia(empregadoId);
@@ -308,10 +319,10 @@ public class OcorrenciaServico {
         List<ClassificacaoAcessoDocumento> classificacoes = validarClassificacoes(dto.classificacoesAnexos(), arquivos);
         validarTamanho(motivo, 255, "motivo"); validarTamanho(tipoRo, 255, "tipoRo"); validarTamanho(numeroSei, 255, "numeroSei");
         if (observacao != null && observacao.getBytes(StandardCharsets.UTF_8).length > 65535)
-            throw new IllegalArgumentException("Observação excede o tamanho permitido.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Observação excede o tamanho permitido.");
         String hash = hashIntencao(dto, arquivos, classificacoes, usuario);
         String chave = normalizarOpcional(dto.chaveIdempotencia());
-        if (chave != null && chave.length() > 96) throw new IllegalArgumentException("Chave de idempotência excede 96 caracteres.");
+        if (chave != null && chave.length() > 96) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Chave de idempotência excede 96 caracteres.");
         chave = chave == null ? "auto:" + hash : "req:" + chave;
         var anterior = repositorio.findByEmpregadoIdAndChaveIdempotencia(empregadoId, chave);
         if (anterior.isPresent()) {
@@ -319,7 +330,14 @@ public class OcorrenciaServico {
             if (!Objects.equals(hash, anterior.get().getHashIntencao()))
                 throw new org.springframework.web.server.ResponseStatusException(HttpStatus.CONFLICT,
                         "A chave de idempotência já foi usada para outra intenção.");
-            return paraResumoDTO(anterior.get());
+            Ocorrencia existente = anterior.get();
+            if (existente.getCanceladoEm() == null) {
+                reconciliarFrequenciaPorOcorrencias(empregado, existente.getDataOcorrencia(),
+                        existente.getQuantidadeDias() == null ? 1 : existente.getQuantidadeDias(),
+                        "Registro da ocorrência " + existente.getId() + ": " + existente.getMotivo(),
+                        "ocorrencia:" + existente.getId() + ":registro", ModoReconciliacao.REENVIO);
+            }
+            return paraResumoDTO(existente);
         }
         var contextos = autorizacaoTemporal.validarCriacao(usuario, empregado, dataOcorrencia, dias == null ? 1 : dias);
 
@@ -434,8 +452,16 @@ public class OcorrenciaServico {
 
     private void reconciliarFrequenciaPorOcorrencias(Empregado empregado, LocalDate dataInicio, int dias,
                                                      String justificativa, String chaveOperacao) {
+        reconciliarFrequenciaPorOcorrencias(empregado, dataInicio, dias, justificativa, chaveOperacao, ModoReconciliacao.REGISTRO);
+    }
+
+    private void reconciliarFrequenciaPorOcorrencias(Empregado empregado, LocalDate dataInicio, int dias,
+                                                     String justificativa, String chaveOperacao, ModoReconciliacao modo) {
         if (empregado == null || dataInicio == null || dias <= 0) return;
-        LocalDate dataFim = dataInicio.plusDays(dias - 1L);
+        LocalDate hoje = LocalDate.now(ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO));
+        if (dataInicio.isAfter(hoje)) return;
+        LocalDate fimInformado = dataInicio.plusDays(dias - 1L);
+        LocalDate dataFim = fimInformado.isAfter(hoje) ? hoje : fimInformado;
         LocalDate inicioCandidatos = dataInicio.minusDays(Math.max(0, maxPeriodDays - 1L));
         List<Ocorrencia> ocorrenciasDoEmpregado = repositorio
                 .findByEmpregadoIdAndCanceladoEmIsNullAndDataOcorrenciaBetweenOrderByDataOcorrenciaDesc(
@@ -443,14 +469,30 @@ public class OcorrenciaServico {
         java.util.Map<LocalDate, Frequencia> frequenciasPorData = frequenciaRepositorio
                 .findByEmpregadoIdAndDataReferenciaBetween(empregado.getId(), dataInicio, dataFim).stream()
                 .collect(java.util.stream.Collectors.toMap(Frequencia::getDataReferencia, f -> f));
-        java.util.Map<LocalDate, Contrato> contratosPorData =
-                frequenciaServico.resolverContratosVigentesNoPeriodo(empregado, dataInicio, dataFim);
+        java.util.Map<LocalDate, Contrato> contratosPorData = new java.util.LinkedHashMap<>();
+        if (modo == ModoReconciliacao.REENVIO) {
+            for (LocalDate dia = dataInicio; !dia.isAfter(dataFim); dia = dia.plusDays(1)) {
+                if (!frequenciasPorData.containsKey(dia)) {
+                    contratosPorData.putAll(frequenciaServico.resolverContratosVigentesNoPeriodo(empregado, dia, dia));
+                }
+            }
+        } else if (modo == ModoReconciliacao.CANCELAMENTO) {
+            for (LocalDate dia = dataInicio; !dia.isAfter(dataFim); dia = dia.plusDays(1)) {
+                Frequencia existente = frequenciasPorData.get(dia);
+                if (existente != null && Boolean.TRUE.equals(existente.getOcorrenciaOverrideAtivo())
+                        && !preservarProvaSemReconciliacao(existente))
+                    contratosPorData.putAll(frequenciaServico.resolverContratosVigentesNoPeriodo(empregado, dia, dia));
+            }
+        } else {
+            contratosPorData.putAll(frequenciaServico.resolverContratosVigentesNoPeriodo(empregado, dataInicio, dataFim));
+        }
 
-        for (int i = 0; i < dias; i++) {
-            LocalDate dataAtual = dataInicio.plusDays(i);
+        for (LocalDate dataAtual = dataInicio; !dataAtual.isAfter(dataFim); dataAtual = dataAtual.plusDays(1)) {
+            // Reenvio antigo pode alcançar um novo dia, mas não refaz uma projeção já existente.
+            if (modo == ModoReconciliacao.REENVIO && frequenciasPorData.containsKey(dataAtual)) continue;
             reconciliarFrequenciaDia(empregado, dataAtual, ocorrenciasDoEmpregado,
                     frequenciasPorData, contratosPorData.get(dataAtual), justificativa,
-                    chaveOperacao + ":" + dataAtual);
+                    chaveOperacao + ":" + dataAtual, modo);
         }
     }
 
@@ -460,8 +502,16 @@ public class OcorrenciaServico {
                                           java.util.Map<LocalDate, Frequencia> frequenciasPorData,
                                           Contrato contratoVigente,
                                           String justificativa,
-                                          String chaveIdempotencia) {
+                                          String chaveIdempotencia, ModoReconciliacao modo) {
         Frequencia frequencia = frequenciasPorData.get(dataAtual);
+        // Cancelamento não substitui uma decisão manual posterior nem cria Frequência ausente.
+        if (modo == ModoReconciliacao.CANCELAMENTO
+                && (frequencia == null || !Boolean.TRUE.equals(frequencia.getOcorrenciaOverrideAtivo())
+                    || preservarProvaSemReconciliacao(frequencia))) {
+            if (frequencia != null && preservarProvaSemReconciliacao(frequencia))
+                log.debug("Cancelamento preserva Frequência {} inválida/sujeita à revisão em {}, sem reconstrução operacional", frequencia.getId(), dataAtual);
+            return;
+        }
         if (frequencia == null) {
             frequencia = new Frequencia();
             frequencia.setEmpregado(empregado);
@@ -470,103 +520,24 @@ public class OcorrenciaServico {
             frequencia.setAno(dataAtual.getYear());
         }
 
-        List<Ocorrencia> ocorrenciasAtivas = ocorrenciasDoEmpregado.stream()
-                .filter(o -> abrangeData(o, dataAtual))
-                .sorted(Comparator.comparingInt(this::prioridadeDoStatus))
-                .toList();
-
-        String novoStatus = ocorrenciasAtivas.stream()
-                .map(o -> mapearMotivoParaStatus(normalizarMotivo(o.getMotivo())))
-                .filter(Objects::nonNull)
-                .findFirst()
-                .orElse(null);
-
-        String observacaoManual = removerNotasOcorrencia(frequencia.getObservacao());
-        List<String> markers = new ArrayList<>();
-        for (Ocorrencia ocorrencia : ocorrenciasAtivas) {
-            String motivo = normalizarMotivo(ocorrencia.getMotivo());
-            String label = obterRotuloFrequencia(motivo);
-            markers.add(label + " (Ocorrência ID: " + ocorrencia.getId() + ")");
-        }
-
-        StringBuilder obsFinal = new StringBuilder();
-        if (observacaoManual != null && !observacaoManual.isBlank()) {
-            obsFinal.append(observacaoManual.trim());
-        }
-        if (!markers.isEmpty()) {
-            if (obsFinal.length() > 0) obsFinal.append(" | ");
-            obsFinal.append(String.join(" | ", markers));
-        }
-
-        String statusFinal = frequencia.getStatus();
-        String statusBase = frequencia.getStatusBaseAntesOcorrencia();
-        boolean sobreposta = Boolean.TRUE.equals(frequencia.getOcorrenciaOverrideAtivo());
-        if (novoStatus != null) {
-            if (!sobreposta) {
-                statusBase = statusFinal;
-                sobreposta = true;
-            }
-            statusFinal = novoStatus;
-            // Batidas, horas físicas e memória de cálculo são evidências e não
-            // podem ser destruídas por uma classificação administrativa.
-        } else if (sobreposta) {
-            statusFinal = statusBase;
-            statusBase = null;
-            sobreposta = false;
-        }
-
-        String observacaoFinal = obsFinal.length() == 0 ? null : obsFinal.toString();
-
-        boolean shouldPersist = frequencia.getId() != null
-                || statusFinal != null
-                || observacaoFinal != null
-                || frequencia.getHorasTrabalhadas() != null
-                || frequencia.getHorarioSaida() != null;
-
-        if (shouldPersist) {
+        var resultado = classificacaoOcorrencias.paraComandoOcorrencia(frequencia, empregado, dataAtual, ocorrenciasDoEmpregado);
+        boolean devePersistir = frequencia.getId() != null || resultado.status() != null
+                || resultado.observacao() != null || frequencia.getHorasTrabalhadas() != null || frequencia.getHorarioSaida() != null;
+        if (devePersistir && classificacaoOcorrencias.mudou(frequencia, resultado)) {
             Frequencia salva = frequenciaServico.aplicarClassificacaoOcorrencia(frequencia, empregado,
                     dataAtual, contratoVigente, new FrequenciaServico.ClassificacaoOcorrencia(
-                            statusFinal, observacaoFinal, sobreposta, statusBase, justificativa, chaveIdempotencia));
+                            resultado.status(), resultado.observacao(), resultado.sobreposta(), resultado.statusBase(),
+                            justificativa, chaveIdempotencia));
             frequenciasPorData.put(dataAtual, salva);
         }
     }
 
-    private boolean abrangeData(Ocorrencia ocorrencia, LocalDate data) {
-        if (ocorrencia == null || ocorrencia.getDataOcorrencia() == null || data == null) return false;
-        int dias = ocorrencia.getQuantidadeDias() != null && ocorrencia.getQuantidadeDias() > 0 ? ocorrencia.getQuantidadeDias() : 1;
-        LocalDate inicio = ocorrencia.getDataOcorrencia();
-        LocalDate fim = inicio.plusDays(dias - 1L);
-        return !data.isBefore(inicio) && !data.isAfter(fim);
+    /** Decisão técnica43: cancelar a fonte não regulariza uma Frequência explicitamente inválida. */
+    private boolean preservarProvaSemReconciliacao(Frequencia frequencia) {
+        return frequencia.getValidadeOperacional() == ValidadeOperacionalFrequencia.INVALIDA_COBERTURA
+                || frequencia.getValidadeOperacional() == ValidadeOperacionalFrequencia.SUJEITA_REVISAO
+                || frequencia.getEstadoAuditoria() == EstadoAuditoriaFrequencia.SUJEITA_REVISAO;
     }
-
-    private int prioridadeDoStatus(Ocorrencia ocorrencia) {
-        String status = mapearMotivoParaStatus(normalizarMotivo(ocorrencia != null ? ocorrencia.getMotivo() : null));
-        if (ConstantesDominio.FREQ_SUSPENSAO.equals(status)) return 0;
-        if (ConstantesDominio.FREQ_FALTA.equals(status)) return 1;
-        if (ConstantesDominio.FREQ_ATESTADO.equals(status)) return 2;
-        if (ConstantesDominio.FREQ_ATRASO.equals(status)) return 3;
-        return 10;
-    }
-
-    private String removerNotasOcorrencia(String value) {
-        if (value == null || value.isBlank()) return null;
-
-        String regexDyn = "(?i)(^|\\s*\\|\\s*)(" +
-                obterRotuloFrequencia(ConstantesDominio.FREQ_FALTA) + "|" +
-                obterRotuloFrequencia(ConstantesDominio.FREQ_SUSPENSAO) + "|" +
-                obterRotuloFrequencia(ConstantesDominio.FREQ_ATESTADO) + "|" +
-                obterRotuloFrequencia(ConstantesDominio.FREQ_ATRASO) +
-                ") \\(Ocorrência ID: \\d+\\)";
-
-        String cleaned = value
-                .replaceAll(regexDyn, "")
-                .replaceAll("\\s*\\|\\s*\\|\\s*", " | ")
-                .replaceAll("^\\s*\\|\\s*", "")
-                .replaceAll("\\s*\\|\\s*$", "")
-                .trim();
-        return cleaned.isBlank() ? null : cleaned;
-    }
-
 
     private List<EnvioPreparado> prepararEnvios(List<MultipartFile> arquivos) {
         if (arquivos == null || arquivos.isEmpty()) return List.of();
@@ -634,7 +605,7 @@ public class OcorrenciaServico {
     private Path resolverArquivoArmazenado(String nomeSalvo) {
         String nomeSeguro = Paths.get(nomeSalvo == null ? "" : nomeSalvo).getFileName().toString();
         if (nomeSeguro.isBlank() || !nomeSeguro.equals(nomeSalvo)) {
-            throw new IllegalArgumentException("Nome de anexo inválido.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Nome de anexo inválido.");
         }
         Path result = uploadRoot.resolve(nomeSeguro).normalize();
         garantirDentroDiretorio(result, uploadRoot);
@@ -643,7 +614,7 @@ public class OcorrenciaServico {
 
     private void garantirDentroDiretorio(Path path, Path root) {
         if (!path.toAbsolutePath().normalize().startsWith(root.toAbsolutePath().normalize())) {
-            throw new IllegalArgumentException("Caminho de arquivo inválido.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Caminho de arquivo inválido.");
         }
     }
 
@@ -669,7 +640,7 @@ public class OcorrenciaServico {
             try {
                 Files.deleteIfExists(file);
             } catch (IOException e) {
-                log.warn("Não foi possível limpar arquivo temporário: {}", file, e);
+                log.warn("OcorrenciaServico: Não foi possível limpar arquivo temporário falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
             }
         }
     }
@@ -685,7 +656,7 @@ public class OcorrenciaServico {
     private void validarEnvios(List<MultipartFile> arquivos) {
         if (arquivos == null || arquivos.isEmpty()) return;
         if (arquivos.size() > maxFilesPerRequest) {
-            throw new IllegalArgumentException("Quantidade máxima de anexos por envio: " + maxFilesPerRequest + ".");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Quantidade máxima de anexos por envio: " + maxFilesPerRequest + ".");
         }
 
         long total = 0L;
@@ -693,16 +664,16 @@ public class OcorrenciaServico {
             if (arquivo == null || arquivo.isEmpty()) continue;
             total += arquivo.getSize();
             if (arquivo.getSize() > maxFileSizeBytes) {
-                throw new IllegalArgumentException("Arquivo excede o limite individual definido de upload: " + higienizarNomeArquivo(arquivo.getOriginalFilename()));
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Arquivo excede o limite individual definido de upload: " + higienizarNomeArquivo(arquivo.getOriginalFilename()));
             }
             String contentType = resolverTipoConteudoSeguro(arquivo.getContentType());
             if (!ALLOWED_CONTENT_TYPES.contains(contentType)) {
-                throw new IllegalArgumentException("Tipo de arquivo não permitido: " + higienizarNomeArquivo(arquivo.getOriginalFilename()));
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Tipo de arquivo não permitido: " + higienizarNomeArquivo(arquivo.getOriginalFilename()));
             }
         }
 
         if (total > maxTotalUploadBytes) {
-            throw new IllegalArgumentException("Os anexos excedem o limite total de envio.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Os anexos excedem o limite total de envio.");
         }
     }
 
@@ -717,26 +688,6 @@ public class OcorrenciaServico {
         return "application/octet-stream";
     }
 
-    private String normalizarMotivo(String motivo) {
-        return motivo == null ? null : motivo.trim().toUpperCase(Locale.ROOT);
-    }
-
-    private String mapearMotivoParaStatus(String motivo) {
-        if (ConstantesDominio.FREQ_FALTA.equals(motivo)) return ConstantesDominio.FREQ_FALTA;
-        if (ConstantesDominio.FREQ_SUSPENSAO.equals(motivo)) return ConstantesDominio.FREQ_SUSPENSAO;
-        if (ConstantesDominio.FREQ_ATESTADO.equals(motivo) || ConstantesDominio.OCORRENCIA_LICENCA_MEDICA.equals(motivo)) return ConstantesDominio.FREQ_ATESTADO;
-        if (ConstantesDominio.FREQ_ATRASO.equals(motivo)) return ConstantesDominio.FREQ_ATRASO;
-        return null;
-    }
-
-    private String obterRotuloFrequencia(String motivo) {
-        if (ConstantesDominio.FREQ_FALTA.equals(motivo)) return "Falta";
-        if (ConstantesDominio.FREQ_SUSPENSAO.equals(motivo)) return "Suspensão";
-        if (ConstantesDominio.FREQ_ATESTADO.equals(motivo) || ConstantesDominio.OCORRENCIA_LICENCA_MEDICA.equals(motivo)) return "Atestado/Abono";
-        if (ConstantesDominio.FREQ_ATRASO.equals(motivo)) return "Atraso registrado";
-        return "Evento";
-    }
-
     private static String normalizarOpcional(String value) {
         if (value == null) return null;
         String v = value.trim();
@@ -746,24 +697,24 @@ public class OcorrenciaServico {
     private static String normalizarObrigatorio(String value, String field) {
         String v = normalizarOpcional(value);
         if (v == null) {
-            throw new IllegalArgumentException("Campo '" + field + "' é obrigatório.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Campo '" + field + "' é obrigatório.");
         }
         return v;
     }
 
     private void validarTamanho(String valor, int limite, String campo) {
         if (valor != null && valor.codePointCount(0, valor.length()) > limite)
-            throw new IllegalArgumentException("Campo '" + campo + "' excede " + limite + " caracteres.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Campo '" + campo + "' excede " + limite + " caracteres.");
     }
 
     private List<ClassificacaoAcessoDocumento> validarClassificacoes(List<String> valores, List<MultipartFile> arquivos) {
         int total = arquivos == null ? 0 : (int) arquivos.stream().filter(a -> a != null && !a.isEmpty()).count();
         if (valores == null || valores.isEmpty())
             return java.util.Collections.nCopies(total, ClassificacaoAcessoDocumento.PESSOAL_RESTRITO);
-        if (valores.size() != total) throw new IllegalArgumentException("Informe uma classificação para cada anexo não vazio.");
+        if (valores.size() != total) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe uma classificação para cada anexo não vazio.");
         try { return valores.stream().map(v -> ClassificacaoAcessoDocumento.valueOf(v.trim().toUpperCase(Locale.ROOT))).toList(); }
         catch (IllegalArgumentException | NullPointerException e) {
-            throw new IllegalArgumentException("Classificação de anexo inválida: use NEGOCIAL ou PESSOAL_RESTRITO.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Classificação de anexo inválida: use NEGOCIAL ou PESSOAL_RESTRITO.");
         }
     }
 
@@ -782,7 +733,7 @@ public class OcorrenciaServico {
             valor.append(nome.length()).append(':').append(nome).append('|').append(resolverTipoConteudoSeguro(arquivo.getContentType()))
                     .append('|').append(classificacoes.get(indice++)).append('|');
             try (var stream = arquivo.getInputStream()) { valor.append(hashFluxo(stream)); }
-            catch (IOException e) { throw new IllegalArgumentException("Não foi possível conferir a intenção do anexo.", e); }
+            catch (IOException e) { throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Não foi possível conferir a intenção do anexo.", e); }
         }
         return com.example.siggtrat.utilitario.UtilitarioHashSeguranca.sha256Hexadecimal(valor.toString());
     }
@@ -814,7 +765,7 @@ public class OcorrenciaServico {
                         a.getClassificacaoAcesso().name(), a.getSha256())).toList();
         String motivo = entity.getMotivo();
         // Códigos conhecidos conservam a classificação gerencial; motivo livre pode conter narrativa pessoal.
-        if (!minimizador.completo(nivel) && mapearMotivoParaStatus(normalizarMotivo(motivo)) == null) motivo = null;
+        if (!minimizador.completo(nivel) && classificacaoOcorrencias.status(motivo) == null) motivo = null;
         // A associação canônica comprova a identidade, mas não recupera o nome de um fato
         // legado cuja fotografia nunca foi registrada. Não converter o cadastro atual em prova.
         String nomeFotografado = entity.getEmpregadoNomeFotografia();
@@ -885,6 +836,6 @@ public class OcorrenciaServico {
 
         reconciliarFrequenciaPorOcorrencias(empregado, ocorrencia.getDataOcorrencia(), dias,
                 "Cancelamento da ocorrência " + ocorrencia.getId() + ": " + ocorrencia.getMotivo(),
-                "ocorrencia:" + ocorrencia.getId() + ":remocao");
+                "ocorrencia:" + ocorrencia.getId() + ":remocao", ModoReconciliacao.CANCELAMENTO);
     }
 }

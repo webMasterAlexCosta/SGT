@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
- * Regressão DOC-VERSION em MySQL real. Não há transação externa de rollback:
+ * Regressão DOC-VERSION em PostgreSQL real. Não há transação externa de rollback:
  * cada resposta só é comparada depois do commit da transação do serviço.
  * MockMvc cobre MVC/segurança/JPA; não é prova de TCP, Chrome ou restart.
  */
@@ -94,7 +94,7 @@ class DocumentoVersaoCanonicaH04HttpIT extends ContratosHttpBase {
                 "operacao", operacao, "comArquivo", comArquivo, "id", id,
                 "versionPrimeiraResposta", primeira.path("version").asLong(),
                 "versionGetAposCommit", getAposCommit.path("version").asLong(), "versionJpa", versionJpa,
-                "versaoDocumento", primeira.path("versaoDocumento").asInt(), "camada", "MockMvc + JPA + MySQL real")));
+                "versaoDocumento", primeira.path("versaoDocumento").asInt(), "camada", "MockMvc + JPA + PostgreSQL real")));
         assertThat(primeira.path("version").asLong()).as("primeira resposta deve trazer a versão persistida, não o valor anterior ao flush")
                 .isEqualTo(versionJpa).isEqualTo(getAposCommit.path("version").asLong());
         for (String campo : new String[]{"id", "contratoId", "grupoLogicoId", "versaoDocumento", "documentoAnteriorId",
@@ -156,7 +156,7 @@ class DocumentoVersaoCanonicaH04HttpIT extends ContratosHttpBase {
                 "primeiraResposta", primeira, "getAposCommit", getAposCommit, "versionJpa", versionJpa,
                 "replay", replay, "antesReplayRecusa", fotografiaAntesRepeticao,
                 "depoisReplayRecusa", fotografiaDepoisRepeticao, "cadeiaIntegra", true,
-                "resultado", "PASS", "camada", "MockMvc + JPA + MySQL real; sem prova de navegador ou TCP")));
+                "resultado", "PASS", "camada", "MockMvc + JPA + PostgreSQL real; sem prova de navegador ou TCP")));
     }
 
     /** Somente SELECT. Nenhuma tabela ou linha é criada/corrigida por SQL. */

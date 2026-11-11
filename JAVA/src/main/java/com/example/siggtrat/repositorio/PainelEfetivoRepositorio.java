@@ -215,8 +215,8 @@ public class PainelEfetivoRepositorio {
             List<Long> ids = jdbc.queryForList("""
                 SELECT c.id_contrato FROM contrato c
                   JOIN gestao_local gl ON gl.id_gestao_local = c.id_gestao_local
-                 WHERE c.id_contrato > :cursor AND (:contratoId IS NULL OR c.id_contrato = :contratoId)
-                   AND ((:gestaoLocalId IS NULL AND :superintendenciaId IS NULL)
+                 WHERE c.id_contrato > :cursor AND (CAST(:contratoId AS BIGINT) IS NULL OR c.id_contrato = :contratoId)
+                   AND ((CAST(:gestaoLocalId AS BIGINT) IS NULL AND CAST(:superintendenciaId AS BIGINT) IS NULL)
                      OR c.id_gestao_local = :gestaoLocalId OR gl.id_superintendencia = :superintendenciaId
                      OR EXISTS (SELECT 1 FROM contrato_versao_negocial cv
                           JOIN gestao_local gh ON gh.id_gestao_local = cv.gestao_local_id
@@ -284,7 +284,7 @@ public class PainelEfetivoRepositorio {
         String sql = """
             WITH RECURSIVE datas AS (
                 SELECT CAST(:inicio AS DATE) data UNION ALL
-                SELECT DATE_ADD(data, INTERVAL 1 DAY) FROM datas WHERE data < CAST(:fim AS DATE)
+                SELECT data + 1 FROM datas WHERE data < CAST(:fim AS DATE)
             )
             SELECT d.data, COUNT(DISTINCT v.id_vinculo_contratual) alocados
               FROM datas d JOIN vinculo_contratual v ON v.id_contrato = :contratoId
@@ -318,9 +318,9 @@ public class PainelEfetivoRepositorio {
         String l = snapshot ? "lotacao_snapshot_id" : "id_lotacao";
         String j = snapshot ? "jornada_snapshot_id" : "id_jornada";
         String c = snapshot ? "cargo_snapshot_id" : "id_cargo";
-        return " AND (:lotacaoId IS NULL OR " + alias + "." + l + " = :lotacaoId)"
-                + " AND (:jornadaId IS NULL OR " + alias + "." + j + " = :jornadaId)"
-                + " AND (:cargoId IS NULL OR " + alias + "." + c + " = :cargoId)";
+        return " AND (CAST(:lotacaoId AS BIGINT) IS NULL OR " + alias + "." + l + " = :lotacaoId)"
+                + " AND (CAST(:jornadaId AS BIGINT) IS NULL OR " + alias + "." + j + " = :jornadaId)"
+                + " AND (CAST(:cargoId AS BIGINT) IS NULL OR " + alias + "." + c + " = :cargoId)";
     }
     private String escopoFrequencia(Filtro f) {
         return (f.gestao != null ? " AND f.gestao_local_snapshot_id = :gestaoLocalId" : "")

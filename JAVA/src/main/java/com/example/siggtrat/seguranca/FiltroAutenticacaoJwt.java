@@ -40,6 +40,7 @@ public class FiltroAutenticacaoJwt extends OncePerRequestFilter {
     private final UtilitarioJwt jwtUtil;
     private final DetalhesUsuarioPersonalizadoServico customUserDetailsServico;
     private final TokenAtivoRepositorio tokenAtivoRepositorio;
+    private final com.example.siggtrat.servico.RevogacaoSessaoServico revogacaoSessaoServico;
 
     // Este cache reduz gravações repetidas de atividade; nunca autoriza uma
     // sessão. A existência e o último acesso autoritativos vêm do banco.
@@ -55,7 +56,9 @@ public class FiltroAutenticacaoJwt extends OncePerRequestFilter {
     public FiltroAutenticacaoJwt(UtilitarioJwt jwtUtil,
                                    DetalhesUsuarioPersonalizadoServico customUserDetailsServico,
                                    TokenAtivoRepositorio tokenAtivoRepositorio,
-                                   PropriedadesSegurancaJwt properties) {
+                                   PropriedadesSegurancaJwt properties,
+                                    com.example.siggtrat.servico.RevogacaoSessaoServico revogacaoSessaoServico) {
+        this.revogacaoSessaoServico = revogacaoSessaoServico;
         this.jwtUtil = jwtUtil;
         this.customUserDetailsServico = customUserDetailsServico;
         this.tokenAtivoRepositorio = tokenAtivoRepositorio;
@@ -81,7 +84,7 @@ public class FiltroAutenticacaoJwt extends OncePerRequestFilter {
 
                         if (estaInativoHaMuitoTempo(tokenAtivo)) {
                             logger.info("Sessão encerrada por inatividade. Usuário: {}", tokenAtivo.getUsername());
-                            tokenAtivoRepositorio.excluirPorTokenBruto(jwt);
+                            revogacaoSessaoServico.revogarToken(jwt);
                             atividadeCache.remove(jwt);
 
                             request.setAttribute("AUTH_ERROR_CODE", "SESSION_IDLE_TIMEOUT");
@@ -92,13 +95,9 @@ public class FiltroAutenticacaoJwt extends OncePerRequestFilter {
                             Long userId = jwtUtil.extrairIdUsuario(jwt);
                             if (definirContextoAutenticacao(request, userId)) {
                                 if (trocaSenhaObrigatoria() && !permiteAcessoAntesDaTroca(request)) {
-                                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                                    response.setContentType("application/json");
-                                    response.setCharacterEncoding("UTF-8");
-                                    response.getWriter().write("{\"status\":403,\"error\":\"Forbidden\","
-                                            + "\"code\":\"PASSWORD_CHANGE_REQUIRED\","
-                                            + "\"message\":\"Altere a senha inicial antes de acessar o sistema.\","
-                                            + "\"action\":\"CHANGE_PASSWORD\"}");
+                                    com.example.siggtrat.diagnostico.ErroHttpCorrelacionado.escrever(request,response,403,
+                                            "PASSWORD_CHANGE_REQUIRED","Altere a senha inicial antes de acessar o sistema.",
+                                            "CHANGE_PASSWORD");
                                     return;
                                 }
                                 request.setAttribute("twoFactorVerified", jwtUtil.segundoFatorVerificado(jwt));
@@ -120,10 +119,10 @@ public class FiltroAutenticacaoJwt extends OncePerRequestFilter {
                     }
                 }
             } catch (JwtException e) {
-                logger.debug("JWT Inválido/Expirado: {}", e.getMessage());
+                logger.debug("FiltroAutenticacaoJwt: JWT Inválido/Expirado falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
                 SecurityContextHolder.clearContext();
             } catch (Exception e) {
-                logger.error("Erro interno no filtro", e);
+                logger.error("FiltroAutenticacaoJwt: Erro interno no filtro falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
                 SecurityContextHolder.clearContext();
             }
         }

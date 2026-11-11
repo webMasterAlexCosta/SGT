@@ -11,7 +11,11 @@ import org.springframework.stereotype.Service;
 import java.util.Arrays;
 
 @Service
-public class CacheDiagnosticoServico {
+public class CacheDiagnosticoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CacheDiagnosticoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final CacheManager cacheManager;
     private final ObjectProvider<RedisConnectionFactory> redisConnectionFactoryProvider;

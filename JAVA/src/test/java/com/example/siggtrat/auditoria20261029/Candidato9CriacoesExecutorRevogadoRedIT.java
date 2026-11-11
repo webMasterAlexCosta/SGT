@@ -4,6 +4,8 @@ import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.dominio.acesso.TipoPermissaoExcepcional;
 import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.entidade.*;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.Timeout;
@@ -45,7 +47,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Jornada. Status.criar e Permissao.revogar foram descartados porque já retêm
  * PESSIMISTIC_READ no executor. Não há mudança de produção nem execução pelo autor.
  * O controle positivo e a tentativa usam o mesmo comando e perfil permitido.
- * A ordem depende da espera física no PRIMARY da tabela/ID informados e de
+ * A ordem depende da espera física PostgreSQL associada ao JDBC do ator e de
  * revogação HTTP commitada antes da liberação. Uma falha dessas premissas é
  * falha de preparação, não comprovação do defeito de autorização.
  */
@@ -60,7 +62,7 @@ class Candidato9CriacoesExecutorRevogadoRedIT extends ContratosHttpBase {
     @Timeout(value = 75, unit = TimeUnit.SECONDS)
     void criacaoExigeExecutorCorrenteDepoisDaEsperaNaReferencia(String fluxo) throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
         }
         Plano p = preparar(criarCenarioPersistido(), fluxo);
         JsonNode antes = p.estado().get();
@@ -76,11 +78,16 @@ class Candidato9CriacoesExecutorRevogadoRedIT extends ContratosHttpBase {
         var pool = Executors.newFixedThreadPool(3);
         CountDownLatch liberar = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBloqueadora = new CompletableFuture<>();
+        var ator = new Ator("criacao-" + fluxo);
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 // Somente a referência já existente: nenhum campo nem Usuario é alterado.
-                assertThat(em.find(p.raiz(), p.raizId(), LockModeType.PESSIMISTIC_WRITE)).isNotNull();
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                // FOR UPDATE retém também a chave referenciada pela FK. O lock padrão
+                // Hibernate FOR NO KEY UPDATE é compatível com FK KEY SHARE no PostgreSQL.
+                assertThat(em.createNativeQuery("select " + colunaRaiz(p.tabela()) + " from " + p.tabela()
+                        + " where " + colunaRaiz(p.tabela()) + "=:id for update")
+                        .setParameter("id", p.raizId()).getSingleResult()).isNotNull();
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(40, TimeUnit.SECONDS))
@@ -91,8 +98,11 @@ class Candidato9CriacoesExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            List<Map<String, Object>> espera = aguardarBloqueioReal(conexao, p.tabela(), p.raizId(), tentativa);
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            List<Map<String, Object>> espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave(p.tabela(), colunaRaiz(p.tabela()), p.raizId())
+                            || sql.insercao(tabelaCriacao(fluxo), colunaRaiz(p.tabela()), p.raizId()),
+                    p.tabela() + "/" + p.raizId(), tentativa);
 
             // Outro Admin e outra transação. O limite evita deixar a fixture
             // presa caso uma guarda já retenha corretamente o executor.
@@ -130,7 +140,7 @@ class Candidato9CriacoesExecutorRevogadoRedIT extends ContratosHttpBase {
                     "controlePositivoStatus", p.statusControle(), "executorId", p.executor().getId(),
                     "tipoRevogacao", retirarPerfilLocal ? "PERDA_PERFIL_LOCAL" : "DESATIVACAO_ADMIN",
                     "revogadorId", p.revogador().getId(), "tabelaBloqueada", p.tabela(), "registroBloqueado", p.raizId(),
-                    "esperaMySqlObservada", true, "esperaFisica", espera,
+                    "esperaPostgresObservada", true, "esperaFisica", espera,
                     "revogacaoCommitadaAntesDaLiberacao", true,
                     "status", resultado.getResponse().getStatus(), "antes", antes, "depois", depois)));
             assertAll("Criar exige autoridade corrente depois da espera: " + fluxo,
@@ -327,38 +337,23 @@ class Candidato9CriacoesExecutorRevogadoRedIT extends ContratosHttpBase {
         throw new AssertionError("Referência da fixture ausente: " + classe.getSimpleName() + "/" + id);
     }
 
-    private List<Map<String, Object>> aguardarBloqueioReal(long bloqueadora, String tabela, long id,
-                                                          Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<List<Map<String, Object>>> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                List<Map<String, Object>> linhas = jdbc.queryForList("select w.REQUESTING_THREAD_ID as solicitante, "
-                        + "w.BLOCKING_THREAD_ID as bloqueador, r.OBJECT_SCHEMA as esquema, r.OBJECT_NAME as tabela, "
-                        + "r.INDEX_NAME as indice, r.LOCK_DATA as registro, r.LOCK_MODE as modo_solicitado, "
-                        + "b.LOCK_MODE as modo_detido, r.LOCK_STATUS as estado "
-                        + "from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "join performance_schema.data_locks r on r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID and r.ENGINE=w.ENGINE "
-                        + "join performance_schema.data_locks b on b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID and b.ENGINE=w.ENGINE "
-                        + "where t.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() and r.OBJECT_NAME=? "
-                        + "and r.INDEX_NAME='PRIMARY' and r.LOCK_TYPE='RECORD' and r.LOCK_DATA=? "
-                        + "and r.LOCK_STATUS='WAITING' and b.LOCK_STATUS='GRANTED' "
-                        + "and b.OBJECT_SCHEMA=r.OBJECT_SCHEMA and b.OBJECT_NAME=r.OBJECT_NAME "
-                        + "and b.INDEX_NAME=r.INDEX_NAME and b.LOCK_DATA=r.LOCK_DATA",
-                        bloqueadora, tabela, Long.toString(id));
-                if (!linhas.isEmpty()) observada.complete(List.copyOf(linhas));
-                else if (tentativa.isDone()) observada.completeExceptionally(
-                        new AssertionError("Comando não alcançou espera física em " + tabela + "/" + id));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true);
-            observador.shutdownNow();
-            observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
+    private String colunaRaiz(String tabela) {
+        return switch(tabela) {
+            case "superintendencia_estadual" -> "id_superintendencia";
+            case "contrato" -> "id_contrato";
+            case "gestao_local" -> "id_gestao_local";
+            case "jornada" -> "id_jornada";
+            default -> throw new AssertionError("Raiz não prevista: " + tabela);
+        };
+    }
+    private String tabelaCriacao(String fluxo) {
+        return switch(fluxo) {
+            case "USUARIO" -> "usuario_aplicacao";
+            case "PERMISSAO" -> "permissao_excepcional";
+            case "CARGO" -> "cargo";
+            case "REGRA" -> "regra_adicional";
+            default -> throw new AssertionError("Fluxo não previsto: " + fluxo);
+        };
     }
 
     private record Plano(String hipotese, UsuarioAplicacao executor, UsuarioAplicacao revogador,

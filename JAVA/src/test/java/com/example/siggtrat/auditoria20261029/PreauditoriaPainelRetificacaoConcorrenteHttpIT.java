@@ -48,7 +48,8 @@ public class PreauditoriaPainelRetificacaoConcorrenteHttpIT extends ContratosHtt
                     frame.getClassName().equals("com.example.siggtrat.servico.PainelCalculoEstadoServico")
                             && frame.getMethodName().equals("concluir"));
             if (conclusao && normal.startsWith("select ") && normal.contains(" from painel_calculo ")
-                    && normal.contains("for update") && espera.usada().compareAndSet(false, true)) {
+                    && (normal.contains("for update") || normal.contains("for no key update"))
+                    && espera.usada().compareAndSet(false, true)) {
                 // O DTO já foi calculado e serializado. A espera ocorre ANTES
                 // da execução do SELECT: não se retém o lock de publicação.
                 espera.alcancou().complete(null);

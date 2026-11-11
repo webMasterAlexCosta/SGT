@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import jakarta.persistence.LockModeType;
@@ -9,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,7 +54,7 @@ class Candidato4FontesExecutorRevogadoRedIT extends ContratosHttpBase {
         long criado = positivo.path("id").asLong();
         assertThat(criado).isPositive();
         Estado antes = estado(c.empregadoA.getId());
-        MockHttpServletRequestBuilder comando = fluxo.equals("CANCELAR_OCORRENCIA")
+        AbstractMockHttpServletRequestBuilder<?> comando = fluxo.equals("CANCELAR_OCORRENCIA")
                 ? delete("/api/ocorrencias/" + criado) : criar(fluxo, c, DATA);
         var pedido = autenticar(comando, c.localA);
         var pool = Executors.newFixedThreadPool(2);
@@ -60,7 +63,7 @@ class Candidato4FontesExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, c.contratoA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Limite da fixture: raiz não liberada");
@@ -68,8 +71,11 @@ class Candidato4FontesExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("fonte-manual-" + fluxo);
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    "Fonte manual: Contrato da fixture", tentativa);
             executar(c.admin, put("/api/usuarios/" + c.localA.getId()).contentType(APPLICATION_JSON)
                     .content(json(mapa("active", false))), 200,
                     "Desativação administrativa confirmada antes de liberar " + fluxo);
@@ -83,7 +89,7 @@ class Candidato4FontesExecutorRevogadoRedIT extends ContratosHttpBase {
             Path evidencia = Path.of("target/auditoria-http/candidato4-fontes-executor-" + fluxo + ".json");
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
-                    "hipotese", "C4-TR-H03", "fluxo", fluxo, "esperaMySqlObservada", true,
+                    "hipotese", "C4-TR-H03", "fluxo", fluxo, "esperaPostgresObservada", espera,
                     "revogacaoCommitadaAntesDaLiberacao", true, "status", resultado.getResponse().getStatus(),
                     "antes", antes, "depois", depois)));
             assertAll("A autorização atual deve sobreviver à espera do contexto negocial",
@@ -92,7 +98,7 @@ class Candidato4FontesExecutorRevogadoRedIT extends ContratosHttpBase {
         } finally { liberar.countDown(); pool.shutdownNow(); pool.awaitTermination(10, TimeUnit.SECONDS); }
     }
 
-    private MockHttpServletRequestBuilder criar(String fluxo, Cenario c, LocalDate dia) throws Exception {
+    private AbstractMockHttpServletRequestBuilder<?> criar(String fluxo, Cenario c, LocalDate dia) throws Exception {
         if (fluxo.equals("ADICIONAL")) return post("/api/frequencias-adicionais").contentType(APPLICATION_JSON)
                 .content(json(mapa("empregadoId", c.empregadoA.getId(), "dataReferencia", dia,
                         "tipo", "RT", "minutos", 30, "quantidade", 1,
@@ -119,22 +125,6 @@ class Candidato4FontesExecutorRevogadoRedIT extends ContratosHttpBase {
     private long contar(String entidade, long empregadoId) {
         return em.createQuery("select count(x) from " + entidade + " x where x.empregado.id=:e", Long.class)
                 .setParameter("e", empregadoId).getSingleResult();
-    }
-    private void aguardarBloqueioReal(long conexaoBloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<Void> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
-                if (esperas != null && esperas > 0) observada.complete(null);
-                else if (tentativa.isDone()) observada.completeExceptionally(new AssertionError("Fonte não aguardou Contrato"));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { observada.get(10, TimeUnit.SECONDS); }
-        finally { consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS); }
     }
     private record Estado(long adicionais, long excecoes, long ocorrencias, long historicos, long canceladas, long versoes) { }
 }

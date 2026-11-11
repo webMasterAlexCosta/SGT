@@ -58,7 +58,7 @@ async function historical({ page, context, check, open, screenshot, report }) {
   const endpoint = `/api/contratos/${fixture.contratoId}`;
   report.fixture = { ...fixture, sha256: state.historicalFixtureSha256, origin: state.historicalOrigin };
   report.cuts = [];
-  report.limits = ['Fixture sintética criada pela suíte Spring/JPA/MySQL. A perda documental foi simulada pelo teste Java; as provas foram incorporadas pela API canônica.',
+  report.limits = ['Fixture sintética criada pela suíte Spring/JPA/PostgreSQL 18.6, com banco isolado e origem reconciliados pela coordenação. A perda documental foi simulada pelo teste Java; as provas foram incorporadas pela API canônica.',
     'Este cenário lê a persistência real via TCP e navegador. Não cria fatos nem concede acesso no cliente.',
     'A restrição exercitada é a minimização do DTO de prova para seu leitor autorizado, sem tentar contornar a rota documental.'];
   await open('/historico');

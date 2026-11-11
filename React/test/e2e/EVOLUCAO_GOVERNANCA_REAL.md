@@ -1,6 +1,6 @@
 # E2E operacional: JAR integrado, prova zero/falso e IND-08
 
-> Requisito operacional vigente em 2026-11-03: MySQL exatamente 8.0.45. As referências de versões anteriores preservadas em documentação histórica e seus recibos não autorizam outra versão nesta execução.
+> Contrato vigente da campanha: PostgreSQL exatamente 18.6, conforme `.codex/validation.toml`, com banco isolado, role limitada e ownership comprovados. O laboratório autorizado usa Valkey 9.0.7 compatível com Redis, identificado como Valkey nos recibos. Os preparadores e recibos antigos de MySQL permanecem históricos e não autorizam seu uso nesta execução.
 
 ## Estado desta entrega
 
@@ -15,8 +15,8 @@ em ambiente de navegador autorizado que alcance o runtime sintético.
 
 ## Preparação necessária
 
-1. Concluir os gates Java, o build React e a integração do `dist` no novo JAR. Iniciar esse JAR com MySQL **8.0.45** e Redis sintéticos preparados, registrando as versões reais. Não executar login ou mutações concorrentes nas contas usadas pelo browser.
-2. Preservar a fixture Java mais recente `target/evolucao-fixtures/ind08-historico-parcial.json` em `runtime/private/ind08-historico-parcial.json` antes de eventual `clean`. Ela contém os IDs das três provas e os quatro cortes K exatos. O teste Java criou lacunas documentais sintéticas e incorporou as provas pela API; o navegador não reproduz essa perda por SQL.
+1. Concluir os gates Java, o build React e a integração do `dist` no novo JAR. Iniciar esse JAR com PostgreSQL **18.6** e cache real exclusivo, registrando versões, destino, role limitada e ownership. Não executar login ou mutações concorrentes nas contas usadas pelo browser.
+2. Preservar a fixture Java `target/evolucao-fixtures/ind08-historico-parcial.json` em `runtime/private/ind08-historico-parcial.json` antes de eventual `clean`. Confirmar sua origem no banco autorizado, os IDs das três provas e os quatro cortes K exatos; a data do arquivo, sozinha, não comprova essa origem. O teste Java criou lacunas documentais sintéticas e incorporou as provas pela API; o navegador não reproduz essa perda por SQL.
 3. Manter `runtime/private/e2e-fixture.json` com `synthetic: true`, os catálogos da fixture existente e os aliases `accounts.gestor_local` e `accounts.ind08_historico`. A conta histórica deve corresponder à matrícula da fixture Java atual. A coordenação preenche sua senha privadamente; nenhum script deste diretório contém ou extrai senha de fonte Java.
 4. Definir o caminho do Playwright e do Google Chrome reais já preparados. Credenciais, cookies, estado de sessão e payloads de recuperação permanecem em `runtime/private`.
 
@@ -31,16 +31,19 @@ export SGT_E2E_OUTPUT=/caminho/sgt_evolucao/evidencias/browser-evolucao
 export SGT_EVOLUCAO_LABEL=candidato-final-01
 export PLAYWRIGHT_MODULE=/caminho/playwright
 export CHROMIUM_EXECUTABLE=/caminho/google-chrome/chrome
-python3 test/e2e/preparar-evolucao-governanca-real.py --label "$SGT_EVOLUCAO_LABEL"
+# O estado privado deve estar preparado e reconciliado no PostgreSQL isolado.
+# Não executar o preparador Python legado de MySQL nesta campanha.
 node test/e2e/evolucao-governanca-real.cjs
 ```
 
-Usar Node22 e o ambiente de bibliotecas nativas já preparado para o Google Chrome. A coordenação pode também definir `SGT_E2E_MANIFEST` para registrar no recibo a referência do manifesto do frontend/JAR usado.
+Usar Node26.13.0/npm12.2.2 e o ambiente de bibliotecas nativas já preparado para o Google Chrome/Chromium. A coordenação pode também definir `SGT_E2E_MANIFEST` para registrar no recibo a referência do manifesto do frontend/JAR usado.
 
-As duas origens são explícitas e não possuem fallback. O preparador usa `SGT_BACKEND_URL`, validada pelo cliente Python; o driver usa `SGT_FRONTEND_URL`. Neste cenário integrado, o estado privado exige que ambas identifiquem o mesmo JAR. Para a cópia de upgrade na porta `18081`, configure ambas com essa origem e use seu runtime/label isolados. Não sobrescreva `api_client.BASE` nem reutilize sessões de outra origem. Copie também `configuracao_http.py` ao preparar os helpers no runtime privado.
+As duas origens são explícitas e não possuem fallback. O driver usa `SGT_FRONTEND_URL`; neste cenário integrado, o estado privado exige que as duas origens identifiquem o mesmo JAR. A coordenação deve registrar a origem efetivamente observada e usar runtime/label próprios. Não reutilizar sessões de outra origem. O preparador Python e seus helpers preservados são históricos; não executá-los contra o PostgreSQL atual nem adaptá-los por substituição de URL.
 
-O setup cria contrato futuro, composição positiva e composição com zero documentado,
-e publica o contrato pelas APIs existentes. Não cria tarifas nem chama endpoints financeiros.
+O estado privado identifica contrato publicado e composição com zero documentado,
+criados por Spring/JPA e APIs existentes no laboratório autorizado. Um corpus preservado
+exige reconciliação atual de identidade, origem e cortes D/K antes de ser reutilizado.
+Não cria tarifas nem chama endpoints financeiros.
 O estado fica em `runtime/private/evolucao-governanca-real-<label>.json` e a evidência pública
 contém apenas contagens/identificadores técnicos. Use um novo label em cada execução.
 

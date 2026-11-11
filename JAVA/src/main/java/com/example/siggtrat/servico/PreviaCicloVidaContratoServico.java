@@ -25,7 +25,11 @@ import java.util.Set;
 /** A confirmação é chamada sob o mesmo bloqueio do contrato que protege a mutação. */
 @Service
 @Transactional(readOnly = true)
-public class PreviaCicloVidaContratoServico {
+public class PreviaCicloVidaContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PreviaCicloVidaContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int LIMITE_DETALHES = 200;
     private static final Set<String> OPERACOES = Set.of("inativar", "reativar", "encerrar-antecipadamente",
             "cancelar-futuro", "anular", "corrigir-anulacao", "publicar", "transferir-gestao");
@@ -61,7 +65,7 @@ public class PreviaCicloVidaContratoServico {
 
     /** A mesma assinatura de impactos pode vincular o contexto específico de uma operação. */
     public PreviaCicloVidaContratoDTO gerar(Contrato contrato, String operacao, AcaoCicloVidaContratoDTO acao,
-                                           UsuarioAplicacao usuario, List<String> partesDaIntencao) {
+                                           UsuarioAplicacao usuario, List<?> partesDaIntencao) {
         validarDados(operacao, acao);
         LocalDate desde = inicioDoAlcance(contrato, acao);
         long quantidadeVinculos = contar("select count(v) " + VINCULOS, contrato.getId(), desde);
@@ -161,17 +165,13 @@ public class PreviaCicloVidaContratoServico {
     }
 
     private String assinar(Contrato contrato, String operacao, AcaoCicloVidaContratoDTO acao,
-            UsuarioAplicacao usuario, List<String> partesDaIntencao) {
-        List<String> partes = new ArrayList<>(List.of("ciclo-vida-v1", operacao, AssinaturaPreviaNegocial.valor(usuario.getId()),
-                AssinaturaPreviaNegocial.valor(acao.dataEfetiva()), AssinaturaPreviaNegocial.valor(acao.dataAto()), acao.motivo(),
-                AssinaturaPreviaNegocial.valor(acao.referenciaSei()), AssinaturaPreviaNegocial.valor(acao.eventoPrecedenteId()),
-                AssinaturaPreviaNegocial.valor(acao.relacaoPrecedencia()), AssinaturaPreviaNegocial.valor(acao.ordemDocumental())));
+            UsuarioAplicacao usuario, List<?> partesDaIntencao) {
+        List<Object> partes = new ArrayList<>(AssinaturaPreviaNegocial.partes(operacao, usuario.getId(), acao.dataEfetiva(), acao.dataAto(),
+                acao.motivo(), acao.referenciaSei(), acao.eventoPrecedenteId(), acao.relacaoPrecedencia(), acao.ordemDocumental()));
         partes.addAll(assinaturaImpacto.partesPorContrato(contrato.getId(), inicioDoAlcance(contrato, acao), null));
-        if ("publicar".equals(operacao)) {
-            partes.addAll(assinaturaImpacto.partesDaConfiguracaoPublicacao(contrato.getId()));
-        }
-        partes.addAll(partesDaIntencao == null ? List.of() : partesDaIntencao);
-        return AssinaturaPreviaNegocial.sha256(partes);
+        if ("publicar".equals(operacao)) partes.addAll(assinaturaImpacto.partesDaConfiguracaoPublicacao(contrato.getId()));
+        partes.add(partesDaIntencao == null ? null : new ArrayList<>(partesDaIntencao));
+        return AssinaturaPreviaNegocial.sha256("sgt.previa.ciclo-vida.v1", partes);
     }
 
     public void validarConfirmacao(Contrato contrato, String operacao, AcaoCicloVidaContratoDTO acao, UsuarioAplicacao usuario) {
@@ -179,7 +179,7 @@ public class PreviaCicloVidaContratoServico {
     }
 
     public void validarConfirmacao(Contrato contrato, String operacao, AcaoCicloVidaContratoDTO acao,
-            UsuarioAplicacao usuario, List<String> partesDaIntencao) {
+            UsuarioAplicacao usuario, List<?> partesDaIntencao) {
         if (acao == null || !Boolean.TRUE.equals(acao.confirmarImpacto()) || acao.tokenPrevia() == null || acao.tokenPrevia().isBlank()) {
             throw new ResponseStatusException(HttpStatus.CONFLICT, "Consulte a prévia de impactos e confirme expressamente a operação.");
         }

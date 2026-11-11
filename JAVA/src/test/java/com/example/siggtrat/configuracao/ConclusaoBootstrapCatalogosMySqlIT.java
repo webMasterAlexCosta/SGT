@@ -23,7 +23,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** Bootstrap real no mesmo MySQL do contexto; a transação de cada caso é revertida. */
+/** Bootstrap real no mesmo PostgreSQL do contexto; a transação de cada caso é revertida. */
 class ConclusaoBootstrapCatalogosMySqlIT extends AuditoriaHttpSuporte {
     @Autowired private ApplicationContext contexto;
 

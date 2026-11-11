@@ -6,6 +6,8 @@ import com.example.siggtrat.entidade.GestaoLocal;
 import com.example.siggtrat.entidade.SuperintendenciaEstadual;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -68,7 +70,7 @@ class GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT extends ContratosHt
     @Timeout(value = 90, unit = TimeUnit.SECONDS)
     void criacaoDeGestaoNaoAtravessaInativacaoCommitadaDaSuperintendencia() throws Exception {
         try (var connection = dataSource.getConnection()) {
-            assertThat(connection.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
+            assertThat(connection.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
         }
         Cenario c = criarCenarioPersistido();
         UsuarioAplicacao outroAdmin = emTransacao(() -> {
@@ -78,6 +80,7 @@ class GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT extends ContratosHt
         var pool = Executors.newFixedThreadPool(3);
         CountDownLatch liberarUsuario = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBarreira = new CompletableFuture<>();
+        var atorInativacao=new Ator("cascata-inativacao");var atorCriacao=new Ator("cascata-criacao");
         try {
             JsonNode seCriada = enviar(c.admin, "/api/superintendencias",
                     mapa("uf", UF, "ativo", true), 201,
@@ -116,7 +119,7 @@ class GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT extends ContratosHt
             Future<?> barreira = pool.submit(() -> emTransacao(() -> {
                 assertThat(em.find(UsuarioAplicacao.class, estadual.getId(), LockModeType.PESSIMISTIC_WRITE))
                         .as("Conta existente da própria fixture, sem modificar seus campos").isNotNull();
-                conexaoBarreira.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBarreira.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarUsuario.await(45, TimeUnit.SECONDS))
@@ -127,17 +130,17 @@ class GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT extends ContratosHt
                 return null;
             }));
             long conexao = conexaoBarreira.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> inativacao = pool.submit(() -> mvc.perform(pedidoInativacao).andReturn());
-            List<Map<String, Object>> esperaCascata = aguardarBloqueioReal(
-                    conexao, "usuario_aplicacao", estadual.getId(), inativacao);
-            long conexaoInativacao = ((Number) esperaCascata.get(0).get("solicitante_conexao")).longValue();
-            List<Map<String, Object>> lockSe = lockExclusivoDetido(
-                    conexaoInativacao, "superintendencia_estadual", se.getId());
-            assertThat(lockSe).as("Premissa: o PUT já detém X na SE antes do POST concorrente").isNotEmpty();
-
-            Future<MvcResult> criacao = pool.submit(() -> mvc.perform(pedidoCriacao).andReturn());
-            List<Map<String, Object>> esperaCriacao = aguardarBloqueioReal(
-                    conexaoInativacao, "superintendencia_estadual", se.getId(), criacao);
+            Future<MvcResult> inativacao = pool.submit(() -> atorInativacao.executar(() -> mvc.perform(pedidoInativacao).andReturn()));
+            List<Map<String, Object>> esperaCascata = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource),conexao,atorInativacao,
+                    sql->sql.selecaoId("usuario_aplicacao",estadual.getId())
+                            ||sql.alteracaoNaChave("usuario_aplicacao","id",estadual.getId()),
+                    "usuario_aplicacao/"+estadual.getId(),inativacao);
+            long conexaoInativacao = ((Number) esperaCascata.get(0).get("solicitante")).longValue();
+            Future<MvcResult> criacao = pool.submit(() -> atorCriacao.executar(() -> mvc.perform(pedidoCriacao).andReturn()));
+            List<Map<String, Object>> esperaCriacao = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource),conexaoInativacao,atorCriacao,
+                    sql->sql.selecaoChave("superintendencia_estadual","id_superintendencia",se.getId())
+                            ||sql.insercao("gestao_local","id_superintendencia",se.getId()),
+                    "superintendencia_estadual/"+se.getId(),criacao);
             Instant ambasEsperasEm = Instant.now();
             assertThat(inativacao.isDone()).isFalse();
             assertThat(criacao.isDone()).isFalse();
@@ -172,7 +175,7 @@ class GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT extends ContratosHt
                     "seedId", seed.id(), "ufTemporariaSeed", seed.ufTemporaria(), "versaoProposta", "v2",
                     "executorInativacaoId", c.admin.getId(), "executorCriacaoId", outroAdmin.getId(),
                     "codigoTentativa", codigoTentativa, "esperaCascata", esperaCascata,
-                    "lockExclusivoSeAntesDaCriacao", lockSe, "esperaCriacao", esperaCriacao,
+                    "conflitoFisicoSeDuranteCriacao", esperaCriacao, "esperaCriacao", esperaCriacao,
                     "ambasEsperasObservadasEm", ambasEsperasEm.toString(),
                     "inativacaoConcluidaEm", inativacaoConcluidaEm.toString(),
                     "statusInativacao", respostaInativacao.getResponse().getStatus(),
@@ -319,45 +322,7 @@ class GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT extends ContratosHt
         });
     }
 
-    private List<Map<String, Object>> lockExclusivoDetido(long conexao, String tabela, long id) {
-        return new JdbcTemplate(dataSource).queryForList("select d.THREAD_ID as thread_id, t.PROCESSLIST_ID as conexao, "
-                        + "d.OBJECT_NAME as tabela,d.INDEX_NAME as indice,d.LOCK_DATA as registro,d.LOCK_MODE as modo "
-                        + "from performance_schema.data_locks d join performance_schema.threads t on t.THREAD_ID=d.THREAD_ID "
-                        + "where t.PROCESSLIST_ID=? and d.OBJECT_SCHEMA=database() and d.OBJECT_NAME=? "
-                        + "and d.INDEX_NAME='PRIMARY' and d.LOCK_TYPE='RECORD' and d.LOCK_DATA=? "
-                        + "and d.LOCK_STATUS='GRANTED' and d.LOCK_MODE like 'X%'", conexao, tabela, Long.toString(id));
-    }
 
-    private List<Map<String, Object>> aguardarBloqueioReal(long bloqueadora, String tabela, long id,
-                                                          Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<List<Map<String, Object>>> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                List<Map<String, Object>> linhas = jdbc.queryForList("select w.REQUESTING_THREAD_ID as solicitante, "
-                        + "tr.PROCESSLIST_ID as solicitante_conexao, w.BLOCKING_THREAD_ID as bloqueador, "
-                        + "r.OBJECT_SCHEMA as esquema,r.OBJECT_NAME as tabela,r.INDEX_NAME as indice, "
-                        + "r.LOCK_DATA as registro,r.LOCK_MODE as modo_solicitado,b.LOCK_MODE as modo_detido, "
-                        + "r.LOCK_STATUS as estado from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "join performance_schema.threads tr on tr.THREAD_ID=w.REQUESTING_THREAD_ID "
-                        + "join performance_schema.data_locks r on r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID and r.ENGINE=w.ENGINE "
-                        + "join performance_schema.data_locks b on b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID and b.ENGINE=w.ENGINE "
-                        + "where t.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() and r.OBJECT_NAME=? "
-                        + "and r.INDEX_NAME='PRIMARY' and r.LOCK_TYPE='RECORD' and r.LOCK_DATA=? "
-                        + "and r.LOCK_STATUS='WAITING' and b.LOCK_STATUS='GRANTED' "
-                        + "and b.OBJECT_SCHEMA=r.OBJECT_SCHEMA and b.OBJECT_NAME=r.OBJECT_NAME "
-                        + "and b.INDEX_NAME=r.INDEX_NAME and b.LOCK_DATA=r.LOCK_DATA",
-                        bloqueadora, tabela, Long.toString(id));
-                if (!linhas.isEmpty()) observada.complete(List.copyOf(linhas));
-                else if (tentativa.isDone()) observada.completeExceptionally(
-                        new AssertionError("Premissa ausente: comando não aguardou " + tabela + "/" + id));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observada.get(12, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
+
+
 }

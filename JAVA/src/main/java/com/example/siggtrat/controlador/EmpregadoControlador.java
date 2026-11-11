@@ -20,7 +20,11 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/empregados")
-public class EmpregadoControlador {
+public class EmpregadoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(EmpregadoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final EmpregadoServico empregadoServico;
 

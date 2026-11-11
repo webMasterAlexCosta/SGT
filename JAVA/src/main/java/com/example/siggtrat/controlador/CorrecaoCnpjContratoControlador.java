@@ -14,7 +14,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/contratos/{contratoId}/correcoes-cnpj")
 @InvalidaCacheNegocio
-public class CorrecaoCnpjContratoControlador {
+public class CorrecaoCnpjContratoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CorrecaoCnpjContratoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final CorrecaoCnpjContratoServico servico;
     public CorrecaoCnpjContratoControlador(CorrecaoCnpjContratoServico servico) { this.servico = servico; }
     @PostMapping @ResponseStatus(HttpStatus.CREATED) @ExigirSenha

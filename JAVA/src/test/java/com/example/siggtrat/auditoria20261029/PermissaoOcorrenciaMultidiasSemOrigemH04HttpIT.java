@@ -12,7 +12,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -34,7 +34,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
- * PER-010:004 / H04. MockMvc com filtros reais e MySQL da DataSource da aplicação;
+ * PER-010:004 / H04. MockMvc com filtros reais e PostgreSQL da DataSource da aplicação;
  * cada requisição confirma sua transação e os snapshots são relidos depois.
  * Não representa navegador, conexão TCP HTTP nem uma implantação do JAR.
  * A única retirada de fonte é a fixture legada sintética e explícita da parte B.
@@ -87,6 +87,31 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
 
         negarSemEfeito(c, c.localA, get("/api/ocorrencias/{id}", ocorrencia), 403, SEM_CONTEXTO, "A-local-A");
         negarSemEfeito(c, c.localB, get("/api/ocorrencias/{id}", ocorrencia), 403, SEM_CONTEXTO, "A-local-B");
+        for (UsuarioAplicacao local : List.of(c.localA, c.localB)) {
+            negarSemEfeito(c, local, multipartCriacao(c, d1, 2, "B08-criar-A-B-" + local.getId()),
+                    403, SEM_CONTEXTO, "B08-criar-multidias-A-B-" + local.getId());
+            negarSemEfeito(c, local, delete("/api/ocorrencias/{id}", ocorrencia),
+                    403, SEM_CONTEXTO, "B08-cancelar-multidias-A-B-" + local.getId());
+            assertEquals(fotoOriginal, fotografia(ocorrencia));
+            assertNull(emTransacao(() -> em.find(Ocorrencia.class, ocorrencia).getCanceladoEm()));
+        }
+        for (var controle : List.of(java.util.Map.entry(c.localA, d1.minusDays(2)), java.util.Map.entry(c.localB, d2.plusDays(1)))) {
+            JsonNode permitido = criar(c, controle.getKey(), controle.getValue(), 2, "B08-controle-cobertura-completa-" + controle.getKey().getId());
+            long idControle = permitido.path("id").asLong(), anexoControle = permitido.path("anexos").get(0).path("id").asLong();
+            JsonNode contextosControle = emTransacao(() -> mapper.valueToTree(autorizacao.resolver(em.find(Ocorrencia.class, idControle))));
+            assertEquals(2, contextosControle.size());
+            for (int dia = 0; dia < 2; dia++) {
+                assertEquals(controle.getValue().plusDays(dia).toString(), contextosControle.get(dia).path("data").asText());
+                assertEquals(controle.getKey().getGestaoLocal().getId().longValue(), contextosControle.get(dia).path("gestaoId").asLong());
+                assertEquals(c.vinculoA.getId().longValue(), contextosControle.get(dia).path("vinculoId").asLong());
+            }
+            JsonNode fotoControle = fotografia(idControle);
+            executar(controle.getKey(), delete("/api/ocorrencias/{id}", idControle), 204,
+                    "PER001004/PER010004 controle positivo: Local possui todos os dias deste período, A/A ou B/B");
+            assertNotNull(emTransacao(() -> em.find(Ocorrencia.class, idControle).getCanceladoEm()));
+            assertEquals(fotoControle.path("contextos"), fotografia(idControle).path("contextos"));
+            verificarArquivo(anexoControle);
+        }
         verificarPaginas(c, c.localA, d1, 0, ocorrencia, "A-lista-local-A");
         verificarPaginas(c, c.localB, d1, 0, ocorrencia, "A-lista-local-B");
         verificarPaginas(c, c.nacional, d1, 1, ocorrencia, "A-lista-nacional");
@@ -141,7 +166,7 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
         assertEquals(fotoOriginal, fotografia(ocorrencia));
         verificarArquivo(anexo);
         assertTrue(integridade.verificarEmpregado(c.empregadoA.getId()).integro());
-        registrar(c, "A-conclusao", mapa("camada", "MOCKMVC_JPA_MYSQL", "predicados", "EXECUTADOS",
+        registrar(c, "A-conclusao", mapa("camada", "MOCKMVC_JPA_POSTGRES", "predicados", "EXECUTADOS",
                 "fotografiaOriginalPreservada", fotografia(ocorrencia), "concessaoARevogada", revogada,
                 "usosA", usos(c, permissaoA), "usosB", usos(c, permissaoB)));
     }
@@ -269,7 +294,7 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
         JsonNode novaComProva = criar(c, c.localB, comprovado, 1, "B-criacao-controle-com-origem");
         assertTrue(novaComProva.path("id").asLong() > 0);
         assertEquals(fotoOriginal, fotografia(ocorrencia));
-        registrar(c, "B-conclusao", mapa("camada", "MOCKMVC_JPA_MYSQL", "seisConsumidores", List.of(
+        registrar(c, "B-conclusao", mapa("camada", "MOCKMVC_JPA_POSTGRES", "seisConsumidores", List.of(
                         "detalhe403", "lista200vazia", "arquivo403semBytes", "criar409semEfeito",
                         "cancelar403semEfeito", "conceder201_e_uso403semEfeito"),
                 "limiteArquitetural", "Concessão não recebe ocorrênciaId/data: 201 genérico não prova concessão contextual recusada",
@@ -285,7 +310,7 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
         return r;
     }
 
-    private MockHttpServletRequestBuilder multipartCriacao(Cenario c, LocalDate dia, int dias, String rotulo) {
+    private AbstractMockHttpServletRequestBuilder<?> multipartCriacao(Cenario c, LocalDate dia, int dias, String rotulo) {
         return multipart("/api/ocorrencias")
                 .file(new MockMultipartFile("anexos", "prova-PER010004.txt", "text/plain", DOCUMENTO))
                 .param("empregadoId", c.empregadoA.getId().toString()).param("motivo", "ATESTADO")
@@ -296,7 +321,8 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
 
     private void transferir(Cenario c, LocalDate dia, String rotulo) throws Exception {
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", dia, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Transferência retroativa legítima PER010004 " + rotulo,
                 "referenciaSei", "SEI-SINTETICO-PER010004", "autorizacaoAdministrativa", "ATO-HTTP",
@@ -409,7 +435,7 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
         assertSemEfeito(c, rotulo, antes);
     }
 
-    private void negarSemEfeito(Cenario c, UsuarioAplicacao ator, MockHttpServletRequestBuilder pedido,
+    private void negarSemEfeito(Cenario c, UsuarioAplicacao ator, AbstractMockHttpServletRequestBuilder<?> pedido,
                                int status, String causa, String rotulo) throws Exception {
         JsonNode antes = snapshot(c);
         MvcResult r = executar(ator, pedido, status, "PER010004 " + rotulo);
@@ -493,7 +519,7 @@ class PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT extends ContratosHttpBase {
     private void registrar(Cenario c, String fase, Map<String, Object> conteudo) throws Exception {
         Map<String, Object> r = new LinkedHashMap<>();
         r.put("criterio", "PER-010:004"); r.put("fase", fase); r.put("emUtc", Instant.now());
-        r.put("camada", "MOCKMVC_COM_FILTROS_JPA_MYSQL_REAL");
+        r.put("camada", "MOCKMVC_COM_FILTROS_JPA_POSTGRES_REAL");
         r.put("contratoId", c.contratoA.getId()); r.put("empregadoId", c.empregadoA.getId());
         r.putAll(conteudo);
         Path destino = Path.of("target/auditoria-http/PER010004-" + c.contratoA.getId() + "-" + fase + ".json");

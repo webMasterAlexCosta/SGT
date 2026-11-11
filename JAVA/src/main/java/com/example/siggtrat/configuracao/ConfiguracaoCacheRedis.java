@@ -185,25 +185,22 @@ public class ConfiguracaoCacheRedis implements CachingConfigurer {
         return new CacheErrorHandler() {
             @Override
             public void handleCacheGetError(RuntimeException exception, Cache cache, Object key) {
-                log.warn("Falha ao ler o cache Redis '{}' (chave {}). Consulta seguirá sem cache: {}",
-                        cache.getName(), key, exception.getMessage());
+                log.warn("ConfiguracaoCacheRedis: Falha ao ler o cache Redis falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(exception));
             }
 
             @Override
             public void handleCachePutError(RuntimeException exception, Cache cache, Object key, Object value) {
-                log.warn("Falha ao gravar o cache Redis '{}' (chave {}): {}",
-                        cache.getName(), key, exception.getMessage());
+                log.warn("ConfiguracaoCacheRedis: Falha ao gravar o cache Redis falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(exception));
             }
 
             @Override
             public void handleCacheEvictError(RuntimeException exception, Cache cache, Object key) {
-                log.warn("Falha ao invalidar o cache Redis '{}' (chave {}): {}",
-                        cache.getName(), key, exception.getMessage());
+                log.warn("ConfiguracaoCacheRedis: Falha ao invalidar o cache Redis falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(exception));
             }
 
             @Override
             public void handleCacheClearError(RuntimeException exception, Cache cache) {
-                log.warn("Falha ao limpar o cache Redis '{}': {}", cache.getName(), exception.getMessage());
+                log.warn("ConfiguracaoCacheRedis: Falha ao limpar o cache Redis falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(exception));
             }
         };
     }

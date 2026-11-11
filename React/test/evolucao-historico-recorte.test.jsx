@@ -4,11 +4,11 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 const { requisitar, auth } = vi.hoisted(() => ({ requisitar: vi.fn(), auth: { user: null } }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: valor => Array.isArray(valor) ? valor : valor?.content || [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => auth }));
-import { ServicoHistorico } from '../src/services/historico/ServicoHistorico.js';
-import { PaginaHistorico } from '../src/modules/historico/PaginaHistorico.jsx';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: valor => Array.isArray(valor) ? valor : valor?.content || [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => auth }));
+import { ServicoHistorico } from '../src/services/historico/ServicoHistorico.ts';
+import { PaginaHistorico } from '../src/modules/historico/PaginaHistorico.tsx';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
 import { diferida } from './fixtures/promessaDiferida.js';
 
 const K = '2026-02-01T12:00:00.123456Z';

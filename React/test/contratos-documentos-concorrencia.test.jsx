@@ -4,10 +4,10 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: r => Array.isArray(r) ? r : [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'ADMINISTRADOR' } }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: r => Array.isArray(r) ? r : [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'ADMINISTRADOR' } }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.tsx';
 
 const documentos = [
   { id: 1, titulo: 'Documento A', classificacaoAcesso: 'PESSOAL_RESTRITO', estado: 'PUBLICADO' },

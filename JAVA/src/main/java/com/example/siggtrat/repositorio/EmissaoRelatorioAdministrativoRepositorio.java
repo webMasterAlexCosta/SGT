@@ -67,7 +67,7 @@ public interface EmissaoRelatorioAdministrativoRepositorio extends
                e.superintendenciaEscopoId as superintendenciaEscopoId,
                e.lotacaoId as lotacaoId, e.jornadaId as jornadaId, e.fonteConhecidaAte as fonteConhecidaAte
         from EmissaoRelatorioAdministrativo e
-        where e.estado = :estado and e.fim >= :desde and (:ate is null or e.inicio <= :ate)
+        where e.estado = :estado and e.fim >= :desde and (cast(:ate as date) is null or e.inicio <= :ate)
           and e.id > :ultimoId
         order by e.id asc
         """)

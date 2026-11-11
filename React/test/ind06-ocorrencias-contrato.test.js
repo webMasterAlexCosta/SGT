@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-import { ServicoOcorrencia } from '../src/services/rh/ServicoOcorrencia.js';
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+import { ServicoOcorrencia } from '../src/services/rh/ServicoOcorrencia.ts';
 
 const contexto = { dataRef: '2026-11-01', lotacaoId: 7, turnoId: 8 };
 beforeEach(() => { requisitar.mockReset(); });

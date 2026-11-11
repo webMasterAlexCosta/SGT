@@ -1,0 +1,9 @@
+{
+  "thread_id": "01a1c50d-6d2d-74e3-910d-86635b797156",
+  "turn_id": "01a1c8c3-9318-7031-92c8-1aa63eb74725",
+  "model": "gpt-6.1-sol",
+  "effort": "xhigh",
+  "cwd": "/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT",
+  "source": "actual turn_context, not saved configuration",
+  "read_only": true
+}

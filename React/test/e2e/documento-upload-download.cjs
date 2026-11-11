@@ -28,7 +28,12 @@ execute('documento-upload-download', async ({ page, fixture, check, screenshot, 
   await item.getByRole('button', { name: 'Baixar', exact: true }).click();
   const download = await downloadPromise;
   const downloaded = fs.readFileSync(await download.path());
+  const preserved = path.join(process.env.SGT_E2E_OUTPUT, 'documento-comprovante-download.png');
+  fs.writeFileSync(preserved, downloaded, { mode: 0o600 });
+  const descriptor = fs.openSync(preserved, 'r');
+  try { fs.fsyncSync(descriptor); } finally { fs.closeSync(descriptor); }
   const digest = value => crypto.createHash('sha256').update(value).digest('hex');
   check('Download autenticado preserva exatamente os bytes enviados', digest(source) === digest(downloaded), { sha256: digest(downloaded), bytes: downloaded.length, filename: download.suggestedFilename() });
+  check('Cópia durável do download mantém os bytes comparados', digest(fs.readFileSync(preserved)) === digest(source));
   await screenshot('documento-registrado');
 });

@@ -14,7 +14,11 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class CalculoFrequenciaServico {
+public class CalculoFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CalculoFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     public static final String CALCULO_VERSAO = "CLT-NOTURNO-3.0";
 

@@ -4,15 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 const observador = vi.hoisted(() => ({ notificar: vi.fn(), confirmar: vi.fn() }));
-vi.mock('../src/core/events.js', async original => ({ ...(await original()), notificar: observador.notificar }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { id: 81, perfil: 'GESTOR_LOCAL' } }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: observador.confirmar, ModalConfirmacao: () => null }) }));
-vi.mock('../src/core/config.js', async original => { const modulo = await original(); return { ...modulo, CONFIG: { ...modulo.CONFIG, SEARCH_DEBOUNCE_MS: 0 } }; });
-import { PaginaOcorrencias } from '../src/modules/rh/pages/PaginaOcorrencias/index.jsx';
-import { api } from '../src/core/http.js';
-import { invalidarGeracaoSessao, obterGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+vi.mock('../src/core/events.ts', async original => ({ ...(await original()), notificar: observador.notificar }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { id: 81, perfil: 'GESTOR_LOCAL' } }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: observador.confirmar, ModalConfirmacao: () => null }) }));
+vi.mock('../src/core/config.ts', async original => { const modulo = await original(); return { ...modulo, CONFIG: { ...modulo.CONFIG, SEARCH_DEBOUNCE_MS: 0 } }; });
+import { PaginaOcorrencias } from '../src/modules/rh/pages/PaginaOcorrencias/index.tsx';
+import { api } from '../src/core/http.ts';
+import { invalidarGeracaoSessao, obterGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 
 const adiar = () => { let resolve, reject; const promise = new Promise((r, j) => { resolve = r; reject = j; }); return { promise, resolve, reject }; };
 const ok = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });

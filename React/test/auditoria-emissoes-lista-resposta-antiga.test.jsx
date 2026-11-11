@@ -4,14 +4,14 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const { listar, filtros } = vi.hoisted(() => ({ listar: vi.fn(), filtros: vi.fn() }));
-vi.mock('../src/services/rh/ServicoFrequencia.js', () => ({ ServicoFrequencia: { carregarFiltrosRelatorio: filtros } }));
-vi.mock('../src/services/rh/ServicoRelatorioAdministrativo.js', () => ({
+vi.mock('../src/services/rh/ServicoFrequencia.ts', () => ({ ServicoFrequencia: { carregarFiltrosRelatorio: filtros } }));
+vi.mock('../src/services/rh/ServicoRelatorioAdministrativo.ts', () => ({
   ServicoRelatorioAdministrativo: { listar },
   criarChaveIdempotenciaRelatorio: () => 'intencao-sintetica-apenas-consulta',
 }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'PERFIL_GESTOR_LOCAL' } }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.jsx';
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'PERFIL_GESTOR_LOCAL' } }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.tsx';
 const pendente = () => {
   let resolve;
   const promise = new Promise(ok => { resolve = ok; });

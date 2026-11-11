@@ -1,0 +1,22 @@
+{
+  "verified": true,
+  "scope": "PG18_6_FULL_SERVICES_MOCKMVC_THREE_RESPONSIBILITY_CASES_NOT_CHROME_PACKAGED_HTTP",
+  "tests": 3,
+  "same_jar_main_class_bytes": 823,
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "receipt": "it-pendencia-responsabilidade-final08-01/result.json",
+  "receipt_sha256": "74f050a187666b48bab1945fc1462c06ea059fd8953934e7b26a0fdac315c9d6",
+  "source": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/PendenciaFrequenciaResponsabilidadeAtualHttpIT.java",
+  "source_sha256": "de2f633e00d4fe389314405316e2541db8f5d9245fdad3144598570f5edf4f4a",
+  "predicates": [
+    "AUD-006:005 responsible Gestão/Lotação/Turno after transfer and second transfer with open revision; old manager cannot initiate treatment",
+    "AUD-006:006 ALL active revisions incl prior version EM_TRATAMENTO retain IDs/keys/reason/creation/first-treatment author/time/source photograph",
+    "Human correction resolves all revisions from the same source, preserves first event and removes report warning/count"
+  ],
+  "no_flush": true,
+  "cache_database": 2,
+  "limitations": [
+    "Synthetic JPA fixture with actual Hibernate/PostgreSQL transactions and real application services/MockMvc; not Tomcat packaged-browser/LAN.",
+    "Current byte equality proves same production implementation; these three methods are the concrete oracle, not all module acceptance."
+  ]
+}

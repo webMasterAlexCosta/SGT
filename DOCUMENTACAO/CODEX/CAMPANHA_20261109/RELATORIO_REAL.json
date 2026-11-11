@@ -1,0 +1,101 @@
+{
+  "state": "CURRENT_JAR_REPORT_PASS_ROOT_VISUAL_NATIVE_REVIEW_PENDING",
+  "batch": "it-relatorio-contextual-03",
+  "receipt_sha256": "f8811f91bab60eee37b9e1f144fa04db919e1d97ea73d8b7ee885c6d98c774c5",
+  "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+  "production_source_manifest_sha256": "ca076478a5174c32114865bd1bafac736f7eaaa936ba726777a7e744b7f43627",
+  "reports": [
+    {
+      "name": "com.example.siggtrat.auditoria20261029.RelatorioJarMultipaginaIT",
+      "tests": "1",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "73.492",
+      "effective_test_context_cache_max_size": "1",
+      "xml_sha256": "a329f299c4573b63072863ab198649a3a7f34874e6a7780ac7f4c33e47cdfbf3"
+    }
+  ],
+  "checks": {
+    "quarentaEDuasFontesHttpConfirmadas": true,
+    "apiQuarentaEUmSemPerdaOuDuplicacaoEmVinteECincoMaisDezesseis": true,
+    "controleOutroEscopoComUmaPessoa": true,
+    "pdfExatamenteDuasPaginasQuarentaEUmNomesEValores": true,
+    "xlsxRecorteCompletoQuarentaEUmLinhasEValores": true,
+    "arquivosControleUmaPessoaSemVazamentoEntreFiltros": true,
+    "negativasDeEscopoEPerfilNaConsultaEEmAmbosExportadores": true,
+    "mesmoJarClassesConferidasEFilhoSaudavel": true,
+    "filhoProprioEncerrado": true
+  },
+  "population_a": 41,
+  "population_b": 1,
+  "api_page_sizes": [
+    25,
+    16
+  ],
+  "pdf_a_pages": 2,
+  "pdf_b_pages": 1,
+  "pdf_a_names_per_page": [
+    28,
+    13
+  ],
+  "actual_table_continuation_confirmed": true,
+  "files": {
+    "relatorio-a-41.pdf": {
+      "sha256": "ff546013a1a0e2b8f95333defa1e87da7a0600243c9e55fb8efa1f727b13ce42",
+      "bytes": 13394,
+      "contentType": "application/pdf",
+      "contentDisposition": "attachment; filename=\"Relatorio_Frequencia_Lotacao_Gestao_A_a8b2d6d4_Turno_8h_Gestao_A_a8b2d6d4_2026-11-10_03-13-27.pdf\"",
+      "cacheControl": "no-store",
+      "nosniff": "nosniff"
+    },
+    "relatorio-a-41.xlsx": {
+      "sha256": "6044aa2fbd17a8b0bb58acf72b936bb4a598d50113a13a42e5c8efe1fdefc5cb",
+      "bytes": 7600,
+      "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "contentDisposition": "attachment; filename=\"Relatorio_Frequencia_Lotacao_Gestao_A_a8b2d6d4_Turno_8h_Gestao_A_a8b2d6d4_2026-11-10_03-13-28.xlsx\"",
+      "cacheControl": "no-store",
+      "nosniff": "nosniff"
+    },
+    "relatorio-b-1.pdf": {
+      "sha256": "66944ceb645384c511c933cba909e0c3b342ebe890a6684b11a56f17d7550ecf",
+      "bytes": 3154,
+      "contentType": "application/pdf",
+      "contentDisposition": "attachment; filename=\"Relatorio_Frequencia_Lotacao_Gestao_B_a8b2d6d4_Turno_8h_Gestao_B_a8b2d6d4_2026-11-10_03-13-28.pdf\"",
+      "cacheControl": "no-store",
+      "nosniff": "nosniff"
+    },
+    "relatorio-b-1.xlsx": {
+      "sha256": "f9143296ff908d45e93c6751ebd94a430736cac0f091a2336a69d015a9fc00d9",
+      "bytes": 4729,
+      "contentType": "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+      "contentDisposition": "attachment; filename=\"Relatorio_Frequencia_Lotacao_Gestao_B_a8b2d6d4_Turno_8h_Gestao_B_a8b2d6d4_2026-11-10_03-13-28.xlsx\"",
+      "cacheControl": "no-store",
+      "nosniff": "nosniff"
+    }
+  },
+  "scenario_manifest_sha256": "9d3df15ede933002f5c7165527892ff1c205c5366a28b89a09b2d71ade0745f6",
+  "render_result_sha256": "b18f5229c5d46fa7f6963187c7570f4aefc1650be5bdb5ecb1e6e3a2a2d3a63e",
+  "visual_review_sha256": "ff0cb99e6811181e0df5447059c25e8e8a9cac01cf5e340d544e817d028269b3",
+  "rendering_images_sha256": {
+    "cairo-a-1.png": "13f4c3f0b78824f84f2db3944d111a31073860d35a843de6ca43b538c671f066",
+    "cairo-a-2.png": "97856c0571eaad64f947093e4f71a7fcd88012da81dd8b7e6ccb81c3a0004f10",
+    "cairo-b-1.png": "5854c6997eb84f04a8c22282c979b3d77c793fe3661dc6d96ba1912d784f126b"
+  },
+  "peak_aggregate_bytes": 7737606144,
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "review": "PENDING_NATIVE15",
+  "limitations": [
+    "CurrentactualPDF28+13rows/tableheaderrepeated;old41+0layoutproofretainownscope.",
+    "All41distincthourscomparedbytestwithrealHTTPsource/XLSX;controlBonly1.",
+    "Not29Februaryproducer/Chrome/download/LAN/PDFUAapproval."
+  ]
+}

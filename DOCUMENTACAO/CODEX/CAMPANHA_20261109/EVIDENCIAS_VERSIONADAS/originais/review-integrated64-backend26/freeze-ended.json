@@ -1,0 +1,7 @@
+{
+  "state": "ENDED_ALL_SOURCE_INPUT_AND_JAR_HASHES_VERIFIED",
+  "scope_approved": true,
+  "global_approved": false,
+  "parecer_sha256": "938b0ef073211ebf4e88711edfbd24fe6971461adbd98ca750d57e6af21717e7",
+  "release": "Authorized .gitignore and commit/push preparation before sequential frontend12; no productive source change without affected checks."
+}

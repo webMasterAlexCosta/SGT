@@ -15,5 +15,6 @@ public record ConcessaoPermissaoExcepcionalRequisicao(
         @NotBlank String finalidade,
         @NotBlank String justificativa,
         @NotBlank String autorizacaoAdministrativa,
-        @NotNull @Future Instant validoAte
+        @NotNull @Future Instant validoAte,
+        Long ocorrenciaId
 ) {}

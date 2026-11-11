@@ -17,7 +17,11 @@ import java.util.concurrent.TimeUnit;
 
 @InvalidaCacheNegocio
 @RestController
-public class ConfiguracaoSistemaControlador {
+public class ConfiguracaoSistemaControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ConfiguracaoSistemaControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ConfiguracaoSistemaServico servico;
     public ConfiguracaoSistemaControlador(ConfiguracaoSistemaServico servico) { this.servico = servico; }
 
@@ -42,11 +46,11 @@ public class ConfiguracaoSistemaControlador {
         } catch (org.springframework.web.server.ResponseStatusException e) {
             // Uma revogação durante a espera conserva sua resposta de autorização.
             throw e;
+        } catch (com.example.siggtrat.excecao.ExcecaoValidacaoNegocio e) {
+            return ResponseEntity.badRequest().body(MensagemApiDTO.erro(
+                    com.example.siggtrat.diagnostico.DiagnosticoFalha.mensagemPublica(e.getMessage(), "Valor de configuração inválido.")));
         } catch (IllegalArgumentException | java.time.format.DateTimeParseException e) {
-            return ResponseEntity.badRequest().body(MensagemApiDTO.erro(e.getMessage() == null
-                    ? "Valor inválido. Verifique os formatos informados." : e.getMessage()));
-        } catch (Exception e) {
-            return ResponseEntity.internalServerError().body(MensagemApiDTO.erro("Erro ao salvar configurações."));
+            return ResponseEntity.badRequest().body(MensagemApiDTO.erro("Valor de configuração inválido. Verifique datas, números e formatos informados."));
         }
     }
 }

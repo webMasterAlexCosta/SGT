@@ -35,7 +35,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class ContratoServico {
+public class ContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final ContratoRepositorio contratoRepositorio;
     private final EmpregadoRepositorio empregadoRepositorio;

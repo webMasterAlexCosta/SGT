@@ -9,15 +9,12 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.core.Ordered;
 import org.springframework.core.annotation.Order;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.time.Duration;
-import java.time.Instant;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -67,16 +64,9 @@ public class FiltroLimitacaoRequisicoes extends OncePerRequestFilter {
         if (entry.bucket.tryConsume(1)) {
             filterChain.doFilter(request, response);
         } else {
-            response.setStatus(HttpStatus.TOO_MANY_REQUESTS.value());
-            response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-            response.setCharacterEncoding("UTF-8");
-
-            String jsonError = String.format(
-                    "{\"timestamp\": \"%s\", \"status\": 429, \"error\": \"Too Many Requests\", \"message\": \"Muitas requisições. Aguarde um momento. (%d req/%ds).\"}",
-                    Instant.now(), capacity, durationSeconds
-            );
-
-            response.getWriter().write(jsonError);
+            com.example.siggtrat.diagnostico.ErroHttpCorrelacionado.escrever(request,response,429,
+                    "RATE_LIMIT_EXCEEDED",String.format("Muitas requisições. Aguarde um momento. (%d req/%ds).",
+                            capacity,durationSeconds),null);
         }
     }
 
@@ -92,10 +82,7 @@ public class FiltroLimitacaoRequisicoes extends OncePerRequestFilter {
     }
 
     private String resolverIpCliente(HttpServletRequest req) {
-        String xff = req.getHeader("X-Forwarded-For");
-        if (xff != null && !xff.isBlank()) {
-            return xff.split(",")[0].trim();
-        }
+        // O servidor resolve proxies confiáveis; cabeçalho arbitrário não identifica o cliente.
         return req.getRemoteAddr();
     }
 

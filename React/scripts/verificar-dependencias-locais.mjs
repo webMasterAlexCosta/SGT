@@ -12,4 +12,4 @@ for (const [categoria, deps] of [['runtime',pkg.dependencies],['development',pkg
   if (verAtual!==versao)faltar++;
  }
 }
-if (faltar) {console.log(`Dependências não atendidas: ${faltar}. Completar no Fedora conforme PROMPT_CODEX_FEDORA.md`);process.exitCode=1}
+if (faltar) {console.log(`Dependências não atendidas: ${faltar}. Completar no Fedora conforme documentacao/FRONTEND_TYPESCRIPT.md`);process.exitCode=1}

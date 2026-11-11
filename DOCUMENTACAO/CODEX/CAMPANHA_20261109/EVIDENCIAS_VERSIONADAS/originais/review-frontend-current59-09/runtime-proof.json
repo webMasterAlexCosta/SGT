@@ -1,0 +1,9 @@
+{
+  "thread_id": "01a1c50d-6d2d-74e3-910d-86635b797156",
+  "turn_id": "01a1c796-f00a-7802-aa9b-5ade9d4f7faf",
+  "cursor": "17a84ccf-2a21-40e4-a2d9-d62093b24fb8:56",
+  "runtime_model": "gpt-6.1-sol",
+  "runtime_effort": "xhigh",
+  "duration_ms": 162286,
+  "source": "actual filtered turn_context + native wait_threads"
+}

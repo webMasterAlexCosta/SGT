@@ -3,14 +3,20 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 const usuario = vi.hoisted(() => ({ id: 17, perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL', twoFactorEnabled: true, twoFactorVerified: true }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: usuario }) }));
-import { LancamentoPorVinculo } from '../src/modules/rh/pages/PaginaFrequencia/components/LancamentoPorVinculo.jsx';
-import { api } from '../src/core/http.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: usuario }) }));
+import { LancamentoPorVinculo } from '../src/modules/rh/pages/PaginaFrequencia/components/LancamentoPorVinculo.tsx';
+import { api } from '../src/core/http.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 
 const data = '2026-10-30';
+const elegivel = {
+  id: 301, pessoaId: 201, pessoaNome: 'Pessoa sintética atual', pessoaCpf: null,
+  contratoId: 91, contratoNumero: 'LAB-91', contratoAno: 2026, matricula: 'LAB-301',
+  dataReferencia: data, conhecidoAte: '2026-10-30T12:00:00Z', gestaoLocalId: 55,
+  alocacaoId: 501, lotacaoId: 7, jornadaId: 8, cargoId: 6,
+};
 const ok = (config, body) => ({ config, data: body, status: 200, statusText: 'OK', headers: {} });
 const erro = (config, status) => ({ config, response: { status, data: { message: 'Resultado sintético não confirmado' }, headers: {} } });
 const adiar = () => { let resolve, reject; const promise = new Promise((r, j) => { resolve = r; reject = j; }); return { promise, resolve, reject }; };
@@ -20,9 +26,9 @@ beforeEach(() => {
   envios = []; aoSalvar = vi.fn(); salvar = async () => ({ id: 701 });
   api.defaults.adapter = async config => {
     if (config.url === '/autenticacao/csrf') return ok(config, { headerName: 'X-XSRF-TOKEN', token: 'csrf-sintetico' });
-    if (config.url === '/vinculos-contratuais') return ok(config, { content: [{ id: 301, pessoaId: 201, contratoId: 91, pessoaNome: 'Pessoa sintética atual' }], totalPages: 1, totalElements: 1, number: 0, size: 5 });
+    if (config.url === '/vinculos-contratuais/elegiveis-frequencia') return ok(config, { content: [elegivel], totalPages: 1, totalElements: 1, number: 0, size: 5, first: true, last: true, sort: null });
     if (config.url.includes('/pessoas/')) return ok(config, { pessoaId: 201, dataReferencia: data, vinculos: [{ vinculoId: 301, pessoaId: 201, contratoId: 91, dataReferencia: data, estadoNegocial: 'REGISTRADO', situacaoTemporal: 'VIGENTE' }] });
-    if (config.url.endsWith('/alocacoes/posicao')) return ok(config, { vinculoId: 301, dataReferencia: data, situacaoTemporal: 'VIGENTE', alocacaoId: 501, lotacaoId: 7, jornadaId: 8 });
+    if (config.url.endsWith('/alocacoes/posicao')) return ok(config, { vinculoId: 301, dataReferencia: data, situacaoTemporal: 'VIGENTE', alocacaoId: 501, lotacaoId: 7, jornadaId: 8, cargoId: 6 });
     if (config.url === '/frequencias' && config.method === 'post') { envios.push(JSON.parse(config.data)); return ok(config, await salvar(config)); }
     throw new Error('Requisição inesperada: ' + config.url);
   };

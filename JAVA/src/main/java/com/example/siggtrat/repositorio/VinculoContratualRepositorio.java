@@ -60,11 +60,11 @@ public interface VinculoContratualRepositorio extends JpaRepository<VinculoContr
           and (:contratoId is null or v.contrato.id = :contratoId)
           and (:pessoaId is null or v.pessoa.id = :pessoaId)
           and (:estado is null or v.estadoNegocial = :estado)
-          and (:inicioDe is null or v.dataInicio >= :inicioDe)
-          and (:inicioAte is null or v.dataInicio <= :inicioAte)
-          and (:fimDe is null or v.dataFim >= :fimDe)
-          and (:fimAte is null or v.dataFim <= :fimAte)
-          and (:ativoEm is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
+          and (cast(:inicioDe as date) is null or v.dataInicio >= :inicioDe)
+          and (cast(:inicioAte as date) is null or v.dataInicio <= :inicioAte)
+          and (cast(:fimDe as date) is null or v.dataFim >= :fimDe)
+          and (cast(:fimAte as date) is null or v.dataFim <= :fimAte)
+          and (cast(:ativoEm as date) is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
                 and v.dataInicio <= :ativoEm and (v.dataFim is null or v.dataFim >= :ativoEm)))
           and (:busca is null or lower(v.pessoa.nome) like concat('%', :busca, '%')
                or (:buscaCpf is not null and v.pessoa.cpf like concat('%', :buscaCpf, '%'))
@@ -78,11 +78,11 @@ public interface VinculoContratualRepositorio extends JpaRepository<VinculoContr
           and (:contratoId is null or v.contrato.id = :contratoId)
           and (:pessoaId is null or v.pessoa.id = :pessoaId)
           and (:estado is null or v.estadoNegocial = :estado)
-          and (:inicioDe is null or v.dataInicio >= :inicioDe)
-          and (:inicioAte is null or v.dataInicio <= :inicioAte)
-          and (:fimDe is null or v.dataFim >= :fimDe)
-          and (:fimAte is null or v.dataFim <= :fimAte)
-          and (:ativoEm is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
+          and (cast(:inicioDe as date) is null or v.dataInicio >= :inicioDe)
+          and (cast(:inicioAte as date) is null or v.dataInicio <= :inicioAte)
+          and (cast(:fimDe as date) is null or v.dataFim >= :fimDe)
+          and (cast(:fimAte as date) is null or v.dataFim <= :fimAte)
+          and (cast(:ativoEm as date) is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
                 and v.dataInicio <= :ativoEm and (v.dataFim is null or v.dataFim >= :ativoEm)))
           and (:busca is null or lower(v.pessoa.nome) like concat('%', :busca, '%')
                or (:buscaCpf is not null and v.pessoa.cpf like concat('%', :buscaCpf, '%'))

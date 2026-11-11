@@ -16,7 +16,11 @@ import java.util.Objects;
 /** Unicidade global atual e histórica, na mesma transação do ato contratual. */
 @Service
 @Transactional(readOnly = true)
-public class IdentidadeContratualServico {
+public class IdentidadeContratualServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(IdentidadeContratualServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ContratoRepositorio contratos;
     private final CorrecaoIdentificadorContratoRepositorio correcoes;
     private final ReservaIdentificadorContratoRepositorio reservas;

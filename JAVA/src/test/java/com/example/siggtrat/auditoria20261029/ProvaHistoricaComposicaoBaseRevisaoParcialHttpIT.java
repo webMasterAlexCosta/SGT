@@ -43,7 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  *
  * Fixture e PDF são expressamente sintéticos. DML da fixture simula perda de
  * colunas antigas; não recupera dados de produção e não introduz DDL manual.
- * MockMvc exercita controladores, autenticação, serviços e MySQL reais; a prova
+ * MockMvc exercita controladores, autenticação, serviços e PostgreSQL reais; a prova
  * de transporte TCP/JAR e de Redis real permanece gate separado da raiz.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -69,8 +69,8 @@ class ProvaHistoricaComposicaoBaseRevisaoParcialHttpIT extends ContratosHttpBase
     void exigirPersistenciaPermitida() throws Exception {
         try (var conexao = dataSource.getConnection()) {
             var meta = conexao.getMetaData();
-            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
-            assertThat(meta.getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
+            assertThat(meta.getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");

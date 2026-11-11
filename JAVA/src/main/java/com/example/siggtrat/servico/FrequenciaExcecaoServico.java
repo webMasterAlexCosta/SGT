@@ -28,7 +28,11 @@ import java.util.*;
 
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
-public class FrequenciaExcecaoServico {
+public class FrequenciaExcecaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FrequenciaExcecaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final FrequenciaExcecaoRepositorio repositorio;
     private final UsuarioAplicacaoRepositorio usuarios;
     private final AcessoOrganizacionalServico acesso;

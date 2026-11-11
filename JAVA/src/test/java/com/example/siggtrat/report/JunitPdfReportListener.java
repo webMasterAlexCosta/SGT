@@ -241,7 +241,7 @@ public class JunitPdfReportListener implements TestExecutionListener {
                 temSpring ? "EVIDENCIADO" : "DISPONÍVEL", "Spring Boot Test + spring-security-test");
         adicionarFerramenta(ferramentas, "ArchUnit", "Regras estruturais Controller > Service > Repository",
                 temArquitetura ? "EXECUTADO" : "OPT-IN NA SUÍTE", "classes *ArchitectureTest");
-        adicionarFerramenta(ferramentas, "Testcontainers", "MySQL 8.0.45 real e descartável para integração",
+        adicionarFerramenta(ferramentas, "Testcontainers", "PostgreSQL 18.6 real e descartável para integração",
                 temIntegracao ? "EXECUTADO" : "OPT-IN", "mvn verify -Pintegration / -Pdb-load");
         adicionarFerramenta(ferramentas, "JaCoCo", "Cobertura de linhas e branches",
                 "ATIVO NO BUILD", "target/site/jacoco/index.html");

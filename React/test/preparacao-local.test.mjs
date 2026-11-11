@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { readFileSync, existsSync } from 'node:fs';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
-import { criarConfiguracaoFrontend } from '../src/core/configuracaoFrontend.js';
+import { criarConfiguracaoFrontend } from '../src/core/configuracaoFrontend.ts';
 
 const raiz = dirname(dirname(fileURLToPath(import.meta.url)));
 const ambiente = Object.fromEntries(readFileSync(join(raiz,'.env.example'),'utf8').split(/\r?\n/)
@@ -23,18 +23,23 @@ test('rejeita paginação incompatível sem relaxar invariantes',()=>{
   assert.throws(()=>criarConfiguracaoFrontend({...ambiente,VITE_PAGINATION_DEFAULT_SIZE:'200'}, {producao:true}),/exceder/);
 });
 
-test('scripts de publicação no backend são explicitamente bloqueados',()=>{
+test('pipeline autorizado verifica tipos, build e sincronização Java explícita',()=>{
   const pkg=JSON.parse(readFileSync(join(raiz,'package.json'),'utf8'));
-  assert.match(pkg.scripts['sync:java'],/bloquear-mutacao-backend/);
-  assert.match(pkg.scripts['build:java'],/bloquear-mutacao-backend/);
+  assert.match(pkg.scripts['typecheck'],/tsc --noEmit/);
+  assert.match(pkg.scripts.build,/typecheck.*vite build/);
+  assert.match(pkg.scripts['sync:java'],/sincronizar-java.*--execute/);
+  assert.match(pkg.scripts['sync:java:check'],/sincronizar-java.*--dry-run/);
+  const sync = readFileSync(join(raiz, 'scripts/sincronizar-java.mjs'), 'utf8');
+  assert.match(sync, /if \(executar\)/);
+  assert.doesNotMatch(sync, /rmSync|rm\(/);
 });
 
 test('não há importações de react-icons nos componentes corrigidos',()=>{
   const arquivos=[
-    'src/modules/rh/pages/PaginaRelatorioAbsenteismo/index.jsx',
-    'src/modules/rh/pages/PaginaRelatoriosTerceirizados/components/CabecalhoRelatorios/index.jsx',
-    'src/modules/painel/components/IndicadorEfetivo/index.jsx',
-    'src/modules/painel/components/GestaoExecutiva/index.jsx',
+    'src/modules/rh/pages/PaginaRelatorioAbsenteismo/index.tsx',
+    'src/modules/rh/pages/PaginaRelatoriosTerceirizados/components/CabecalhoRelatorios/index.tsx',
+    'src/modules/painel/components/IndicadorEfetivo/index.tsx',
+    'src/modules/painel/components/GestaoExecutiva/index.tsx',
   ];
   for (const f of arquivos) {
     assert.ok(existsSync(join(raiz,f)));
@@ -58,12 +63,12 @@ test('pins do React e Vite refletem os módulos locais efetivamente recebidos', 
   }
 });
 
-test('prompt prioriza devolver dependências, e o gerador está disponível sem mutação Java', () => {
+test('documentação vigente distingue ambiente público, HMR e integração autorizada', () => {
   const pkg = JSON.parse(readFileSync(join(raiz, 'package.json'), 'utf8'));
   assert.match(pkg.scripts['dependencias:empacotar:fedora'], /gerar-pacote-dependencias-fedora/);
-  assert.match(pkg.scripts['test:vitest:dependencias'], /vitest.dependencias.config.js/);
-  const prompt = readFileSync(join(raiz, 'PROMPT_CODEX_FEDORA.md'), 'utf8');
-  assert.match(prompt, /SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE22\.zip/);
-  assert.match(prompt, /Biblioteca/);
-  assert.match(prompt, /NÃO.*implementar os 198 requisitos/);
+  const documento = readFileSync(join(raiz, 'documentacao/FRONTEND_TYPESCRIPT.md'), 'utf8');
+  assert.match(documento, /127\.0\.0\.1:5173/);
+  assert.match(documento, /127\.0\.0\.1:5000/);
+  assert.match(documento, /cookies.*CSRF/);
+  assert.match(documento, /sync:java:check/);
 });

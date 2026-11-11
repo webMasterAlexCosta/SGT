@@ -99,15 +99,15 @@ public class UtilitarioJwt {
             Jwts.parser().verifyWith(key).build().parseSignedClaims(token);
             return true;
         } catch (SignatureException e) {
-            log.error("Assinatura JWT (HS512) inválida: {}", e.getMessage());
+            log.error("UtilitarioJwt: Assinatura JWT (HS512) inválida falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         } catch (MalformedJwtException e) {
-            log.error("Token JWT malformado: {}", e.getMessage());
+            log.error("UtilitarioJwt: Token JWT malformado falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         } catch (ExpiredJwtException e) {
-            log.warn("Token JWT expirado: {}", e.getMessage());
+            log.warn("UtilitarioJwt: Token JWT expirado falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         } catch (WeakKeyException e) {
             log.error("Chave JWT fraca detectada durante validação.");
         } catch (JwtException | IllegalArgumentException e) {
-            log.error("Erro na validação do JWT: {}", e.getMessage());
+            log.error("UtilitarioJwt: Erro na validação do JWT falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         }
         return false;
     }

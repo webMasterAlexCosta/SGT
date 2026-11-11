@@ -15,7 +15,11 @@ import java.time.LocalDate;
 @RestController
 @com.example.siggtrat.configuracao.InvalidaCacheNegocio
 @RequestMapping("/api/catalogos-temporais")
-public class DisponibilidadeCatalogoControlador {
+public class DisponibilidadeCatalogoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(DisponibilidadeCatalogoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final DisponibilidadeCatalogoTemporalServico servico;
     private final TransicaoDisponibilidadeCatalogoServico transicoes;
     public DisponibilidadeCatalogoControlador(DisponibilidadeCatalogoTemporalServico servico,

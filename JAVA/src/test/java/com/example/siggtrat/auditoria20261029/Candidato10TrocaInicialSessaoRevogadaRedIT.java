@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.ObservadorAtorPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.example.siggtrat.utilitario.UtilitarioHashSeguranca;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -10,7 +13,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +42,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * de aguardar o commit de uma revogação administrativa da sessão/conta.
  * Login, comando administrativo, cadeia MVC, JPA e locks são reais; sem mocks.
  * A transação externa apenas retém o commit do comando HTTP administrativo para
- * observar a espera física do comando de troca em performance_schema.
+ * observar a espera física do comando de troca em PostgreSQL por ator/método/chave e PID.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class Candidato10TrocaInicialSessaoRevogadaRedIT extends ContratosHttpBase {
@@ -87,7 +90,7 @@ class Candidato10TrocaInicialSessaoRevogadaRedIT extends ContratosHttpBase {
                     MvcResult resultado = mvc.perform(administracaoHttp).andReturn();
                     assertThat(resultado.getResponse().getStatus()).isEqualTo(200);
                     em.flush();
-                    long conexao = ((Number) em.createNativeQuery("select connection_id()")
+                    long conexao = ((Number) em.createNativeQuery("select pg_backend_pid()")
                             .getSingleResult()).longValue();
                     JsonNode esperado = estadoNaTransacao(c.operacionalA.getId());
                     assertThat(esperado.path("sessoes").asLong()).isZero();
@@ -104,8 +107,9 @@ class Candidato10TrocaInicialSessaoRevogadaRedIT extends ContratosHttpBase {
                 }
             }));
             Barreira retida = barreira.get(15, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(tentativaHttp).andReturn());
-            aguardarUsuarioNoMySql(retida.conexao(), tentativa);
+            var atorTroca = new Ator("troca-inicial-" + fluxo);
+            Future<MvcResult> tentativa = pool.submit(() -> atorTroca.executar(() -> mvc.perform(tentativaHttp).andReturn()));
+            aguardarUsuarioNoPostgres(retida.conexao(), atorTroca, c.operacionalA.getUsername(), tentativa);
             assertThat(administracao.isDone()).isFalse();
             assertThat(tentativa.isDone()).isFalse();
             permitirCommit.countDown();
@@ -118,7 +122,7 @@ class Candidato10TrocaInicialSessaoRevogadaRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
                     "hipotese", "C10-CENTRAL-TROCA-INICIAL-SESSAO-REVOGADA", "autoria", "/root",
-                    "fluxo", fluxo, "esperaMySqlUsuarioObservada", true,
+                    "fluxo", fluxo, "esperaPostgresUsuarioObservada", true,
                     "revogacaoAdministrativaHttp", 200, "commitAdministrativoConfirmado", true,
                     "statusEsperado", 401, "status", resultado.getResponse().getStatus(),
                     "emitiuCookieAutenticacao", emitiuSessao, "estadoAdministrativo", retida.estado(),
@@ -165,25 +169,21 @@ class Candidato10TrocaInicialSessaoRevogadaRedIT extends ContratosHttpBase {
         return cookies;
     }
 
-    private MockHttpServletRequestBuilder comCookies(MockHttpServletRequestBuilder request,
+    private AbstractMockHttpServletRequestBuilder<?> comCookies(AbstractMockHttpServletRequestBuilder<?> request,
                                                      Map<String, Cookie> cookies) {
         request.cookie(cookies.values().toArray(Cookie[]::new));
         if (cookies.containsKey("XSRF-TOKEN")) request.header("X-XSRF-TOKEN", cookies.get("XSRF-TOKEN").getValue());
         return request;
     }
 
-    private void aguardarUsuarioNoMySql(long conexao, Future<?> tentativa) throws Exception {
+    private void aguardarUsuarioNoPostgres(long conexao, Ator ator, String username, Future<?> tentativa) throws Exception {
         JdbcTemplate jdbc = new JdbcTemplate(dataSource);
         var observador = Executors.newSingleThreadScheduledExecutor();
         CompletableFuture<Void> observada = new CompletableFuture<>();
         var consulta = observador.scheduleWithFixedDelay(() -> {
             try {
-                Long quantidade = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "join performance_schema.data_locks l on l.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID "
-                        + "and l.ENGINE=w.ENGINE where t.PROCESSLIST_ID=? and l.OBJECT_NAME='usuario_aplicacao'",
-                        Long.class, conexao);
-                if (quantidade != null && quantidade > 0) observada.complete(null);
+                if (ObservadorAtorPostgres.esperaDiretaNoAlvo(jdbc, conexao, ator,
+                        "UsuarioAplicacaoRepositorio.buscarPorUsernameParaAtualizacao", username, "usuario_aplicacao")) observada.complete(null);
                 else if (tentativa.isDone()) observada.completeExceptionally(
                         new AssertionError("A troca inicial não alcançou espera real no usuário"));
             } catch (Throwable ex) { observada.completeExceptionally(ex); }

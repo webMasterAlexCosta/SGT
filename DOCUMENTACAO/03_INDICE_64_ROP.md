@@ -1,5 +1,7 @@
 # Índice dos 64 roteiros operacionais ROP
 
+> **Corte histórico preservado.** Para implementação/aceite atuais, aplique o [suplemento da janela configurável/padrão30](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) e o [plano de09/11](CODEX/CAMPANHA_20261109/PLANO.md). Os estados históricos abaixo não são aprovação atual.
+
 Fonte: `MATRIZ_64_ROP_NOVA.md`, incluída integralmente no ZIP. Esta lista é navegação, não substitui os passos, oráculos e evidências dos roteiros.
 
 - **ROP-001:** Cadastro da empresa contratada

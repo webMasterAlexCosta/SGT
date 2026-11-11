@@ -1,0 +1,112 @@
+{
+  "project": "SGT",
+  "review": {
+    "thread_id": "01a1b3bb-a3d3-70d0-9c16-f8b04fe50cb9",
+    "host": "local",
+    "requested_model": "gpt-6.1-sol",
+    "requested_reasoning_effort": "xhigh",
+    "p1": 0,
+    "p2": 1,
+    "p3": 1
+  },
+  "findings": [
+    {
+      "severity": "P3",
+      "project": "SGT",
+      "file": "React/src/core/ui/ModalCreditosColaboracao.tsx",
+      "line_before": 140,
+      "problem": "Créditos ativos e teste ainda identificavam Java17/Boot3.5.16.",
+      "resolution": "Somente três rótulos técnicos atualizados para Java25/Boot4.1.2 e expectativas do teste existente alinhadas."
+    }
+  ],
+  "baseline_receipt": "MIGRACAO_VERIFICADA.json",
+  "baseline_scope": "Recibo anterior preservado, correspondente ao estado antes desta revisão final.",
+  "post_review_evidence": {
+    "credits_tests": 5,
+    "frontend_typecheck_build": true,
+    "jar_package": "passed with -DskipTests; no claim of a fresh full Java suite",
+    "gates": {
+      "review-credits-green": {
+        "cwd": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/stage/SGT/React",
+        "command": [
+          "npm",
+          "run",
+          "test",
+          "--",
+          "test/creditos-versoes-reais.test.jsx"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 1.85,
+        "log": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/logs/review-credits-green.log",
+        "log_sha256": "42f0b22fda0e2d5a467c2c15fb7bb4075d47f0466eb773912e92ecc9c28aa1f3"
+      },
+      "review-sgt-frontend-build": {
+        "cwd": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/stage/SGT/React",
+        "command": [
+          "python3",
+          "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/public_frontend_env.py",
+          "npm",
+          "run",
+          "build"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 11.33,
+        "log": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/logs/review-sgt-frontend-build.log",
+        "log_sha256": "40094c104a5b38133672c58e3518be83a112a341407fc452da1b91f05051aa12"
+      },
+      "review-sgt-jar-package": {
+        "cwd": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/stage/SGT/JAVA",
+        "command": [
+          "bash",
+          "./mvnw",
+          "-B",
+          "-ntp",
+          "-T1",
+          "-Dmaven.repo.local=/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/maven-repository",
+          "-DskipTests",
+          "package"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 24.54,
+        "log": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/logs/review-sgt-jar-package.log",
+        "log_sha256": "bc5a2ca6865cc23372e36ac4c0d1441721f558c49307406bdea956e3dac81d3c"
+      },
+      "review-sgt-jar-http-smoke-isolated": {
+        "cwd": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/stage/SGT/JAVA",
+        "command": [
+          "python3",
+          "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/review_isolated_sgt_smoke.py",
+          "--classes",
+          "Postgres186AmbienteHttpIT",
+          "--smoke"
+        ],
+        "exit_code": 0,
+        "elapsed_seconds": 21.05,
+        "log": "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/logs/review-sgt-jar-http-smoke-isolated.log",
+        "log_sha256": "39a8efdd9b1cb465c73db0c2d648a651711cfa97ed81a31f5582164b714669bf"
+      }
+    },
+    "http_smoke": {
+      "project": "SGT",
+      "root": 200,
+      "deep_route": {
+        "path": "/contratos",
+        "status": 200
+      },
+      "assets_verified": 10,
+      "api_unauthenticated_status": 401,
+      "jar_sha256": "32f081db5d8a19c4693647932c6e40f7aa49006462d1376f914cb7bea7743eba",
+      "java_release": 25,
+      "database_scope": "fresh isolated PostgreSQL18.6 only"
+    },
+    "dist_files_inside_new_jar": 100,
+    "all_backend_classes_resources_and_dependency_jars_byte_identical_to_previous_validated_jar": true,
+    "older_static_assets_preserved": true
+  },
+  "current_sgt_jar": {
+    "path": "/home/alexcosta/Documents/Codex/2026-11-06/que/outputs/SGT-java25-boot4.1.2-revisado-20261106.jar",
+    "sha256": "32f081db5d8a19c4693647932c6e40f7aa49006462d1376f914cb7bea7743eba",
+    "supersedes": "/home/alexcosta/Documents/Codex/2026-11-06/que/outputs/SGT-java25-boot4.1.2-20261106.jar",
+    "previous_artifact_preserved": true
+  }
+}

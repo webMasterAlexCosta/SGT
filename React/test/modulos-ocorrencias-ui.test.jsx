@@ -3,11 +3,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 const { requisitar, requisitarDownload, user } = vi.hoisted(() => ({ requisitar: vi.fn(), requisitarDownload: vi.fn(), user: { perfil: 'GESTOR_ESTADUAL' } }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar, requisitarDownload }));
-vi.mock('../src/core/config.js', async (original) => { const m = await original(); return { ...m, CONFIG: { ...m.CONFIG, SEARCH_DEBOUNCE_MS: 0 } }; });
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null }) }));
-import { PaginaOcorrencias } from '../src/modules/rh/pages/PaginaOcorrencias/index.jsx';
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar, requisitarDownload }));
+vi.mock('../src/core/config.ts', async (original) => { const m = await original(); return { ...m, CONFIG: { ...m.CONFIG, SEARCH_DEBOUNCE_MS: 0 } }; });
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null }) }));
+import { PaginaOcorrencias } from '../src/modules/rh/pages/PaginaOcorrencias/index.tsx';
 
 beforeEach(() => {
   user.perfil = 'GESTOR_ESTADUAL'; requisitar.mockReset(); requisitarDownload.mockReset();
@@ -45,10 +45,11 @@ describe('Acesso auditado ao anexo da ocorrência', () => {
   it('apresenta recusa de concessão sem baixar arquivo e conserva a finalidade para correção', async () => {
     requisitarDownload.mockRejectedValue(Object.assign(new Error('Concessão específica ausente'), { status: 403 }));
     fireEvent.click(await selecionarPessoa());
-    fireEvent.change(screen.getByLabelText(/Finalidade/), { target: { value: 'Auditoria do ato' } });
-    fireEvent.click(screen.getByRole('button', { name: 'Baixar anexo' }));
-    expect(await screen.findByRole('alert')).toHaveTextContent('Concessão específica ausente');
-    expect(screen.getByLabelText(/Finalidade/)).toHaveValue('Auditoria do ato');
+    const dialogo = within(screen.getByRole('dialog', { name: /Acessar anexo/ }));
+    fireEvent.change(dialogo.getByLabelText(/Finalidade/), { target: { value: 'Auditoria do ato' } });
+    fireEvent.click(dialogo.getByRole('button', { name: 'Baixar anexo' }));
+    expect(await dialogo.findByRole('alert')).toHaveTextContent('Concessão específica ausente');
+    expect(dialogo.getByLabelText(/Finalidade/)).toHaveValue('Auditoria do ato');
     expect(URL.createObjectURL).not.toHaveBeenCalled();
   });
 

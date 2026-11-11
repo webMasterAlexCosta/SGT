@@ -90,6 +90,16 @@ public class EventoCicloVidaContrato {
     @Column(name = "valor_novo", length = 255, updatable = false)
     private String valorNovo;
 
+    @Embedded
+    private ConferenciaDocumentalTransferencia conferenciaDocumental;
+
+    public ConferenciaDocumentalTransferencia getConferenciaDocumental() { return conferenciaDocumental; }
+    public void registrarConferenciaDocumental(ConferenciaDocumentalTransferencia conferencia) {
+        if (id != null || conferenciaDocumental != null)
+            throw new IllegalStateException("A conferência deve integrar o primeiro registro imutável do evento.");
+        conferenciaDocumental = java.util.Objects.requireNonNull(conferencia);
+    }
+
     public EventoCicloVidaContrato() {}
 
     @PrePersist

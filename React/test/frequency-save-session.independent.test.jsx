@@ -4,18 +4,18 @@ import React from 'react';
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const observer = vi.hoisted(() => ({ notify: vi.fn(), refresh: vi.fn() }));
-vi.mock('../src/core/events.js', async original => ({ ...(await original()), notificar: observer.notify }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({
+vi.mock('../src/core/events.ts', async original => ({ ...(await original()), notificar: observer.notify }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({
   user: { id: 81, perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL', vinculosGestao: [] }, atualizarPerfil: observer.refresh,
 }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({
   confirmarComSenha: ({ acao }) => acao('senha-exclusivamente-sintetica'), ModalConfirmacao: () => null,
 }) }));
-import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.js';
-import { api } from '../src/core/http.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.ts';
+import { api } from '../src/core/http.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 
 let originalAdapter;
 const ok = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });

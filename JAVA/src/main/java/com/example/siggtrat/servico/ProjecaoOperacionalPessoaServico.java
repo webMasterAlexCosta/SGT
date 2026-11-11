@@ -24,7 +24,11 @@ import java.time.LocalDate;
  * não precisa cadastrar um segundo colaborador para lançar frequência.
  */
 @Service
-public class ProjecaoOperacionalPessoaServico {
+public class ProjecaoOperacionalPessoaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ProjecaoOperacionalPessoaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EmpregadoRepositorio empregadoRepositorio;
     private final StatusEmpregadoRepositorio statusRepositorio;
     private GestaoContratoTemporalServico gestaoTemporal;

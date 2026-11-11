@@ -1,0 +1,68 @@
+{
+  "state": "P3_FIXED_ALL_FINAL_HASHES_VALID_NATIVE16_PENDING",
+  "batch": "coverage-current44-02",
+  "result_sha256": "7782fc202e97029bc0e342f99c35bc9ccf00fe1a6dd98ff670c9ba6fb1079d33",
+  "proof_sha256": "6d94c9cd5d9b5fa4a3d8967f5037fc227e3613dd01138e3ff2a39f8e8c94160e",
+  "inputs": 244,
+  "excluded_batches": [
+    {
+      "label": "unit-quantitativo-final-14",
+      "reason": "OWN_TEST_BYTES_CHANGED_EXCLUDE_WHOLE_BATCH",
+      "tests": [
+        "com.example.siggtrat.servico.FornecedorContratoTest"
+      ]
+    }
+  ],
+  "current_class_files": 823,
+  "report_classes": 823,
+  "csv_classes": 748,
+  "counters": {
+    "INSTRUCTION": {
+      "missed": 21745,
+      "covered": 159876
+    },
+    "BRANCH": {
+      "missed": 7386,
+      "covered": 14041
+    },
+    "LINE": {
+      "missed": 2829,
+      "covered": 26697
+    },
+    "COMPLEXITY": {
+      "missed": 7105,
+      "covered": 10849
+    },
+    "METHOD": {
+      "missed": 571,
+      "covered": 6610
+    },
+    "CLASS": {
+      "missed": 9,
+      "covered": 739
+    }
+  },
+  "percentage": {
+    "INSTRUCTION": 88.03,
+    "BRANCH": 65.53,
+    "LINE": 90.42,
+    "COMPLEXITY": 60.43,
+    "METHOD": 92.05,
+    "CLASS": 98.8
+  },
+  "limits": [
+    "Only exact current name+classID probes; old affected IDs and foreign classes excluded.",
+    "Older tests retain own execution stages; this is not a whole-program rerun on the final source.",
+    "Child JAR JVMs were not instrumented; parent data do not establish child coverage.",
+    "No invented threshold, national performance, frontend or homologation approval."
+  ],
+  "JUnit_tests_executed": 0,
+  "immutable_artifacts": 1648,
+  "runner_owned_mutable_files_excluded": [
+    "execution-state.json",
+    "maven.log",
+    "resources-latest.json",
+    "result.json"
+  ],
+  "native15_counter_review": "CurrentclassIDs/union/countersaccepted;P3manifestfixedafterreviewawaitsrecheck"
+}

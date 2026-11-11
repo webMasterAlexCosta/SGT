@@ -36,7 +36,8 @@ class FrequenciaPermissaoHistoricaHttpIT extends ContratosHttpBase {
                 200, "Frequência e prova integral reais na Gestão A").path("id").asLong();
         LocalDate transferencia = RelogioSistema.hoje().plusDays(5);
         conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", transferencia, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência documentada posterior à frequência", "referenciaSei", "SEI-FREQUENCIA-HISTORICA",
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(mapa(

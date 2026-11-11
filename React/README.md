@@ -1,8 +1,12 @@
 # SGT/GTRAT React — gestão operacional 1.4.4-operacional.20261101
 
-> Execução corretiva de 2026-11-03: exigir MySQL exatamente 8.0.45 e recibos novos da candidata. Os resultados históricos abaixo mantêm a proveniência da campanha recebida; não certificam esta correção.
+> **Entrada de módulo. Projeto em desenvolvimento, sem homologação integral de produção.** Consulte o [estado atual](../DOCUMENTACAO/ESTADO_ATUAL.md) e o README da raiz. Trechos de preparação/entrega abaixo identificam suas campanhas e não concedem conclusão ou produção.
 
-Esta versão deriva da baseline operacional React `1.4.3-operacional.20261101` / Java `0.0.3-operacional-20261101`. Os originais permanecem preservados. O par candidato é Java `0.0.4-operacional-20261101` e React `1.4.4-operacional.20261101`, com runtime Java/MySQL **8.0.45** e Redis a verificar conforme os recibos desta execução.
+> Toolchain atualizada por pedido humano para Node26.13.0/npm12.2.2, Java/release25 e Boot4.1.2. Consulte `../DOCUMENTACAO/CODEX/TOOLCHAIN.md` e o recibo de migração correspondente. Os números, hashes e aprovações de campanhas anteriores abaixo permanecem históricos e não aprovam estes novos bytes.
+
+A etapa atual migra os componentes para React TypeScript e os utilitários para `.ts`, com contratos Java, estados/props explícitos e `strict=true`. A autenticação permanece por cookies e CSRF. O procedimento vigente está em [FRONTEND_TYPESCRIPT.md](documentacao/FRONTEND_TYPESCRIPT.md). Os relatórios históricos preservados neste repositório não certificam a execução atual.
+
+A integração PostgreSQL/Redis, o JAR e as jornadas no navegador pertencem à frente de integração. Esta frente compila somente `React/dist` e confere a sincronização em modo de leitura.
 
 Foi retirada integralmente a Governança de Terceiros: página, abas, processos exclusivos de admissão/desligamento, avaliação manual/contínua de risco, resumo, serviço HTTP, rota e item de menu. A remoção financeira anterior permanece. URLs antigas seguem o fallback da aplicação e não montam a funcionalidade removida.
 
@@ -18,24 +22,23 @@ Contratos, pessoas, vínculos, cargos, alocações, frequência, ocorrências, a
 
 ## Instalação e build
 
-Use Node 22.16.0/npm 10.9.2 e o `package-lock.json` desta cópia. As dependências permanecem fixadas, incluindo Vite 8.2.4 e Vitest 4.1.12; a versão da aplicação foi atualizada somente nas entradas da raiz. O procedimento vigente está em `GUIA_INSTALACAO_EXECUCAO.md`. `GUIA_REPRODUCAO.md` e `DEPENDENCIAS_ATUALIZADAS.md` preservam o acervo de preparação anterior e seus recibos históricos.
+Use Node 26.13.0 e npm 12.2.2 com o lockfile. A toolchain escolhida usa Node 26.13.0; os pins existentes, incluindo React 19.2.5 e Vite 8.2.4, foram preservados. TypeScript 5.9.3 e os tipos de React/React DOM são as dependências adicionadas.
 
-Após restaurar o cache-base e acrescentar os tarballs de `SGT_GTRAT_DEPENDENCIAS_PATCH_20261101.zip`, defina `SGT_CACHE` para esse cache. Em uma cópia nova, prepare `.env.local` a partir de `.env.example`, sem substituir configuração local existente. Todos os valores `VITE_*` são públicos. Execute sequencialmente:
+`.env.example` contém valores públicos sanitizados; preserve sua configuração privada existente. Valores `VITE_*` integram o bundle e não devem conter credenciais. O build de laboratório usa essas configurações públicas e `VITE_API_URL=/api`, aplicadas somente ao processo.
 
 ```bash
-npm ci --offline --ignore-scripts --no-audit --no-fund --cache "$SGT_CACHE" --userconfig=/dev/null
-flock /tmp/sgt-heavy.lock env NODE_OPTIONS=--max-old-space-size=768 npm run test:preparacao
-flock /tmp/sgt-heavy.lock env NODE_OPTIONS=--max-old-space-size=768 npm test -- --maxWorkers=1 --no-file-parallelism
-flock /tmp/sgt-heavy.lock env NODE_OPTIONS=--max-old-space-size=768 npm run build
+npm ci --ignore-scripts --no-audit --no-fund
+npm run test:preparacao
+npm run typecheck
+npm run build
+npm run sync:java:check
 ```
 
-O projeto usa JavaScript/JSX com contratos documentados em JSDoc. Não há configuração de TypeScript, ESLint ou script `typecheck` no projeto recebido; o relatório não apresenta esses gates como executados. Os testes de contrato, a compilação Vite e os testes de integração verificam as fronteiras afetadas.
+A regressão Vitest é executada em lotes sequenciais de cinco ou dez arquivos no ambiente compartilhado. Os recibos registram cada comando, horário, saída, testes e XML; um lote não iniciado por exclusão mútua não conta como teste ou skip. A compilação verifica `strict`, `noImplicitAny` e `strictNullChecks`, sem supressões globais.
 
-O `dist/` deve ser regenerado após os testes e integrado exclusivamente em `src/main/resources/static` do novo backend candidato. Até existir recibo de build desta versão, o conteúdo recebido de `dist/` é histórico. Os comandos antigos `build:java` e `sync:java` continuam bloqueados; a integração do candidato é coordenada separadamente e não substitui arquivos da baseline Java.
+`npm run dev` preserva HMR em `127.0.0.1:5173`, com proxy `/api` e `/config.json` para `127.0.0.1:5000`. `npm run sync:java:check` apenas confere o dist e o destino. `sync:java` e `build:java` executam a cópia explicitamente; a frente frontend não os executa. A integração final no static/JAR cabe ao orquestrador.
 
-Para desenvolvimento, configure o proxy conforme `.env.example` e `vite.config.js`, então execute `npm run dev`. Para a aplicação integrada, use o novo JAR e o guia que acompanha a entrega. Valores `VITE_*` são públicos e não devem conter credenciais.
-
-O [supervisor do runtime](test/real-runtime/README.md) agora usa configuração privada explícita, MySQL **8.0.45** observado por consulta, Java **17** e hash/manifest do novo JAR. Ele oferece somente `status`, `serve-app` e `stop-app`, sobre banco/Redis já preparados externamente. O supervisor original e seus guias foram preservados em `documentacao/historico-runtime-8.4.11/`, com o código antigo como texto `.py.txt`. O cenário de segurança/concorrência exige o recibo observado dessa execução antes de abrir o navegador. A validação local desses helpers não representa execução real de banco, aplicação ou navegador.
+Os guias, supervisores e recibos antigos que exigem MySQL pertencem ao acervo histórico. Eles não são os comandos de execução desta etapa PostgreSQL e não devem ser usados para interpretar a validação atual.
 
 ## Verificação e evidências
 
@@ -50,6 +53,6 @@ O [supervisor do runtime](test/real-runtime/README.md) agora usa configuração 
 
 Registro histórico recebido da campanha anterior (sem reaproveitamento como resultado atual): baseline React com **457 testes aprovados em 68 arquivos**; RED da remoção com **18 falhas esperadas e 1 caso já aprovado, em 19 testes**. A candidata passou **469/469 testes em 67 arquivos**, preparação separada **1/1** e build de produção. Java passou **500/500 unitários e clean package**. Os **98 arquivos** do dist conferem com o JAR. Integração Java/MySQL 8.0.46/Redis, causa e correção do 409, navegador e reinício permanecem pendentes. Consultar os recibos próprios; os resultados unitários não constituem homologação integral.
 
-Os testes de frontend com adapter controlado verificam ordenação, logout, troca de identidade, validação e reenvio. Eles não substituem os testes Java/MySQL/Redis, o navegador contra o JAR nem o reinício com comparação do banco.
+Os testes de frontend com adapter controlado verificam ordenação, logout, troca de identidade, validação e reenvio. Eles não substituem os testes Java/PostgreSQL/Redis, o navegador contra o JAR nem o reinício com comparação do banco.
 
 As seis dependências de fontes autênticas continuam separadas: CON-023, CAT-004, CAT-007, COL-010, HIS-001 e HIS-006. Dados sintéticos de teste não suprem essas fontes.

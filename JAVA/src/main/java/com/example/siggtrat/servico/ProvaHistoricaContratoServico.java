@@ -22,7 +22,11 @@ import java.util.*;
 /** Confere uma fonte declarada, preserva o acervo e publica conhecimento novo de um fato antigo. */
 @Service
 @Transactional
-public class ProvaHistoricaContratoServico {
+public class ProvaHistoricaContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ProvaHistoricaContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final TipoPermissaoExcepcional PERMISSAO=TipoPermissaoExcepcional.INCORPORACAO_PROVA_HISTORICA;
     private static final Set<String> CAMPOS=Set.of("dataEfetiva","numeroContrato","anoContrato","descricao",
             "tipoContratacaoId","tipoContratacaoDescricao","fornecedorId","cnpjEmpresa","razaoSocialEmpresa",

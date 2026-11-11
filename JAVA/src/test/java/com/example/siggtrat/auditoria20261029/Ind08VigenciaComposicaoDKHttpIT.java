@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * TMP-004/005/008/012: limite herdado de composição introduzida por ADI é histórico.
- * HTTP/Spring/JPA/MySQL reais. O único dado alterado diretamente no primeiro caso
+ * HTTP/Spring/JPA/PostgreSQL reais. O único dado alterado diretamente no primeiro caso
  * é a projeção materializada atual, para demonstrar que ela não é fonte do replay.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)

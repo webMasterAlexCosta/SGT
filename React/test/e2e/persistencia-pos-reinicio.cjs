@@ -4,6 +4,21 @@ const path = require('node:path');
 const crypto = require('node:crypto');
 const { execute } = require('./ambiente-real.cjs');
 const hash = value => crypto.createHash('sha256').update(value).digest('hex');
+// Map.copyOf in the Java read DTO varies its iteration order across JVMs.
+// Recover the original encoding's order without removing or changing any value.
+const matchesOriginalEncoding = (version, expected) => {
+  if (!version) return false;
+  if (hash(JSON.stringify(version)) === expected) return true;
+  const keys = Object.keys(version.provaCampos || {});
+  for (const sequence of [keys, [...keys].reverse()]) {
+    for (let offset = 0; offset < sequence.length; offset++) {
+      const ordered = [...sequence.slice(offset), ...sequence.slice(0, offset)];
+      const candidate = { ...version, provaCampos: Object.fromEntries(ordered.map(key => [key, version.provaCampos[key]])) };
+      if (hash(JSON.stringify(candidate)) === expected) return true;
+    }
+  }
+  return false;
+};
 execute('persistencia-pos-reinicio', async ({ page, context, account, fixture, check, screenshot, open, report }) => {
   const contratoAlvo = contratoDaFixture(fixture);
   const business = JSON.parse(fs.readFileSync(path.join(process.env.SGT_TEST_RUNTIME, 'private/e2e-business.json')));
@@ -24,7 +39,14 @@ execute('persistencia-pos-reinicio', async ({ page, context, account, fixture, c
   check('Os dois cortes do nome histórico sobrevivem ao reinício', currentName.nome === business.nomeHistoricoComprovado && oldName.nome === business.nomeAtualAnterior && currentName.comprovado && oldName.comprovado);
   const versions = await read(`${contratoAlvo.caminho}/versoes`);
   const original = versions.find(version => version.id === business.contratoVersaoOriginalId);
-  check('Fotografia da publicação mantém SHA-256 após reinício', hash(JSON.stringify(original)) === business.contratoVersaoOriginalSha256);
+  check('Fotografia da publicação mantém SHA-256 original, admitindo somente ordem das chaves do mapa', matchesOriginalEncoding(original, business.contratoVersaoOriginalSha256));
+  const proofKeys = Object.keys(original.provaCampos);
+  check('Oráculo continua recusando valor alterado, prova alterada e campo removido',
+    !matchesOriginalEncoding({ ...original, descricao: original.descricao + ' ALTERADA' }, business.contratoVersaoOriginalSha256)
+    && !matchesOriginalEncoding({ ...original, provaCampos: { ...original.provaCampos, [proofKeys[0]]: { ...original.provaCampos[proofKeys[0]], estado: 'ALTERADO' } } }, business.contratoVersaoOriginalSha256)
+    && !matchesOriginalEncoding({ ...original, provaCampos: Object.fromEntries(Object.entries(original.provaCampos).slice(1)) }, business.contratoVersaoOriginalSha256));
+  report.persistenceEncoding = { originalSha256: business.contratoVersaoOriginalSha256,
+    actualSha256: hash(JSON.stringify(original)), onlyMapKeyOrderMayVary: true, noFieldsExcluded: true };
   for (const [label, endpoint, payload, expectedId, idField] of [
     ['nome', business.nomeEndpoint, business.nomeReplay, business.nomeProvaId, 'id'],
     ['contrato', business.contratoEndpoint, business.contratoReplay, business.contratoProvaId, 'id'],
@@ -49,7 +71,7 @@ execute('persistencia-pos-reinicio', async ({ page, context, account, fixture, c
   const document = await context.request.get(base + `${contratoAlvo.api}/documentos/${business.documentoId}/arquivo`);
   if (document.status() === 404) throw new Error('O driver deve usar a rota binária exata do Java; consulte ServicoExcecoesContrato.');
   const bytes = await document.body();
-  check('Arquivo publicado preserva bytes após reinício', document.status() === 200 && hash(bytes) === '8d0f050761d337273d63e3abeb522a8610260bab52604c2b45ef2204600aa5fb');
+  check('Arquivo do documento registrado preserva bytes após reinício', document.status() === 200 && hash(bytes) === '8d0f050761d337273d63e3abeb522a8610260bab52604c2b45ef2204600aa5fb');
   const query = page.getByRole('form', { name: 'Consulta histórica' });
   await query.getByLabel('ID do contrato', { exact: true }).fill(String(contratoAlvo.id));
   await query.getByLabel('Data efetiva consultada', { exact: true }).fill(fixture.dates.future);

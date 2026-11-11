@@ -2,7 +2,7 @@ import React from 'react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import BarraLateral from '../src/Leiaute/BarraLateral/index.jsx';
+import BarraLateral from '../src/Leiaute/BarraLateral/index.tsx';
 
 afterEach(cleanup);
 it('oferece os catálogos vigentes sem conduzir a cadastros bancários removidos da API', () => {

@@ -18,7 +18,11 @@ import java.util.TreeMap;
 
 /** Fotografia de autorização persistida; não depende das autoridades antigas de um JWT nem de cache. */
 @Service
-public class AutorizacaoExportacaoRelatorioServico {
+public class AutorizacaoExportacaoRelatorioServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AutorizacaoExportacaoRelatorioServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final UsuarioAplicacaoRepositorio usuarios;
     private final AcessoOrganizacionalServico acesso;
     private final MinimizadorDadosPessoaisServico minimizador;

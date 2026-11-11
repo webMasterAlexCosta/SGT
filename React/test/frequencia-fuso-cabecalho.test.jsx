@@ -2,7 +2,7 @@ import React from 'react';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import { afterEach, expect, it, vi } from 'vitest';
-import { CabecalhoFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/components/CabecalhoFrequencia.jsx';
+import { CabecalhoFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/components/CabecalhoFrequencia.tsx';
 
 afterEach(() => { cleanup(); vi.useRealTimers(); });
 

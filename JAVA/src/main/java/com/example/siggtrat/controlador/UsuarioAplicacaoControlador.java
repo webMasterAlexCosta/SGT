@@ -16,7 +16,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/usuarios")
-public class UsuarioAplicacaoControlador {
+public class UsuarioAplicacaoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(UsuarioAplicacaoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final UsuarioAplicacaoServico appUserServico;
     public UsuarioAplicacaoControlador(UsuarioAplicacaoServico appUserServico) { this.appUserServico = appUserServico; }
 
@@ -39,7 +43,8 @@ public class UsuarioAplicacaoControlador {
     @ExigirSenha
     public ResponseEntity<MensagemApiDTO> revogarAcessoRetroativo(@PathVariable Long id) {
         appUserServico.revogarAcessoRetroativo(id);
-        return ResponseEntity.ok(MensagemApiDTO.sucesso("Acesso retroativo bloqueado com sucesso."));
+        return ResponseEntity.ok(MensagemApiDTO.sucesso("Marcador legado de acesso retroativo removido. "
+                + "A janela operacional e os bloqueios de frequência não foram alterados."));
     }
 
     @PostMapping("/{id}/redefinir-senha")

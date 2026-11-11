@@ -38,7 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
- * Candidato SEG-003. Dois comandos HTTP e duas transações MySQL reais.
+ * Candidato SEG-003. Dois comandos HTTP e duas transações PostgreSQL reais.
  * A barreira AOP apenas pausa depois da consulta JPA real; não substitui banco,
  * repositório, autorização nem retorno. Aceita as duas ordens serializáveis:
  * uso conclui antes da revogação, ou revogação conclui e impede novo uso.
@@ -86,10 +86,8 @@ class SegurancaRevogacaoConcorrenteRedIT extends ContratosHttpBase {
             while (System.nanoTime() < limite) {
                 if (revogacao.isDone()) { revogacaoConcluiuAntesDoConsumo = true; break; }
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexaoAto).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexaoAto).getSingleResult()).longValue());
                 if (esperas > 0) { esperaReal = true; break; }
                 TimeUnit.MILLISECONDS.sleep(30);
             }
@@ -177,8 +175,8 @@ class SegurancaRevogacaoConcorrenteRedIT extends ContratosHttpBase {
                     && ativa.compareAndSet(true, false)) {
                 assertTrue(resultado instanceof List<?> lista && lista.stream()
                         .anyMatch(x -> x instanceof PermissaoExcepcional p && permissaoId.equals(p.getId())),
-                        "A barreira deve vir após uma concessão real consultada no MySQL.");
-                consultaConcluida.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                        "A barreira deve vir após uma concessão real consultada no PostgreSQL.");
+                consultaConcluida.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Barreira de autorização não liberada.");
             }
             return resultado;

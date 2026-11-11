@@ -17,7 +17,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * Novos casos RED propostos pela revisão independente de pessoas.
- * Usa MVC, segurança, serviços e MySQL da base existente, sem transação externa
+ * Usa MVC, segurança, serviços e PostgreSQL da base existente, sem transação externa
  * envolvendo os comandos exercidos. Não foi executado pelo autor da revisão.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)

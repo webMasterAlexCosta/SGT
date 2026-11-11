@@ -15,7 +15,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/contratos")
-public class CorrecaoIdentificadorContratoControlador {
+public class CorrecaoIdentificadorContratoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CorrecaoIdentificadorContratoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final CorrecaoIdentificadorContratoServico servico;
 
     public CorrecaoIdentificadorContratoControlador(CorrecaoIdentificadorContratoServico servico) {

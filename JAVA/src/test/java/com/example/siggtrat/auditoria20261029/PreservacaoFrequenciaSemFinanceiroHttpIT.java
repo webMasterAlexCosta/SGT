@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Lacunas de regressão: recusa direta de futuro, atomicidade e batidas físicas no MySQL real. */
+/** Lacunas de regressão: recusa direta de futuro, atomicidade e batidas físicas no PostgreSQL real. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class PreservacaoFrequenciaSemFinanceiroHttpIT extends AuditoriaHttpSuporte {
     @ParameterizedTest(name = "Frequência futura recusada; gestor={0}")

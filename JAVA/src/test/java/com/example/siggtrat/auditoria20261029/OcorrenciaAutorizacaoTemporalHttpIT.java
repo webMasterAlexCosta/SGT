@@ -1,5 +1,9 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.*;
 import com.example.siggtrat.servico.HistoricoIntegridadeServico;
@@ -21,9 +25,10 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** DIF-02, PER-010, DOC-009/010, AUD-001/005: prova HTTP e releitura MySQL após commit. */
+/** DIF-02, PER-010, DOC-009/010, AUD-001/005: prova HTTP e releitura PostgreSQL após commit. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSource;
     @Autowired HistoricoIntegridadeServico integridade;
     @Autowired com.example.siggtrat.servico.OcorrenciaServico ocorrencias;
     @Autowired com.example.siggtrat.configuracao.propriedades.PropriedadesArmazenamentoArquivo armazenamento;
@@ -69,6 +74,18 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                 "Download não contorna a autorização temporal da ocorrência");
         assertArrayEquals(bytes(), executar(x.operadorDestino, get("/api/ocorrencias/anexos/{id}", anexo), 200,
                 "Documento negocial no contexto autorizado é recuperado íntegro").getResponse().getContentAsByteArray());
+        JsonNode metadadosEstaduais = dados(executar(x.c.estadualA, get("/api/ocorrencias/{id}", id), 200,
+                "PER-009:001[2] Estadual correto consulta metadados negociais no contexto do fato"));
+        assertTrue(java.util.stream.StreamSupport.stream(metadadosEstaduais.path("ocorrencia").path("anexos").spliterator(), false)
+                .anyMatch(a -> a.path("id").asLong() == anexo));
+        assertArrayEquals(bytes(), executar(x.c.estadualA, get("/api/ocorrencias/anexos/{id}", anexo), 200,
+                "PER009 Estadual correto também recupera os bytes existentes").getResponse().getContentAsByteArray());
+        JsonNode antesEstadualAlheio = fotografiaNegocialB08(x.empregado);
+        for (String rota : java.util.List.of("/api/ocorrencias/" + id, "/api/ocorrencias/anexos/" + anexo)) {
+            var recusa = executar(x.c.estadualB, get(rota), 403, "PER009 Estadual de outro estado não consulta metadados nem bytes");
+            assertNull(recusa.getResponse().getHeader("Content-Disposition"));
+            assertEquals(antesEstadualAlheio, fotografiaNegocialB08(x.empregado));
+        }
         executar(x.c.localA, delete("/api/ocorrencias/{id}", id), 204, "Cancelamento lógico autorizado");
         executar(x.c.operacionalA, get("/api/ocorrencias/anexos/{id}", anexo), 403,
                 "Cancelamento não devolve a prova ao contexto materializado incorreto");
@@ -101,6 +118,7 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
         executar(x.c.nacional, delete("/api/ocorrencias/{id}", id), 403,
                 "Permissão pessoal ativa não transforma consulta nacional em escrita negocial");
         assertNull(emTransacao(() -> em.find(Ocorrencia.class, id).getCanceladoEm()));
+        finalidadeObrigatoriaB08(x, o, permissao.path("id").asLong(), x.c.nacional);
         assertArrayEquals(bytes(), executar(x.c.nacional, get("/api/ocorrencias/anexos/{id}", anexo)
                 .param("finalidade", "Conferência da prova do afastamento"), 200,
                 "Concessão válida libera somente prova no seu escopo").getResponse().getContentAsByteArray());
@@ -234,8 +252,20 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                 "Concorrência documental", null, null, 1, java.util.List.of("PESSOAL_RESTRITO"), chave);
         var pronto = new java.util.concurrent.CountDownLatch(2);
         var iniciar = new java.util.concurrent.CountDownLatch(1);
-        var executor = java.util.concurrent.Executors.newFixedThreadPool(2);
+        var executor = java.util.concurrent.Executors.newFixedThreadPool(3);
+        var liberarContrato = new java.util.concurrent.CountDownLatch(1);
+        var bloqueadorPronto = new java.util.concurrent.CompletableFuture<Long>();
+        var atorA = new Ator("ocorrencia-A"); var atorB = new Ator("ocorrencia-B");
         try {
+            var bloqueador = executor.submit(() -> emTransacao(() -> {
+                em.find(Contrato.class, x.contrato, jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+                bloqueadorPronto.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
+                try {
+                    if (!liberarContrato.await(25, java.util.concurrent.TimeUnit.SECONDS)) throw new AssertionError("AUD005 fixture não liberou o contexto");
+                } catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IllegalStateException(e); }
+                return null;
+            }));
+            long raiz = bloqueadorPronto.get(10, java.util.concurrent.TimeUnit.SECONDS);
             java.util.concurrent.Callable<Long> chamada = () -> {
                 autenticarServico(x.c.localA);
                 try {
@@ -243,8 +273,15 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                     return ocorrencias.criar(dto, java.util.List.of(new MockMultipartFile("anexos", "concorrente.txt", "text/plain", bytes()))).id();
                 } finally { org.springframework.security.core.context.SecurityContextHolder.clearContext(); }
             };
-            var primeira = executor.submit(chamada); var segunda = executor.submit(chamada);
+            var primeira = executor.submit(() -> atorA.executar(chamada));
+            var segunda = executor.submit(() -> atorB.executar(chamada));
             assertTrue(pronto.await(10, java.util.concurrent.TimeUnit.SECONDS)); iniciar.countDown();
+            var esperas = EsperaJdbcPostgres.aguardarAmbos(new JdbcTemplate(dataSource), raiz,
+                    atorA, sql -> sql.selecaoChave("contrato", "id_contrato", x.contrato),
+                    atorB, sql -> sql.selecaoChave("contrato", "id_contrato", x.contrato),
+                    "AUD005 criação/reenvio ocorrência no Contrato " + x.contrato, primeira, segunda);
+            assertFalse(esperas.isEmpty()); assertFalse(primeira.isDone()); assertFalse(segunda.isDone());
+            liberarContrato.countDown(); bloqueador.get(10, java.util.concurrent.TimeUnit.SECONDS);
             long id = primeira.get(40, java.util.concurrent.TimeUnit.SECONDS);
             assertEquals(id, segunda.get(40, java.util.concurrent.TimeUnit.SECONDS).longValue());
             assertEquals(historicos + 1, contarHistoricos(x.empregado));
@@ -257,7 +294,7 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                         .setParameter("id", id).getSingleResult()); return null;
             });
             assertTrue(integridade.verificarEmpregado(x.empregado).integro());
-        } finally { iniciar.countDown(); executor.shutdownNow(); }
+        } finally { iniciar.countDown(); liberarContrato.countDown(); executor.shutdownNow(); }
     }
 
     @Test
@@ -265,21 +302,130 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
         Contexto x = preparar(); long historicos = contarHistoricos(x.empregado);
         autenticarServico(x.c.localA);
         String nome;
+        var ids = new java.util.concurrent.atomic.AtomicReference<java.util.Map<String, java.util.List<Long>>>();
+        var arquivosAntes = estadoArquivosOcorrencia();
         try {
             nome = new org.springframework.transaction.support.TransactionTemplate(transactionManager).execute(status -> {
                 var dto = new com.example.siggtrat.dto.CriacaoOcorrenciaDTO(x.empregado, "ATESTADO", x.fato,
                         "Rollback documental", null, null, 1, java.util.List.of("PESSOAL_RESTRITO"), "rollback-" + UUID.randomUUID());
                 var criada = ocorrencias.criar(dto, java.util.List.of(new MockMultipartFile("anexos", "rollback.txt", "text/plain", bytes())));
                 String salvo = em.find(AnexoOcorrencia.class, criada.anexos().get(0).id()).getNomeSalvo();
-                em.flush(); status.setRollbackOnly(); return salvo;
+                em.flush();
+                var contextos = em.createQuery("select c.id from ContextoOcorrencia c where c.ocorrencia.id=:id", Long.class)
+                        .setParameter("id", criada.id()).getResultList();
+                var anexos = em.createQuery("select a.id from AnexoOcorrencia a where a.ocorrencia.id=:id", Long.class)
+                        .setParameter("id", criada.id()).getResultList();
+                assertEquals(1, contextos.size(), "Controle positivo: a própria criação escreveu o contexto antes do rollback");
+                assertEquals(1, anexos.size(), "Controle positivo: a própria criação escreveu o anexo antes do rollback");
+                var arquivosDurante = estadoArquivosOcorrencia();
+                assertTrue(arquivosDurante.entrySet().containsAll(arquivosAntes.entrySet()), "Arquivos preexistentes mantidos durante a operação");
+                var novos = new java.util.HashSet<>(arquivosDurante.keySet()); novos.removeAll(arquivosAntes.keySet());
+                assertEquals(1, novos.size(), "Controle positivo: um arquivo sintético temporário foi preparado nesta operação");
+                assertTrue(novos.iterator().next().startsWith(".staging/"), "Publicação definitiva aguarda beforeCommit");
+                ids.set(java.util.Map.of("ocorrencia", java.util.List.of(criada.id()), "contextos", contextos, "anexos", anexos));
+                status.setRollbackOnly(); return salvo;
             });
         } finally { org.springframework.security.core.context.SecurityContextHolder.clearContext(); }
         assertNotNull(nome); assertFalse(java.nio.file.Files.exists(armazenamento.uploadDir().resolve(nome)));
+        assertNotNull(ids.get());
+        assertEquals(arquivosAntes, estadoArquivosOcorrencia(), "Rollback remove staging novo e preserva caminhos/bytes anteriores");
+        emTransacao(() -> {
+            for (long id : ids.get().get("ocorrencia")) assertNull(em.find(Ocorrencia.class, id));
+            for (long id : ids.get().get("contextos")) assertNull(em.find(ContextoOcorrencia.class, id), "Nenhum contexto órfão por PK capturada");
+            for (long id : ids.get().get("anexos")) assertNull(em.find(AnexoOcorrencia.class, id), "Nenhum anexo órfão por PK capturada");
+            return null;
+        });
         assertEquals(historicos, contarHistoricos(x.empregado));
         assertEquals(0L, emTransacao(() -> em.createQuery("select count(o) from Ocorrencia o where o.empregado.id=:id", Long.class)
                 .setParameter("id", x.empregado).getSingleResult()).longValue());
         assertEquals(0L, emTransacao(() -> em.createQuery("select count(f) from Frequencia f where f.empregado.id=:id", Long.class)
                 .setParameter("id", x.empregado).getSingleResult()).longValue());
+    }
+
+    @Test
+    void intencaoSemChaveNormalizaBordasEDistingueNomeEBytesDosArquivos() throws Exception {
+        Contexto x = preparar();
+        long historicosAntes = contarHistoricos(x.empregado);
+        byte[] provaA = "ARQUIVO SINTETICO A".getBytes(StandardCharsets.UTF_8);
+        byte[] provaB = "ARQUIVO SINTETICO B".getBytes(StandardCharsets.UTF_8);
+        var primeira = criarIntencaoSemChave(x, " ATESTADO ", "  Texto sintético  ", "  ", "prova-a.txt", provaA);
+        long idA = primeira.path("id").asLong();
+        var estadoAntesReplay = estadoIntencoes(x);
+        var repetida = criarIntencaoSemChave(x, "ATESTADO", "Texto sintético", null, "prova-a.txt", provaA.clone());
+        assertEquals(primeira, repetida, "AUD005 trim e opcional vazio não criam outra intenção sem chave explícita");
+        assertEquals(estadoAntesReplay, estadoIntencoes(x), "Mesmos IDs, contextos, arquivos, história e frequência após replay");
+        assertEquals(historicosAntes + 1, contarHistoricos(x.empregado));
+
+        var nomeDiferente = criarIntencaoSemChave(x, "ATESTADO", "Texto sintético", null, "prova-b.txt", provaA);
+        var bytesDiferentes = criarIntencaoSemChave(x, "ATESTADO", "Texto sintético", null, "prova-a.txt", provaB);
+        long idNome = nomeDiferente.path("id").asLong(), idBytes = bytesDiferentes.path("id").asLong();
+        assertEquals(3, java.util.Set.of(idA, idNome, idBytes).size(), "Nome e bytes distintos não se fundem pela data/pessoa/narrativa");
+        assertEquals(historicosAntes + 3, contarHistoricos(x.empregado));
+        for (var intencao : java.util.List.of(primeira, nomeDiferente, bytesDiferentes)) {
+            assertEquals(1, intencao.path("anexos").size());
+            long id = intencao.path("id").asLong();
+            long anexoId = intencao.path("anexos").get(0).path("id").asLong();
+            emTransacao(() -> {
+                assertEquals(id, em.find(AnexoOcorrencia.class, anexoId).getOcorrencia().getId().longValue());
+                assertEquals(1L, em.createQuery("select count(c) from ContextoOcorrencia c where c.ocorrencia.id=:id", Long.class)
+                        .setParameter("id", id).getSingleResult());
+                return null;
+            });
+            assertArrayEquals(id == idBytes ? provaB : provaA,
+                    executar(x.c.localA, get("/api/ocorrencias/anexos/{id}", anexoId), 200,
+                            "AUD005 bytes discriminados do arquivo sintético pelo ID da fonte").getResponse().getContentAsByteArray());
+        }
+        var estadoAntesRepetirTodas = estadoIntencoes(x);
+        assertEquals(nomeDiferente, criarIntencaoSemChave(x, "ATESTADO", "Texto sintético", null, "prova-b.txt", provaA));
+        assertEquals(bytesDiferentes, criarIntencaoSemChave(x, "ATESTADO", "Texto sintético", null, "prova-a.txt", provaB));
+        assertEquals(estadoAntesRepetirTodas, estadoIntencoes(x), "Reenvio de cada intenção distinta conserva seu próprio fato e cadeia");
+        emTransacao(() -> {
+            assertEquals(3L, em.createQuery("select count(o) from Ocorrencia o where o.empregado.id=:id", Long.class)
+                    .setParameter("id", x.empregado).getSingleResult());
+            assertEquals(1L, em.createQuery("select count(f) from Frequencia f where f.vinculoContratual.id=:id and f.dataReferencia=:data", Long.class)
+                    .setParameter("id", x.vinculo).setParameter("data", x.fato).getSingleResult(), "Três fontes não duplicam a frequência do mesmo Vínculo/dia");
+            return null;
+        });
+        assertTrue(integridade.verificarEmpregado(x.empregado).integro());
+    }
+
+    private JsonNode criarIntencaoSemChave(Contexto x, String motivo, String observacao, String tipoRo,
+                                          String nome, byte[] conteudo) throws Exception {
+        autenticarServico(x.c.localA);
+        try {
+            var dto = new com.example.siggtrat.dto.CriacaoOcorrenciaDTO(x.empregado, motivo, x.fato,
+                    observacao, tipoRo, null, 1, java.util.List.of("NEGOCIAL"), null);
+            return mapper.valueToTree(ocorrencias.criar(dto, java.util.List.of(new MockMultipartFile("anexos", nome, "text/plain", conteudo))));
+        } finally { org.springframework.security.core.context.SecurityContextHolder.clearContext(); }
+    }
+
+    private java.util.Map<String, java.util.List<String>> estadoIntencoes(Contexto x) {
+        // Oráculo de fatos persistidos por ID; não reimplementa o digest da intenção.
+        return emTransacao(() -> java.util.Map.of(
+                "fontes", em.createQuery("select o from Ocorrencia o where o.empregado.id=:id order by o.id", Ocorrencia.class)
+                        .setParameter("id", x.empregado).getResultList().stream().map(o -> o.getId()+"|"+o.getChaveIdempotencia()+"|"+o.getHashIntencao()).toList(),
+                "contextos", em.createQuery("select c.id,c.ocorrencia.id,c.vinculoId,c.alocacaoId,c.dataReferencia,c.contratoId,c.gestaoLocalId,c.superintendenciaId,c.lotacaoId,c.jornadaId from ContextoOcorrencia c where c.ocorrencia.empregado.id=:id order by c.id", Object[].class)
+                        .setParameter("id", x.empregado).getResultList().stream().map(java.util.Arrays::toString).toList(),
+                "anexos", em.createQuery("select a from AnexoOcorrencia a where a.ocorrencia.empregado.id=:id order by a.id", AnexoOcorrencia.class)
+                        .setParameter("id", x.empregado).getResultList().stream().map(a -> a.getId()+"|"+a.getOcorrencia().getId()+"|"+a.getNomeOriginal()+"|"+a.getNomeSalvo()+"|"+a.getSha256()).toList(),
+                "historico", em.createQuery("select h from HistoricoEmpregado h where h.empregado.id=:id order by h.id", HistoricoEmpregado.class)
+                        .setParameter("id", x.empregado).getResultList().stream().map(h -> h.getId()+"|"+h.getHashIntegridade()).toList(),
+                "frequencias", em.createQuery("select f from Frequencia f where f.vinculoContratual.id=:id order by f.id", Frequencia.class)
+                        .setParameter("id", x.vinculo).getResultList().stream().map(f -> f.getId()+"|"+f.getStatus()+"|"+f.getVersaoNegocial()).toList(),
+                "eventosFrequencia", em.createQuery("select e from EventoFrequencia e where e.frequencia.vinculoContratual.id=:id order by e.id", EventoFrequencia.class)
+                        .setParameter("id", x.vinculo).getResultList().stream().map(e -> e.getId()+"|"+e.getFrequencia().getId()+"|"+e.getHashEvento()).toList()));
+    }
+
+    private java.util.Map<String,String> estadoArquivosOcorrencia() {
+        var raiz = armazenamento.uploadDir();
+        if (!java.nio.file.Files.exists(raiz)) return java.util.Map.of();
+        try (var caminhos = java.nio.file.Files.walk(raiz)) {
+            var estado = new java.util.TreeMap<String,String>();
+            for (var p : caminhos.filter(java.nio.file.Files::isRegularFile).toList())
+                estado.put(raiz.relativize(p).toString(), java.util.HexFormat.of().formatHex(
+                        java.security.MessageDigest.getInstance("SHA-256").digest(java.nio.file.Files.readAllBytes(p))));
+            return java.util.Map.copyOf(estado);
+        } catch (java.io.IOException | java.security.NoSuchAlgorithmException e) { throw new IllegalStateException(e); }
     }
 
     private void autenticarServico(UsuarioAplicacao u) {
@@ -300,7 +446,8 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                 "composicaoId", contrato.composicao1(), "dataInicio", RelogioSistema.hoje().minusDays(15)),
                 201, "Vínculo anterior à transferência retroativa").path("id").asLong();
         conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa("dataEfetiva", RelogioSistema.hoje().minusDays(5),
+        enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", RelogioSistema.hoje().minusDays(5),
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Reorganização administrativa comprovada",
                 "referenciaSei", "SEI-OCORRENCIA-TRANSFERIDA", "autorizacaoAdministrativa", "ATO-HTTP",
@@ -396,6 +543,7 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                 "contratoId", x.contrato, "finalidade", finalidade, "justificativa", "Necessidade específica comprovada",
                 "autorizacaoAdministrativa", "ATO-PRESIDENCIA-TESTE", "validoAte", Instant.now().plusSeconds(1800)),
                 201, "PER011 permissão vigente para consulta institucional excepcional");
+        finalidadeObrigatoriaB08(x, o, permissao.path("id").asLong(), x.c.presidente);
         assertArrayEquals(bytes(), executar(x.c.presidente, get("/api/ocorrencias/anexos/{id}", anexo)
                 .param("finalidade", finalidade), 200, "Permissão e escopo são revalidados no download pessoal")
                 .getResponse().getContentAsByteArray());
@@ -423,6 +571,7 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                 "contratoId", x.contrato, "finalidade", finalidade, "justificativa", "Incidente sintético documentado",
                 "autorizacaoAdministrativa", "ATO-SUPORTE-TESTE", "validoAte", Instant.now().plusSeconds(1800)),
                 201, "Suporte exige ato específico, finalidade, prazo e contrato delimitados");
+        finalidadeObrigatoriaB08(x, o, concessao.path("id").asLong(), x.c.admin);
         assertArrayEquals(bytes(), executar(x.c.admin, get("/api/ocorrencias/anexos/{id}", anexo)
                 .param("finalidade", finalidade), 200, "Concessão técnica vigente autoriza a prova delimitada")
                 .getResponse().getContentAsByteArray());
@@ -431,6 +580,8 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
         assertEquals(1, usos.size()); assertEquals(anexo, usos.get(0).path("recursoId").asLong());
         assertEquals(x.c.admin.getId().longValue(), usos.get(0).path("usuarioId").asLong());
         assertEquals("AnexoOcorrencia", usos.get(0).path("tipoRecurso").asText());
+        assertEquals(concessao.path("id").asLong(), usos.get(0).path("permissaoId").asLong());
+        assertEquals(finalidade, usos.get(0).path("finalidade").asText());
         executar(x.c.admin, delete("/api/ocorrencias/{id}", o.path("id").asLong()), 403,
                 "Suporte documental também não altera a competência negocial");
         enviar(x.c.admin, "/api/permissoes-excepcionais/" + concessao.path("id").asLong() + "/revogar",
@@ -478,6 +629,43 @@ class OcorrenciaAutorizacaoTemporalHttpIT extends ContratosHttpBase {
                 .param("observacao", "Conteúdo pessoal reservado")
                 .param("classificacoesAnexos", classificacao).param("chaveIdempotencia", chave), 201,
                 "Ocorrência posterior à mudança registrada pelo Gestor Local responsável"));
+    }
+
+    private void finalidadeObrigatoriaB08(Contexto x, JsonNode ocorrencia, long permissao, UsuarioAplicacao ator) throws Exception {
+        long anexo = ocorrencia.path("anexos").get(0).path("id").asLong();
+        String rotaUsos = "/api/permissoes-excepcionais/" + permissao + "/usos";
+        JsonNode usosAntes = consultar(x.c.admin, rotaUsos, "B08 concessão válida antes das finalidades inválidas");
+        assertTrue(usosAntes.isEmpty());
+        JsonNode fonteAntes = fotografiaNegocialB08(x.empregado);
+        for (String invalida : java.util.Arrays.asList(null, "", "   ")) {
+            var pedido = get("/api/ocorrencias/anexos/{id}", anexo);
+            if (invalida != null) pedido.param("finalidade", invalida);
+            var recusa = executar(ator, pedido, 403, "PER005004/PER011004 mesma concessão ativa, finalidade ausente/vazia/branca");
+            assertNull(recusa.getResponse().getHeader("Content-Disposition"));
+            assertFalse(recusa.getResponse().getContentAsString().contains(new String(bytes(), StandardCharsets.UTF_8)));
+            assertEquals(usosAntes, consultar(x.c.admin, rotaUsos, "B08 recusa não consome a concessão"));
+            assertEquals(fonteAntes, fotografiaNegocialB08(x.empregado));
+            assertTrue(emTransacao(() -> Boolean.TRUE.equals(em.find(PermissaoExcepcional.class, permissao).getAtivo())));
+        }
+        assertArrayEquals(bytes(), executar(x.c.localA, get("/api/ocorrencias/anexos/{id}", anexo), 200,
+                "B08 controle dos mesmos bytes preservados após as recusas").getResponse().getContentAsByteArray());
+    }
+
+    private JsonNode fotografiaNegocialB08(long empregado) {
+        return emTransacao(() -> {
+            em.clear();
+            return mapper.valueToTree(mapa(
+                    "ocorrencias", linhasB08("select o.id,o.empregado.id,o.dataOcorrencia,o.quantidadeDias,o.canceladoEm,o.hashIntencao from Ocorrencia o where o.empregado.id=:e order by o.id", empregado),
+                    "contextos", linhasB08("select c.id,c.ocorrencia.id,c.dataReferencia,c.contratoId,c.vinculoId,c.alocacaoId,c.gestaoLocalId,c.superintendenciaId,c.lotacaoId,c.jornadaId from ContextoOcorrencia c where c.ocorrencia.empregado.id=:e order by c.id", empregado),
+                    "anexos", linhasB08("select a.id,a.ocorrencia.id,a.sha256,a.nomeSalvo from AnexoOcorrencia a where a.ocorrencia.empregado.id=:e order by a.id", empregado),
+                    "frequencias", linhasB08("select f.id,f.dataReferencia,f.vinculoContratual.id,f.alocacaoVinculo.id,f.status,f.versaoNegocial,f.bloqueadaEdicaoOperacional from Frequencia f where f.empregado.id=:e order by f.id", empregado),
+                    "eventos", linhasB08("select e.id,e.frequencia.id,e.hashAnterior,e.hashEvento from EventoFrequencia e where e.frequencia.empregado.id=:e order by e.id", empregado),
+                    "historicos", linhasB08("select h.id,h.empregado.id,h.hashIntegridade from HistoricoEmpregado h where h.empregado.id=:e order by h.id", empregado)));
+        });
+    }
+    private java.util.List<java.util.List<Object>> linhasB08(String jpql, long empregado) {
+        return em.createQuery(jpql, Object[].class).setParameter("e", empregado).getResultList().stream()
+                .map(java.util.Arrays::asList).toList();
     }
 
     private Contexto preparar() throws Exception {

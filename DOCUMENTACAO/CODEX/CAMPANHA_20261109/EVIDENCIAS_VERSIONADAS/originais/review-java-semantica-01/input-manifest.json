@@ -1,0 +1,9 @@
+{
+  "state": "PREPARED_NOT_DISPATCHED",
+  "brief_sha256": "0fa6e421a11e5e16d5865a4bd5eecfcfd044a05d4def5f3538041988e1bb2297",
+  "input_sha256": "a8b6c8a4cae02daf6c1ba428c123517c9f03f1f8759c0daf5e6a097f387de7be",
+  "input_criteria_count": 112,
+  "source_freeze_manifest_sha256": "2638b14b966ca5af88af92c1e8366b4e2891fbd717e2d5072c63820226155808",
+  "nominal_trace_sha256": "7b3f387ef0cecc0f7cf443400277b8299e2c28013b900715fb4e5b2fddff4995",
+  "scope": "Individual backend semantic assessment, no automatic acceptance."
+}

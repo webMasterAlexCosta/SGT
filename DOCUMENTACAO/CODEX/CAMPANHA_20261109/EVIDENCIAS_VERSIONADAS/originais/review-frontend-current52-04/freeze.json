@@ -1,0 +1,10 @@
+{
+  "state": "ACTIVE",
+  "source_manifest_sha256": "54ef5a4adda4018142e2bcbfdda106e7d8feac63d3d41ffa73b517f19ded68fb",
+  "input_manifest_sha256": "dab748f8c0ab174929f2e1f79e5258df5c69a436795dec49e72966a9aff32925",
+  "source_files": 2249,
+  "input_files": 144,
+  "dist_files": 100,
+  "jar_sha256": "c411a178a9abb4fa5e25799ebd8bae348b171ed082526d1916ea0f22fc04256c",
+  "no_changes_until_review_final": true
+}

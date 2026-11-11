@@ -1,0 +1,15 @@
+{
+  ".homologacao/20261109-sgt-final/backend-gate18-approved.json": "df6d4cb7e96b6164f2e23aa4b4f036681c64edc64442f9fe8b3d91d957482871",
+  ".homologacao/20261109-sgt-final/frontend-final07-jar-binding.json": "de548cec400a2edb4e65184fc1f6cfb9479edc5b2439d4e2101b6e791383f2fa",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/parecer.md": "c622ca121be1cc3e63f290087dece69048b9053f76164565b1e98a7cbd760178",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/freeze-ended.json": "6dc5ac7d6bb563c4e10b69449fe61183f6adfa4a506dfd0c7ddcddd3a00c2913",
+  ".homologacao/20261109-sgt-final/it-supplier-red01/result.json": "58967fca97ea5a92e42c03808b8f1cd8031ce6cfbc14545df8d03505a0cf3a7f",
+  ".homologacao/20261109-sgt-final/it-supplier-red02/result.json": "b89fb63e18e7026f4c2f771ae19ba9994bcf38390f28685bdeeefedbf0f32000",
+  ".homologacao/20261109-sgt-final/it-supplier-red02/cache-isolation.json": "03e7c5ae21ffff32c8c3cf1d9ad44891ef6d9cc53bbe3416e8894430d332dbb5",
+  ".homologacao/20261109-sgt-final/it-supplier-green01/result.json": "f2ba818454ca9eb1819b4d7bfa2e6219481a72d32204e3117a3b6d7d8de16d23",
+  ".homologacao/20261109-sgt-final/it-supplier-green02/result.json": "c6caad67860a3497fd8268bd227ceb651a3267c4b7e12a12ae6de84b6246e5df",
+  ".homologacao/20261109-sgt-final/it-supplier-green02/cache-isolation.json": "03e7c5ae21ffff32c8c3cf1d9ad44891ef6d9cc53bbe3416e8894430d332dbb5",
+  ".homologacao/20261109-sgt-final/java-compile-supplier01/result.json": "fc84eaabf11070adee50afaee77b2699553aa3cfc7b6f1303101d1a6cc4e87aa",
+  ".homologacao/20261109-sgt-final/review-java-supplier19/brief.md": "0c50a6c51f10c4d8a59aca491b4bf747bb9a816b31a8c37042bc0497a423fef8",
+  ".homologacao/20261109-sgt-final/review-java-supplier19/increment.patch": "55136d744f988e4d8339df589b4b95dab1cf94e93a9d1fc289e4e6e4b304ced6"
+}

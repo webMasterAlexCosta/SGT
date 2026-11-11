@@ -13,13 +13,17 @@ import java.util.Base64;
 import java.util.Map;
 
 @Service
-public class CodigoQrServico {
+public class CodigoQrServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CodigoQrServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final int TAMANHO = 256;
 
     public String gerarDataUrl(String conteudo) {
         if (conteudo == null || conteudo.isBlank()) {
-            throw new IllegalArgumentException("Conteúdo do QR Code não informado.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Conteúdo do QR Code não informado.");
         }
         try {
             BitMatrix matriz = new QRCodeWriter().encode(

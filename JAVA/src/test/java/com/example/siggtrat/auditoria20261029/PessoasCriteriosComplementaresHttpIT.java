@@ -113,6 +113,21 @@ class PessoasCriteriosComplementaresHttpIT extends ContratosHttpBase {
         JsonNode criado = enviar(c.localA, "/api/vinculos-contratuais", cadastro(c, cpf(seed(c, 739000000)), null, inicio),
                 201, "VIN002 cadastro tardio informa início efetivo do mês anterior");
         long pessoaId = criado.path("pessoaId").asLong();
+        LocalDate inicioProjecao = RelogioSistema.hoje().minusMonths(2).withDayOfMonth(15);
+        long empregadoId = emTransacao(() -> {
+            Empregado empregado = em.createQuery("select e from Empregado e where e.pessoaCanonica.id=:p", Empregado.class)
+                    .setParameter("p", pessoaId).getSingleResult();
+            // Mutação sintética controlada na projeção; não representa fluxo de produção.
+            empregado.setDataAdmissao(inicioProjecao); em.flush();
+            return empregado.getId();
+        });
+        emTransacao(() -> {
+            em.clear();
+            assertThat(em.find(Empregado.class, empregadoId).getDataAdmissao()).isEqualTo(inicioProjecao);
+            assertThat(em.find(com.example.siggtrat.entidade.VinculoContratual.class, criado.path("id").asLong()).getDataInicio())
+                    .as("VIN-002:002[1] fonte canônica diferente da projeção").isEqualTo(inicio).isNotEqualTo(inicioProjecao);
+            return null;
+        });
         String rota = "/api/vinculos-contratuais?pessoaId=" + pessoaId;
         YearMonth mesFato = YearMonth.from(inicio), mesRegistro = YearMonth.from(RelogioSistema.hoje());
         JsonNode porFato = consultar(c.localA, rota + "&inicioDe=" + mesFato.atDay(1) + "&inicioAte=" + mesFato.atEndOfMonth(),
@@ -123,6 +138,12 @@ class PessoasCriteriosComplementaresHttpIT extends ContratosHttpBase {
                 "VIN002 mês de registro não substitui o mês de início");
         assertThat(porRegistro.path("content")).isEmpty();
         assertThat(porRegistro.path("totalElements").asLong()).isZero();
+        assertThat(porFato.path("totalElements").asLong()).isEqualTo(1);
+        YearMonth mesProjecao = YearMonth.from(inicioProjecao);
+        JsonNode porProjecao = consultar(c.localA, rota + "&inicioDe=" + mesProjecao.atDay(1) + "&inicioAte=" + mesProjecao.atEndOfMonth(),
+                "VIN-002:002[1] dataAdmissao divergente não governa pesquisa canônica");
+        assertThat(porProjecao.path("content")).isEmpty();
+        assertThat(porProjecao.path("totalElements").asLong()).isZero();
     }
 
     private Map<String, Object> cadastro(Cenario c, String cpf, String matricula, LocalDate inicio) {

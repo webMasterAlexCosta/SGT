@@ -4,7 +4,7 @@ const { contratoDaFixture, idObservado } = require('./contexto-fixture.cjs');
 const { execute } = require('./ambiente-real.cjs');
 
 const TIPO = 'TRANSFERENCIA_GESTAO_LOCAL';
-const REFERENCIA = 'SINTETICO-E2E-TRANSFERENCIA-20261101';
+const REFERENCIA_BASE = 'SINTETICO-E2E-TRANSFERENCIA-20261101';
 const FINALIDADE = 'SINTETICO E2E: validar transferência do contrato sintético observado; sem validade administrativa real.';
 const JUSTIFICATIVA = 'SINTETICO E2E autorizado: testar concessão temporária, prévia e posterior revogação em ambiente isolado.';
 const dados = body => body && Object.hasOwn(body, 'data') ? body.data : body;
@@ -13,6 +13,7 @@ const api = (page, caminho) => new URL(`/api${caminho}`, page.url()).href;
 async function principal() {
   await execute('admin-autorizacao', async ({ page, context, fixture, account, report, check, screenshot, open, confirmPassword, recordBusiness }) => {
     const contratoAlvo = contratoDaFixture(fixture);
+    const REFERENCIA = `${REFERENCIA_BASE}-CONTRATO-${contratoAlvo.id}`;
     const beneficiarioId = idObservado(fixture.accounts.gestor_local?.id, 'gestor_local');
     const gestaoOrigemId = idObservado(fixture.ids.gestao_origem, 'gestao_origem');
     check('Conta administrativa sintética designada', account.id === idObservado(fixture.accounts.fixture_admin?.id, 'fixture_admin') && account.perfil === 'ADMINISTRADOR');

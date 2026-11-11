@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-import { ServicoVinculoContratual } from '../src/services/rh/ServicoVinculoContratual.js';
-import { montarPayloadFrequenciaCanonica, possuiIdentidadeCanonicaFrequencia } from '../src/services/rh/ServicoDominioFrequencia.js';
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+import { ServicoVinculoContratual } from '../src/services/rh/ServicoVinculoContratual.ts';
+import { montarPayloadFrequenciaCanonica, possuiIdentidadeCanonicaFrequencia } from '../src/services/rh/ServicoDominioFrequencia.ts';
 
 const contexto = { data: '2026-11-01', contratoIds: [9] };
 const base = { empregadoId: 17, pessoaId: 101, nome: 'Ana Silva', matricula: 'MAT-123', cpf: '111.111.111-11', lotacaoId: 7, turnoId: 8 };

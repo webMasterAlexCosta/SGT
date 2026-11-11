@@ -1,0 +1,11 @@
+{
+  "state": "FROZEN_FOR_NATIVE_FRONTEND_REVIEW",
+  "head": "3ed3843e954040a330957c8cd715daefc9760b72",
+  "source_manifest_sha256": "85ed0918b8432311a722bd8e2494376922ee170ebba3c19f3baf4d5229e5aa1b",
+  "input_manifest_sha256": "eafc038d3f8f1108ae286b6ea96ad1dd9fe3f04011b992f98e9a8cd1daaa50e9",
+  "source_files": 2148,
+  "input_files": 66,
+  "dist_files": 100,
+  "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+  "no_changes_until_review_final": true
+}

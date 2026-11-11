@@ -18,7 +18,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * VIN-014:003 / REL-006: reforço da ponte comando -> consumidor de emissão.
  * A fixture declara uma origem sintética explícita; ela não recupera acervo real.
- * HTTP, serviços e leituras posteriores usam transações próprias no MySQL.
+ * HTTP, serviços e leituras posteriores usam transações próprias no PostgreSQL.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class RetificacaoInicioEmissaoPreexistenteHttpIT extends ContratosHttpBase {

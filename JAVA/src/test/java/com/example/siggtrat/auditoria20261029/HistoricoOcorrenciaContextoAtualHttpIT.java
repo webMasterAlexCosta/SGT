@@ -33,7 +33,8 @@ class HistoricoOcorrenciaContextoAtualHttpIT extends ContratosHttpBase {
                 .setParameter("id", c.empregadoA.getId()).setMaxResults(1).getSingleResult());
         JsonNode antes = consultar(c.localA, "/api/historicos-empregados/" + historico, "Narrativa original acessível em A");
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.minusDays(1), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Responsabilidade histórica corrigida documentalmente", "referenciaSei", "SEI-HISTORICO-FONTE",

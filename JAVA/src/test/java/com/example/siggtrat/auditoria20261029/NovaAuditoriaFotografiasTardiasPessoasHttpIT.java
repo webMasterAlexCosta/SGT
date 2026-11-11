@@ -29,7 +29,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Usa a cadeia MVC/segurança/serviços/JPA real do suporte do projeto.
  * MockMvc não substitui a prova separada por TCP de um JAR em execução.
  * Não usa mock de persistência, não altera schema e não fabrica foto histórica.
- * O suporte só substitui o agendador; este teste exige MySQL 8.0.45 e Redis reais.
+ * O suporte só substitui o agendador; este teste exige PostgreSQL 18.6 e Redis reais.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @TestPropertySource(properties = {
@@ -46,8 +46,8 @@ class NovaAuditoriaFotografiasTardiasPessoasHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirInfraestruturaRealEUnicoGestorDeSchema() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");

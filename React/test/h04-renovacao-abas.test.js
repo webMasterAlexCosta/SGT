@@ -12,11 +12,11 @@ const mudarRevisao = valor => {
 let sessaoA, sessaoB, servicoB, apiB, requisitarB, geracaoA, geracaoB, enviados, resolver, rejeitar, configuracao;
 beforeEach(async () => {
   vi.resetModules(); localStorage.clear(); sessionStorage.clear(); mudarRevisao('sessao-inicial-sintetica');
-  sessaoA = await import('../src/core/security/geracaoSessao.js'); geracaoA = sessaoA.obterGeracaoSessao();
+  sessaoA = await import('../src/core/security/geracaoSessao.ts'); geracaoA = sessaoA.obterGeracaoSessao();
   vi.resetModules();
-  sessaoB = await import('../src/core/security/geracaoSessao.js'); geracaoB = sessaoB.obterGeracaoSessao();
-  ({ api: apiB, requisitar: requisitarB } = await import('../src/core/http.js'));
-  ({ ServicoAutenticacao: servicoB } = await import('../src/services/auth/ServicoAutenticacao.js'));
+  sessaoB = await import('../src/core/security/geracaoSessao.ts'); geracaoB = sessaoB.obterGeracaoSessao();
+  ({ api: apiB, requisitar: requisitarB } = await import('../src/core/http.ts'));
+  ({ ServicoAutenticacao: servicoB } = await import('../src/services/auth/ServicoAutenticacao.ts'));
   enviados = []; configuracao = null;
   const gate = new Promise((resolve, reject) => { resolver = resolve; rejeitar = reject; });
   apiB.defaults.adapter = async config => {

@@ -15,8 +15,8 @@ import java.util.UUID;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integração MySQL: TokenAtivoRepositorio")
-class TokenAtivoRepositorioIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: TokenAtivoRepositorio")
+class TokenAtivoRepositorioIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private TokenAtivoRepositorio repositorio;

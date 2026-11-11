@@ -136,7 +136,7 @@ class ConclusaoApiCanonicaHttpIT extends AuditoriaHttpSuporte {
         try {
             Future<?> primeira = pool.submit(() -> emTransacao(() -> {
                 Pessoa pessoa = em.find(Pessoa.class, c.pessoaA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Não houve espera pela Pessoa bloqueada.");
@@ -155,14 +155,12 @@ class ConclusaoApiCanonicaHttpIT extends AuditoriaHttpSuporte {
             boolean aguardou = false;
             while (System.nanoTime() < limite && !segunda.isDone()) {
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", bloqueadora).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", bloqueadora).getSingleResult()).longValue());
                 if (esperas > 0) { aguardou = true; break; }
                 TimeUnit.MILLISECONDS.sleep(20);
             }
-            assertThat(aguardou).as("A segunda conexão deve aguardar a primeira no MySQL real").isTrue();
+            assertThat(aguardou).as("A segunda conexão deve aguardar a primeira no PostgreSQL real").isTrue();
             liberar.countDown();
             primeira.get(20, TimeUnit.SECONDS);
             segunda.get(20, TimeUnit.SECONDS);

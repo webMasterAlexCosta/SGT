@@ -1,9 +1,9 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: (r) => Array.isArray(r) ? r : r?.content || [] }));
-import { ServicoExcecoesContrato } from '../src/services/admin/ServicoExcecoesContrato.js';
-import * as dominio from '../src/services/admin/ServicoDominioExcecoesContrato.js';
+vi.mock('../src/core/http.ts', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: (r) => Array.isArray(r) ? r : r?.content || [] }));
+import { ServicoExcecoesContrato } from '../src/services/admin/ServicoExcecoesContrato.ts';
+import * as dominio from '../src/services/admin/ServicoDominioExcecoesContrato.ts';
 
 const formulario = {
   cnpjCorrigido: '11.222.333/0001-44', dataEfetiva: '2026-10-01', dataAto: '2026-10-02',

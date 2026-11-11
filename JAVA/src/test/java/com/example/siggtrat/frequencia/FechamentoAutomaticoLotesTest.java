@@ -47,7 +47,7 @@ class FechamentoAutomaticoLotesTest {
             for (long id = 1; id <= 1001; id++) {
                 var frequencia = new Frequencia();
                 frequencia.setId(id);
-                frequencia.setDataReferencia(LocalDate.now(new PoliticaTemporalFrequenciaServico().zona()).minusDays(8));
+                frequencia.setDataReferencia(LocalDate.now(new PoliticaTemporalFrequenciaServico(7).zona()).minusDays(8));
                 frequencia.setEstadoNegocial(EstadoNegocialFrequencia.ABERTA);
                 frequencia.setVersaoNegocial(1);
                 registros.add(frequencia);
@@ -56,12 +56,12 @@ class FechamentoAutomaticoLotesTest {
     }
 
     @Configuration(proxyBeanMethods = false)
-    @EnableTransactionManagement
+    @EnableTransactionManagement(proxyTargetClass = true)
     static class Configuracao {
         @Bean Dados dados() { return new Dados(); }
         @Bean Transacoes transactionManager() { return new Transacoes(); }
         @Bean EntityManager entityManager() { return mock(EntityManager.class); }
-        @Bean PoliticaTemporalFrequenciaServico politica() { return new PoliticaTemporalFrequenciaServico(); }
+        @Bean PoliticaTemporalFrequenciaServico politica() { return new PoliticaTemporalFrequenciaServico(7); }
         @Bean InvalidacaoCacheServico invalidacao() {
             var cache = mock(InvalidacaoCacheServico.class);
             doAnswer(inv -> {

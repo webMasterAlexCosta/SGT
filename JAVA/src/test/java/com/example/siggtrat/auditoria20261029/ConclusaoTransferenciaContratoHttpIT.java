@@ -1,5 +1,9 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.example.siggtrat.entidade.TransferenciaGestaoContrato;
 import com.example.siggtrat.utilitario.RelogioSistema;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -22,6 +26,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /** CON-023 / TMP-008/012/014/016: fatos persistidos e relidos em transações independentes. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ConclusaoTransferenciaContratoHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSource;
     @Test
     void retificarTransferenciaProgramadaReconstroiOrigemEReaplicaAditamentoPosterior() throws Exception {
         var f = preparar();
@@ -170,8 +175,20 @@ class ConclusaoTransferenciaContratoHttpIT extends ContratosHttpBase {
         });
         var adi = aditamento("ADI-PRORROGA-ANTES-DA-RESCISAO", f.n().inicio().plusDays(1));
         adi.put("novaDataFim", f.n().fim().plusDays(30));
-        emTransacao(() -> { try { return registrarAditamento(f.c(), f.n().id(), adi); }
+        JsonNode adiRegistrado=emTransacao(() -> { try { return registrarAditamento(f.c(), f.n().id(), adi); }
             catch (Exception ex) { throw new IllegalStateException(ex); } });
+        long adiId=adiRegistrado.path("id").asLong(),eventoAdi=adiRegistrado.path("eventoId").asLong();
+        JsonNode instrumentoAntes=consultar(f.c().nacional,base(f.n().id())+"/aditamentos","CON016 ADI exato antes da rescisão").get(0).deepCopy();
+        assertThat(instrumentoAntes.path("id").asLong()).isEqualTo(adiId);
+        assertThat(instrumentoAntes.path("eventoId").asLong()).isEqualTo(eventoAdi);
+        assertThat(instrumentoAntes.path("identificacao").asText()).isEqualTo("ADI-PRORROGA-ANTES-DA-RESCISAO");
+        assertThat(instrumentoAntes.path("novaDataFim").asText()).isEqualTo(f.n().fim().plusDays(30).toString());
+        var prorrogado=consultar(f.c().nacional,base(f.n().id())+"/posicao-temporal?data="+f.n().fim().plusDays(15),
+                "CON016 ADI futuro cobre a data que depois será objeto de rescisão");
+        assertThat(prorrogado.path("contratoId").asLong()).isEqualTo(f.n().id());
+        assertThat(prorrogado.path("situacaoTemporal").asText()).isEqualTo("VIGENTE");
+        assertThat(prorrogado.path("vigenciaFim").asText()).isEqualTo(f.n().fim().plusDays(30).toString());
+        assertThat(prorrogado.path("versaoContratual").path("dataFim").asText()).isEqualTo(f.n().fim().plusDays(30).toString());
         LocalDate efeito = f.n().fim().plusDays(15);
         var req = mapa("dataEfetiva", efeito, "dataAto", RelogioSistema.hoje(), "motivo", "Rescisão no período prorrogado",
                 "referenciaSei", "SEI-RESCISAO-PRORROGADA");
@@ -186,31 +203,85 @@ class ConclusaoTransferenciaContratoHttpIT extends ContratosHttpBase {
         assertThat(encerrado.path("situacaoTemporal").asText()).isEqualTo("ENCERRADO");
         assertThat(encerrado.path("vigenciaFim").asText()).isEqualTo(efeito.toString());
         assertThat(contar(f.n().id(), "AditamentoContratual")).isEqualTo(1L);
+        JsonNode instrumentosDepois=consultar(f.c().nacional,base(f.n().id())+"/aditamentos","CON016 rescisão não remove nem reescreve ADI");
+        assertThat(instrumentosDepois).hasSize(1);
+        assertThat(instrumentosDepois.get(0)).isEqualTo(instrumentoAntes);
+        emTransacao(() -> {
+            var persistido=em.find(com.example.siggtrat.entidade.AditamentoContratual.class,adiId);
+            assertThat(persistido.getContrato().getId()).isEqualTo(f.n().id());
+            assertThat(persistido.getEvento().getId()).isEqualTo(eventoAdi);
+            assertThat(persistido.getIdentificacao()).isEqualTo("ADI-PRORROGA-ANTES-DA-RESCISAO");
+            assertThat(persistido.getNovaDataFim()).isEqualTo(f.n().fim().plusDays(30));return null;
+        });
     }
 
     @Test
     void duasTransferenciasConflitantesConcorrentesNaoPublicamDuasCadeias() throws Exception {
         var f = preparar();
         LocalDate data = f.n().inicio().plusDays(2);
+        var eventosAntes = consultar(f.c().nacional, base(f.n().id()) + "/eventos", "CON023 origem publicada antes da disputa");
+        assertThat(eventosAntes).hasSize(1);
+        long eventoOrigemId = eventosAntes.get(0).path("id").asLong();
         String corpo = json(requisicao(f, data));
         var primeira = autenticar(post(base(f.n().id()) + "/transferir-gestao")
                 .contentType(MediaType.APPLICATION_JSON).content(corpo), f.c().localA);
         var segunda = autenticar(post(base(f.n().id()) + "/transferir-gestao")
                 .contentType(MediaType.APPLICATION_JSON).content(corpo), f.c().localA);
         var inicio = new CountDownLatch(1);
-        var pool = Executors.newFixedThreadPool(2);
+        var pool = Executors.newFixedThreadPool(3);
+        var liberarContrato = new CountDownLatch(1);
+        var bloqueadorPronto = new java.util.concurrent.CompletableFuture<Long>();
+        var atorA = new Ator("transferencia-A"); var atorB = new Ator("transferencia-B");
         try {
-            var a = pool.submit(() -> { inicio.await(); return mvc.perform(primeira).andReturn().getResponse().getStatus(); });
-            var b = pool.submit(() -> { inicio.await(); return mvc.perform(segunda).andReturn().getResponse().getStatus(); });
+            var bloqueador = pool.submit(() -> emTransacao(() -> {
+                em.find(com.example.siggtrat.entidade.Contrato.class, f.n().id(), jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+                bloqueadorPronto.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
+                try {
+                    if (!liberarContrato.await(25, TimeUnit.SECONDS)) throw new AssertionError("CON023 fixture não liberou o Contrato");
+                } catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IllegalStateException(e); }
+                return null;
+            }));
+            long raiz = bloqueadorPronto.get(10, TimeUnit.SECONDS);
+            var a = pool.submit(() -> atorA.executar(() -> { inicio.await(); return mvc.perform(primeira).andReturn().getResponse().getStatus(); }));
+            var b = pool.submit(() -> atorB.executar(() -> { inicio.await(); return mvc.perform(segunda).andReturn().getResponse().getStatus(); }));
             inicio.countDown();
+            var esperas = EsperaJdbcPostgres.aguardarAmbos(new JdbcTemplate(dataSource), raiz,
+                    atorA, sql -> sql.selecaoChave("contrato", "id_contrato", f.n().id()),
+                    atorB, sql -> sql.selecaoChave("contrato", "id_contrato", f.n().id()),
+                    "CON023 transferência/Contrato " + f.n().id(), a, b);
+            assertThat(esperas).isNotEmpty();
+            assertThat(a.isDone()).isFalse(); assertThat(b.isDone()).isFalse();
+            liberarContrato.countDown(); bloqueador.get(10, TimeUnit.SECONDS);
             var resultados = List.of(a.get(30, TimeUnit.SECONDS), b.get(30, TimeUnit.SECONDS));
             assertThat(resultados.stream().filter(status -> status == 200).count()).isEqualTo(1L);
             assertThat(resultados).allMatch(status -> status == 200 || status == 400 || status == 409);
         } finally {
-            pool.shutdownNow();
+            inicio.countDown(); liberarContrato.countDown(); pool.shutdownNow();
         }
         assertThat(contar(f.n().id(), "TransferenciaGestaoContrato")).isEqualTo(1L);
         assertThat(contar(f.n().id(), "EventoCicloVidaContrato")).isEqualTo(2L);
+        var transferida = transferencia(f.n().id());
+        var eventosDepois = consultar(f.c().nacional, base(f.n().id()) + "/eventos", "CON023 cadeia por IDs e relações, sem fonte parcial");
+        var porId = java.util.stream.StreamSupport.stream(eventosDepois.spliterator(), false)
+                .collect(java.util.stream.Collectors.toMap(e -> e.path("id").asLong(), e -> e));
+        assertThat(porId.keySet()).containsExactlyInAnyOrder(eventoOrigemId, transferida.evento());
+        assertThat(porId.get(eventoOrigemId)).isEqualTo(eventosAntes.get(0));
+        emTransacao(() -> {
+            var t = em.find(TransferenciaGestaoContrato.class, transferida.id());
+            assertThat(t.getContrato().getId()).isEqualTo(f.n().id());
+            assertThat(t.getEvento().getId()).isEqualTo(transferida.evento());
+            assertThat(t.getEvento().getContrato().getId()).isEqualTo(f.n().id());
+            assertThat(t.getEvento().getTipoEvento().name()).isEqualTo("TRANSFERENCIA_GESTAO_LOCAL");
+            var mapas = em.createQuery("select m from MapeamentoTransferenciaGestao m where m.transferencia.id=:id",
+                    com.example.siggtrat.entidade.MapeamentoTransferenciaGestao.class).setParameter("id", t.getId()).getResultList();
+            assertThat(mapas).hasSize(1);
+            assertThat(mapas.get(0).getComposicaoOrigem().getId()).isEqualTo(f.n().composicao1());
+            assertThat(mapas.get(0).getTransferencia().getEvento().getId()).isEqualTo(transferida.evento());
+            assertThat(mapas.get(0).getLotacaoDestino().getId()).isEqualTo(f.c().lotacaoB.getId());
+            assertThat(mapas.get(0).getJornadaDestino().getId()).isEqualTo(f.c().jornadaB.getId());
+            assertThat(mapas.get(0).getCargoDestino().getId()).isEqualTo(f.c().cargoB.getId());
+            return null;
+        });
         assertThat(foto(f, data).path("gestaoLocalId").asLong()).isEqualTo(f.c().gestaoB.getId());
     }
 
@@ -228,7 +299,8 @@ class ConclusaoTransferenciaContratoHttpIT extends ContratosHttpBase {
     }
 
     private Map<String, Object> requisicao(Preparado f, LocalDate data) {
-        return mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(),
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(),
                 "tipoContratacaoDestinoId", f.c().tipoB.getId(), "motivo", "Reorganização administrativa documentada",
                 "referenciaSei", "SEI-CONCLUSAO-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", f.n().composicao1(),
@@ -237,7 +309,8 @@ class ConclusaoTransferenciaContratoHttpIT extends ContratosHttpBase {
     }
 
     private Map<String, Object> cancelar(LocalDate data) {
-        return mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "motivo", "Ato futuro revogado expressamente",
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "motivo", "Ato futuro revogado expressamente",
                 "referenciaSei", "SEI-CANCELAMENTO-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP");
     }
 

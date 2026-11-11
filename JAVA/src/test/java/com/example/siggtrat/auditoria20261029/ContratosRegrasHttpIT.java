@@ -93,6 +93,10 @@ class ContratosRegrasHttpIT extends ContratosHttpBase {
                 c.gestaoA.getId(), c.localA, "Anulação documentada", CategoriaTerminoVinculo.ANULACAO_CONTRATO,
                 DATA, DATA, com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros(),
                 "SEI-SINTETICO-CONTRATOS-ANULACAO-RESERVA-IDENTIFICADOR");
+        var vinculoAntes=consultar(c.localA,"/api/vinculos-contratuais/"+c.vinculoA.getId(),"CON018 vínculo antes da anulação");
+        var alocacaoAntes=consultar(c.localA,"/api/vinculos-contratuais/"+c.vinculoA.getId()+"/alocacoes","CON018 alocação antes da anulação").get(0);
+        assertThat(vinculoAntes.path("id").asLong()).isEqualTo(c.vinculoA.getId());
+        assertThat(alocacaoAntes.path("id").asLong()).isEqualTo(c.alocacaoA.getId());
         var req = mapa("dataEfetiva", DATA, "dataAto", DATA.plusDays(3), "motivo", "Instrumento invalidado pelo ato formal", "referenciaSei", "SEI-ANULACAO");
         confirmarCiclo(c, c.contratoA.getId(), "anular", req);
         var evento = consultar(c.localA, base(c.contratoA.getId()) + "/eventos", "CON-024 datas e autor auditáveis").get(0);
@@ -107,6 +111,41 @@ class ContratosRegrasHttpIT extends ContratosHttpBase {
         executar(c.localA, delete(base(c.contratoA.getId())), 409, "GOV-003 anulação preserva contrato");
         assertThat(em.find(com.example.siggtrat.entidade.VinculoContratual.class, c.vinculoA.getId())).isNotNull();
         assertThat(c.vinculoA.getContrato().getId()).isEqualTo(c.contratoA.getId());
+        em.flush();em.clear();
+        var vinculoDepois=consultar(c.localA,"/api/vinculos-contratuais/"+c.vinculoA.getId(),"CON018 mesmo vínculo auditável após anulação");
+        var faixas=consultar(c.localA,"/api/vinculos-contratuais/"+c.vinculoA.getId()+"/alocacoes","CON018 mesma alocação preservada sem realocação automática");
+        assertThat(faixas).hasSize(1);var alocacaoDepois=faixas.get(0);
+        for(String campo:List.of("id","pessoaId","contratoId","dataInicio","matricula")) {
+            assertThat(vinculoAntes.has(campo)).as("CON018 campo existente no DTO: "+campo).isTrue();
+            assertThat(vinculoDepois.path(campo)).as("CON018 vínculo preserva "+campo).isEqualTo(vinculoAntes.path(campo));
+        }
+        assertThat(vinculoDepois.path("dataFim").asText()).isEqualTo(DATA.toString());
+        assertThat(vinculoDepois.path("motivoDesligamentoId").asLong()).isEqualTo(motivo.getId());
+        for(String campo:List.of("id","vinculoId","composicaoBaseId","lotacaoId","jornadaId","cargoId","dataInicio")) {
+            assertThat(alocacaoAntes.has(campo)).as("CON018 campo existente no DTO: "+campo).isTrue();
+            assertThat(alocacaoDepois.path(campo)).as("CON018 alocação conserva "+campo).isEqualTo(alocacaoAntes.path(campo));
+        }
+        // Anulação retira cobertura desde D; a última Alocação válida termina em D-1.
+        // O vínculo e o evento acima conservam D como data causal, não como cobertura da Alocação.
+        assertThat(alocacaoDepois.path("dataFim").asText()).isEqualTo(DATA.minusDays(1).toString());
+        var historica=consultar(c.localA,"/api/vinculos-contratuais/"+c.vinculoA.getId()+"/alocacoes/posicao?data="+DATA.minusDays(1),
+                "CON018 corte anterior ainda resolve a alocação original");
+        assertThat(historica.path("alocacaoId").asLong()).isEqualTo(c.alocacaoA.getId());
+        assertThat(historica.path("vinculoId").asLong()).isEqualTo(c.vinculoA.getId());
+        assertThat(historica.path("lotacaoId").asLong()).isEqualTo(c.lotacaoA.getId());
+        assertThat(historica.path("situacaoTemporal").asText()).isEqualTo("VIGENTE");
+        var noAlcance=consultar(c.localA,"/api/vinculos-contratuais/"+c.vinculoA.getId()+"/alocacoes/posicao?data="+DATA,
+                "CON018 desde o alcance anulatório não há cobertura operacional de Alocação");
+        assertThat(noAlcance.path("situacaoTemporal").asText()).isEqualTo("SEM_ALOCACAO");
+        assertThat(noAlcance.has("alocacaoId")).isTrue();
+        assertThat(noAlcance.path("alocacaoId").isNull()).isTrue();
+        var vinculosNoAlcance=consultar(c.localA,"/api/vinculos-contratuais/pessoas/"+c.pessoaA.getId()+"/posicao?data="+DATA,
+                "CON018 vínculo preservado fica ANULADO na data de alcance").path("vinculos");
+        assertThat(vinculosNoAlcance).hasSize(1);
+        assertThat(vinculosNoAlcance.get(0).path("vinculoId").asLong()).isEqualTo(c.vinculoA.getId());
+        assertThat(vinculosNoAlcance.get(0).path("situacaoTemporal").asText()).isEqualTo("ANULADO");
+        assertThat(em.createQuery("select count(v) from VinculoContratual v where v.pessoa.id=:p",Long.class)
+                .setParameter("p",c.pessoaA.getId()).getSingleResult()).isEqualTo(1);
     }
 
     @Test
@@ -134,7 +173,7 @@ class ContratosRegrasHttpIT extends ContratosHttpBase {
         var c = criarCenario(); var n = publicado(c, 5, null, false); var outro = publicado(c, 5, null, false);
         // As duas leituras devem partir da persistência real. O contexto do
         // teste é compartilhado com MockMvc: uma entidade recém-criada ainda
-        // retém nanos, enquanto a releitura MySQL retorna a precisão persistida.
+        // retém nanos, enquanto a releitura PostgreSQL retorna a precisão persistida.
         // Nenhum campo da fotografia é removido ou normalizado no oráculo.
         em.flush(); em.clear();
         LocalDate efeito = n.inicio().plusDays(4);
@@ -170,13 +209,39 @@ class ContratosRegrasHttpIT extends ContratosHttpBase {
         LocalDate zero = n.inicio().plusDays(2); LocalDate retorno = zero.plusDays(3);
         var reduzir = aditamento("ZERAR", zero); reduzir.put("novoEfetivoTotal", 75);
         reduzir.put("alteracoesComposicao", List.of(mapa("composicaoId", n.composicao1(), "quantidadeResultante", 0)));
-        registrarAditamento(c, n.id(), reduzir);
+        var zerar = registrarAditamento(c, n.id(), reduzir);
+        em.flush(); em.clear();
+        var acervoZerado = consultar(c.localA, base(n.id()) + "/aditamentos", "CMP005 fotografia sintética do instrumento ZERAR");
+        assertThat(acervoZerado).hasSize(1);
+        assertThat(acervoZerado.get(0)).isEqualTo(zerar);
         var incluir = vinculo(n, zero.plusDays(1), "52998224725"); incluir.put("confirmarInclusaoExcedente", true);
         incluir.put("justificativaExcedente", "Excedente não autoriza composição inexistente");
-        enviar(c.localA, "/api/vinculos-contratuais", incluir, 409, "CMP-004 zero não é autorização de excedente");
+        incluir.put("evidenciaExcedente", "SEI-SINTETICO-CAPACIDADE-ZERO");
+        incluir.put("autorizacaoExcedente", "ATO-SINTETICO-GESTOR-LOCAL");
+        JsonNode negativaZero = enviar(c.localA, "/api/vinculos-contratuais", incluir, 409, "CMP-004 zero não é autorização de excedente");
+        assertThat(negativaZero.path("message").asText()).as("CMP010 consentimento completo não afasta capacidade zero")
+                .contains("efetivo previsto zero");
         var restaurar = aditamento("RESTAURAR", retorno); restaurar.put("novoEfetivoTotal", 100);
         restaurar.put("alteracoesComposicao", List.of(mapa("composicaoId", n.composicao1(), "quantidadeResultante", 25)));
-        registrarAditamento(c, n.id(), restaurar);
+        var retornoInstrumento = registrarAditamento(c, n.id(), restaurar);
+        em.flush(); em.clear();
+        var acervoRestaurado = consultar(c.localA, base(n.id()) + "/aditamentos", "CMP005 releitura de ambos instrumentos por ID, incluindo itens e situação");
+        assertThat(acervoRestaurado).hasSize(2);
+        var porId = java.util.stream.StreamSupport.stream(acervoRestaurado.spliterator(), false)
+                .collect(java.util.stream.Collectors.toMap(a -> a.path("id").asLong(), a -> a));
+        assertThat(porId.keySet()).containsExactlyInAnyOrder(zerar.path("id").asLong(), retornoInstrumento.path("id").asLong());
+        assertThat(porId.get(zerar.path("id").asLong())).isEqualTo(acervoZerado.get(0));
+        assertThat(porId.get(retornoInstrumento.path("id").asLong())).isEqualTo(retornoInstrumento);
+        assertThat(zerar.path("identificacao").asText()).isEqualTo("ZERAR");
+        assertThat(retornoInstrumento.path("identificacao").asText()).isEqualTo("RESTAURAR");
+        assertThat(zerar.path("alteracoesComposicao")).hasSize(1);
+        assertThat(retornoInstrumento.path("alteracoesComposicao")).hasSize(1);
+        for (var ato : java.util.List.of(zerar, retornoInstrumento))
+            assertThat(ato.path("alteracoesComposicao").get(0).path("composicaoId").asLong()).isEqualTo(n.composicao1());
+        assertThat(zerar.path("alteracoesComposicao").get(0).path("quantidadeAnterior").asInt()).isEqualTo(25);
+        assertThat(zerar.path("alteracoesComposicao").get(0).path("quantidadeResultante").asInt()).isZero();
+        assertThat(retornoInstrumento.path("alteracoesComposicao").get(0).path("quantidadeAnterior").asInt()).isZero();
+        assertThat(retornoInstrumento.path("alteracoesComposicao").get(0).path("quantidadeResultante").asInt()).isEqualTo(25);
         assertThat(quantidade(c, n, zero.plusDays(1))).isZero();
         assertThat(quantidade(c, n, retorno)).isEqualTo(25);
         incluir.put("dataInicio", retorno);
@@ -295,9 +360,32 @@ class ContratosRegrasHttpIT extends ContratosHttpBase {
 
     @Test
     void prorrogacaoNaoPodeCriarLacunaInternaNaVigencia() throws Exception {
-        var c = criarCenario(); var n = publicado(c, 100, null, false);
-        var lacuna = aditamento("PRORROGA-GAP", n.fim().plusDays(3)); lacuna.put("novaDataInicio", n.fim().plusDays(3)); lacuna.put("novaDataFim", n.fim().plusDays(50));
+        var c = criarCenario(); var n = contratoCurtoB10(c);
+        var eventosAntes=consultar(c.localA,base(n.id())+"/eventos","TMP015 linha original antes da recusa");
+        var versoesAntes=consultar(c.localA,base(n.id())+"/versoes","TMP015 fotografia original antes da recusa");
+        var lacuna = aditamento("PRORROGA-GAP", n.fim().plusDays(3)); lacuna.put("novaDataInicio", n.fim().plusDays(3)); lacuna.put("novaDataFim", n.fim().plusDays(5));
         enviar(c.localA, base(n.id()) + "/aditamentos/previa", lacuna, 400, "TMP-015 prorrogação do mesmo contrato não admite intervalo sem cobertura");
+        assertThat(consultar(c.localA,base(n.id())+"/eventos","TMP015 recusa não grava fato")).isEqualTo(eventosAntes);
+        assertThat(consultar(c.localA,base(n.id())+"/versoes","TMP015 recusa não grava versão")).isEqualTo(versoesAntes);
+        LocalDate novoFim=n.fim().plusDays(5);
+        var continua=aditamento("PRORROGA-CONTINUA-B10",n.fim().plusDays(1));continua.put("novaDataFim",novoFim);
+        var adi=registrarAditamento(c,n.id(),continua);
+        em.flush();em.clear();
+        int dias=0;
+        for(LocalDate d=n.inicio();!d.isAfter(novoFim);d=d.plusDays(1)) {
+            JsonNode p=posicao(c,n.id(),d);
+            assertThat(p.path("contratoId").asLong()).isEqualTo(n.id());
+            assertThat(p.path("dataReferencia").asText()).isEqualTo(d.toString());
+            assertThat(p.path("situacaoTemporal").asText()).as("TMP015 cobertura inclusive em "+d).isEqualTo("VIGENTE");
+            assertThat(p.path("vigenciaInicio").asText()).isEqualTo(n.inicio().toString());
+            assertThat(p.path("vigenciaFim").asText()).isEqualTo((d.isBefore(n.fim().plusDays(1))?n.fim():novoFim).toString());
+            dias++;
+        }
+        assertThat(dias).isEqualTo(Math.toIntExact(java.time.temporal.ChronoUnit.DAYS.between(n.inicio(),novoFim)+1));
+        assertThat(posicao(c,n.id(),n.inicio().minusDays(1)).path("situacaoTemporal").asText()).isEqualTo("FUTURO");
+        assertThat(posicao(c,n.id(),novoFim.plusDays(1)).path("situacaoTemporal").asText()).isEqualTo("ENCERRADO");
+        assertThat(consultar(c.localA,base(n.id())+"/aditamentos","TMP015 instrumento contínuo identificado").get(0).path("id").asLong())
+                .isEqualTo(adi.path("id").asLong());
     }
 
     @Test
@@ -309,6 +397,18 @@ class ContratosRegrasHttpIT extends ContratosHttpBase {
         var p = posicao(c, n.id(), n.fim().plusDays(1));
         assertThat(p.path("situacaoTemporal").asText()).isEqualTo("VIGENTE");
         assertThat(p.path("habilitacaoAdministrativa").asText()).isEqualTo("INATIVO");
+    }
+
+    private NovoContrato contratoCurtoB10(Cenario c) throws Exception {
+        LocalDate inicio=RelogioSistema.hoje().minusDays(2),fim=RelogioSistema.hoje().plusDays(2);
+        long id=enviar(c.localA,"/api/contratos",rascunho(c,"B10-CONTINUIDADE-"+c.contratoA.getId(),5,inicio,fim),201,
+                "TMP015 contrato sintético curto com cobertura enumerável").path("id").asLong();
+        long comp=enviar(c.localA,base(id)+"/composicoes",composicao(c,c.cargoA.getId(),5),201,"TMP015 composição explícita").path("id").asLong();
+        var pub=mapa("dataPublicacao",RelogioSistema.hoje(),"referenciaSei","SEI-SINTETICO-B10-CONTINUIDADE", "justificativa","Fonte sintética de vigência contínua");
+        var previa=enviar(c.localA,base(id)+"/previas/publicar",pub,200,"TMP015 prévia da publicação retroativa");
+        pub.put("tokenPrevia",previa.path("tokenPrevia").asText());pub.put("confirmarImpacto",true);
+        enviar(c.localA,base(id)+"/publicar",pub,200,"TMP015 publicação controlada");
+        return new NovoContrato(id,comp,null,inicio,fim);
     }
 
     private void documentarAdmissaoOriginal(Cenario c) {

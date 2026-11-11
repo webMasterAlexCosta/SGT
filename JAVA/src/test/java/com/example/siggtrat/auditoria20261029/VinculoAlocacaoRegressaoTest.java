@@ -345,6 +345,11 @@ class VinculoAlocacaoRegressaoTest {
             when(gestaoTemporal.gestaoEm(any(), any(), any())).thenAnswer(i -> i.getArgument(0, Contrato.class).getGestaoLocal());
             contexto.registerBean(GestaoContratoTemporalServico.class, () -> gestaoTemporal);
             contexto.registerBean(MinimizadorDadosPessoaisServico.class, MinimizadorDadosPessoaisServico::new);
+            // Esta fixture exercita cadastro futuro; a dependência de consulta
+            // operacional continua sem participar do caminho sob teste.
+            var gradeLeitura = mock(com.example.siggtrat.servico.GradeFrequenciaCanonicaServico.class);
+            contexto.registerBean(com.example.siggtrat.servico.GradeFrequenciaCanonicaServico.class,
+                    () -> gradeLeitura);
             // O módulo de Vínculo agora exige os resolvedores históricos reais.
             // Os repositórios continuam sendo as fronteiras unitárias desta fixture;
             // nenhum valor temporal ou resultado de autorização é fabricado aqui.
@@ -353,7 +358,7 @@ class VinculoAlocacaoRegressaoTest {
             contexto.registerBean(ConsultaProvaHistoricaContratoServico.class, () -> new ConsultaProvaHistoricaContratoServico(
                     mock(ProvaHistoricaContratoRepositorio.class), mock(ProvaHistoricaComposicaoRepositorio.class)));
             // Fronteira unitária exigida pela injeção @PersistenceContext do
-            // serviço; os testes de integração continuam usando MySQL real.
+            // serviço; os testes de integração continuam usando PostgreSQL real.
             contexto.registerBean(jakarta.persistence.EntityManagerFactory.class,
                     () -> mock(jakarta.persistence.EntityManagerFactory.class));
             var em = mock(jakarta.persistence.EntityManager.class);
@@ -380,6 +385,7 @@ class VinculoAlocacaoRegressaoTest {
                     "O novo ato futuro fotografa a Pessoa explicitamente escolhida, pelo resolvedor real");
             assertEquals(fimOriginal, contrato.getDataFim(),
                     "Programação futura não deve sobrescrever a projeção operacional de hoje");
+            verifyNoInteractions(gradeLeitura);
         }
     }
 

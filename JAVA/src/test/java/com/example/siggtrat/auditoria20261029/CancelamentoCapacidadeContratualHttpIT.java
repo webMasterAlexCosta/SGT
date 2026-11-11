@@ -57,6 +57,9 @@ class CancelamentoCapacidadeContratualHttpIT extends ContratosHttpBase {
         long vinculoId = vinculo.path("id").asLong();
         em.flush(); em.clear();
         var eventosAntes = consultar(c.localA, base(n.id()) + "/eventos", "CMP-007 histórico antes da tentativa de cancelamento");
+        var instrumentosAntes = consultar(c.localA, base(n.id()) + "/" + familia, "ADI006 fotografia integral do original antes da recusa");
+        assertThat(instrumentosAntes).hasSize(1);
+        assertThat(instrumentosAntes.get(0)).isEqualTo(instrumento);
         var leituraAntes = AssercoesComposicoesHttp.capturar(() -> consultar(c.localA,
                 base(n.id()) + "/composicoes?data=" + inicioPessoa,
                 "CMP-006 composição disponível no início futuro"));
@@ -71,6 +74,7 @@ class CancelamentoCapacidadeContratualHttpIT extends ContratosHttpBase {
         AssercoesComposicoesHttp.exigirPreservacaoComConsultaPosterior(leituraAntes, leituraDepois);
         var instrumentos = consultar(c.localA, base(n.id()) + "/" + familia, "CMP-007 instrumento original continua vigente");
         assertThat(instrumentos).hasSize(1);
+        assertThat(instrumentos).as("ADI006 recusa conserva ID, versão, conteúdo e todos os itens originais").isEqualTo(instrumentosAntes);
         assertThat(instrumentos.get(0).path("situacao").asText()).isEqualTo("VIGENTE");
         var pessoaDepois = consultar(c.localA, "/api/vinculos-contratuais/" + vinculoId, "CMP-007 vínculo não é apagado ou movido");
         assertThat(pessoaDepois.path("composicaoInicialId").asLong()).isEqualTo(n.composicao2());

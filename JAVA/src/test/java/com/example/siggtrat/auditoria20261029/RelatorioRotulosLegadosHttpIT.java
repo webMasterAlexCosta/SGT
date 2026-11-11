@@ -9,7 +9,7 @@ import com.example.siggtrat.entidade.Lotacao;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 
 import java.util.UUID;
 
@@ -72,7 +72,7 @@ class RelatorioRotulosLegadosHttpIT extends ContratosHttpBase {
         assertEquals(0L, em.createQuery("select count(e) from EventoAlocacaoVinculo e where e.vinculo.id=:v", Long.class)
                 .setParameter("v", c.vinculoA.getId()).getSingleResult());
 
-        MockHttpServletRequestBuilder pedido = get("/api/relatorios/" + tipo);
+        AbstractMockHttpServletRequestBuilder<?> pedido = get("/api/relatorios/" + tipo);
         if (tipo.equals("frequencia-consolidada")) {
             pedido.param("inicio", DATA.toString()).param("fim", DATA.toString())
                     .param("contratoIds", c.contratoA.getId().toString());

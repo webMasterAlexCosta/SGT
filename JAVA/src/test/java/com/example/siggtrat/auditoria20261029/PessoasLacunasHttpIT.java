@@ -14,7 +14,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Regressões de requisitos derivadas do levantamento, pela API e MySQL reais. */
+/** Regressões de requisitos derivadas do levantamento, pela API e PostgreSQL reais. */
 class PessoasLacunasHttpIT extends AuditoriaHttpSuporte {
     @org.springframework.beans.factory.annotation.Autowired
     private com.example.siggtrat.servico.GestaoContratoTemporalServico gestaoDaFonte;
@@ -138,6 +138,24 @@ class PessoasLacunasHttpIT extends AuditoriaHttpSuporte {
         var c = criarCenario();
         String cpfAntigo = c.pessoaA.getCpf();
         String cpfCorrigido = "39053344705";
+        declararFonteNominalSintetica(c, "COL006-HISTORIA-ORIGEM-EXPLICITA");
+        JsonNode frequenciaOrigem = dados(executar(c.localA, post("/api/frequencias")
+                .contentType(MediaType.APPLICATION_JSON).content(json(Map.of(
+                        "vinculoContratualId", c.vinculoA.getId(), "dataReferencia", DATA.toString(), "status", "PRESENCA",
+                        "entrada1", "08:00", "saida1", "12:00", "entrada2", "13:00", "saida2", "17:00",
+                        "justificativaRetificacao", "Fonte sintética positiva da história da Pessoa original",
+                        "chaveIdempotencia", "col006-fonte-" + java.util.UUID.randomUUID()))), 200, "COL006 fonte positiva de frequência"));
+        JsonNode ocorrenciaOrigem = dados(executar(c.localA, multipart("/api/ocorrencias")
+                .param("empregadoId", c.empregadoA.getId().toString()).param("motivo", "ATESTADO")
+                .param("dataOcorrencia", DATA.toString()).param("dias", "1")
+                .param("observacao", "Fonte estritamente sintética da história original")
+                .param("chaveIdempotencia", "col006-ocorrencia-" + java.util.UUID.randomUUID()),
+                201, "COL006 fonte positiva de ocorrência e histórico assinado"));
+        em.flush(); em.clear();
+        Map<String, java.util.List<java.util.List<Object>>> historiaAntes = historiaCol006(c.pessoaA.getId(), c.empregadoA.getId());
+        historiaAntes.forEach((familia, linhas) -> assertThat(linhas).as("Controle positivo da história original: %s", familia).isNotEmpty());
+        assertThat(em.find(Frequencia.class, frequenciaOrigem.path("id").asLong()).getEmpregado().getId()).isEqualTo(c.empregadoA.getId());
+        assertThat(em.find(Ocorrencia.class, ocorrenciaOrigem.path("id").asLong()).getEmpregado().getId()).isEqualTo(c.empregadoA.getId());
         executar(c.localA, post("/api/pessoas/{id}/correcoes-identidade", c.pessoaA.getId())
                 .contentType(MediaType.APPLICATION_JSON).content(json(Map.of(
                         "tipo", "CPF", "novoValor", cpfCorrigido, "motivo", "Erro material comprovado",
@@ -145,6 +163,9 @@ class PessoasLacunasHttpIT extends AuditoriaHttpSuporte {
                 200, "COL-006 correção excepcional do CPF");
         em.flush();
         Long empregadoOriginal = c.empregadoA.getId();
+        java.util.List<Long> correcoesOriginais = em.createQuery("select c.id from CorrecaoPessoa c where c.pessoa.id=:p order by c.id", Long.class)
+                .setParameter("p", c.pessoaA.getId()).getResultList();
+        assertThat(correcoesOriginais).as("Controle positivo da correção na Pessoa original").hasSize(1);
         JsonNode novoVinculo = dados(executar(c.localA, post("/api/vinculos-contratuais")
                 .contentType(MediaType.APPLICATION_JSON).content(json(Map.of(
                         "pessoa", Map.of("nome", "Titular real do CPF liberado", "cpf", cpfAntigo),
@@ -159,6 +180,26 @@ class PessoasLacunasHttpIT extends AuditoriaHttpSuporte {
         assertThat(anterior.getCpf()).isEqualTo(cpfCorrigido);
         assertThat(em.createQuery("select e.id from Empregado e where e.pessoaCanonica.id=:p", Long.class)
                 .setParameter("p", novaPessoa).getResultList()).doesNotContain(empregadoOriginal).hasSize(1);
+        em.flush(); em.clear();
+        assertThat(historiaCol006(c.pessoaA.getId(), empregadoOriginal))
+                .as("COL-006:004[2] história da origem permanece nos mesmos IDs e valores após correção/reuso")
+                .isEqualTo(historiaAntes);
+        long empregadoNovo = em.createQuery("select e.id from Empregado e where e.pessoaCanonica.id=:p", Long.class)
+                .setParameter("p", novaPessoa).getSingleResult();
+        Map<String, java.util.List<java.util.List<Object>>> historiaNova = historiaCol006(novaPessoa, empregadoNovo);
+        for (String familia : java.util.List.of("ocorrencias", "historicoEmpregado", "frequencias", "eventosFrequencia"))
+            assertThat(historiaNova.get(familia)).as("COL006 nova identidade não se apropria de %s", familia).isEmpty();
+        java.util.List<java.util.List<Object>> eventosNovos = historiaNova.get("eventosVinculo");
+        assertThat(eventosNovos).as("Novo vínculo possui apenas o seu próprio evento de criação").hasSize(1);
+        assertThat(eventosNovos.get(0).get(1)).isEqualTo(novoVinculo.path("id").asLong());
+        assertThat(eventosNovos.get(0).get(2)).isEqualTo(novaPessoa);
+        assertThat(eventosNovos.get(0).get(3).toString()).isEqualTo("CRIACAO");
+        assertThat(historiaAntes.get("eventosVinculo").stream().map(linha -> linha.get(0)).toList())
+                .doesNotContain(eventosNovos.get(0).get(0));
+        assertThat(em.createQuery("select c.id from CorrecaoPessoa c where c.pessoa.id=:p order by c.id", Long.class)
+                .setParameter("p", c.pessoaA.getId()).getResultList()).isEqualTo(correcoesOriginais);
+        assertThat(em.createQuery("select c.id from CorrecaoPessoa c where c.pessoa.id=:p", Long.class)
+                .setParameter("p", novaPessoa).getResultList()).isEmpty();
     }
 
     @Test
@@ -174,6 +215,31 @@ class PessoasLacunasHttpIT extends AuditoriaHttpSuporte {
         em.flush();
         assertThat(c.empregadoA.getNome()).isEqualTo(nomeOriginal);
         assertThat(c.pessoaA.getNome()).isEqualTo(nomeOriginal);
+    }
+
+    /** Fotografia escalar da fonte sintética: associação por IDs explícitos, nunca por CPF ou narrativa. */
+    private Map<String, java.util.List<java.util.List<Object>>> historiaCol006(long pessoaId, long empregadoId) {
+        Map<String, java.util.List<java.util.List<Object>>> fontes = new LinkedHashMap<>();
+        fontes.put("eventosVinculo", linhasCol006("select e.id, e.vinculo.id, e.vinculo.pessoa.id, e.tipoEvento, e.dataEfetiva, "
+                + "e.inicioNovo, e.fimNovo, e.pessoaNomeFotografia, e.pessoaCpfFotografia, e.hashAnterior, e.hashEvento "
+                + "from EventoVinculoContratual e where e.vinculo.pessoa.id=:id order by e.id", pessoaId));
+        fontes.put("ocorrencias", linhasCol006("select o.id, o.empregado.id, o.dataOcorrencia, o.motivo, o.observacao, "
+                + "o.quantidadeDias, o.registradoEm, o.registradoPorId, o.empregadoNomeFotografia, o.hashIntencao, o.canceladoEm "
+                + "from Ocorrencia o where o.empregado.id=:id order by o.id", empregadoId));
+        fontes.put("historicoEmpregado", linhasCol006("select h.id, h.empregado.id, o.id, h.dataEvento, h.dataEfetiva, "
+                + "h.descricao, u.id, h.gestaoLocalSnapshotId, h.superintendenciaSnapshotId, h.hashIntegridade "
+                + "from HistoricoEmpregado h left join h.ocorrencia o left join h.usuario u where h.empregado.id=:id order by h.id", empregadoId));
+        fontes.put("frequencias", linhasCol006("select f.id, f.empregado.id, f.pessoa.id, f.vinculoContratual.id, f.alocacaoVinculo.id, "
+                + "f.dataReferencia, f.status, f.versaoNegocial, f.empregadoSnapshotNome, f.contratoSnapshotId, f.lotacaoSnapshotId, f.cargoSnapshotId "
+                + "from Frequencia f where f.empregado.id=:id order by f.id", empregadoId));
+        fontes.put("eventosFrequencia", linhasCol006("select e.id, e.frequencia.id, e.tipoEvento, e.dataReferencia, e.numeroVersao, "
+                + "e.snapshotAnterior, e.snapshotNovo, e.hashAnterior, e.hashEvento "
+                + "from EventoFrequencia e where e.frequencia.empregado.id=:id order by e.id", empregadoId));
+        return fontes;
+    }
+    private java.util.List<java.util.List<Object>> linhasCol006(String consulta, long id) {
+        return em.createQuery(consulta, Object[].class).setParameter("id", id).getResultList().stream()
+                .map(java.util.Arrays::asList).toList();
     }
 
     private MotivoDesligamento motivo(Cenario c, String descricao) {

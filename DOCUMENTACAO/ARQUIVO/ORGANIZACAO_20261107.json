@@ -1,0 +1,26 @@
+{
+  "schema": 1,
+  "project": "SGT",
+  "checkpoint_before_cleanup": "d8c415f46f0942df1dc00b8ced1e55debf4792da",
+  "duplicate_markdown": [
+    {
+      "removed": "React/documentacao/evolucao/CONTRATOS_ANTES_DEPOIS.md",
+      "canonical": "JAVA/docs/EVOLUCAO_GOVERNANCA/CONTRATOS_ANTES_DEPOIS.md",
+      "sha256": "aa4b1f8c7f3ec75e560982605ced3174d1b09689916d24b1d78a8f107b178d35"
+    },
+    {
+      "removed": "React/documentacao/evolucao/CONTRATO_PROVA_CAMPO.md",
+      "canonical": "JAVA/docs/EVOLUCAO_GOVERNANCA/CONTRATO_PROVA_CAMPO.md",
+      "sha256": "40daca0ea120a8c0dd9ee8ad07c9f461bb45b20a45ec49df75e2702c01f18845"
+    }
+  ],
+  "removed_file_count": 4299,
+  "generated_target": {
+    "files": 4297,
+    "bytes": 242517571,
+    "private_archive": ".homologacao/organizacao-20261107/target-checkpoint.zip",
+    "private_zip_sha256": "d99198289e3ee5613653d29f81f5e1f3eb73d81725fb3685053d1d8f4415f023",
+    "private_loose_files": 1,
+    "index_private": ".homologacao/organizacao-20261107/INDICE_TARGET.json"
+  }
+}

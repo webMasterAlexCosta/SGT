@@ -1,7 +1,5 @@
 package com.example.siggtrat.repositorio;
 
-import com.example.siggtrat.constante.ConstantesDominio;
-import com.example.siggtrat.dto.EmpregadoFrequenciaDTO;
 import com.example.siggtrat.dto.EmpregadoContratoListaDTO;
 import com.example.siggtrat.entidade.Empregado;
 import org.springframework.data.domain.Page;
@@ -15,7 +13,6 @@ import jakarta.persistence.LockModeType;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
-import java.time.LocalDate;
 import java.util.Collection;
 import java.util.List;
 
@@ -65,18 +62,6 @@ public interface EmpregadoRepositorio extends JpaRepository<Empregado, Long>, or
     List<EmpregadoContratoListaDTO> buscarContratosDaListaPorIdsEmpregados(
             @Param("empregadoIds") List<Long> empregadoIds);
 
-    /**
-     * Conta todos os vínculos atuais por contrato em uma única consulta agregada.
-     * Evita usar o tamanho da página da listagem e evita uma consulta por contrato.
-     */
-    @Query("SELECT new com.example.siggtrat.dto.ContratoContagemDTO(" +
-            "c.id, COUNT(DISTINCT e.id)) " +
-            "FROM Empregado e JOIN e.contratos c " +
-            "WHERE c.id IN :contratoIds " +
-            "GROUP BY c.id")
-    List<com.example.siggtrat.dto.ContratoContagemDTO> contarColaboradoresPorContrato(
-            @Param("contratoIds") Collection<Long> contratoIds);
-
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("SELECT e FROM Empregado e WHERE e.id = :id")
     java.util.Optional<Empregado> buscarPorIdParaAtualizacao(@Param("id") Long id);
@@ -125,318 +110,6 @@ public interface EmpregadoRepositorio extends JpaRepository<Empregado, Long>, or
             Pageable pageable
     );
 
-    // === QUERY ANTIGA (Corrigida para usar um @Param normal e evitar o erro do IntelliJ) ===
-    @Query("SELECT DISTINCT e FROM Empregado e LEFT JOIN e.contratos c WHERE " +
-            "e.status.descricao = :statusAtivo " +
-            "AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef) " +
-            "AND (:lotacaoId IS NULL OR e.lotacao.id = :lotacaoId) " +
-            "AND (:turnoId IS NULL OR e.jornada.id = :turnoId) " +
-            "AND (:contratoId IS NULL OR c.id = :contratoId) " +
-            "AND (:searchTerm IS NULL OR :searchTerm = '' OR LOWER(e.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR e.cpf LIKE CONCAT('%', :searchTerm, '%'))")
-    Page<Empregado> findParaFrequenciaInternal(
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("contratoId") Long contratoId,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("turnoId") Long turnoId,
-            @Param("searchTerm") String searchTerm,
-            Pageable pageable);
-
-    // O Controller chama este método, que injeta a constante automaticamente na query interna
-    default Page<Empregado> buscarParaFrequencia(
-            LocalDate dataRef, Long contratoId, Long lotacaoId, Long turnoId, String searchTerm, Pageable pageable) {
-        return findParaFrequenciaInternal(ConstantesDominio.STATUS_ATIVO, dataRef, contratoId, lotacaoId, turnoId, searchTerm, pageable);
-    }
-
-    // === NOVA QUERY OTIMIZADA COM DTO (Corrigida para usar um @Param normal) ===
-    @Query("SELECT new com.example.siggtrat.dto.EmpregadoFrequenciaDTO(" +
-            "e.id, e.nome, e.matricula, e.cpf, l.nome, l.id, j.descricao, j.id, c.nome) " +
-            "FROM Empregado e " +
-            "LEFT JOIN e.lotacao l " +
-            "LEFT JOIN e.jornada j " +
-            "LEFT JOIN e.cargo c " +
-            "WHERE e.status.descricao = :statusAtivo " +
-            "AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef) " +
-            "AND (:lotacaoId IS NULL OR l.id = :lotacaoId) " +
-            "AND (:turnoId IS NULL OR j.id = :turnoId) " +
-            "AND EXISTS (SELECT 1 FROM e.contratos ct WHERE ct.ativo = true AND (:contratoId IS NULL OR ct.id = :contratoId)) " +
-            "AND (:searchTerm IS NULL OR :searchTerm = '' OR LOWER(e.nome) LIKE LOWER(CONCAT('%', :searchTerm, '%')) OR e.cpf LIKE CONCAT('%', :searchTerm, '%'))")
-    Page<EmpregadoFrequenciaDTO> findFrequenciaGridInternal(
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("contratoId") Long contratoId,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("turnoId") Long turnoId,
-            @Param("searchTerm") String searchTerm,
-            Pageable pageable);
-
-    // O Controller chama este método, que injeta a constante automaticamente na query interna
-    default Page<EmpregadoFrequenciaDTO> buscarGradeFrequencia(
-            LocalDate dataRef, Long contratoId, Long lotacaoId, Long turnoId, String searchTerm, Pageable pageable) {
-        return findFrequenciaGridInternal(ConstantesDominio.STATUS_ATIVO, dataRef, contratoId, lotacaoId, turnoId, searchTerm, pageable);
-    }
-
-
-
-    @Query("""
-            SELECT COUNT(e.id)
-            FROM Empregado e
-            WHERE e.status.descricao = :statusAtivo
-              AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef)
-              AND e.lotacao.id = :lotacaoId
-              AND e.jornada.id = :jornadaId
-              AND (
-                    EXISTS (
-                        SELECT h.id FROM HistoricoVinculoContrato h
-                        WHERE h.empregado = e
-                          AND h.dataInicio < :fimExclusivo
-                          AND (h.dataFim IS NULL OR h.dataFim >= :inicioDia)
-                          AND (:filtrarContratos = false OR h.contrato.id IN :contratoIds)
-                    )
-                    OR (
-                        NOT EXISTS (SELECT h2.id FROM HistoricoVinculoContrato h2 WHERE h2.empregado = e)
-                        AND EXISTS (
-                            SELECT ct.id FROM e.contratos ct
-                            WHERE ct.ativo = true
-                              AND (ct.dataInicio IS NULL OR ct.dataInicio <= :dataRef)
-                              AND (ct.dataFim IS NULL OR ct.dataFim >= :dataRef)
-                              AND (:filtrarContratos = false OR ct.id IN :contratoIds)
-                        )
-                    )
-              )
-            """)
-    long countElegiveisParaFechamento(
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("inicioDia") java.time.ZonedDateTime inicioDia,
-            @Param("fimExclusivo") java.time.ZonedDateTime fimExclusivo,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("jornadaId") Long jornadaId,
-            @Param("filtrarContratos") boolean filtrarContratos,
-            @Param("contratoIds") Collection<Long> contratoIds);
-
-    @Query("""
-            SELECT COUNT(e.id)
-            FROM Empregado e
-            WHERE e.status.descricao = :statusAtivo
-              AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef)
-              AND e.lotacao.id = :lotacaoId
-              AND e.jornada.id = :jornadaId
-              AND NOT EXISTS (
-                    SELECT f.id FROM Frequencia f
-                    WHERE f.empregado = e AND f.dataReferencia = :dataRef
-              )
-              AND (
-                    EXISTS (
-                        SELECT h.id FROM HistoricoVinculoContrato h
-                        WHERE h.empregado = e
-                          AND h.dataInicio < :fimExclusivo
-                          AND (h.dataFim IS NULL OR h.dataFim >= :inicioDia)
-                          AND (:filtrarContratos = false OR h.contrato.id IN :contratoIds)
-                    )
-                    OR (
-                        NOT EXISTS (SELECT h2.id FROM HistoricoVinculoContrato h2 WHERE h2.empregado = e)
-                        AND EXISTS (
-                            SELECT ct.id FROM e.contratos ct
-                            WHERE ct.ativo = true
-                              AND (ct.dataInicio IS NULL OR ct.dataInicio <= :dataRef)
-                              AND (ct.dataFim IS NULL OR ct.dataFim >= :dataRef)
-                              AND (:filtrarContratos = false OR ct.id IN :contratoIds)
-                        )
-                    )
-              )
-            """)
-    long countElegiveisSemFrequencia(
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("inicioDia") java.time.ZonedDateTime inicioDia,
-            @Param("fimExclusivo") java.time.ZonedDateTime fimExclusivo,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("jornadaId") Long jornadaId,
-            @Param("filtrarContratos") boolean filtrarContratos,
-            @Param("contratoIds") Collection<Long> contratoIds);
-
-    @Query("""
-            SELECT e.id
-            FROM Empregado e
-            WHERE e.id > :aposId
-              AND e.status.descricao = :statusAtivo
-              AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef)
-              AND e.lotacao.id = :lotacaoId
-              AND e.jornada.id = :jornadaId
-              AND (
-                    EXISTS (
-                        SELECT h.id FROM HistoricoVinculoContrato h
-                        WHERE h.empregado = e
-                          AND h.dataInicio < :fimExclusivo
-                          AND (h.dataFim IS NULL OR h.dataFim >= :inicioDia)
-                          AND (:filtrarContratos = false OR h.contrato.id IN :contratoIds)
-                    )
-                    OR (
-                        NOT EXISTS (SELECT h2.id FROM HistoricoVinculoContrato h2 WHERE h2.empregado = e)
-                        AND EXISTS (
-                            SELECT ct.id FROM e.contratos ct
-                            WHERE ct.ativo = true
-                              AND (ct.dataInicio IS NULL OR ct.dataInicio <= :dataRef)
-                              AND (ct.dataFim IS NULL OR ct.dataFim >= :dataRef)
-                              AND (:filtrarContratos = false OR ct.id IN :contratoIds)
-                        )
-                    )
-              )
-            ORDER BY e.id
-            """)
-    List<Long> findIdsElegiveisParaFechamentoApos(
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("inicioDia") java.time.ZonedDateTime inicioDia,
-            @Param("fimExclusivo") java.time.ZonedDateTime fimExclusivo,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("jornadaId") Long jornadaId,
-            @Param("filtrarContratos") boolean filtrarContratos,
-            @Param("contratoIds") Collection<Long> contratoIds,
-            @Param("aposId") Long aposId,
-            Pageable pageable);
-
-    @Query("""
-            SELECT COUNT(e.id)
-            FROM Empregado e
-            WHERE e.status.descricao = :statusAtivo
-              AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef)
-              AND e.lotacao.id = :lotacaoId
-              AND e.jornada.id = :jornadaId
-              AND (
-                    NOT EXISTS (
-                        SELECT f.id FROM Frequencia f
-                        WHERE f.empregado = e AND f.dataReferencia = :dataRef
-                    )
-                    OR EXISTS (
-                        SELECT i.id FROM FechamentoFrequenciaItem i
-                        WHERE i.fechamento.id = :fechamentoId AND i.empregado = e
-                    )
-              )
-              AND (
-                    EXISTS (
-                        SELECT h.id FROM HistoricoVinculoContrato h
-                        WHERE h.empregado = e
-                          AND h.dataInicio < :fimExclusivo
-                          AND (h.dataFim IS NULL OR h.dataFim >= :inicioDia)
-                          AND (:filtrarContratos = false OR h.contrato.id IN :contratoIds)
-                    )
-                    OR (
-                        NOT EXISTS (SELECT h2.id FROM HistoricoVinculoContrato h2 WHERE h2.empregado = e)
-                        AND EXISTS (
-                            SELECT ct.id FROM e.contratos ct
-                            WHERE ct.ativo = true
-                              AND (ct.dataInicio IS NULL OR ct.dataInicio <= :dataRef)
-                              AND (ct.dataFim IS NULL OR ct.dataFim >= :dataRef)
-                              AND (:filtrarContratos = false OR ct.id IN :contratoIds)
-                        )
-                    )
-              )
-            """)
-    long countPendentesParaFechamento(
-            @Param("fechamentoId") Long fechamentoId,
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("inicioDia") java.time.ZonedDateTime inicioDia,
-            @Param("fimExclusivo") java.time.ZonedDateTime fimExclusivo,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("jornadaId") Long jornadaId,
-            @Param("filtrarContratos") boolean filtrarContratos,
-            @Param("contratoIds") Collection<Long> contratoIds);
-
-    @Query("""
-            SELECT e.id
-            FROM Empregado e
-            WHERE e.id > :aposId
-              AND e.status.descricao = :statusAtivo
-              AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef)
-              AND e.lotacao.id = :lotacaoId
-              AND e.jornada.id = :jornadaId
-              AND (
-                    NOT EXISTS (
-                        SELECT f.id FROM Frequencia f
-                        WHERE f.empregado = e AND f.dataReferencia = :dataRef
-                    )
-                    OR EXISTS (
-                        SELECT i.id FROM FechamentoFrequenciaItem i
-                        WHERE i.fechamento.id = :fechamentoId AND i.empregado = e
-                    )
-              )
-              AND (
-                    EXISTS (
-                        SELECT h.id FROM HistoricoVinculoContrato h
-                        WHERE h.empregado = e
-                          AND h.dataInicio < :fimExclusivo
-                          AND (h.dataFim IS NULL OR h.dataFim >= :inicioDia)
-                          AND (:filtrarContratos = false OR h.contrato.id IN :contratoIds)
-                    )
-                    OR (
-                        NOT EXISTS (SELECT h2.id FROM HistoricoVinculoContrato h2 WHERE h2.empregado = e)
-                        AND EXISTS (
-                            SELECT ct.id FROM e.contratos ct
-                            WHERE ct.ativo = true
-                              AND (ct.dataInicio IS NULL OR ct.dataInicio <= :dataRef)
-                              AND (ct.dataFim IS NULL OR ct.dataFim >= :dataRef)
-                              AND (:filtrarContratos = false OR ct.id IN :contratoIds)
-                        )
-                    )
-              )
-            ORDER BY e.id
-            """)
-    List<Long> findIdsPendentesParaFechamentoApos(
-            @Param("fechamentoId") Long fechamentoId,
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("inicioDia") java.time.ZonedDateTime inicioDia,
-            @Param("fimExclusivo") java.time.ZonedDateTime fimExclusivo,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("jornadaId") Long jornadaId,
-            @Param("filtrarContratos") boolean filtrarContratos,
-            @Param("contratoIds") Collection<Long> contratoIds,
-            @Param("aposId") Long aposId,
-            Pageable pageable);
-
-    @Query("""
-            SELECT COUNT(e.id)
-            FROM Empregado e
-            WHERE e.id IN :empregadoIds
-              AND e.status.descricao = :statusAtivo
-              AND (e.dataAdmissao IS NULL OR e.dataAdmissao <= :dataRef)
-              AND e.lotacao.id = :lotacaoId
-              AND e.jornada.id = :jornadaId
-              AND (
-                    EXISTS (
-                        SELECT h.id FROM HistoricoVinculoContrato h
-                        WHERE h.empregado = e
-                          AND h.dataInicio < :fimExclusivo
-                          AND (h.dataFim IS NULL OR h.dataFim >= :inicioDia)
-                          AND (:filtrarContratos = false OR h.contrato.id IN :contratoIds)
-                    )
-                    OR (
-                        NOT EXISTS (SELECT h2.id FROM HistoricoVinculoContrato h2 WHERE h2.empregado = e)
-                        AND EXISTS (
-                            SELECT ct.id FROM e.contratos ct
-                            WHERE ct.ativo = true
-                              AND (ct.dataInicio IS NULL OR ct.dataInicio <= :dataRef)
-                              AND (ct.dataFim IS NULL OR ct.dataFim >= :dataRef)
-                              AND (:filtrarContratos = false OR ct.id IN :contratoIds)
-                        )
-                    )
-              )
-            """)
-    long countIdsElegiveisParaFechamento(
-            @Param("empregadoIds") Collection<Long> empregadoIds,
-            @Param("statusAtivo") String statusAtivo,
-            @Param("dataRef") LocalDate dataRef,
-            @Param("inicioDia") java.time.ZonedDateTime inicioDia,
-            @Param("fimExclusivo") java.time.ZonedDateTime fimExclusivo,
-            @Param("lotacaoId") Long lotacaoId,
-            @Param("jornadaId") Long jornadaId,
-            @Param("filtrarContratos") boolean filtrarContratos,
-            @Param("contratoIds") Collection<Long> contratoIds);
-
-
     @Query("SELECT e.id FROM Empregado e JOIN e.contratos c GROUP BY e.id HAVING COUNT(c.id) > 1 ORDER BY e.id")
     List<Long> buscarIdsComMultiplosContratos();
 
@@ -467,7 +140,7 @@ public interface EmpregadoRepositorio extends JpaRepository<Empregado, Long>, or
 
     @Query(value = """
             SELECT COALESCE(
-                MIN(CAST(SUBSTRING(matricula, CHAR_LENGTH(:prefixo) + 1) AS UNSIGNED)),
+                MIN(CAST(SUBSTRING(matricula, CHAR_LENGTH(:prefixo) + 1) AS BIGINT)),
                 0
             )
             FROM empregado
@@ -477,7 +150,7 @@ public interface EmpregadoRepositorio extends JpaRepository<Empregado, Long>, or
 
     @Query(value = """
             SELECT COALESCE(
-                MAX(CAST(SUBSTRING(matricula, CHAR_LENGTH(:prefixo) + 1) AS UNSIGNED)),
+                MAX(CAST(SUBSTRING(matricula, CHAR_LENGTH(:prefixo) + 1) AS BIGINT)),
                 0
             )
             FROM empregado

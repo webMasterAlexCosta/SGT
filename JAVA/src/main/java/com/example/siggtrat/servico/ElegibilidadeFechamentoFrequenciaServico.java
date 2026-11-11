@@ -26,8 +26,13 @@ import java.util.function.Supplier;
  * transação para limitar a persistência de entidades durante fechamentos grandes.
  */
 @Service
-public class ElegibilidadeFechamentoFrequenciaServico {
+public class ElegibilidadeFechamentoFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ElegibilidadeFechamentoFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int PAGINA = 200;
+    private static final int PROJECOES_POR_CONTEXTO = 25;
     @PersistenceContext private EntityManager em;
     private final MotorTemporalContratoServico contratos;
     private final MotorTemporalVinculoServico vinculos;
@@ -73,6 +78,7 @@ public class ElegibilidadeFechamentoFrequenciaServico {
                     var contexto = contextoElegivel(id, data, lotacao, jornada, contratosIds);
                     if (contexto == null) continue;
                     Pessoa pessoa = contexto.pessoa();
+                    if (possuiColisaoDeIdentidade(pessoa)) continue;
                     Long empregadoId = empregadoId(pessoa);
                     if (empregadoId != null && excluidos.contains(empregadoId)) continue;
                     if (semFrequencia && possuiFrequencia(pessoa, data)) continue;
@@ -93,9 +99,21 @@ public class ElegibilidadeFechamentoFrequenciaServico {
                                       List<Long> contratosIds, long apos, int tamanho) {
         List<Long> ids = candidatosVinculo(lotacao, jornada, contratosIds, apos, Math.min(Math.max(tamanho, 1), PAGINA));
         bloqueioEscrita.bloquearVinculos(ids);
+        // Os locks de todas as raízes continuam no PostgreSQL até o fim desta
+        // transação. Desanexar suas entidades evita varrê-las em cada AUTO flush.
+        em.flush();
+        em.clear();
+        int avaliados = 0;
         for (Long id : ids) {
             var contexto = contextoElegivel(id, data, lotacao, jornada, contratosIds);
-            if (contexto != null) projecoes.projetar(contexto.vinculo(), contexto.alocacao());
+            if (contexto != null && !possuiColisaoDeIdentidade(contexto.pessoa()))
+                projecoes.projetar(contexto.vinculo(), contexto.alocacao());
+            if (++avaliados % PROJECOES_POR_CONTEXTO == 0) {
+                // Sincronizar não é commit: falha posterior ainda reverte o lote
+                // inteiro, sem reduzir o chunk transacional ou liberar os locks.
+                em.flush();
+                em.clear();
+            }
         }
         return ids.isEmpty() ? 0 : ids.get(ids.size() - 1);
     }
@@ -189,9 +207,7 @@ public class ElegibilidadeFechamentoFrequenciaServico {
         Empregado e = em.find(Empregado.class, id);
         if (e == null) return false;
         Pessoa pessoa = e.getPessoaCanonica();
-        if (pessoa == null) pessoa = em.createQuery("select p from Pessoa p where p.cpf=:cpf", Pessoa.class)
-                .setParameter("cpf", e.getCpf()).getResultStream().findFirst().orElse(null);
-        if (pessoa == null) return false;
+        if (pessoa == null || possuiColisaoDeIdentidade(pessoa)) return false;
         List<Long> ids = em.createQuery("select v.id from VinculoContratual v where v.pessoa.id=:p", Long.class)
                 .setParameter("p", pessoa.getId()).getResultList();
         long elegiveis = ids.stream().filter(v -> contextoElegivel(v, data, lotacao, jornada, contratosIds) != null).count();
@@ -200,17 +216,26 @@ public class ElegibilidadeFechamentoFrequenciaServico {
         return elegiveis == 1;
     }
 
+    /** CPF só identifica uma colisão impeditiva; nunca comprova associação canônica. */
+    private boolean possuiColisaoDeIdentidade(Pessoa pessoa) {
+        return !em.createQuery("""
+            select e.id from Empregado e left join e.pessoaCanonica canonica
+             where e.cpf=:cpf and (canonica.id is null or canonica.id<>:p)
+            """, Long.class).setParameter("cpf", pessoa.getCpf()).setParameter("p", pessoa.getId())
+                .setMaxResults(1).getResultList().isEmpty();
+    }
+
     private Long empregadoId(Pessoa pessoa) {
-        return em.createQuery("select e.id from Empregado e where e.pessoaCanonica.id=:p or e.cpf=:cpf", Long.class)
-                .setParameter("p", pessoa.getId()).setParameter("cpf", pessoa.getCpf())
+        return em.createQuery("select e.id from Empregado e where e.pessoaCanonica.id=:p", Long.class)
+                .setParameter("p", pessoa.getId())
                 .getResultStream().findFirst().orElse(null);
     }
     private boolean possuiFrequencia(Pessoa pessoa, LocalDate data) {
         return !em.createQuery("""
             select f.id from Frequencia f where f.dataReferencia=:data
-              and (f.pessoa.id=:p or f.empregado.pessoaCanonica.id=:p or f.empregado.cpf=:cpf)
+              and (f.pessoa.id=:p or f.empregado.pessoaCanonica.id=:p)
             """, Long.class).setParameter("data", data).setParameter("p", pessoa.getId())
-                .setParameter("cpf", pessoa.getCpf()).setMaxResults(1).getResultList().isEmpty();
+                .setMaxResults(1).getResultList().isEmpty();
     }
     private <T> T ler(Supplier<T> acao) { return leitura.execute(status -> acao.get()); }
     private record ResumoPagina(long ultimoId, boolean ultima, long quantidade) {}

@@ -53,7 +53,7 @@ class DocumentosCadeiaConcorrenciaNovaAuditoriaHttpIT extends ContratosHttpBase 
                 try {
                     MvcResult resultado = mvc.perform(primeiraReq).andReturn();
                     assertThat(resultado.getResponse().getStatus()).as(resultado.getResponse().getContentAsString()).isEqualTo(200);
-                    primeiraLeitura.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                    primeiraLeitura.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                     if (!liberarPrimeira.await(25, TimeUnit.SECONDS)) throw new AssertionError("Barreira da cadeia não liberada.");
                     return resultado;
                 } catch (Exception e) {
@@ -68,10 +68,8 @@ class DocumentosCadeiaConcorrenciaNovaAuditoriaHttpIT extends ContratosHttpBase 
             while (System.nanoTime() < limite) {
                 if (segunda.isDone()) { observada = true; break; }
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexao).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexao).getSingleResult()).longValue());
                 if (esperas > 0) { observada = true; break; }
                 TimeUnit.MILLISECONDS.sleep(20);
             }

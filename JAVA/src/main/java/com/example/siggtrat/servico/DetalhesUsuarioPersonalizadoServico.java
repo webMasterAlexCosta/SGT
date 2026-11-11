@@ -17,7 +17,11 @@ import java.util.List;
 
 /** Carrega a identidade e o estado real da conta a cada autenticação. */
 @Service
-public class DetalhesUsuarioPersonalizadoServico implements UserDetailsService {
+public class DetalhesUsuarioPersonalizadoServico implements UserDetailsService, com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(DetalhesUsuarioPersonalizadoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final UsuarioAplicacaoRepositorio userRepositorio;
 

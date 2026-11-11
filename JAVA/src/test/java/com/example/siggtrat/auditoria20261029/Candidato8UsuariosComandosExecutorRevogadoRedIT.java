@@ -11,7 +11,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,7 +35,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Autoria: revisor independente /root/revisao_final_transversais.
  * Base C8 cdf471fbe344f4eb4e096a5e86b6f71226fe3ad3cde040baa6d6d4d4812e5545.
  * Cinco callsites mutáveis de obterUsuarioOuFalhar ainda autorizam antes do
- * UPDATE do alvo. Cada parâmetro possui controle positivo e espera MySQL real.
+ * UPDATE do alvo. Cada parâmetro possui controle positivo e espera PostgreSQL real.
  * A revogação usa outro Admin, com commit conferido antes da liberação do alvo.
  * Nenhum DDL, mock, serviço externo ou execução Java pelo autor.
  */
@@ -60,7 +60,7 @@ class Candidato8UsuariosComandosExecutorRevogadoRedIT extends ContratosHttpBase 
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 assertThat(em.find(UsuarioAplicacao.class, alvoId, LockModeType.PESSIMISTIC_WRITE)).isNotNull();
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(40, TimeUnit.SECONDS))
@@ -179,7 +179,7 @@ class Candidato8UsuariosComandosExecutorRevogadoRedIT extends ContratosHttpBase 
         };
     }
 
-    private MockHttpServletRequestBuilder pedido(long id, String fluxo, String novaSenha) throws Exception {
+    private AbstractMockHttpServletRequestBuilder<?> pedido(long id, String fluxo, String novaSenha) throws Exception {
         if (fluxo.equals("EXCLUIR")) return delete(rota(id, fluxo));
         var pedido = post(rota(id, fluxo));
         if (fluxo.equals("REDEFINIR_SENHA"))
@@ -214,9 +214,9 @@ class Candidato8UsuariosComandosExecutorRevogadoRedIT extends ContratosHttpBase 
         var observador = Executors.newSingleThreadScheduledExecutor();
         var consulta = observador.scheduleWithFixedDelay(() -> {
             try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
+                Long esperas = jdbc.queryForObject("""
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND ? = ANY(pg_blocking_pids(a.pid))
+""", Long.class, conexaoBloqueadora);
                 if (esperas != null && esperas > 0) observada.complete(null);
                 else if (tentativa.isDone()) observada.completeExceptionally(
                         new AssertionError("O comando não alcançou a espera real do usuário alvo"));

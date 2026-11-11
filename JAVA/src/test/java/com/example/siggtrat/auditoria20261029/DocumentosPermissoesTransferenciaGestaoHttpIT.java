@@ -152,7 +152,8 @@ class DocumentosPermissoesTransferenciaGestaoHttpIT extends ContratosHttpBase {
         var n = publicado(c, 100, null, false);
         LocalDate data = RelogioSistema.hoje().plusDays(5);
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Reorganização programada com contexto mapeado", "referenciaSei", "SEI-TRANSFERENCIA-CONSUMIDORES",
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(mapa(

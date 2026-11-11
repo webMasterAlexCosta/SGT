@@ -18,7 +18,11 @@ import java.util.Objects;
 import java.util.Set;
 
 @Service
-public class StatusEmpregadoServico {
+public class StatusEmpregadoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(StatusEmpregadoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final Set<String> STATUS_ESTRUTURAIS = Set.of(
             ConstantesDominio.STATUS_ATIVO, ConstantesDominio.STATUS_INATIVO,
             ConstantesDominio.STATUS_FERIAS, ConstantesDominio.STATUS_AFASTADO_INSS

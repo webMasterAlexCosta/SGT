@@ -30,7 +30,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Não compilado/executado pelo revisor. Novos fatos contemporâneos/futuros,
  * sem inferência nominal ou de motivo para período retroativo. O helper publicado
  * declara explicitamente a fonte sintética integral e a disponibilidade do Cargo.
- * A fixture compartilhada simula somente o agendador; MySQL/Redis e HTTP MVC reais.
+ * A fixture compartilhada simula somente o agendador; PostgreSQL/Redis e HTTP MVC reais.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @TestPropertySource(properties = {"spring.cache.type=redis", "spring.sql.init.mode=never",
@@ -43,8 +43,8 @@ class Candidato4RecibosVinculoAlocacaoPrecisaoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void infraestruturaReal() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -136,7 +136,7 @@ class Candidato4RecibosVinculoAlocacaoPrecisaoHttpIT extends ContratosHttpBase {
     }
     private void conferir(SoftAssertions soft, Recibo recibo, String tipo) {
         // Instant exato; não compara formatação e não arredonda/trunca o oráculo.
-        soft.assertThat(recibo.recebido()).as("Recibo de %s coincide exatamente com MySQL", tipo)
+        soft.assertThat(recibo.recebido()).as("Recibo de %s coincide exatamente com PostgreSQL", tipo)
                 .isEqualTo(recibo.persistido());
         soft.assertThat(recibo.relido()).as("GET de %s coincide com persistência real", tipo)
                 .isEqualTo(recibo.persistido());
@@ -147,7 +147,7 @@ class Candidato4RecibosVinculoAlocacaoPrecisaoHttpIT extends ContratosHttpBase {
         Path destino = Path.of("target/auditoria-http/candidato4-recibos-" + tipo + ".json");
         Files.createDirectories(destino.getParent());
         Files.writeString(destino, json(mapa("hipotese", "C4-PES-H03", "tipo", tipo, "recibos", recibos,
-                "transporte", "MockMvc/dispatcher real; MySQL8.0.45 e Redis reais; não TCP")));
+                "transporte", "MockMvc/dispatcher real; PostgreSQL18.6 e Redis reais; não TCP")));
     }
     private record Recibo(Instant recebido, Instant persistido, Instant relido) {}
 }

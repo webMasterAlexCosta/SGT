@@ -51,9 +51,31 @@ class ConclusaoEfetivoContratoHttpIT extends ContratosHttpBase {
         req.put("novoEfetivoTotal", Integer.MAX_VALUE - 2);
         req.put("alteracoesComposicao", f.composicoes().stream()
                 .map(id -> mapa("composicaoId", id, "quantidadeResultante", Integer.MAX_VALUE)).toList());
+        var contratoAntes = consultar(c.localA, base(f.id()), "Contrato publicado antes da prévia inválida");
+        var composicoesAntes = consultar(c.localA, base(f.id()) + "/composicoes?data=" + RelogioSistema.hoje().plusDays(11),
+                "Distribuição antes da soma não representável");
+        var persistidasAntes = composicoesPersistidas(f.id());
+        var eventosAntes = consultar(c.localA, base(f.id()) + "/eventos", "Eventos antes da prévia inválida");
+        var versoesAntes = consultar(c.localA, base(f.id()) + "/versoes", "Versões antes da prévia inválida");
         enviar(c.localA, base(f.id()) + "/aditamentos/previa", req, 400,
                 "CMP003 variações são somadas sem descartar os bits altos");
         assertThat(contar(f.id(), "AditamentoContratual")).isZero();
+        assertThat(consultar(c.localA, base(f.id()), "Recusa preserva contrato integral")).isEqualTo(contratoAntes);
+        var composicoesDepois = consultar(c.localA, base(f.id()) + "/composicoes?data=" + RelogioSistema.hoje().plusDays(11),
+                "Recusa preserva distribuição integral");
+        assertThat(composicoesPersistidas(f.id())).isEqualTo(persistidasAntes);
+        // conhecidoAte é o instante da consulta, não um campo persistido da composição.
+        for (var item : composicoesDepois) {
+            assertThat(java.time.Instant.parse(item.path("conhecidoAte").asText()))
+                    .isAfterOrEqualTo(java.time.Instant.parse(composicoesAntes.get(0).path("conhecidoAte").asText()));
+        }
+        var antesSemInstanteConsulta = composicoesAntes.deepCopy();
+        var depoisSemInstanteConsulta = composicoesDepois.deepCopy();
+        for (var item : antesSemInstanteConsulta) ((com.fasterxml.jackson.databind.node.ObjectNode) item).remove("conhecidoAte");
+        for (var item : depoisSemInstanteConsulta) ((com.fasterxml.jackson.databind.node.ObjectNode) item).remove("conhecidoAte");
+        assertThat(depoisSemInstanteConsulta).isEqualTo(antesSemInstanteConsulta);
+        assertThat(consultar(c.localA, base(f.id()) + "/eventos", "Recusa não publica evento parcial")).isEqualTo(eventosAntes);
+        assertThat(consultar(c.localA, base(f.id()) + "/versoes", "Recusa não publica versão parcial")).isEqualTo(versoesAntes);
     }
 
     @Test
@@ -95,6 +117,12 @@ class ConclusaoEfetivoContratoHttpIT extends ContratosHttpBase {
 
     private java.util.Map<String, Object> publicacao() {
         return mapa("dataPublicacao", RelogioSistema.hoje(), "referenciaSei", "SEI-EFETIVO-EXATO", "justificativa", "Publicação documentada");
+    }
+
+    private List<?> composicoesPersistidas(long id) {
+        return emTransacao(() -> em.createNativeQuery("SELECT to_jsonb(c)::text FROM composicao_contratual c "
+                + "WHERE c.id_contrato=:id ORDER BY c.id_composicao_contratual")
+                .setParameter("id", id).getResultList());
     }
 
     private long contar(long id, String entidade) {

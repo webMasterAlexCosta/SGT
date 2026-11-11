@@ -164,7 +164,7 @@ public class FiltroCacheConsultaHttpRedis extends OncePerRequestFilter {
                     return;
                 }
             } catch (RuntimeException ex) {
-                log.warn("Falha ao ler cache HTTP GET do Redis. Consulta seguirá para a aplicação: {}", ex.getMessage());
+                log.warn("FiltroCacheConsultaHttpRedis: Falha ao ler cache HTTP GET do Redis. Consulta seguirá para a aplicação falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
             }
         }
 
@@ -183,7 +183,7 @@ public class FiltroCacheConsultaHttpRedis extends OncePerRequestFilter {
                     cache.put(key, value);
                     wrapper.setHeader(CACHE_HEADER, bypassLeitura ? "REFRESH" : "MISS");
                 } catch (RuntimeException ex) {
-                    log.warn("Falha ao gravar cache HTTP GET no Redis. Resposta original será preservada: {}", ex.getMessage());
+                    log.warn("FiltroCacheConsultaHttpRedis: Falha ao gravar cache HTTP GET no Redis. Resposta original será preservada falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
                 }
             }
         } finally {

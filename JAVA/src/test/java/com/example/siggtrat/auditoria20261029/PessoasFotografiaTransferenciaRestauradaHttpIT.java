@@ -159,7 +159,8 @@ class PessoasFotografiaTransferenciaRestauradaHttpIT extends ContratosHttpBase {
         enviar(f.c().localA, raiz + "/" + id + "/desligar", terminar, 200, "Término original não possui sucessora no destino");
         LocalDate transferencia = RelogioSistema.hoje().minusDays(5);
         conceder(f.c(), f.contrato().id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa("dataEfetiva", transferencia,
+        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", transferencia,
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(), "tipoContratacaoDestinoId", f.c().tipoB.getId(),
                 "motivo", "Contexto posterior comprovado", "referenciaSei", "SEI-FOTO-CONTEXTO", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", f.contrato().composicao1(), "lotacaoDestinoId", f.c().lotacaoB.getId(),

@@ -17,9 +17,23 @@ public interface PermissaoExcepcionalRepositorio extends JpaRepository<Permissao
             select p from PermissaoExcepcional p
             where p.usuarioBeneficiario.id = :usuarioId and p.tipo = :tipo
               and p.ativo = true and p.validoAte > :agora
+              and p.ocorrencia is null
             order by p.concedidoEm desc, p.id desc
             """)
     List<PermissaoExcepcional> buscarAtivas(@Param("usuarioId") Long usuarioId,
                                              @Param("tipo") TipoPermissaoExcepcional tipo,
                                              @Param("agora") Instant agora);
+
+    /** Só o alvo solicitado e o fallback genérico; não carrega grants de outros fatos. */
+    @Query("""
+            select p from PermissaoExcepcional p
+            where p.usuarioBeneficiario.id = :usuarioId and p.tipo = :tipo
+              and p.ativo = true and p.validoAte > :agora
+              and (p.ocorrencia is null or p.ocorrencia.id = :ocorrenciaId)
+            order by case when p.ocorrencia is null then 1 else 0 end,
+                     p.concedidoEm desc, p.id desc
+            """)
+    List<PermissaoExcepcional> buscarAtivasParaOcorrencia(@Param("usuarioId") Long usuarioId,
+            @Param("tipo") TipoPermissaoExcepcional tipo, @Param("agora") Instant agora,
+            @Param("ocorrenciaId") Long ocorrenciaId);
 }

@@ -3,14 +3,14 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, renderHook, waitFor } from '@testing-library/react';
-import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.jsx';
-import { usePulsoAtividade } from '../src/hooks/usePulsoAtividade.js';
-import { CONFIG } from '../src/core/config.js';
-import { api } from '../src/core/http.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { confirmarLoginExplicito, obterIntencaoSaida } from '../src/core/security/saidaSessao.js';
-import { dispararSaida, redefinirIndicadorRedirecionamento } from '../src/core/events.js';
-import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
+import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.tsx';
+import { usePulsoAtividade } from '../src/hooks/usePulsoAtividade.ts';
+import { CONFIG } from '../src/core/config.ts';
+import { api } from '../src/core/http.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { confirmarLoginExplicito, obterIntencaoSaida } from '../src/core/security/saidaSessao.ts';
+import { dispararSaida, redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
+import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
 
 const CHAVE = 'sgt_revisao_compartilhada_sessao';
 const A = { id: 9891, username: 'idle-a-sintetico', perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' };

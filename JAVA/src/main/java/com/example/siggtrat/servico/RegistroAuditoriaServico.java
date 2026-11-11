@@ -37,7 +37,9 @@ import java.util.regex.Pattern;
  * serviço registra as operações em INFO no log de aplicação.
  */
 @Service
-public class RegistroAuditoriaServico {
+public class RegistroAuditoriaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(RegistroAuditoriaServico.class);
 
@@ -169,11 +171,11 @@ public class RegistroAuditoriaServico {
         try {
             auditLogBuffer.enfileirarOuPersistir(al);
         } catch (Exception e) {
-            log.error("CRÍTICO: Falha ao enfileirar log de auditoria. Tentativa de persistir de forma síncrona.", e);
+            log.error("RegistroAuditoriaServico: CRÍTICO: Falha ao enfileirar log de auditoria. Tentativa de persistir de forma síncrona. falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
             try {
                 persistencia.salvar(al);
             } catch (Exception ex) {
-                log.error("CRÍTICO: Falha ao persistir log de auditoria de fallback.", ex);
+                log.error("RegistroAuditoriaServico: CRÍTICO: Falha ao persistir log de auditoria de fallback. falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
             }
         }
 

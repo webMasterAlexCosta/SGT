@@ -35,7 +35,11 @@ import java.util.zip.GZIPOutputStream;
  * emissão é comprimido e preservado; somente seu estado vigente/superado muda.
  */
 @Service
-public class RelatorioAdministrativoServico {
+public class RelatorioAdministrativoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioAdministrativoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int TAMANHO_MAXIMO_PAGINA = 200;
 
     private final EmissaoRelatorioAdministrativoRepositorio repositorio;

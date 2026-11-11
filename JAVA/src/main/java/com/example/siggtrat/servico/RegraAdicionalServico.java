@@ -15,7 +15,11 @@ import java.time.LocalTime;
 import java.util.List;
 
 @Service
-public class RegraAdicionalServico {
+public class RegraAdicionalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RegraAdicionalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final RegraAdicionalRepositorio repositorio;
     private final JornadaRepositorio jornadaRepositorio;
     private final AcessoOrganizacionalServico acessoOrganizacionalServico;
@@ -71,25 +75,25 @@ public class RegraAdicionalServico {
     }
 
     private void aplicarDados(RegraAdicionalDTO dto, RegraAdicional r) {
-        if (dto == null) throw new IllegalArgumentException("Regra inválida.");
+        if (dto == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Regra inválida.");
         r.setTipo(dto.tipo()); r.setInicio(dto.inicio()); r.setFim(dto.fim()); r.setPercentual(dto.percentual());
         r.setAtivo(dto.ativo()); r.setOrdem(dto.ordem());
     }
 
     private void validar(RegraAdicional regra) {
-        if (regra.getTipo() == null || regra.getTipo().isBlank()) throw new IllegalArgumentException("Tipo da regra é obrigatório.");
+        if (regra.getTipo() == null || regra.getTipo().isBlank()) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Tipo da regra é obrigatório.");
         validarHorario("Início", regra.getInicio()); validarHorario("Fim", regra.getFim());
         boolean ini = regra.getInicio() != null && !regra.getInicio().isBlank();
         boolean fim = regra.getFim() != null && !regra.getFim().isBlank();
-        if (ini ^ fim) throw new IllegalArgumentException("Informe início e fim da janela, ou deixe ambos em branco.");
-        if (regra.getPercentual() != null && regra.getPercentual().signum() < 0) throw new IllegalArgumentException("Percentual não pode ser negativo.");
+        if (ini ^ fim) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe início e fim da janela, ou deixe ambos em branco.");
+        if (regra.getPercentual() != null && regra.getPercentual().signum() < 0) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Percentual não pode ser negativo.");
         if (regra.getAtivo() == null) regra.setAtivo(true);
     }
 
     private void validarHorario(String rotulo, String horario) {
         if (horario == null || horario.isBlank()) return;
-        if (horario.length() != 5) throw new IllegalArgumentException(rotulo + " deve estar no formato HH:mm");
-        try { LocalTime.parse(horario); } catch (Exception e) { throw new IllegalArgumentException(rotulo + " inválido (use HH:mm)"); }
+        if (horario.length() != 5) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(rotulo + " deve estar no formato HH:mm");
+        try { LocalTime.parse(horario); } catch (Exception e) { throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(rotulo + " inválido (use HH:mm)"); }
     }
 
     private Jornada obterJornadaVisivel(Long id) {

@@ -26,7 +26,11 @@ import java.util.List;
  */
 @Service
 @Transactional
-public class GestaoAcessoHierarquicoServico {
+public class GestaoAcessoHierarquicoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(GestaoAcessoHierarquicoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final UsuarioAplicacaoRepositorio usuarioRepositorio;
     private final SuperintendenciaEstadualRepositorio superintendenciaRepositorio;
@@ -101,7 +105,7 @@ public class GestaoAcessoHierarquicoServico {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Usuário não encontrado.");
         }
         if (Boolean.TRUE.equals(usuario.getActive())) {
-            throw new IllegalArgumentException("O usuário já está ativo.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O usuário já está ativo.");
         }
 
         ativarEstruturaDoNivel(usuario);

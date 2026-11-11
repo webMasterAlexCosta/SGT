@@ -5,16 +5,16 @@ import { AxiosError } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { PainelAlteracoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.jsx';
-import { api } from '../src/core/http.js';
-import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { resetarSolicitadorConfirmacaoSenhaParaTestes } from '../src/core/http/coordenadorConfirmacaoSenha.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import { PainelAlteracoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx';
+import { api } from '../src/core/http.ts';
+import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { resetarSolicitadorConfirmacaoSenhaParaTestes } from '../src/core/http/coordenadorConfirmacaoSenha.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 import { diferida } from './fixtures/promessaDiferida.js';
-import { validarAditamentoLocal } from '../src/services/admin/ServicoDominioAlteracoesContrato.js';
+import { validarAditamentoLocal } from '../src/services/admin/ServicoDominioAlteracoesContrato.ts';
 
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: {
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: {
   id: 9701, perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL', gestaoLocalId: 1,
 } }) }));
 const contrato = { id: 9741, numeroContrato: 'PROR-SINTETICO', anoContrato: 2026, estadoNegocial: 'PUBLICADO',
@@ -81,7 +81,7 @@ const calcular = async () => {
 };
 const abrirConfirmacao = async () => {
   fireEvent.click(screen.getByRole('button', { name: 'Confirmar com esta prévia' }));
-  return screen.findByRole('dialog', { name: /Confirmar (aditamento|remanejamento)/ });
+  return screen.findByRole('dialog', { name: /Confirmar (?:retificação do )?(aditamento|remanejamento)/ });
 };
 const confirmar = modal => {
   fireEvent.change(within(modal).getByLabelText('Senha de Acesso'), { target: { value: 'senha-sintetica-unitaria' } });
@@ -245,5 +245,127 @@ describe('ROP-064: leituras parciais e fora de ordem do painel', () => {
     await act(async () => { b.resolve(resposta(configB, [comp(9771, 'Lotação B sintética') ])); await b.promise; });
     expect(screen.getByText(/Lotação C sintética/, { selector: 'strong' })).toBeInTheDocument();
     expect(screen.queryByText(/Lotação B sintética/, { selector: 'strong' })).toBeNull();
+  });
+});
+
+describe('Aditamento: empresa documental e redução excepcional', () => {
+  const fornecedor = { id: 9790, razaoSocial: 'Empresa destino sintética', cnpj: '73995543000160', ativo: true };
+  it('não reutiliza a prévia anterior se a nova consulta falhar para o mesmo ato', async () => {
+    await abrir(); preencherBase(); await calcular();
+    especial = config => config.url === '/contratos/9741/aditamentos/previa'
+      ? recusar(config, 409, 'O contexto mudou durante a nova prévia') : undefined;
+    fireEvent.click(screen.getByRole('button', { name: 'Calcular prévia', exact: true }));
+    await waitFor(() => expect(avisos.some(a => /contexto mudou/.test(JSON.stringify(a)))).toBe(true));
+    expect(screen.getByLabelText(/Identificação/)).toHaveValue('ADI-PROR-SINTETICO');
+    expect(screen.getByRole('button', { name: 'Confirmar com esta prévia' })).toBeDisabled();
+    expect(posts('aditamentos')).toHaveLength(0);
+  });
+  it('mantém os dados documentais ao experimentar outra empresa e desistir na retificação', async () => {
+    especial = (config, dados) => {
+      if (config.method === 'get' && config.url === '/contratos/9741/aditamentos') return resposta(config, [{
+        id: 9789, eventoId: 9778, versaoInstrumento: 1, identificacao: 'ATO-SEM-TROCA', dataDocumento: '2026-11-03',
+        dataEfetiva: '2026-11-15', justificativa: 'Documento histórico sem troca de fornecedor.',
+        novaRazaoSocialEmpresa: 'Razão documental histórica', novoCnpjEmpresa: '12345678000190', novaDataFim: '2027-11-30',
+        novaMatriculaVinculoObrigatoria: false, novoDiaSemanaReduzido: 'FRIDAY', novasHorasDiaReduzido: 6,
+      }]);
+      if (config.method === 'get' && config.url === '/fornecedores') return resposta(config, [fornecedor]);
+      if (config.method === 'post' && config.url === '/contratos/9741/aditamentos/9789/retificar') return resposta(config, { id: 9788, ...dados });
+    };
+    await abrir();
+    fireEvent.click(screen.getByRole('button', { name: 'Retificar' }));
+    const trocar = screen.getByRole('checkbox', { name: /empresa.*aditamento|empresa.*retificação/i });
+    if (!trocar.checked) fireEvent.click(trocar);
+    const seletor = await screen.findByRole('combobox', { name: 'Nova empresa contratada' });
+    await within(seletor).findByRole('option', { name: /Empresa destino sintética/ });
+    fireEvent.change(seletor, { target: { value: String(fornecedor.id) } });
+    fireEvent.click(trocar);
+    await calcular();
+    const expected = {
+      novoFornecedorId: null, novoCnpjEmpresa: '12345678000190', novaRazaoSocialEmpresa: 'Razão documental histórica',
+      eventoPrecedenteId: 9778, novaMatriculaVinculoObrigatoria: false, novoDiaSemanaReduzido: 'FRIDAY', novasHorasDiaReduzido: 6,
+    };
+    expect(posts('aditamentos/previa').at(-1).data).toMatchObject(expected);
+    confirmar(await abrirConfirmacao());
+    await waitFor(() => expect(posts('aditamentos/9789/retificar')).toHaveLength(1));
+    expect(posts('aditamentos/9789/retificar')[0].data).toMatchObject(expected);
+  });
+  it('permite avaliar a empresa atual na data efetiva de um novo ato', async () => {
+    especial = config => config.method === 'get' && config.url === '/fornecedores' ? resposta(config, [fornecedor]) : undefined;
+    await abrir({ contrato: { ...contrato, fornecedorId: fornecedor.id } }); preencherBase();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Alterar empresa neste aditamento' }));
+    const seletor = await screen.findByRole('combobox', { name: 'Nova empresa contratada' });
+    await within(seletor).findByRole('option', { name: /Empresa destino sintética/ });
+    fireEvent.change(seletor, { target: { value: String(fornecedor.id) } });
+    enviarCampo('Nome fantasia da nova empresa', 'Documento de retorno futuro');
+    await calcular();
+    expect(posts('aditamentos/previa').at(-1).data).toMatchObject({ novoFornecedorId: fornecedor.id, dataEfetiva: '2026-11-15' });
+  });
+  it('não confirma nem recalcula a troca quando o fornecedor some do catálogo ativo', async () => {
+    let ativo = true;
+    especial = config => config.method === 'get' && config.url === '/fornecedores'
+      ? resposta(config, [{ ...fornecedor, ativo }]) : undefined;
+    await abrir(); preencherBase();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Alterar empresa neste aditamento' }));
+    const seletor = await screen.findByRole('combobox', { name: 'Nova empresa contratada' });
+    await within(seletor).findByRole('option', { name: /Empresa destino sintética/ });
+    fireEvent.change(seletor, { target: { value: String(fornecedor.id) } });
+    enviarCampo('Nome fantasia da nova empresa', 'Documento sintético');
+    await calcular();
+    ativo = false;
+    fireEvent.click(screen.getByRole('tab', { name: 'Remanejamentos' }));
+    fireEvent.click(screen.getByRole('tab', { name: 'Aditamentos' }));
+    await waitFor(() => {
+      expect(pedidos.filter(p => p.url === '/fornecedores')).toHaveLength(2);
+      expect(screen.queryByText('Consultando empresas contratadas…')).not.toBeInTheDocument();
+    });
+    expect(screen.getByRole('button', { name: 'Confirmar com esta prévia' })).toBeDisabled();
+    expect(screen.queryByRole('option', { name: /Empresa registrada no ato/ })).not.toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Calcular prévia', exact: true }));
+    expect(posts('aditamentos/previa')).toHaveLength(1);
+    expect(posts('aditamentos')).toHaveLength(0);
+  });
+  it('seleciona empresa ativa, preserva dados documentais e exige nova prévia se os dados mudarem', async () => {
+    especial = config => config.method === 'get' && config.url === '/fornecedores'
+      ? resposta(config, [fornecedor, { id: 9791, razaoSocial: 'Empresa inativa', cnpj: '73995543000240', ativo: false }]) : undefined;
+    await abrir(); preencherBase();
+    expect(pedidos.filter(x => x.url === '/fornecedores')).toHaveLength(0);
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Alterar empresa neste aditamento' }));
+    const empresa = await screen.findByRole('combobox', { name: 'Nova empresa contratada' });
+    await within(empresa).findByRole('option', { name: /Empresa destino sintética/ });
+    expect(within(empresa).queryByRole('option', { name: /Empresa inativa/ })).not.toBeInTheDocument();
+    fireEvent.change(empresa, { target: { value: String(fornecedor.id) } });
+    expect(screen.getByLabelText('CNPJ da nova empresa')).toHaveValue(fornecedor.cnpj);
+    expect(screen.getByLabelText('Razão social da nova empresa')).toHaveValue(fornecedor.razaoSocial);
+    enviarCampo('Nome fantasia da nova empresa', 'Destino documental sintético');
+    await calcular();
+    expect(posts('aditamentos/previa').at(-1).data).toMatchObject({ novoFornecedorId: 9790, novoCnpjEmpresa: fornecedor.cnpj,
+      novaRazaoSocialEmpresa: fornecedor.razaoSocial, novoNomeFantasiaEmpresa: 'Destino documental sintético' });
+    enviarCampo('Nome fantasia da nova empresa', 'Destino retificado no formulário');
+    expect(screen.getByRole('button', { name: 'Confirmar com esta prévia' })).toBeDisabled();
+    await calcular(); confirmar(await abrirConfirmacao());
+    await waitFor(() => expect(posts('aditamentos')).toHaveLength(1));
+    expect(posts('aditamentos')[0].data).toMatchObject({ novoFornecedorId: 9790, novoCnpjEmpresa: fornecedor.cnpj,
+      novaRazaoSocialEmpresa: fornecedor.razaoSocial, novoNomeFantasiaEmpresa: 'Destino retificado no formulário', tokenPrevia: 'previa-unitaria-2' });
+  });
+  it('confirma explicitamente a exceção válida sem invalidar o token de seus impactos', async () => {
+    especial = (config, data) => config.url === '/contratos/9741/aditamentos/previa' ? resposta(config, {
+      contratoId: 9741, dataEfetiva: data.dataEfetiva, efetivoAnterior: 100, efetivoResultante: 74,
+      efetivoOriginalPublicado: 100, pisoNormalReducao: 75, exigeAutorizacaoExcepcional: true,
+      possuiImpactoOcupacao: false, impactosComposicao: [], alertas: [], tokenPrevia: 'previa-excecao',
+    }) : undefined;
+    await abrir(); preencherBase(); enviarCampo('Novo efetivo total', '74');
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Usar fluxo excepcional para redução acima do limite normal' }));
+    enviarCampo(/Fundamento da exceção/, 'Ato sintético com fonte comprobatória e escopo definido.');
+    fireEvent.click(screen.getByRole('button', { name: 'Calcular prévia', exact: true }));
+    const aceite = await screen.findByRole('checkbox', { name: /Confirmo os impactos desta redução excepcional/ });
+    expect(posts('aditamentos/previa')).toHaveLength(1);
+    expect(posts('aditamentos/previa')[0].data).toMatchObject({ reducaoExcepcional: true, confirmarImpacto: false });
+    expect(screen.getByRole('button', { name: 'Confirmar com esta prévia' })).toBeDisabled();
+    fireEvent.click(aceite);
+    expect(screen.getByRole('heading', { name: 'Prévia calculada no servidor' })).toBeInTheDocument();
+    confirmar(await abrirConfirmacao());
+    await waitFor(() => expect(posts('aditamentos')).toHaveLength(1));
+    expect(posts('aditamentos')[0].data).toMatchObject({ reducaoExcepcional: true, confirmarImpacto: true,
+      fundamentoExcecao: 'Ato sintético com fonte comprobatória e escopo definido.', tokenPrevia: 'previa-excecao' });
   });
 });

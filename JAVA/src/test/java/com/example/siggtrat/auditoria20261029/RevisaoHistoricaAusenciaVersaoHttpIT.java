@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Revisão independente preparatória: HIS-001/HIS-006, CAT-004 e TMP-004/005.
  * Oráculo: norma §§1, 2, 5.4, 6.20 e 8.1, não o comportamento corrente.
  * DML altera exclusivamente os acervos sintéticos destes testes. Não há DDL.
- * Execução deve ser feita pelo coordenador em MySQL real, sobre hash identificado.
+ * Execução deve ser feita pelo coordenador em PostgreSQL real, sobre hash identificado.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class RevisaoHistoricaAusenciaVersaoHttpIT extends ContratosHttpBase {

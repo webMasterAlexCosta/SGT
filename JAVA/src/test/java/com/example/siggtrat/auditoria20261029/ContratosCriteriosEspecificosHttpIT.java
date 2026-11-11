@@ -25,18 +25,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /** Provas específicas dos critérios que não eram afirmados pelos cenários abrangentes. */
 class ContratosCriteriosEspecificosHttpIT extends ContratosHttpBase {
     @Test
+    @Transactional(propagation = Propagation.NOT_SUPPORTED)
     void identificadorDuplicadoEmPutDeRascunhoNaoAlteraNenhumContrato() throws Exception {
-        var c = criarCenario(); var inicio = RelogioSistema.hoje().plusDays(5);
+        var c = criarCenarioPersistido(); var inicio = RelogioSistema.hoje().plusDays(5);
         var primeiro = rascunho(c, "PUT-A-" + UUID.randomUUID().toString().substring(0, 8), 5, inicio, inicio.plusMonths(2));
         var segundo = rascunho(c, "PUT-B-" + UUID.randomUUID().toString().substring(0, 8), 5, inicio, inicio.plusMonths(2));
         long a = enviar(c.localA, "/api/contratos", primeiro, 201, "CON002 primeiro rascunho").path("id").asLong();
         long b = enviar(c.localA, "/api/contratos", segundo, 201, "CON002 segundo rascunho").path("id").asLong();
         executar(c.localA, put(base(b)).contentType(MediaType.APPLICATION_JSON).content(json(primeiro)), 409,
                 "CON002 PUT duplicado não pode trocar a identidade do segundo rascunho");
-        em.flush(); em.clear();
-        assertThat(em.find(Contrato.class, a).getNumeroContrato()).isEqualToIgnoringCase((String) primeiro.get("numeroContrato"));
-        assertThat(em.find(Contrato.class, b).getNumeroContrato()).isEqualToIgnoringCase((String) segundo.get("numeroContrato"));
-        assertThat(em.find(Contrato.class, b).getAnoContrato()).isEqualTo(segundo.get("anoContrato"));
+        emTransacao(() -> {
+            em.clear();
+            assertThat(em.find(Contrato.class, a).getNumeroContrato()).isEqualToIgnoringCase((String) primeiro.get("numeroContrato"));
+            assertThat(em.find(Contrato.class, b).getNumeroContrato()).isEqualToIgnoringCase((String) segundo.get("numeroContrato"));
+            assertThat(em.find(Contrato.class, b).getAnoContrato()).isEqualTo(segundo.get("anoContrato"));
+            return null;
+        });
     }
 
     @ParameterizedTest
@@ -162,8 +166,20 @@ class ContratosCriteriosEspecificosHttpIT extends ContratosHttpBase {
         em.flush(); em.clear();
         var lista = consultar(c.localA, base(n.id()) + "/remanejamentos", "REM001/004/005 versões e metadados imutáveis");
         assertThat(lista.size()).isEqualTo(3); var ids = new HashSet<Long>();
+        var itensEsperados = List.of(
+                Map.of(n.composicao1(), List.of(25, -5, 20), n.composicao2(), List.of(75, 5, 80)),
+                Map.of(n.composicao1(), List.of(25, -10, 15), n.composicao2(), List.of(75, 10, 85)),
+                Map.of(n.composicao1(), List.of(25, -15, 10), n.composicao2(), List.of(75, 15, 90)));
         for (int i = 0; i < 3; i++) {
-            var r = lista.get(i); assertThat(ids.add(r.path("id").asLong())).isTrue();
+            var r = lista.get(i);
+            assertThat(r.path("identificacao").asText()).isEqualTo("REM-TRES-VERSOES");
+            var itensPorId = java.util.stream.StreamSupport.stream(r.path("itens").spliterator(), false)
+                    .collect(java.util.stream.Collectors.toMap(item -> item.path("composicaoId").asLong(),
+                            item -> List.of(item.path("quantidadeAnterior").asInt(), item.path("variacao").asInt(),
+                                    item.path("quantidadeResultante").asInt())));
+            assertThat(itensPorId).as("REM001/003 versão %s: todos os IDs e anterior/variação/resultante", i + 1)
+                    .isEqualTo(itensEsperados.get(i));
+             assertThat(ids.add(r.path("id").asLong())).isTrue();
             assertThat(r.path("versaoInstrumento").asInt()).isEqualTo(i + 1);
             assertThat(r.path("situacao").asText()).isEqualTo(i < 2 ? "RETIFICADO" : "VIGENTE");
             assertThat(r.path("usuarioResponsavelId").asLong()).isEqualTo(c.localA.getId());
@@ -229,6 +245,9 @@ class ContratosCriteriosEspecificosHttpIT extends ContratosHttpBase {
     private void assertEfetivo(Cenario c, NovoContrato n, java.time.LocalDate data, int primeiro, int segundo) throws Exception {
         var itens = consultar(c.localA, base(n.id()) + "/composicoes?data=" + data, "Distribuição temporal não duplica instrumentos retificados");
         assertThat(itens.size()).isEqualTo(2);
+        assertThat(java.util.stream.StreamSupport.stream(itens.spliterator(), false)
+                .map(item -> item.path("id").asLong()).toList())
+                .containsExactlyInAnyOrder(n.composicao1(), n.composicao2());
         for (var item : itens) assertThat(item.path("efetivoPrevisto").asInt())
                 .isEqualTo(item.path("id").asLong() == n.composicao1() ? primeiro : segundo);
     }

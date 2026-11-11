@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.ObservadorAtorPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.dominio.pendencia.EstadoPendencia;
 import com.example.siggtrat.dominio.pendencia.TipoPendencia;
 import com.example.siggtrat.entidade.Contrato;
@@ -40,7 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Escopo: a consulta filtrada descobre a causa pedida, mas não disputa lock de
  * contrato alheio ao recorte. Publicação, Pessoa e vínculo nascem por HTTP;
- * persistência e observação de waits usam MySQL/JPA reais. Só o relógio é
+ * persistência e observação de waits usam PostgreSQL/JPA reais. Só o relógio é
  * controlado. O prazo da barreira é watchdog do teste, não requisito de SLA.
  *
  * A barreira usa o primeiro candidato elegível na ordem do sincronizador. Na
@@ -54,6 +57,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class PendenciasRecorteSincronizacaoHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSourceObservador;
+
     @Autowired private VinculoContratualRepositorio vinculos;
 
     @ParameterizedTest
@@ -182,7 +187,7 @@ class PendenciasRecorteSincronizacaoHttpIT extends ContratosHttpBase {
         try {
             detentor = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, contratoExterno, LockModeType.PESSIMISTIC_WRITE);
-                bloqueado.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                bloqueado.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 try {
                     if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Barreira não foi liberada pelo teste.");
                 } catch (InterruptedException e) {
@@ -191,25 +196,21 @@ class PendenciasRecorteSincronizacaoHttpIT extends ContratosHttpBase {
                 return null;
             }));
             long conexaoExterna = bloqueado.get(10, TimeUnit.SECONDS);
-            consulta = pool.submit(() -> {
+            var atorConsulta = new Ator("consulta-recorte");
+            var jdbcObservador = new org.springframework.jdbc.core.JdbcTemplate(dataSourceObservador);
+            consulta = pool.submit(() -> atorConsulta.executar(() -> {
                 try (var clock = Mockito.mockStatic(RelogioSistema.class, Mockito.CALLS_REAL_METHODS)) {
                     clock.when(RelogioSistema::hoje).thenReturn(hoje);
                     return mvc.perform(requisicao).andReturn();
                 }
-            });
+            }));
             // Há dois desfechos observáveis: resposta concluída com a barreira
             // retida, ou uma espera indevida na conexão externa. Ausência de
             // ambos até o watchdog é preparação inconclusiva, não prova de SLA.
             long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
             while (!consulta.isDone() && System.nanoTime() < limite) {
-                long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits w
-                        join performance_schema.threads b on b.THREAD_ID=w.BLOCKING_THREAD_ID
-                        join performance_schema.data_locks l
-                          on l.ENGINE=w.ENGINE and l.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID
-                        where b.PROCESSLIST_ID=:conexao and l.OBJECT_NAME='contrato' and l.INDEX_NAME='PRIMARY'
-                        """).setParameter("conexao", conexaoExterna).getSingleResult()).longValue());
-                if (esperas > 0) { esperaExterna = true; break; }
+                if (ObservadorAtorPostgres.esperaDiretaNoAlvo(jdbcObservador, conexaoExterna, atorConsulta,
+                        "ContratoRepositorio.buscarPorIdParaAtualizacao", contratoExterno, "contrato")) { esperaExterna = true; break; }
                 TimeUnit.MILLISECONDS.sleep(20);
             }
             terminouComLockRetido = consulta.isDone();

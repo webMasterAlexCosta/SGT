@@ -20,7 +20,7 @@ import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** FRE-013: o serviço real confirma estado, versão e cadeia no MySQL em transações próprias. */
+/** FRE-013: o serviço real confirma estado, versão e cadeia no PostgreSQL em transações próprias. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class RevisaoFechamentoNegocialMysqlHttpIT extends ContratosHttpBase {
     @Autowired FechamentoAutomaticoFrequenciaNegocialServico fechamento;
@@ -48,7 +48,7 @@ class RevisaoFechamentoNegocialMysqlHttpIT extends ContratosHttpBase {
         var zona = politica.zona();
 
         // Somente o relógio é controlado. Serviço, gerenciador de transação,
-        // repositórios, bloqueios, commit e leitura posterior usam MySQL real.
+        // repositórios, bloqueios, commit e leitura posterior usam PostgreSQL real.
         try (var datas = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS);
              var instantes = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
             datas.when(() -> LocalDate.now(zona)).thenReturn(amanha);

@@ -14,7 +14,11 @@ import java.util.Objects;
 /** Confere a referência tipada antes de associar uma fonte a um fato já registrado. */
 @Service
 @Transactional(readOnly = true)
-public class VinculoFatoDocumentalServico {
+public class VinculoFatoDocumentalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(VinculoFatoDocumentalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EntityManager em;
 
     public VinculoFatoDocumentalServico(EntityManager em) { this.em = em; }

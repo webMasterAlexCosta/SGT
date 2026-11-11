@@ -67,7 +67,7 @@ class SessaoUnicaConcorrenciaRegressaoTest {
                 mock(JornadaRepositorio.class), mock(SuperintendenciaEstadualRepositorio.class),
                 mock(GestaoLocalRepositorio.class), mock(EscopoAcessoUsuarioServico.class),
                 mock(FiltroAutenticacaoJwt.class), mock(TotpServico.class),
-                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."));
+                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."), mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
         MockHttpServletRequest request = new MockHttpServletRequest();
         if (bearer) request.addHeader("Authorization", "Bearer jwt-anterior");
         else request.setCookies(new Cookie(ConstantesDominio.COOKIE_AUTH, "jwt-anterior"));
@@ -110,7 +110,7 @@ class SessaoUnicaConcorrenciaRegressaoTest {
                 mock(JornadaRepositorio.class), mock(SuperintendenciaEstadualRepositorio.class),
                 mock(GestaoLocalRepositorio.class), mock(EscopoAcessoUsuarioServico.class),
                 mock(FiltroAutenticacaoJwt.class), mock(TotpServico.class),
-                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."));
+                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."), mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
         MockHttpServletRequest request = new MockHttpServletRequest();
         request.setCookies(new Cookie(ConstantesDominio.COOKIE_AUTH, "jwt-revogado"));
         SecurityContextHolder.getContext().setAuthentication(
@@ -178,7 +178,7 @@ class SessaoUnicaConcorrenciaRegressaoTest {
                 mock(JornadaRepositorio.class), mock(SuperintendenciaEstadualRepositorio.class),
                 mock(GestaoLocalRepositorio.class), mock(EscopoAcessoUsuarioServico.class),
                 mock(FiltroAutenticacaoJwt.class), mock(TotpServico.class),
-                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."));
+                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."), mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
         ProxyFactory fabrica = new ProxyFactory(servico);
         fabrica.setProxyTargetClass(true);
         fabrica.addAdvice(new TransactionInterceptor(new TransacaoDeTeste(), new AnnotationTransactionAttributeSource()));

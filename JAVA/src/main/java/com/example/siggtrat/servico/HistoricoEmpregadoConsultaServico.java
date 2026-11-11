@@ -23,7 +23,11 @@ import java.util.List;
 import java.util.ArrayList;
 
 @Service
-public class HistoricoEmpregadoConsultaServico {
+public class HistoricoEmpregadoConsultaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(HistoricoEmpregadoConsultaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final HistoricoEmpregadoRepositorio repositorio;
     private final EmpregadoRepositorio empregadoRepositorio;
     private final AcessoOrganizacionalServico acessoOrganizacionalServico;

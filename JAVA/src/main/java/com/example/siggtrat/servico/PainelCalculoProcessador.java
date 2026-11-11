@@ -15,7 +15,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class PainelCalculoProcessador {
+public class PainelCalculoProcessador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(PainelCalculoProcessador.class);
     private final Set<Long> emExecucao = ConcurrentHashMap.newKeySet();
@@ -57,7 +59,7 @@ public class PainelCalculoProcessador {
             }
             stateServico.concluir(descritor, payload);
         } catch (Throwable erro) {
-            log.error("Falha na consolidação assíncrona do painel id={}", calculoId, erro);
+            log.error("Falha na consolidação assíncrona do painel id={} falha={}", calculoId, com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erro));
             if (descritor != null) stateServico.falhar(descritor, erro);
         } finally {
             emExecucao.remove(calculoId);

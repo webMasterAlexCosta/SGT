@@ -72,6 +72,17 @@ class RedisQueryCacheArchitectureTest {
         assertTrue(servico.contains("connection.ping()"));
         assertTrue(controller.contains("PERFIL_ADMINISTRADOR"));
         assertTrue(config.contains("CacheErrorHandler"));
-        assertTrue(config.contains("Consulta seguirá sem cache"));
+        // O contrato é continuar a operação quando o cache falha, não um texto de log.
+        var ttl=java.time.Duration.ofMinutes(1);
+        var configuracao=new com.example.siggtrat.configuracao.ConfiguracaoCacheRedis(
+                org.mockito.Mockito.mock(org.springframework.data.redis.connection.RedisConnectionFactory.class),
+                new com.fasterxml.jackson.databind.ObjectMapper(),ttl,ttl,ttl,ttl,ttl);
+        var handler=configuracao.errorHandler();
+        var cache=org.mockito.Mockito.mock(org.springframework.cache.Cache.class);
+        var falha=new IllegalStateException("SEGREDO_FICTICIO_DE_REDIS");
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(()->handler.handleCacheGetError(falha,cache,"chave"));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(()->handler.handleCachePutError(falha,cache,"chave","valor"));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(()->handler.handleCacheEvictError(falha,cache,"chave"));
+        org.junit.jupiter.api.Assertions.assertDoesNotThrow(()->handler.handleCacheClearError(falha,cache));
     }
 }

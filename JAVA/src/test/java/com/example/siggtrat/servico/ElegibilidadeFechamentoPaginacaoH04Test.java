@@ -44,7 +44,7 @@ import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
 /**
- * Unidade do selecionador REAL. Não inicializa Spring/JPA/MySQL/HTTP.
+ * Unidade do selecionador REAL. Não inicializa Spring/JPA/PostgreSQL/HTTP.
  * O EntityManager entrega páginas controladas; os motores são fronteiras
  * controladas. O serviço de elegibilidade, seu keyset, o filtro externo e a
  * contagem de todos os vínculos da Pessoa NÃO são substituídos por mocks.
@@ -369,9 +369,11 @@ class ElegibilidadeFechamentoPaginacaoH04Test {
 
     @SuppressWarnings("unchecked")
     private TypedQuery<Long> consulta(String jpql) {
-        boolean paginaEmpregados = jpql.contains("from Empregado e");
+        boolean colisaoIdentidade = jpql.contains("where e.cpf=:cpf") && jpql.contains("canonica.id<>:p");
+        boolean paginaEmpregados = jpql.contains("from Empregado e") && !colisaoIdentidade;
         boolean vinculosPessoa = jpql.contains("from VinculoContratual v") && jpql.contains("v.pessoa.id=:p");
-        assertTrue(paginaEmpregados || vinculosPessoa, "Fronteira de consulta inesperada: " + jpql);
+        assertTrue(paginaEmpregados || vinculosPessoa || colisaoIdentidade,
+                "Fronteira de consulta inesperada: " + jpql);
         Map<String, Object> parametros = new HashMap<>();
         AtomicInteger maximo = new AtomicInteger(Integer.MAX_VALUE);
         TypedQuery<Long> query = mock(TypedQuery.class);
@@ -384,6 +386,18 @@ class ElegibilidadeFechamentoPaginacaoH04Test {
             return query;
         });
         when(query.getResultList()).thenAnswer(inv -> {
+            if (colisaoIdentidade) {
+                Long pessoaId = (Long) parametros.get("p");
+                String cpf = (String) parametros.get("cpf");
+                assertNotNull(pessoaId, "A consulta impeditiva deve usar a Pessoa canônica corrente.");
+                // Modela a fronteira JPQL: igualdade SQL com NULL não encontra linhas.
+                // CPF nunca associa Pessoa: correspondência com outra raiz só impede seleção.
+                return empregados.values().stream()
+                        .filter(e -> cpf != null && cpf.equals(e.getCpf()))
+                        .filter(e -> e.getPessoaCanonica() == null
+                                || !pessoaId.equals(e.getPessoaCanonica().getId()))
+                        .map(Empregado::getId).limit(maximo.get()).toList();
+            }
             if (vinculosPessoa) {
                 Long pessoaId = (Long) parametros.get("p");
                 return List.copyOf(vinculosPorPessoa.getOrDefault(pessoaId, List.of()));

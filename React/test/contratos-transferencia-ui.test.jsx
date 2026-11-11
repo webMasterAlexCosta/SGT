@@ -5,15 +5,15 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar, confirmarComSenha } = vi.hoisted(() => ({ requisitar: vi.fn(), confirmarComSenha: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({
+vi.mock('../src/core/http.ts', () => ({
   requisitar, requisitarDownload: vi.fn(),
   extrairLista: (resposta) => Array.isArray(resposta) ? resposta : resposta?.content || [],
   extrairPagina: (resposta) => Array.isArray(resposta) ? { content: resposta, totalPages: 1 } : resposta,
 }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha, ModalConfirmacao: () => null, fechar: vi.fn() }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.jsx';
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha, ModalConfirmacao: () => null, fechar: vi.fn() }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.tsx';
 
 const mapa = { id: 70, composicaoOrigemId: 31, lotacaoOrigemId: 32, lotacaoOrigemNome: 'Origem fotografada', jornadaOrigemId: 33, jornadaOrigemDescricao: 'Turno fotografado', cargoOrigemId: 34, cargoOrigemNome: 'Cargo fotografado', lotacaoDestinoId: 42, lotacaoDestinoNome: 'Destino fotografado', jornadaDestinoId: 43, jornadaDestinoDescricao: 'Turno destino', cargoDestinoId: 44, cargoDestinoNome: 'Cargo destino' };
 const transferencia = { id: 17, contratoId: 9, eventoContratoId: 101, gestaoOrigemId: 1, gestaoOrigemNome: 'Gestão origem histórica', gestaoDestinoId: 23, gestaoDestinoNome: 'Gestão destino histórica', dataEfetiva: '2099-11-05', motivo: 'Transferência anterior', referenciaSei: 'TESTE-ANTERIOR', autorizacaoAdministrativa: 'AUTORIZACAO-ANTERIOR', registradoEm: '2026-11-01T12:00:00Z', responsavelId: 7, responsavelUsername: 'gestor-sintetico', mapeamentos: [mapa], tipoContratacaoDestinoId: 71, tipoContratacaoDestinoDescricao: 'Tipo fotografado' };
@@ -74,6 +74,7 @@ describe('Transferência de gestão conforme os contratos congelados', () => {
     requisitar.mockImplementation((pedido) => pedido.url.endsWith('/transferir-gestao')
       ? Promise.reject({ status: 409, message: 'Os mapas mudaram no servidor.' }) : responder(pedido));
     await preencher();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Conferência documental deste ato' }));
     fireEvent.click(screen.getByRole('button', { name: /Gerar prévia da transferência/ }));
     await screen.findByText('Os mapas informados serão revalidados.');
     fireEvent.click(screen.getByRole('checkbox', { name: /Confirmo.*impactos.*transferência/i }));
@@ -90,6 +91,7 @@ describe('Transferência de gestão conforme os contratos congelados', () => {
     let resolver;
     confirmarComSenha.mockImplementation(() => new Promise((resolve) => { resolver = resolve; }));
     await preencher();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Conferência documental deste ato' }));
     fireEvent.click(screen.getByRole('button', { name: /Gerar prévia da transferência/ }));
     await screen.findByText('Os mapas informados serão revalidados.');
     fireEvent.click(screen.getByRole('checkbox', { name: /Confirmo.*impactos.*transferência/i }));
@@ -120,6 +122,7 @@ describe('Transferência de gestão conforme os contratos congelados', () => {
 
   it('aceita IDs documentados de destino fora da listagem local e só confirma após prévia', async () => {
     await preencher();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Conferência documental deste ato' }));
     fireEvent.click(screen.getByRole('button', { name: /Gerar prévia da transferência/ }));
     await screen.findByText('Os mapas informados serão revalidados.');
     expect(requisitar).toHaveBeenCalledWith(expect.objectContaining({ url: '/contratos/9/transferencias-gestao/previa', data: expect.objectContaining({ gestaoLocalDestinoId: 23, tipoContratacaoDestinoId: 71, dataEfetiva: '2026-11-05', tokenPrevia: null, confirmarImpacto: false }) }));
@@ -139,6 +142,7 @@ describe('Transferência de gestão conforme os contratos congelados', () => {
 
   it('mudar um mapa invalida a prévia e impede enviar o token antigo', async () => {
     await preencher();
+    fireEvent.click(screen.getByRole('checkbox', { name: 'Conferência documental deste ato' }));
     fireEvent.click(screen.getByRole('button', { name: /Gerar prévia da transferência/ }));
     await screen.findByText('Os mapas informados serão revalidados.');
     fireEvent.click(screen.getByRole('checkbox', { name: /Confirmo.*impactos.*transferência/i }));
@@ -156,6 +160,7 @@ describe('Transferência de gestão conforme os contratos congelados', () => {
     fireEvent.change(within(form).getByLabelText(/Motivo do cancelamento/), { target: { value: 'Revogação documentada' } });
     fireEvent.change(within(form).getByLabelText(/SEI do cancelamento/), { target: { value: 'TESTE-CANCELAR' } });
     fireEvent.change(within(form).getByLabelText(/Autorização do cancelamento/), { target: { value: 'AUTORIZACAO-SINTETICA' } });
+    fireEvent.click(within(form).getByRole('checkbox', { name: 'Conferência documental deste ato' }));
     fireEvent.submit(form);
     await waitFor(() => expect(requisitar).toHaveBeenCalledWith(expect.objectContaining({ method: 'POST', url: '/contratos/9/transferencias-gestao/17/cancelar', data: expect.objectContaining({ dataEfetiva: '2099-11-05', motivo: 'Revogação documentada' }) })));
     expect(requisitar.mock.calls.some(([r]) => r.method === 'DELETE')).toBe(false);

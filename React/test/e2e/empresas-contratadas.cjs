@@ -1,6 +1,7 @@
 const { execute } = require('./ambiente-real.cjs');
+const { contratoDaFixture } = require('./contexto-fixture.cjs');
 
-execute('empresas-contratadas', async ({ page, fixture, report, check, open, screenshot }) => {
+execute('empresas-contratadas', async ({ page, context, fixture, report, check, open, screenshot }) => {
   const requests = [];
   page.on('request', request => {
     const url = new URL(request.url());
@@ -16,7 +17,21 @@ execute('empresas-contratadas', async ({ page, fixture, report, check, open, scr
   await page.getByText('Carregando empresas...', { exact: true }).waitFor({ state: 'hidden' });
   const canonical = ['/api/contratos', '/api/fornecedores'];
   check('Empresa e contratos são consultados pelas APIs canônicas', canonical.every(path => report.http.some(response => response.method === 'GET' && response.path === path && response.status === 200)));
-  check('Contrato sintético autorizado continua disponível para associação', await page.getByRole('combobox', { name: 'Contrato a vincular à empresa', exact: true }).locator(`option[value="${fixture.ids.contrato_rascunho}"]`).count() === 1);
+  // O primeiro contrato já foi publicado por contrato-publicacao.cjs. A associação
+  // deve continuar disponível para o outro rascunho real observado, sem reabrir o publicado.
+  const published = contratoDaFixture(fixture);
+  const draft = contratoDaFixture(fixture, 'contrato_futuro');
+  const read = async contract => {
+    const response = await context.request.get(new URL(contract.api, page.url()).href);
+    check(`Contrato observado ${contract.id} consultado no Java real`, response.status() === 200);
+    return (await response.json()).data;
+  };
+  const publishedDto = await read(published);
+  const draftDto = await read(draft);
+  check('Pré-condições causais: primeiro contrato publicado e segundo ainda em rascunho', publishedDto.estadoNegocial === 'PUBLICADO' && draftDto.estadoNegocial === 'RASCUNHO');
+  const association = page.getByRole('combobox', { name: 'Contrato a vincular à empresa', exact: true });
+  check('Contrato sintético autorizado continua disponível para associação', await association.locator(`option[value="${draft.id}"]`).count() === 1);
+  check('Contrato já publicado não é oferecido para nova associação', await association.locator(`option[value="${published.id}"]`).count() === 0);
   check('Cadastro conserva paginação visual de cinco', await page.getByRole('navigation', { name: 'Paginação de empresas', exact: true }).getByText(/5 por página/).isVisible());
   check('A primeira página não excede cinco empresas', await page.getByRole('table').locator('tbody tr').count() <= 5);
   check('As colunas exclusivas de risco foram retiradas', await page.getByRole('columnheader', { name: /Risco|Monitoramento|Próxima revisão/ }).count() === 0);

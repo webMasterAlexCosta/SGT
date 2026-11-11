@@ -2,7 +2,7 @@
 import { execFileSync } from 'node:child_process';
 import { describe, expect, it } from 'vitest';
 
-const modulo = new URL('../src/core/formatters/dataHoraNegocio.js', import.meta.url).href;
+const modulo = new URL('../src/core/formatters/dataHoraNegocio.ts', import.meta.url).href;
 const script = `
 import { obterDataNoFusoNegocio, interpretarDataHoraNoFusoNegocio } from ${JSON.stringify(modulo)};
 const prazos = [

@@ -95,7 +95,8 @@ class FechamentoContratoTransferidoHttpIT extends ContratosHttpBase {
 
     private void transferir(Cenario c) throws Exception {
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.plusDays(1), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência formal posterior ao dia do fechamento", "referenciaSei", "SEI-FECHAMENTO-TRANSFERIDO",

@@ -12,7 +12,7 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -38,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Fonte lida: C8 cdf471fbe344f4eb4e096a5e86b6f71226fe3ad3cde040baa6d6d4d4812e5545.
  * Hipóteses específicas: calendário depois de Contrato, usuário depois de UPDATE
  * do alvo e configuração depois de UPDATE da chave. Não compilado/executado pelo
- * autor. Usa HTTP/JPA/MySQL reais, sem mock de autorização, sem DDL manual.
+ * autor. Usa HTTP/JPA/PostgreSQL reais, sem mock de autorização, sem DDL manual.
  * O ajuste global de configuração usado como fixture é restaurado no finally.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -66,7 +66,7 @@ class Candidato8ComandosRestantesExecutorRevogadoRedIT extends ContratosHttpBase
             var pedido = autenticar(comando(fluxo, c, false), ator);
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 bloquearRecurso(fluxo, c);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(40, TimeUnit.SECONDS))
@@ -114,7 +114,7 @@ class Candidato8ComandosRestantesExecutorRevogadoRedIT extends ContratosHttpBase
         }
     }
 
-    private MockHttpServletRequestBuilder comando(String fluxo, Cenario c, boolean controle) throws Exception {
+    private AbstractMockHttpServletRequestBuilder<?> comando(String fluxo, Cenario c, boolean controle) throws Exception {
         return switch (fluxo) {
             case "CALENDARIO" -> post("/api/calendario-eventos").contentType(APPLICATION_JSON)
                     .content(json(mapa("data", controle ? DATA.minusDays(1) : DATA,
@@ -194,9 +194,9 @@ class Candidato8ComandosRestantesExecutorRevogadoRedIT extends ContratosHttpBase
         var observador = Executors.newSingleThreadScheduledExecutor();
         var consulta = observador.scheduleWithFixedDelay(() -> {
             try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
+                Long esperas = jdbc.queryForObject("""
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND ? = ANY(pg_blocking_pids(a.pid))
+""", Long.class, conexaoBloqueadora);
                 if (esperas != null && esperas > 0) observada.complete(null);
                 else if (tentativa.isDone()) observada.completeExceptionally(
                         new AssertionError("O comando não alcançou a espera real do recurso"));

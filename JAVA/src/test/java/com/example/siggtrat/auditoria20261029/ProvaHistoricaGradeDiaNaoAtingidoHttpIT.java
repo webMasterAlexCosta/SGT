@@ -40,7 +40,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Não compilado nem executado pelo revisor; somente proposta fora da árvore de trabalho.
  * A Alocação da fixture conserva lacuna real e a Frequência nasce após a prova V1.
  * A prova V2 corrige a mesma origem, somente em outro dia da semana; não é alteração do mestre.
- * MySQL e serviços reais. O DML de perda é exclusivo da fixture sintética.
+ * PostgreSQL e serviços reais. O DML de perda é exclusivo da fixture sintética.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ProvaHistoricaGradeDiaNaoAtingidoHttpIT extends ContratosHttpBase {
@@ -61,7 +61,7 @@ class ProvaHistoricaGradeDiaNaoAtingidoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirMySqlReal() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
         }
     }
 

@@ -7,20 +7,20 @@ import { MemoryRouter } from 'react-router-dom';
 const { requisitar, usuario, atualizarPerfil, iniciarExportacao } = vi.hoisted(() => ({
   requisitar: vi.fn(), usuario: { id: 99, perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 }, atualizarPerfil: vi.fn(), iniciarExportacao: vi.fn(),
 }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: usuario, atualizarPerfil, atualizarInformacoesSessao: atualizarPerfil }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null }) }));
-vi.mock('../src/core/exportacao/context.jsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao }) }));
-vi.mock('../src/modules/rh/pages/PaginaRelatoriosTerceirizados/components/GraficosRelatorios/index.jsx', () => ({ GraficosRelatorios: () => null }));
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: usuario, atualizarPerfil, atualizarInformacoesSessao: atualizarPerfil }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null }) }));
+vi.mock('../src/core/exportacao/context.tsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao }) }));
+vi.mock('../src/modules/rh/pages/PaginaRelatoriosTerceirizados/components/GraficosRelatorios/index.tsx', () => ({ GraficosRelatorios: () => null }));
 
-import { CadastroGenerico } from '../src/modules/admin/components/CadastroGenerico.jsx';
-import { PaginaPessoasVinculos } from '../src/modules/rh/pages/PaginaPessoasVinculos/index.jsx';
-import { PaginaUsuarios } from '../src/modules/admin/pages/PaginaUsuarios/index.jsx';
-import { PaginaRelatoriosTerceirizados } from '../src/modules/rh/pages/PaginaRelatoriosTerceirizados/index.jsx';
-import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.jsx';
-import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.js';
-import { TAMANHO_PAGINA as LOTE_CONSULTA_COMPLETA } from '../src/services/rh/paginacao.js';
-import { RELATORIO_TERCEIRIZADOS_TAMANHO_MAXIMO } from '../src/services/rh/ServicoRelatorioTerceirizados.js';
+import { CadastroGenerico } from '../src/modules/admin/components/CadastroGenerico.tsx';
+import { PaginaPessoasVinculos } from '../src/modules/rh/pages/PaginaPessoasVinculos/index.tsx';
+import { PaginaUsuarios } from '../src/modules/admin/pages/PaginaUsuarios/index.tsx';
+import { PaginaRelatoriosTerceirizados } from '../src/modules/rh/pages/PaginaRelatoriosTerceirizados/index.tsx';
+import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.tsx';
+import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.ts';
+import { TAMANHO_PAGINA as LOTE_CONSULTA_COMPLETA } from '../src/services/rh/paginacao.ts';
+import { RELATORIO_TERCEIRIZADOS_TAMANHO_MAXIMO } from '../src/services/rh/ServicoRelatorioTerceirizados.ts';
 
 const itens = Array.from({ length: 7 }, (_, i) => ({ id: i + 1, nome: `Pessoa ${i + 1}`, username: `Usuario ${i + 1}`,
   pessoaNome: `Pessoa ${i + 1}`, cpf: '***', pessoaCpf: '***', perfil: 'OPERACIONAL', active: true,

@@ -38,7 +38,7 @@ class TransferenciaGestaoContratoServicoEtapa07Test {
         tipoDestino.setGestaoLocal(destino); tipoDestino.setDescricao("Tipo destino"); tipoDestino.setAtivo(true);
         when(tipos.findById(150L)).thenReturn(Optional.of(tipoDestino)); servico.configurarTipos(tipos);
         // Esta prova unitária verifica coordenação e mapeamento. O replay e a
-        // política dos vínculos são exercitados nos IT HTTP/MySQL correspondentes.
+        // política dos vínculos são exercitados nos IT HTTP/PostgreSQL correspondentes.
         AditamentoContratualServico projecao = mock(AditamentoContratualServico.class);
         servico.configurarProjecaoContratual(projecao);
         GestaoContratoTemporalServico gestaoTemporal = mock(GestaoContratoTemporalServico.class);
@@ -73,7 +73,7 @@ class TransferenciaGestaoContratoServicoEtapa07Test {
         };
         evento.setTipoEvento(TipoEventoCicloVidaContrato.TRANSFERENCIA_GESTAO_LOCAL);
         evento.setDataEfetiva(LocalDate.of(2026, 7, 1));
-        when(motor.registrarEvento(eq(contrato), eq(TipoEventoCicloVidaContrato.TRANSFERENCIA_GESTAO_LOCAL), any(), any(), any(), any()))
+        when(motor.registrarEvento(eq(contrato), eq(TipoEventoCicloVidaContrato.TRANSFERENCIA_GESTAO_LOCAL), any(), any(), any(), any(), isNull(), any(ConferenciaDocumentalTransferencia.class)))
                 .thenReturn(evento);
         var salva = new java.util.concurrent.atomic.AtomicBoolean(false);
         when(transferencias.save(any(TransferenciaGestaoContrato.class))).thenAnswer(inv -> {
@@ -90,11 +90,12 @@ class TransferenciaGestaoContratoServicoEtapa07Test {
         UsuarioAplicacao usuario = new UsuarioAplicacao(); usuario.setId(8L); usuario.setUsername("gestor-origem");
         PermissaoExcepcional permissao = new PermissaoExcepcional();
         permissao.setAutorizacaoAdministrativa("Portaria 20/2026");
-        when(permissaoServico.exigirERegistrarUso(eq(usuario), any(), eq(contrato), eq(origem),
-                anyString(), eq("Contrato"), eq(9L))).thenReturn(permissao);
+        UsoPermissaoExcepcional usoSintetico = new UsoPermissaoExcepcional(); usoSintetico.setPermissao(permissao);
+        when(permissaoServico.exigirERegistrarUsoComRecibo(eq(usuario), any(), eq(contrato), eq(origem),
+                anyString(), eq("Contrato"), eq(9L))).thenReturn(new PermissaoExcepcionalServico.ConsumoPermissao(permissao, usoSintetico));
         TransferenciaGestaoContratoRequisicao req = new TransferenciaGestaoContratoRequisicao(LocalDate.of(2026, 7, 1),
                 LocalDate.of(2026, 6, 30), 2L, "reorganização real", "SEI-500", "Portaria 20/2026",
-                List.of(new MapeamentoTransferenciaGestaoRequisicao(30L, null, null, null, 110L, 120L, 140L)), null, null, null, 150L, null, null);
+                List.of(new MapeamentoTransferenciaGestaoRequisicao(30L, null, null, null, 110L, 120L, 140L)), null, null, null, 150L, null, null, true, ConferenciaDocumentalTransferencia.VERSAO_DECLARACAO);
 
         TransferenciaGestaoContrato transferencia = servico.transferir(contrato, req, usuario);
 
@@ -117,7 +118,7 @@ class TransferenciaGestaoContratoServicoEtapa07Test {
         contrato.setEstadoNegocial(EstadoNegocialContrato.PUBLICADO); contrato.setDataInicio(LocalDate.of(2026, 1, 1));
         contrato.setDataFim(LocalDate.of(2026, 12, 31));
         TransferenciaGestaoContratoRequisicao req = new TransferenciaGestaoContratoRequisicao(LocalDate.of(2026, 7, 1), null,
-                2L, "motivo", "SEI", "ato", List.of(), null, null, null, null, null, null);
+                2L, "motivo", "SEI", "ato", List.of(), null, null, null, null, null, null, null, null);
 
         assertThrows(ResponseStatusException.class, () -> servico.transferir(contrato, req, new UsuarioAplicacao()));
     }

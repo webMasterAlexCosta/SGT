@@ -25,10 +25,34 @@ class CatalogosContratoHttpIT extends AuditoriaHttpSuporte {
         String campo = Set.of("cargos", "lotacoes").contains(recurso) ? "nome" : "descricao";
         Map<String,Object> body = payload(recurso, c, nome, true);
         int criadoStatus = recurso.equals("cargos") ? 200 : 201;
+        if(recurso.equals("cargos")) {
+            long antes=em.createQuery("select count(c) from Cargo c where c.gestaoLocal.id=:g",Long.class)
+                    .setParameter("g",c.gestaoA.getId()).getSingleResult();
+            for(String variante:List.of("OMITIDO","NULO","VAZIO","BRANCO")) {
+                Map<String,Object> invalido=new LinkedHashMap<>(body);
+                switch(variante) { case "OMITIDO" -> invalido.remove("nome"); case "NULO" -> invalido.put("nome",null);
+                    case "VAZIO" -> invalido.put("nome",""); default -> invalido.put("nome","   "); }
+                assertThat(invalido.get("ativo")).isEqualTo(body.get("ativo"));
+                assertThat(invalido.get("gestaoLocalId")).isEqualTo(body.get("gestaoLocalId"));
+                executar(c.localA,post("/api/cargos").contentType(MediaType.APPLICATION_JSON).content(json(invalido)),400,
+                        "CAT002 nome isoladamente "+variante+" com demais campos válidos");
+                em.flush();em.clear(); // recarga na transação ambiente; não commit
+                assertThat(em.createQuery("select count(c) from Cargo c where c.gestaoLocal.id=:g",Long.class)
+                        .setParameter("g",c.gestaoA.getId()).getSingleResult()).isEqualTo(antes);
+            }
+            body.put("nome","  "+nome+"  "); // controle positivo confirma normalização, sem faltar outro campo
+        }
         JsonNode criado = dados(executar(c.localA, post("/api/" + recurso).contentType(MediaType.APPLICATION_JSON)
                 .content(json(body)), criadoStatus, "CAT-001/002 criação " + recurso + " na Gestão própria"));
         long id = criado.path("id").asLong();
         assertThat(id).isPositive();
+        if(recurso.equals("cargos")) {
+            assertThat(criado.path("nome").asText()).isEqualTo(nome);
+            em.flush();em.clear();
+            Cargo persistido=em.find(Cargo.class,id);
+            assertThat(persistido.getNome()).isEqualTo(nome);
+            assertThat(persistido.getGestaoLocal().getId()).isEqualTo(c.gestaoA.getId());
+        }
         assertThat(criado.path("gestaoLocalId").asLong()).isEqualTo(c.gestaoA.getId());
         assertThat(criado.path("ativo").asBoolean()).isTrue();
         if (Set.of("tipos-contratacao", "motivos-desligamento").contains(recurso)) {

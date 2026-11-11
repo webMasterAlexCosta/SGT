@@ -2,8 +2,8 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
-import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.jsx';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.tsx';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 import { iniciarContextoSessaoIsolado } from './fixtures/contextoSessaoIsolado.js';
 const { servico } = vi.hoisted(() => ({ servico: { informacoesSessao: vi.fn(), buscarMeuPerfil: vi.fn(), encerrarSessao: vi.fn(), autenticar: vi.fn(), cadastrar: vi.fn() } }));
 vi.mock('../src/services/auth/ServicoAutenticacao', () => ({ ServicoAutenticacao: servico }));

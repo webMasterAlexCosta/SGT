@@ -24,7 +24,11 @@ import java.util.*;
  * operacional, mantendo-se consultável e auditável.
  */
 @Service
-public class RevalidacaoFrequenciaTemporalServico {
+public class RevalidacaoFrequenciaTemporalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RevalidacaoFrequenciaTemporalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int TAMANHO_LOTE = 500;
     private final FrequenciaRepositorio frequenciaRepositorio;
     private final ResolvedorContextoTemporalFrequenciaServico resolvedor;

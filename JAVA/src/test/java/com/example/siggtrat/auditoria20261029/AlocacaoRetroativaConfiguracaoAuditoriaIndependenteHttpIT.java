@@ -216,6 +216,8 @@ class AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT extends Contrato
             assertThat(consultar(c.localA, base(contrato), "Publicação rejeitada não modifica o estado")
                     .path("estadoNegocial").asText()).isEqualTo("RASCUNHO");
             assertThat(fotografiaComposicao(composicao)).isEqualTo(rascunho);
+            assertThat(consultar(c.localA, base(contrato) + "/eventos", "Grade alterada não publica evento parcial")).isEmpty();
+            assertThat(consultar(c.localA, base(contrato) + "/versoes", "Grade alterada não publica versão parcial")).isEmpty();
             JsonNode atualizada = enviar(c.localA, base(contrato) + "/previas/publicar", publicacao, 200,
                     "Nova prévia vincula a confirmação à configuração alterada");
             assertThat(atualizada.path("tokenPrevia").asText()).isNotEqualTo(previa.path("tokenPrevia").asText());

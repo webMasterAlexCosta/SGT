@@ -9,8 +9,10 @@ import com.example.siggtrat.repositorio.TransferenciaGestaoContratoRepositorio;
 import com.example.siggtrat.regra.RegraEfetivoContratual;
 import com.example.siggtrat.utilitario.RelogioSistema;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -26,7 +28,11 @@ import java.util.stream.Collectors;
  * temporal/negocial, para responder qual composição valia em qualquer data.
  */
 @Service
-public class ComposicaoContratualTemporalServico {
+public class ComposicaoContratualTemporalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ComposicaoContratualTemporalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     public record ConflitoReplay(Long eventoId, TipoEventoCicloVidaContrato tipoEvento,
                                  LocalDate dataEfetiva, String motivo) {}
@@ -229,7 +235,7 @@ public class ComposicaoContratualTemporalServico {
         int efetivoOriginal = fotografiaOriginal
                 .map(VersaoContratoNegocial::getEfetivoPrevisto).orElseGet(() ->
                         Optional.ofNullable(contrato.getEfetivoOriginalPublicado()).orElseGet(() ->
-                                estado.values().stream().mapToInt(ComposicaoProjetada::efetivoPrevisto).sum()));
+                                totalRepresentavel(estado.values())));
         Map<Long, AditamentoContratual> aditamentos = aditamentoRepositorio
                 .findByContratoIdOrderByDataEfetivaAscRegistradoEmAsc(contrato.getId())
                 .stream().filter(a -> a.getEvento() != null && a.getEvento().getId() != null)
@@ -313,14 +319,18 @@ public class ComposicaoContratualTemporalServico {
     }
 
     private void aplicarProposta(Map<String, ComposicaoProjetada> estado, PropostaComposicao proposta, FimContratual fimContratual) {
-        int soma = 0;
+        long soma = 0;
         for (DeltaProposto delta : proposta.deltas()) {
             String chave = ComposicaoProjetada.chave(delta.lotacao().getId(), delta.jornada().getId(), delta.cargo().getId());
             ComposicaoProjetada anterior = estado.get(chave);
             if (anterior == null && proposta.tipo() == TipoEventoCicloVidaContrato.REMANEJAMENTO)
                 throw new IllegalStateException("Remanejamento proposto depende de composição inexistente: " + chave);
-            int quantidade = (anterior == null ? 0 : anterior.efetivoPrevisto()) + delta.variacao();
-            if (quantidade < 0) throw new IllegalStateException("Proposta incompatível com a composição " + chave);
+            long quantidadeCalculada = (long) (anterior == null ? 0 : anterior.efetivoPrevisto()) + delta.variacao();
+            if (quantidadeCalculada < 0) throw new IllegalStateException("Proposta incompatível com a composição " + chave);
+            if (quantidadeCalculada > Integer.MAX_VALUE)
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Proposta incompatível com a composição " + chave
+                        + ": quantidade não representável integralmente.");
+            int quantidade = (int) quantidadeCalculada;
             estado.put(chave, new ComposicaoProjetada(delta.composicaoBaseId(), delta.lotacao(), delta.jornada(), delta.cargo(),
                     anterior == null ? nome(delta.lotacao()) : anterior.lotacaoNome(),
                     anterior == null ? descricao(delta.jornada()) : anterior.jornadaDescricao(),
@@ -337,6 +347,7 @@ public class ComposicaoContratualTemporalServico {
         }
         if (proposta.tipo() == TipoEventoCicloVidaContrato.REMANEJAMENTO && soma != 0)
             throw new IllegalStateException("Remanejamento proposto deve preservar o total contratual.");
+        totalRepresentavel(estado.values());
     }
 
     public List<ComposicaoContratualDTO> projetarDTO(Contrato contrato, LocalDate dataReferencia, Instant conhecidoAte) {
@@ -369,8 +380,23 @@ public class ComposicaoContratualTemporalServico {
     }
 
     public int efetivoTotal(Contrato contrato, LocalDate dataReferencia, Instant conhecidoAte) {
-        return projetarEntidades(contrato, dataReferencia, conhecidoAte).stream()
-                .mapToInt(ComposicaoProjetada::efetivoPrevisto).sum();
+        return totalRepresentavel(projetarEntidades(contrato, dataReferencia, conhecidoAte));
+    }
+
+    /** O contrato continua int32; nenhuma soma pode ser truncada antes da validação do replay. */
+    static int totalRepresentavel(Collection<ComposicaoProjetada> composicoes) {
+        long total = 0;
+        for (ComposicaoProjetada composicao : composicoes) {
+            if (composicao.efetivoPrevisto() < 0)
+                throw new IllegalStateException("Composição reconstruída com quantidade negativa.");
+            total += composicao.efetivoPrevisto();
+            if (total > Integer.MAX_VALUE)
+                // Não converter em pendência de replay: omitir o ato produziria outra composição.
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "O efetivo contratual reconstruído não pode ser representado integralmente: "
+                        + total + ". Trate os instrumentos quantitativos incompatíveis.");
+        }
+        return (int) total;
     }
 
     public SortedSet<LocalDate> datasMudancaCapacidade(Contrato contrato, LocalDate ate) {
@@ -410,16 +436,21 @@ public class ComposicaoContratualTemporalServico {
     private void aplicarAditamento(Map<String, ComposicaoProjetada> estado, AditamentoContratual a,
                                    int efetivoOriginal, Instant conhecimento, FimContratual fimContratual,
                                    LeituraHistoricaContratos entradas) {
-        int totalAntes = estado.values().stream().mapToInt(ComposicaoProjetada::efetivoPrevisto).sum();
+        int totalAntes = totalRepresentavel(estado.values());
         for (AditamentoComposicao item : a.getAlteracoesComposicao()) {
             String chave = ComposicaoProjetada.chave(item.getLotacao().getId(), item.getJornada().getId(), item.getCargo().getId());
             ComposicaoProjetada anterior = estado.get(chave);
             int quantidadeAntes = anterior != null ? anterior.efetivoPrevisto() : 0;
-            int quantidadeDepois = quantidadeAntes + item.getVariacao();
-            if (quantidadeDepois < 0) {
+            long quantidadeCalculada = (long) quantidadeAntes + item.getVariacao();
+            if (quantidadeCalculada < 0) {
                 throw new IllegalStateException(
                         "Aditamento incompatível com a linha temporal reconstruída na composição " + chave + ".");
             }
+            if (quantidadeCalculada > Integer.MAX_VALUE)
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Aditamento incompatível com a linha temporal reconstruída na composição "
+                        + chave + ": quantidade não representável integralmente.");
+            int quantidadeDepois = (int) quantidadeCalculada;
             LocalDate inicio = anterior != null ? anterior.dataInicio() : a.getDataEfetiva();
             LocalDate fim = anterior != null ? anterior.dataFim() : fimContratual.data();
             var configuracao = anterior == null && provasHistoricas != null
@@ -466,7 +497,7 @@ public class ComposicaoContratualTemporalServico {
                             : item.getLotacaoMunicipioFotografia()!=null||nomeFotografado(item.getJornadaSemanalFotografia())!=null,
                     anterior == null ? Set.of() : anterior.mapeamentosOrigemIds()).comProvas(campos));
         }
-        int totalDepois = estado.values().stream().mapToInt(ComposicaoProjetada::efetivoPrevisto).sum();
+        int totalDepois = totalRepresentavel(estado.values());
         int piso = RegraEfetivoContratual.pisoNormal(efetivoOriginal);
         if (totalDepois < totalAntes && totalDepois < piso && !possuiExcecaoOriginalValidada(a, piso)) {
             throw new IllegalStateException("Aditamento incompatível com o piso de redução do efetivo original: "
@@ -484,8 +515,8 @@ public class ComposicaoContratualTemporalServico {
     }
 
     private void aplicarRemanejamento(Map<String, ComposicaoProjetada> estado, RemanejamentoContratual r) {
-        int totalAntes = estado.values().stream().mapToInt(ComposicaoProjetada::efetivoPrevisto).sum();
-        int somaVariacoesAplicadas = 0;
+        int totalAntes = totalRepresentavel(estado.values());
+        long somaVariacoesAplicadas = 0;
         for (RemanejamentoComposicao item : r.getItens()) {
             String chave = ComposicaoProjetada.chave(item.getLotacao().getId(), item.getJornada().getId(), item.getCargo().getId());
             ComposicaoProjetada anterior = estado.get(chave);
@@ -493,11 +524,16 @@ public class ComposicaoContratualTemporalServico {
                 throw new IllegalStateException(
                         "Remanejamento incompatível com a linha temporal reconstruída: composição inexistente " + chave + ".");
             }
-            int quantidadeDepois = anterior.efetivoPrevisto() + item.getVariacao();
-            if (quantidadeDepois < 0) {
+            long quantidadeCalculada = (long) anterior.efetivoPrevisto() + item.getVariacao();
+            if (quantidadeCalculada < 0) {
                 throw new IllegalStateException(
                         "Remanejamento incompatível com a linha temporal reconstruída: quantidade negativa em " + chave + ".");
             }
+            if (quantidadeCalculada > Integer.MAX_VALUE)
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "Remanejamento incompatível com a linha temporal reconstruída: "
+                        + "quantidade não representável integralmente em " + chave + ".");
+            int quantidadeDepois = (int) quantidadeCalculada;
             somaVariacoesAplicadas += item.getVariacao();
             var campos=new LinkedHashMap<>(anterior.provaCampos());
             campos.put("efetivoPrevisto",ProvasCamposHistoricos.derivado(quantidadeDepois,
@@ -512,7 +548,7 @@ public class ComposicaoContratualTemporalServico {
                     anterior.lotacaoMunicipio(), anterior.jornadaSemanal(), anterior.aditamentoComposicaoOrigemId(),
                     anterior.municipioComprovado(), anterior.mapeamentosOrigemIds()).comProvas(campos));
         }
-        int totalDepois = estado.values().stream().mapToInt(ComposicaoProjetada::efetivoPrevisto).sum();
+        int totalDepois = totalRepresentavel(estado.values());
         if (somaVariacoesAplicadas != 0 || totalDepois != totalAntes) {
             throw new IllegalStateException(
                     "Remanejamento incompatível com a linha temporal reconstruída: o total contratual deve ser preservado.");

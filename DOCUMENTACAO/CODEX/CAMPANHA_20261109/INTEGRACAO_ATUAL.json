@@ -1,0 +1,732 @@
+{
+  "state": "APPROVED_FUNCTIONAL_INTEGRATED_LABORATORY_CHROME_CHROMIUM_DESKTOP",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "main_classes": 823,
+  "libraries": 116,
+  "static_files": 547,
+  "current_bundle_files": 102,
+  "unchanged_classes_from_gate18": 820,
+  "backend_increment_entries": {
+    "BOOT-INF/classes/com/example/siggtrat/servico/AditamentoContratualServico$1.class": "6032195890e557bfb9e0a20b3d6ce27e7d22a9fdf88884d7a9c2d569dc478a35",
+    "BOOT-INF/classes/com/example/siggtrat/servico/AditamentoContratualServico.class": "335683448977547ac91eba6fe21d99d7bbb0b92b1c9a47b1207c69ac62a2df76",
+    "BOOT-INF/classes/com/example/siggtrat/servico/ConsultaProvaHistoricaContratoServico.class": "4443c346ac0d68d686eb21c7c65ad6264f5c09a6f60ba8aa64fe37ac51634c9e"
+  },
+  "backend_gate": {
+    "review": 24,
+    "runtime": "gpt-6.1-sol/xhigh",
+    "proof_sha256": "212a1483960b3725c2861515bcd194cb1f88c632fad663533221404a8f564397",
+    "scope": "Reviewed supplier/history increment; unaffected gate18 bytes checked"
+  },
+  "frontend_gate": {
+    "review": 11,
+    "runtime": "gpt-6.1-sol/xhigh",
+    "proof_sha256": "f3f9e63ae8eb378e5d13bd856e36995bd0a32adf0aeb8d7d0da4b627f42824b6",
+    "scope": "Technical integration of dist12; integrated browser acceptance pending"
+  },
+  "checks": {
+    "frontend_affected": {
+      "tests": 37,
+      "files": 4,
+      "receipts": [
+        "fe-aditamento-review-green02",
+        "fe-aditamento-review-consumidores01"
+      ]
+    },
+    "java_affected": {
+      "tests": 23,
+      "receipts": [
+        "it-supplier-green07",
+        "it-supplier-controles02"
+      ]
+    },
+    "build": {
+      "receipt": "fe-build12",
+      "strict": true,
+      "files": 102,
+      "peak_aggregate_bytes": 9764270080,
+      "memory_events": {
+        "low": 0,
+        "high": 0,
+        "max": 0,
+        "oom": 0,
+        "oom_kill": 0,
+        "oom_group_kill": 0,
+        "sock_throttled": 0
+      }
+    },
+    "package": {
+      "receipt": "jar-frontend-final08",
+      "tests": 22,
+      "classes": 3,
+      "peak_aggregate_bytes": 9370304512
+    },
+    "http_preflight": {
+      "receipt": "jar-static-http08/http-proof.json",
+      "checks": 107,
+      "scope": "Read-only HTTP, not browser or LAN"
+    },
+    "aditamento": {
+      "proof": "aditamento-jar08-proof.json",
+      "sha256": "c7557f191b04dda375c6b2e0595afe804b14362a1f9a462a2ec4c923b5966ed6",
+      "checks": 154,
+      "scope": "Current JAR08 only; final integrated review pending"
+    },
+    "pendencia_recorte": {
+      "proof": "pendencia-recorte-jar08-proof.json",
+      "sha256": "387b06185580f528f026c0a05932c7f89aac1975fc7f957c89d52effd5ff6bc0",
+      "checks": 80,
+      "scope": "Chrome80 in six phases incl preparation; PG/MockMvc2 temporal replay and3 all revisions responsibility cases with same823mainclasses, separate layers."
+    },
+    "recovery": {
+      "path": ".homologacao/20261109-sgt-final/recovery-integrated08-proof.json",
+      "sha256": "7aa8adbffeec8b46dcca81552ccf7e216ad2d8c008b49b633f55d56f3e75023e"
+    },
+    "full_restart": {
+      "path": ".homologacao/20261109-sgt-final/full-restart-integrated08-proof.json",
+      "sha256": "dd4dbd653946b5b76b6220f0754ec37dc00dc11f34110bca4e8236aa21b555ad"
+    },
+    "pendencia_all_revisions": {
+      "path": ".homologacao/20261109-sgt-final/pendencia-responsabilidade-integrated08-proof.json",
+      "sha256": "17e3c552585c7843805e984769dbcaf1c2bdc15a8f40e2ca2b215be1b954d414"
+    },
+    "external_LAN": {
+      "path": ".homologacao/20261109-sgt-final/lan-external-journey08-proof.json",
+      "sha256": "e393a2050131ea495182f094e7f0ff2d19462b25ffe29f1ac1f217d89feea35a"
+    },
+    "ux_cancel": {
+      "path": ".homologacao/20261109-sgt-final/browser-jar08-ux-confirmacao02/result.json",
+      "sha256": "caaad3a1e561e026b2c9cf3fc5cefe754fee754ce05ee7259280fe2c5d59b2ef",
+      "checks": 29
+    },
+    "pagination_integrity": {
+      "path": ".homologacao/20261109-sgt-final/browser-jar08-paginacao02/result.json",
+      "sha256": "4ccc770e10c5d7c31f1f9b1a858cf8ee1edffcca52593097b3a329e5e01842ec",
+      "checks": 54
+    },
+    "demonstracoes_finais64": {
+      "path": ".homologacao/20261109-sgt-final/demonstracoes-finais64-proof.json",
+      "sha256": "1db8b27359d0d27784e8cb64f5c5168693ccc0377136aae4a8d747d57388f076",
+      "checks": 83,
+      "independent_recheck": "PENDING"
+    },
+    "per_predicate_ledger64": {
+      "path": "DOCUMENTACAO/CODEX/CAMPANHA_20261109/EVIDENCIAS_POR_ACEITE.json",
+      "sha256": "30b52f2651ee2ebd8bf9fb0d02afb615a6e1d23b8e020ba7b21d85b00f18503d",
+      "ids": 820,
+      "state": "NAMED_ACCEPTANCES_MATERIALIZED_ONLY_IN_DECLARED_REVIEW26_SCOPES",
+      "no_automatic_acceptance": true
+    }
+  },
+  "previous_artifact_manifest_sha256": "1e38e44feb7b4e5f21ee43467bfa1d7627273203b89daf2b145c656d1d4a88e2",
+  "previous_artifact_manifest": {
+    "state": "JAR07_MAIN36_DIST10_NATIVE9_TECHNICAL_APPROVED_E2E_IN_PROGRESS",
+    "jar_sha256": "7ae557a625ea9f35fd2db4644dc3f43d6ba568bdd6e1ed55caa2d4ccb701ac84",
+    "main_classes": 823,
+    "libraries": 116,
+    "static_files": 503,
+    "current_bundle_files": 101,
+    "backend_gate": {
+      "review": 18,
+      "runtime": "gpt-6.1-sol/xhigh",
+      "scope": "Synthetic delimited technical backend",
+      "proof_sha256": "df6d4cb7e96b6164f2e23aa4b4f036681c64edc64442f9fe8b3d91d957482871"
+    },
+    "frontend_gate": {
+      "review": 9,
+      "runtime": "gpt-6.1-sol/xhigh",
+      "scope": "Technical integration of dist10/JAR07, independent; E2E final review pending",
+      "proof_sha256": "a711abadcf1dfbb513e07ca168f97b463f8b0f6e33d3cfda807e57b7b9b320b8"
+    },
+    "checks": {
+      "frontend": {
+        "tests": 834,
+        "files": 105,
+        "execution": "105sequential one-file lots",
+        "scope": "Current433ReactSRC and105executedtestfiles; not integrated acceptance",
+        "proof": "frontend-regression11-proof.json"
+      },
+      "build": {
+        "receipt": "fe-build10",
+        "strict": true,
+        "files": 101,
+        "seconds": 14.656033784005558,
+        "peak_aggregate_bytes": 8902684672,
+        "events_high_max_oom": 0,
+        "actual_asset_count": 101
+      },
+      "package": {
+        "receipt": "jar-frontend-final07",
+        "tests": 22,
+        "classes": 3,
+        "seconds": 14.039479732513428,
+        "peak_aggregate_bytes": 8959680512,
+        "scope": "Selected pertinent unit tests, not whole Java suite"
+      },
+      "http_preflight": {
+        "receipt": "jar-static-http07/http-proof.json",
+        "checks": 106,
+        "scope": "Read-only HTTP, not browser or LAN"
+      },
+      "integrated_auxiliaries": [
+        {
+          "receipt": "browser-jar-prorrogacao01",
+          "checks": 19,
+          "sha256": "ccc976c6eb1dbb837d7c6a9b1072187e5cd4f5b76348d13df7b26a9a0c06a32b",
+          "not_additional_original_driver": true
+        },
+        {
+          "receipt": "browser-jar-fornecedor-crud01",
+          "checks": 19,
+          "sha256": "1c0691e33d64bb439f1bd9f259f655edce7f4b6d41c93e5cba25133a792f2cf6",
+          "not_additional_original_driver": true
+        },
+        {
+          "receipt": "browser-jar-doc-versionado03",
+          "checks": 21,
+          "sha256": "172e3b5acea46e2c060fdb23037cd9aaca88337044837fdd1ecd2e583e17fe03",
+          "not_additional_original_driver": true
+        }
+      ],
+      "ri03_stage50": {
+        "receipt": "ri03-stage50-proof.json",
+        "sha256": "3032f16c1f89659fa10b3f035931a893ddacc0fc9c431d9a50f8426c8dfec793",
+        "checks": 64,
+        "four_small_sequential_lots": true,
+        "scope": "Minimum four branches; full variant matrix and final integrated review pending"
+      },
+      "twofa_stage51": {
+        "receipt": "twofa-stage51-proof.json",
+        "sha256": "e2c5ae6a6549209c0b5233ac17863015dacbb479966d0d13ef10de05a1b39e43",
+        "state": "PASS_IN_PHASES",
+        "setup_attempt_after12passed_assertions_remains_failed": true,
+        "resumed27_assertions_passed": true,
+        "account_restored": true,
+        "no_global_security_acceptance": true
+      },
+      "ui52_focal": {
+        "RED": "fe-doc-policy-red01:6cases5pass1expectedfailure",
+        "GREEN": "fe-doc-policy-green01:6pass",
+        "Chrome_RED": "browser-jar-doc-ui-red01:2actualissues",
+        "full_expected_next": 807,
+        "test_files": 105
+      },
+      "ui52_HMR": {
+        "receipt": "browser-hmr-doc-ui-green01",
+        "checks": 5,
+        "border": "1px solid",
+        "draft_version_actions": 0,
+        "published_version_actions": 2,
+        "document_command_writes": 0,
+        "not_final_JAR_approval": true
+      },
+      "job53": {
+        "unit_RED": "fe-job-intent-red01:13PASS5FAIL",
+        "unit_GREEN": "fe-job-intent-green01:18PASS",
+        "coverage_current_hook": {
+          "lines": 75.51,
+          "branches": 51.29,
+          "scope": "one hook only"
+        },
+        "real_original_UI400": "browser-jar-job200-control02",
+        "corrected_UI202": "browser-hmr-job200-control02",
+        "job1_terminal": {
+          "processed": 200,
+          "planned": 200,
+          "seconds": 230.982291,
+          "deadline120_pass": false
+        },
+        "normal_JIT_HMR_trial": "browser-hmr-job200-normaljit01",
+        "normal_JIT_HMR_preventive_stop_no_OOM": true,
+        "job2_preserved_zero_confirmed": "runtime-frontend45-01/hmr08/rollback-after-stop-select.json",
+        "job200_acceptance": "PENDING",
+        "next": "Reviewed embedded JAR, normal JIT without Vite companion"
+      },
+      "grid54": {
+        "diagnosis": "Completed job panel with stale Pending grid; freshpage and realGET200canonicalrows correct",
+        "real_fresh_page": "browser-jar04-grid-read01:4PASS",
+        "unit_RED": "fe-draft54-red01:24PASS1FAIL",
+        "unit_GREEN": "fe-draft54-green01:25PASS",
+        "real_terminal_transition_on_new_JAR": "browser-jar05-grid-terminal01:236PASS",
+        "state": "PASS_CURRENT_JAR05",
+        "proof": "grid54-current-proof.json",
+        "job200_milliseconds": 93598,
+        "SQL1000_unique_and_old800_immutable": true,
+        "local_draft_preserved_without_automatic_POST": true
+      },
+      "jobs200_current_phases": {
+        "fresh_default500": "browser-jar04-job200-control01:200/200 in109.454669s",
+        "cancel_reprocess_chunk10": "browser-jar04-job200-cancel01:20+180=200unique",
+        "physical_upper_bounds_seconds": [
+          61.29658985,
+          79.22524595
+        ],
+        "old600_facts_and_prefix_preserved": true,
+        "old_startup_recovery120s": "FAIL_PRESERVED",
+        "not_global_acceptance": true
+      },
+      "civil_dates57": {
+        "rule": "Administrative civil defaults in America/Sao_Paulo; fullInstant displays unchanged",
+        "focused_pass": [
+          "fe-period57-green01:48",
+          "fe-period57-consumers-green02:35",
+          "fe-period57-panel-green01:20"
+        ],
+        "limits": "Logical Date control only in unit tests; native Chrome/JAR retests pending, no physical midnight claim",
+        "preserved_failures": [
+          "fe-civil56-red01",
+          "fe-period57-red01",
+          "fe-period57-consumers-red01",
+          "fe-period57-consumers-green01"
+        ]
+      },
+      "future_message55": {
+        "functional_previous_JAR05": "future09-current-proof.json",
+        "source_warning_fix": "fe-future55-msg-green01:26",
+        "new_JAR_retest": "PENDING"
+      },
+      "package06": {
+        "receipt": "jar-frontend-final06",
+        "tests": 22,
+        "classes": 3,
+        "failed": 0,
+        "errors": 0,
+        "skipped": 0,
+        "all_backend_nonstatic_bytes_unchanged": true
+      },
+      "pdf_bundle10": {
+        "state": "CHROME_COLD_IMPORT_A_B_AND_CONTROL14_VERIFIED",
+        "asset_count": 101,
+        "delta_initial_js_bytes_uncompressed": 356524,
+        "graph_red": "pdf-bundle09-static-red.json",
+        "graph_green": "pdf-bundle10-static-green.json",
+        "preserved_dist": "frontend-build10-dist/manifest.json",
+        "not_copied_to_Java": false,
+        "no_global_acceptance": true,
+        "native_current": "browser-jar07-pdf-inline01/result.json"
+      }
+    },
+    "original_drivers_current_jar": {
+      "passed": [
+        {
+          "driver": "lancamento-vinculo-real",
+          "receipts": [
+            {
+              "directory": "browser-jar-lancamento-op03",
+              "result_sha256": "1ab9c39cc8dd0ef6608f5e000a497f61965c52464231cd44afcadc9d6b9eb2f5",
+              "binding_sha256": "888fb464e576c588acb850787ec59e769756d8fea83238a78a9d2d420db0eb6a"
+            },
+            {
+              "directory": "browser-jar-lancamento-gl01",
+              "result_sha256": "f164b06e3985bb55adeb5f122ad32aabe11220a315186b77736a02d743eb4a1d",
+              "binding_sha256": "888fb464e576c588acb850787ec59e769756d8fea83238a78a9d2d420db0eb6a"
+            },
+            {
+              "directory": "browser-jar-lancamento-denied01",
+              "result_sha256": "f64b67f66d5e08808f4541a5d86bd4d329605f5b1852707942ce3c863e2fe60c",
+              "binding_sha256": "888fb464e576c588acb850787ec59e769756d8fea83238a78a9d2d420db0eb6a"
+            }
+          ],
+          "checks": 111
+        },
+        {
+          "driver": "documento-upload-download",
+          "receipts": [
+            {
+              "directory": "browser-jar-documento01",
+              "result_sha256": "ba8ca58897fbf14390fa0412f8c9deea28c5e3559cd3bf0a2d33dbf8b8ddf4a0",
+              "binding_sha256": "028045f8a768e531747bd7d723e431d61849a87a25ece233b010866777d113af"
+            }
+          ],
+          "checks": 4
+        },
+        {
+          "driver": "pos-auditoria-operacional",
+          "receipts": [
+            {
+              "directory": "browser-jar-pos-operacional01",
+              "result_sha256": "9c7ce122597b8669d5f9161d50de190375df8d69428003441c4af1a1b774348e",
+              "binding_sha256": "78104ded587e3445d86a1fee6729ef886e35d077d22ea0e7f4245e470ef45fc2"
+            }
+          ],
+          "checks": 7
+        },
+        {
+          "driver": "visual-dialogos",
+          "receipts": [
+            {
+              "directory": "browser-jar-visual-dialogos01",
+              "result_sha256": "23b8ef96aa5e9de1c09d7094ba74b6bf48952f8d2b7f1bc67a56997b83d9f863",
+              "binding_sha256": "bf12d81eb190bd654c85404b09536ef5a82d833ef0d9a86cb5af58671e511a21"
+            }
+          ],
+          "checks": 4
+        },
+        {
+          "driver": "admin-autorizacao",
+          "receipts": [
+            {
+              "directory": "browser-jar-admin-autorizacao01",
+              "result_sha256": "d99ab6d1a464062b8fe934ee5d57d543436c44ffb0512f8902fa835377bc2ea0",
+              "binding_sha256": "d7df9f2e96b5ab04375c1637a112491fe3c4abd6c4843bc795840a513e07a5d0"
+            }
+          ],
+          "checks": 20
+        },
+        {
+          "driver": "transferencia-governanca",
+          "receipts": [
+            {
+              "directory": "browser-jar-transferencia02",
+              "result_sha256": "4ecd70fd407fa430380fc9dae23f90d76ce0346f4f6d3a7a11db148e594720e0",
+              "binding_sha256": "79c2904d29f329b5febc185290a0499c26ff0b935f90b53191ea294aff050eb9"
+            }
+          ],
+          "checks": 23
+        },
+        {
+          "driver": "correcao-cnpj",
+          "receipts": [
+            {
+              "directory": "browser-jar-cnpj01",
+              "result_sha256": "d9acf8dd9ab129a7f253d90b34cd6ddbe2b41c9c2941fc4eccdb80b0a106a772",
+              "binding_sha256": "19caa1f42e3a302910c56f78172e264c1b78c3220cafd9e7e7ec276ac2209628"
+            }
+          ],
+          "checks": 7
+        },
+        {
+          "driver": "historico-contrato",
+          "receipts": [
+            {
+              "directory": "browser-jar-historico-contrato02",
+              "result_sha256": "ff3a41a262c1188a30c63a68fa8664d2463c2cdd3ef788cdc958235059cc82fd",
+              "binding_sha256": "99ca6f54683e2226b7adfa5e4676d33bdce62136570ee61a2214db46d1ab047d"
+            }
+          ],
+          "checks": 22
+        },
+        {
+          "driver": "historico-nome",
+          "receipts": [
+            {
+              "directory": "browser-jar-historico-nome01",
+              "result_sha256": "021e9d3c976ff94fe21cea7c6ec82b34d3ab5777bb529aac55f0375c372f3477",
+              "binding_sha256": "3cb4c2b7b7c37c145415791306d8afb98cf8163d8287c87975c07dc82012da38"
+            }
+          ],
+          "checks": 7
+        },
+        {
+          "driver": "historico-catalogo",
+          "receipts": [
+            {
+              "directory": "browser-jar-historico-catalogo01",
+              "result_sha256": "d4c3a5211ea75bfbe709630baf60edc25363b58c98c229565997635f1b51cded",
+              "binding_sha256": "56bd3f3486135cc86c52b9c98030fa489971ae8d49f4f55ef2a491746e956491"
+            }
+          ],
+          "checks": 6
+        },
+        {
+          "driver": "seguranca-concorrencia",
+          "receipts": [
+            {
+              "directory": "browser-jar-seguranca01",
+              "result_sha256": "aa8a5a70d8af1ee4afe9b2d4e66917fd6b32f25f775627f7d6fdaf53343555ff",
+              "binding_sha256": "ef7902215708f881c21a154c953dbd3a0fcb014586195de8c8d332a3c46c598f"
+            }
+          ],
+          "checks": 15
+        },
+        {
+          "driver": "empresas-contratadas",
+          "receipts": [
+            {
+              "directory": "browser-jar-empresas01",
+              "result_sha256": "314ecacca6863151a2011f2fe008c53819baf29b39f00f2fdf0ab610d2357be2",
+              "binding_sha256": "3cf8a4574b63ae6a46d4b3677aeb458cab0de0ecf1a048262a187d8a75579d6b"
+            }
+          ],
+          "checks": 17
+        },
+        {
+          "driver": "pos-auditoria-sessao-fora-ordem",
+          "receipts": [
+            {
+              "directory": "browser-jar-sessao-atrasada02",
+              "result_sha256": "4408c897b67cc6987c7dea1bd371d077b5ff421c58a21d10e61e4637470d8cdf",
+              "binding_sha256": "80abe5a04b9fd4e2d4eeb43a53fa576c5cadf41d80ba5856fb73e32d1bfdd1b5"
+            }
+          ],
+          "checks": 12
+        },
+        {
+          "driver": "paginacao-contrato-real",
+          "receipts": [
+            {
+              "directory": "browser-jar-paginacao01",
+              "result_sha256": "cdf4f42840f8198a1d545a327c5af4b9664f66bb2b61fa063e49d1ba817a178b",
+              "binding_sha256": "5a10a1db3f2bef00c525f1b656357fe8d0bd3bc9669104dc5524839148c38fc7"
+            }
+          ],
+          "checks": 5
+        },
+        {
+          "driver": "frequencias-relatorios",
+          "receipts": [
+            {
+              "directory": "browser-jar-relatorios01",
+              "result_sha256": "3baaf49b3e9a06e1acba22d15bd000379ce682ab1018b9b6abd5ee19f189522f",
+              "binding_sha256": "5f3fe63572e770306f99c36214e5b2a708a4a2aa30a634af0bc9cf5b133dc74c"
+            }
+          ],
+          "checks": 40
+        }
+      ],
+      "passed_count": 15,
+      "total_required": 20,
+      "previous_stage_positive": [
+        "contrato-publicacao",
+        "pessoa-vinculo"
+      ],
+      "previous_stage_jar_sha256": "f92ad7dc2695b897a3f138a4949abc2aeb95ef02ab7f59fdc70f8d5c376aa904",
+      "current_canonical_frequency_full_driver": "PASS_111_CHECKS_OP_GL_DENIED_WITH_READONLY_DB_RECONCILIATION",
+      "auxiliary_scope35_not_full_driver_approval": true
+    },
+    "criteria24": [
+      {
+        "id": "E2E-01",
+        "state": "EXECUTED_PASS_CURRENT_SCOPE_PENDING_FINAL_INDEPENDENT_REVIEW",
+        "no_approval_inferred_from_driver_count": true,
+        "db_proof": "db-browser-domain02/db-file-proof.json"
+      },
+      {
+        "id": "E2E-02",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-03",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-04",
+        "state": "EXECUTED_PASS_CURRENT_SCOPE_PENDING_FINAL_INDEPENDENT_REVIEW",
+        "no_approval_inferred_from_driver_count": true,
+        "db_proof": "db-browser-domain02/db-file-proof.json"
+      },
+      {
+        "id": "E2E-05",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-06",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-07",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-08",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-09",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-10",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-11",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-12",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-13",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-14",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-15",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-16",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-17",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-18",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-19",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-20",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-21",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-22",
+        "state": "EXECUTED_PASS_CURRENT_SCOPE_PENDING_FINAL_INDEPENDENT_REVIEW",
+        "no_approval_inferred_from_driver_count": true,
+        "db_proof": "db-browser-domain02/db-file-proof.json"
+      },
+      {
+        "id": "E2E-23",
+        "state": "PENDING",
+        "no_approval_inferred_from_driver_count": true
+      },
+      {
+        "id": "E2E-24",
+        "state": "PARTIAL",
+        "no_approval_inferred_from_driver_count": true
+      }
+    ],
+    "checkpoint_erratum": "jar-frontend-final01/checkpoint-metadata-erratum.json: post-call overwrote original metadata JSON; immutable pre-sourceZIP and previousJAR intact; no claim originalJSON preserved; duplicate guard now rejects before mutation.",
+    "resource_limits": {
+      "human_cap_bytes": 15000000000,
+      "preventive_aggregate_bytes": 11000000000,
+      "browser_own_preventive_bytes": 750000000,
+      "sequential": true,
+      "checkpoint_before_heavy": true
+    },
+    "network": {
+      "current_http": null,
+      "physical_other_pc_test": "PENDING; loopback or server ownLAN-IP never counts as external proof",
+      "previous_owned_http": "http://127.0.0.1:5000"
+    },
+    "no_global_acceptance": true,
+    "no_sonar_commit_push_deploy": true,
+    "new_bundle": "frontend-build10-dist/manifest.json",
+    "new_bundle_copied_to_Java": true,
+    "legacy_scope_fix": {
+      "main_source": "React/src/modules/auth/context.tsx",
+      "raw_current_Java_pair_confirmed": true,
+      "HMR_checks": 35,
+      "frequency_POST": 0,
+      "readonly_SQL_frequency_rows": 0,
+      "no_fixture_or_privilege_changes": true,
+      "native_review3": "APPROVED_SOL_XHIGH",
+      "existing_jar_frontend": "Current dist04 embedded and HTTP-bound in final02"
+    },
+    "integrated_observed_limits": [
+      "Documento original2 continuaRASCUNHO; nova fonte8 vinculada ao aditamento foi publicada e retificada para9/v2/JPA1. Primeirorecibo=replay=GET=SQL1;3563bytes/SHAconferidos",
+      "Relatórios40checks entregaramPDF/XLSX e2emissões, porém não são o cenário41registros/2páginas",
+      "Fontes/CNPJ/catálogo reais, concessão administrativa6 e2usos auditados reconciliados porSELECT",
+      "Prorrogação real criou a6ªfotografia, validando paginação5+1; não comprova redução25%/26%",
+      "Semântica de CSS legado e ações de rascunho documental em investigação; não declarar acabamento/homologação global"
+    ],
+    "integrated_stage_proof": {
+      "receipt": "integrated-campaign-stage49.json",
+      "sha256": "796301a1b43b316ee1371019ce357242636a2dd221731f488c8f8e1454aaaa64"
+    },
+    "open_UI_findings": {
+      "state": "FIXED_FOCAL_GREEN_PENDING_NATIVE4_AND_FINAL_JAR_GREEN",
+      "browser_RED": "browser-jar-doc-ui-red01",
+      "browser_HMR_GREEN": "browser-hmr-doc-ui-green01"
+    },
+    "frontend_source_current_gate": {
+      "state": "NATIVE9_APPROVED_FOR_TECHNICAL_INTEGRATION",
+      "review_directory": "review-frontend-current59-09",
+      "effective_runtime": "gpt-6.1-sol/xhigh",
+      "Java_and_React_src_unchanged": true
+    },
+    "physical_current_JAR": {
+      "binding": "frontend-final07-jar-binding.json",
+      "sha256": "7ae557a625ea9f35fd2db4644dc3f43d6ba568bdd6e1ed55caa2d4ccb701ac84",
+      "dist": "10",
+      "backend_nonstatic_bytes_match_gate18": true
+    },
+    "old_assets_preserved": true,
+    "original20_current_JAR_complete": false,
+    "criteria24_complete": false,
+    "full_restart_pending": true,
+    "other_physical_client_LAN_pending": true
+  },
+  "all_prior_evidence_retains_its_own_artifact_sha": true,
+  "no_global_acceptance": true,
+  "integrated_backend25": {
+    "path": ".homologacao/20261109-sgt-final/integrated-backend25-approved.json",
+    "sha256": "b0bb941ec598acf3908009c4c7ccc6194e4b7e24ca46df9641966efa8369376b",
+    "global_acceptance": false
+  },
+  "integrated_backend26": {
+    "gate": ".homologacao/20261109-sgt-final/integrated-backend26-approved.json",
+    "gate_sha256": "fc23c828c7f067061b2dc88e55b925b2faaea737e3f0c93b44edc918dbc89584",
+    "parecer": ".homologacao/20261109-sgt-final/review-integrated64-backend26/parecer.md",
+    "parecer_sha256": "938b0ef073211ebf4e88711edfbd24fe6971461adbd98ca750d57e6af21717e7",
+    "model": "gpt-6.1-sol",
+    "effort": "xhigh"
+  },
+  "functional_laboratory_final_review": {
+    "state": "APPROVED_FUNCTIONAL_INTEGRATED_LABORATORY_CHROME_CHROMIUM_DESKTOP",
+    "review_backend26": {
+      "path": ".homologacao/20261109-sgt-final/integrated-backend26-approved.json",
+      "sha256": "fc23c828c7f067061b2dc88e55b925b2faaea737e3f0c93b44edc918dbc89584"
+    },
+    "review_frontend12": {
+      "path": ".homologacao/20261109-sgt-final/integrated-frontend12-approved.json",
+      "sha256": "d13ae36e6d348c285d75a061a9cea6175570e9647d639543b7c08c7502ac5aca",
+      "parecer_sha256": "0b45efcb4d141febab4cd2ea2d0a3324eefdaeffcee76b9f982f49c13311dda8",
+      "runtime_model": "gpt-6.1-sol",
+      "runtime_effort": "xhigh"
+    },
+    "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+    "remaining_obligations_in_examined_scope": 0,
+    "findings_P0_to_P3": 0,
+    "not_collective_acceptance_of_every_matrix_item": true,
+    "all_prior_receipts_keep_their_own_artifact_and_layer": true,
+    "limits": [
+      "Synthetic functional laboratory and reconciled predicates only.",
+      "Reuse retains artifact, byte and layer limits of each original proof.",
+      "No production, corpus migration, national-scale, institutional authenticity or integral PDF/UA approval."
+    ]
+  },
+  "no_global_acceptance_meaning": "No unqualified production/national-scale/institutional or collective acceptance; functional laboratory scope approved by backend26/frontend12.",
+  "current_ledger": {
+    "path": "DOCUMENTACAO/CODEX/CAMPANHA_20261109/EVIDENCIAS_POR_ACEITE.json",
+    "sha256": "a0db3ff87ed7f9c02bf3112148de21b69ee314367600557ea2c361befa4d3151",
+    "individual_accepted_rows": 10,
+    "unique_ids": 820
+  },
+  "current_matrix": {
+    "path": "DOCUMENTACAO/CODEX/CAMPANHA_20261109/MATRIZ_ACEITE.json",
+    "sha256": "2aeeed639f57edf732bd93e0f223ff2a56058facd32b1e27b37c21ea11a8f0cd"
+  }
+}

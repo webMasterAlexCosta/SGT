@@ -69,7 +69,8 @@ class OcorrenciaEscopoAposPerdaCoberturaHttpIT extends ContratosHttpBase {
         long id = ocorrencia.path("id").asLong(), anexo = ocorrencia.path("anexos").get(0).path("id").asLong();
         String hash = emTransacao(() -> em.find(AnexoOcorrencia.class, anexo).getSha256());
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.minusDays(1), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Responsabilidade retroativa documentada", "referenciaSei", "SEI-ESCOPO-FONTE",

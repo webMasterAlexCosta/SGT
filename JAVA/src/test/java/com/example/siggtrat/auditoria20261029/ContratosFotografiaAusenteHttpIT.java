@@ -53,7 +53,7 @@ class ContratosFotografiaAusenteHttpIT extends ContratosHttpBase {
         if (aditamento) {
             // Ausência na foto do item quantitativo não apaga a foto da origem.
             // O cenário adicional torna ambas as origens desconhecidas por DML
-            // sintético; releitura após clear comprova a preparação no MySQL.
+            // sintético; releitura após clear comprova a preparação no PostgreSQL.
             var itemPersistido = em.createQuery("select i from AditamentoComposicao i where i.aditamento.id=:id",
                             AditamentoComposicao.class)
                     .setParameter("id", fonteId).getSingleResult();
@@ -218,7 +218,8 @@ class ContratosFotografiaAusenteHttpIT extends ContratosHttpBase {
 
     private long transferir(Cenario c, NovoContrato n, LocalDate data) throws Exception {
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        Map<String, Object> req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        Map<String, Object> req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência documentada para prova das fotografias", "referenciaSei", "SEI-FOTO-" + n.id(),
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(mapa("composicaoOrigemId", n.composicao1(),

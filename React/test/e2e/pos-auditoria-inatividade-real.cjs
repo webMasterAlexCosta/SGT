@@ -1,6 +1,11 @@
 // Java real com configuração EXTERNA JWT_MAX_INACTIVITY_MINUTES=1.
 // Nenhuma alteração de relógio, token ou linha persistida é usada neste teste.
 const { execute } = require('./ambiente-real.cjs');
+const fs = require('node:fs');
+const path = require('node:path');
+const template = fs.readFileSync(path.resolve(__dirname, '../../.env.example'), 'utf8');
+const idleTemplate = /^VITE_INACTIVITY_TIMEOUT_MS=(\d+)$/m.exec(template);
+if (!idleTemplate || Number(idleTemplate[1]) <= 60000) throw new Error('O template público deve manter o prazo do navegador acima do ensaio físico de1minuto.');
 execute('pos-auditoria-inatividade-real', async ({ page, account, report, check, open, screenshot }) => {
   if (process.env.SGT_IDLE_TIMEOUT_MINUTES !== '1') throw new Error('Configure externamente o JAR para 1 minuto e declare SGT_IDLE_TIMEOUT_MINUTES=1.');
   let loginAt, resolveIdle, rejectIdle;
@@ -29,16 +34,21 @@ execute('pos-auditoria-inatividade-real', async ({ page, account, report, check,
     // permite observar a PRIMEIRA expiração na consulta real de sessão (401),
     // em vez de consumir o token na rota pública e observar SESSION_REPLACED.
     await page.route(sessionPattern, holdBackground);
-    report.conditions = { externalJavaIdleMinutes: 1, browserIdleMinutes: 15, realClock: true, tokenOrDatabaseModified: false, synthetic: true, publicLatencyRequestsHeld: true, sessionPollingUnmodified: true };
+    report.conditions = { externalJavaIdleMinutes: 1, browserIdleMinutes: Number(idleTemplate[1]) / 60000, browserConfigurationSource: 'public .env.example bound to the official build receipt', realClock: true, tokenOrDatabaseModified: false, synthetic: true, publicLatencyRequestsHeld: true, sessionPollingUnmodified: true };
     const first = await idle;
     report.firstIdleResponse = first;
     report.heldBackgroundRequests = held.length;
     check('Primeira resposta pertinente contém HTTP401 e o código autoritativo do Java', first.status === 401 && first.code === 'SESSION_IDLE_TIMEOUT' && first.path === '/api/autenticacao/sessao');
     check('O prazo decorreu sem acelerar relógios nem alterar persistência', first.millisecondsAfterLogin >= 60000);
     await page.getByRole('button', { name: /Entrar no Sistema/i }).waitFor({ timeout: 5000 });
+    const loginSurfaceVisibleAt = Date.now();
     report.localInvalidationMilliseconds = Date.now() - first.receivedAt;
     check('A primeira resposta de inatividade encerra a interface protegida', await page.getByRole('button', { name: 'Sair', exact: true }).count() === 0 && await page.getByRole('button', { name: 'Frequência diária', exact: true }).count() === 0);
     check('A identificação anterior foi retirada da tela', !(await page.locator('body').innerText()).includes(account.username));
+    // O Login publica o motivo após seu atraso explícito de montagem (150ms).
+    // Esperar o aviso real preserva o aceite, sem alterar relógio ou resposta.
+    await page.getByText(/inatividade/i).first().waitFor({ state: 'visible', timeout: 5000 });
+    report.noticeMillisecondsAfterLoginVisible = Date.now() - loginSurfaceVisibleAt;
     check('A indicação de inatividade permanece acessível', /inatividade/i.test(await page.locator('body').innerText()));
     report.screenshot = await screenshot('primeira-resposta-encerrou-interface');
     report.idleResponseCountBeforeNewLogin = idleResponses.length;

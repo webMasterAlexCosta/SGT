@@ -22,7 +22,11 @@ import java.time.LocalDate;
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_PRESIDENTE, " +
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_ESTADUAL, " +
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_LOCAL)")
-public class RelatorioAdministrativoControlador {
+public class RelatorioAdministrativoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioAdministrativoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final RelatorioAdministrativoServico servico;
 
     public RelatorioAdministrativoControlador(RelatorioAdministrativoServico servico) {

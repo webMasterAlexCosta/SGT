@@ -1,13 +1,15 @@
 package com.example.siggtrat.servico;
 
+import com.example.siggtrat.regra.MaterialHashEventos;
+import static com.example.siggtrat.regra.MaterialHashEventos.*;
+
+
 import com.example.siggtrat.dominio.alocacao.*;
 import com.example.siggtrat.dto.PosicaoAlocacaoTemporalDTO;
 import com.example.siggtrat.entidade.*;
-import com.example.siggtrat.regra.AssinaturaPreviaNegocial;
 import com.example.siggtrat.repositorio.AlocacaoVinculoRepositorio;
 import com.example.siggtrat.repositorio.EventoAlocacaoVinculoRepositorio;
 import com.example.siggtrat.utilitario.RelogioSistema;
-import com.example.siggtrat.utilitario.UtilitarioHashSeguranca;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -23,7 +25,11 @@ import java.util.*;
  */
 @Service
 @Transactional(readOnly = true)
-public class MotorTemporalAlocacaoServico {
+public class MotorTemporalAlocacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(MotorTemporalAlocacaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public record FaixaProjetada(
             Long id,
             Long composicaoBaseId,
@@ -293,26 +299,24 @@ public class MotorTemporalAlocacaoServico {
     private String hashEsperado(EventoAlocacaoVinculo e) {
         if (e.getTipoEvento() == null || e.getDataEfetiva() == null) return null;
         // IDs e valores fotografados são os mesmos usados pelo gerador; não usar a projeção atual.
-        String fotoAnterior = e.getAlocacaoAnteriorId() == null ? "" : textoHashFotografia(anterior(e));
-        String fotoNova = e.getAlocacaoNova() == null ? "" : textoHashFotografia(nova(e));
-        String hash = UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|",
-                AssinaturaPreviaNegocial.valor(e.getHashAnterior()), e.getTipoEvento().name(),
-                AssinaturaPreviaNegocial.valor(e.getDataEfetiva()), fotoAnterior, fotoNova,
-                AssinaturaPreviaNegocial.valor(e.getResponsavelId()), AssinaturaPreviaNegocial.valor(e.getJustificativa()),
-                AssinaturaPreviaNegocial.valor(e.getTransferenciaGestaoId())));
+        MaterialHashEventos.Campo fotoAnterior = e.getAlocacaoAnteriorId() == null
+                ? grupo((MaterialHashEventos.Campo[]) null) : fotografiaHash(anterior(e));
+        MaterialHashEventos.Campo fotoNova = e.getAlocacaoNova() == null
+                ? grupo((MaterialHashEventos.Campo[]) null) : fotografiaHash(nova(e));
+        String hash = MaterialHashEventos.sha256("sgt.evento-alocacao.base",
+                texto(e.getHashAnterior()), enumeracao(e.getTipoEvento()), data(e.getDataEfetiva()),
+                fotoAnterior, fotoNova, longo(e.getResponsavelId()), texto(e.getJustificativa()), longo(e.getTransferenciaGestaoId()));
         if (e.isInclusaoExcedente()) {
-            hash = UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|", hash, "EXCEDENTE",
-                    String.valueOf(e.getEfetivoPrevistoExcedente()), String.valueOf(e.getOcupacaoAposInclusaoExcedente()),
-                    AssinaturaPreviaNegocial.valor(e.getEvidencia()), AssinaturaPreviaNegocial.valor(e.getAutorizacao())));
+            hash = MaterialHashEventos.sha256("sgt.evento-alocacao.excedente", texto(hash), texto("EXCEDENTE"),
+                    inteiro(e.getEfetivoPrevistoExcedente()), longo(e.getOcupacaoAposInclusaoExcedente()),
+                    texto(e.getEvidencia()), texto(e.getAutorizacao()));
         }
         return hash;
     }
 
-    private String textoHashFotografia(FaixaProjetada f) {
-        return String.join(":", AssinaturaPreviaNegocial.valor(f.id()), AssinaturaPreviaNegocial.valor(f.composicaoBaseId()),
-                AssinaturaPreviaNegocial.valor(f.lotacaoId()), AssinaturaPreviaNegocial.valor(f.jornadaId()),
-                AssinaturaPreviaNegocial.valor(f.cargoId()), AssinaturaPreviaNegocial.valor(f.dataInicio()),
-                AssinaturaPreviaNegocial.valor(f.dataFim()), AssinaturaPreviaNegocial.valor(f.estado()));
+    private MaterialHashEventos.Campo fotografiaHash(FaixaProjetada f) {
+        return grupo(longo(f.id()), longo(f.composicaoBaseId()), longo(f.lotacaoId()), longo(f.jornadaId()),
+                longo(f.cargoId()), data(f.dataInicio()), data(f.dataFim()), enumeracao(f.estado()));
     }
 
     private PosicaoAlocacaoTemporalDTO semFaixa(VinculoContratual vinculo, LocalDate data, Instant conhecimento,

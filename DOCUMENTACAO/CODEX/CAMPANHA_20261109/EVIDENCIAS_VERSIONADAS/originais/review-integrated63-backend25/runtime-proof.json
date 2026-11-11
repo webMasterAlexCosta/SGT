@@ -1,0 +1,8 @@
+{
+  "thread_id": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+  "turn_id": "01a1c864-cbf4-7143-8615-e37597e47524",
+  "actual_turn_context_model": "gpt-6.1-sol",
+  "actual_turn_context_effort": "xhigh",
+  "source": "/home/alexcosta/.codex/sessions/2026/11/09/rollout-2026-11-09T09-54-40-01a1c060-0523-74b1-8c83-caaba280f2a0.jsonl",
+  "verified_actual_turn_not_saved_configuration": true
+}

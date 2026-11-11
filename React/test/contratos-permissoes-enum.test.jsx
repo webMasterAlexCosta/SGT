@@ -4,11 +4,11 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: r => Array.isArray(r) ? r : [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'ADMINISTRADOR' } }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { TIPOS_PERMISSAO_EXCEPCIONAL } from '../src/services/admin/ServicoPermissaoExcepcional.js';
-import { PaginaPermissoesExcepcionais } from '../src/modules/admin/pages/PaginaPermissoesExcepcionais/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: r => Array.isArray(r) ? r : [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'ADMINISTRADOR' } }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { TIPOS_PERMISSAO_EXCEPCIONAL } from '../src/services/admin/ServicoPermissaoExcepcional.ts';
+import { PaginaPermissoesExcepcionais } from '../src/modules/admin/pages/PaginaPermissoesExcepcionais/index.tsx';
 
 // Oráculo literal do Java congelado: dominio/acesso/TipoPermissaoExcepcional.java.
 const TIPOS_JAVA = [

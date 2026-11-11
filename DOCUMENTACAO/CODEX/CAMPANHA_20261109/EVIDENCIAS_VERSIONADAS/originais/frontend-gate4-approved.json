@@ -1,0 +1,13 @@
+{
+  "state": "NATIVE_FRONTEND4_SOL_APPROVED_FOR_TECHNICAL_INTEGRATION",
+  "review_directory": "review-frontend-current52-04",
+  "thread_id": "01a1c50d-6d2d-74e3-910d-86635b797156",
+  "turn_id": "01a1c653-d3cc-78f0-9dc4-698bfc785a03",
+  "cursor": "17a84ccf-2a21-40e4-a2d9-d62093b24fb8:28",
+  "runtime_model": "gpt-6.1-sol",
+  "runtime_effort": "xhigh",
+  "parecer_sha256": "bec44e92198f59bb78bc85b0eba8239cb8b24722b836ebc54defff210d3d26b7",
+  "freeze_sha256": "7f0e6f8a98fc8f1d394d80000febb376f02cefe75147f6877c24b8b5dc690c2c",
+  "no_p0_p3_findings": true,
+  "no_global_acceptance": true
+}

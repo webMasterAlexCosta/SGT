@@ -1,0 +1,11 @@
+{
+  "turn_contexts": [
+    {
+      "turn_id": "01a1c68b-bd9c-7fb1-9884-7c1182b1b59b",
+      "model": "gpt-6.1-sol",
+      "effort": "xhigh"
+    }
+  ],
+  "native_chat": "01a1c50d-6d2d-74e3-910d-86635b797156",
+  "configuration_not_used_as_runtime_proof": true
+}

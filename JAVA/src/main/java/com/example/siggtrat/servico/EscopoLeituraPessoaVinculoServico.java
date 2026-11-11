@@ -21,7 +21,11 @@ import java.util.*;
 /** A consulta operacional acompanha as faixas canônicas autorizadas, inclusive históricas. */
 @Service
 @Transactional(readOnly=true)
-public class EscopoLeituraPessoaVinculoServico {
+public class EscopoLeituraPessoaVinculoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(EscopoLeituraPessoaVinculoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final AcessoOrganizacionalServico acesso;
     private final EscopoAcessoUsuarioServico escopos;
     private final AlocacaoVinculoRepositorio alocacoes;

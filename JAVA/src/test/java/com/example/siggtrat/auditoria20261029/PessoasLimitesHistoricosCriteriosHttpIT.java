@@ -192,7 +192,8 @@ class PessoasLimitesHistoricosCriteriosHttpIT extends ContratosHttpBase {
         long vinculo = cadastrar(f, 0, hoje.minusDays(20));
         terminar(f, vinculo, fimAnterior);
         conceder(f.c(), f.contrato().id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa(
+        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", transferencia, "dataAto", hoje, "gestaoLocalDestinoId", f.c().gestaoB.getId(),
                 "tipoContratacaoDestinoId", f.c().tipoB.getId(), "motivo", "Transferência documentada posterior ao fim",
                 "referenciaSei", "SEI-MAPA-ULTIMO-DIA", "autorizacaoAdministrativa", "ATO-HTTP",

@@ -16,7 +16,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/lotacoes")
-public class LotacaoControlador {
+public class LotacaoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(LotacaoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final LotacaoServico lotacaoServico;
 
@@ -38,7 +42,8 @@ public class LotacaoControlador {
     public ResponseEntity<LotacaoDTO> buscarPorId(@PathVariable Long id) {
         return lotacaoServico.buscar(id)
                 .map(ResponseEntity::ok)
-                .orElseGet(() -> ResponseEntity.notFound().build());
+                .orElseThrow(() -> new org.springframework.web.server.ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "Lotação não encontrada no seu escopo."));
     }
 
     @PostMapping

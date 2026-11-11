@@ -9,7 +9,7 @@ import java.util.Objects;
 
 /** Seleção de data somente para a jornada recém-criada da fixture sintética. */
 final class DataJornadaSintetica {
-    private static final PoliticaTemporalFrequenciaServico POLITICA = new PoliticaTemporalFrequenciaServico();
+    private static final PoliticaTemporalFrequenciaServico POLITICA = new PoliticaTemporalFrequenciaServico(7);
 
     private DataJornadaSintetica() {}
 

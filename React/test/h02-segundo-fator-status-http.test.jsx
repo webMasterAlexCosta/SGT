@@ -4,11 +4,11 @@ import { AxiosError } from 'axios';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-import { GerenciadorSegundoFator } from '../src/modules/perfil/components/GerenciadorSegundoFator/index.jsx';
-import { api } from '../src/core/http.js';
-import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import * as eventos from '../src/core/events.js';
+import { GerenciadorSegundoFator } from '../src/modules/perfil/components/GerenciadorSegundoFator/index.tsx';
+import { api } from '../src/core/http.ts';
+import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import * as eventos from '../src/core/events.ts';
 
 // Serviço, interceptores, normalização e notificações HTTP reais. Apenas o adapter
 // devolve respostas sintéticas: o teste precisa observar o efeito de silentError.

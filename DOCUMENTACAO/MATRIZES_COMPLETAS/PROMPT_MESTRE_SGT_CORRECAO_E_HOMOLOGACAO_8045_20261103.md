@@ -1,5 +1,7 @@
 # PROMPT MESTRE — CORREÇÃO EFETIVA, REGRESSÃO E HOMOLOGAÇÃO INDEPENDENTE INTEGRAL DO SGT
 
+> **Reconciliação vigente de09/11/2026:** este documento preserva os textos/resultados do corte histórico. A [decisão humana vigente](../../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) substitui sete dias fixos por N configurável, padrão30, limite exclusivo D+N; preserva as outras permissões, IDs e namespaces. MySQL/recibos antigos não aprovam PostgreSQL ou os bytes atuais. Governança de Terceiros permanece removida; Sonar está fora desta missão. Consulte o [plano atual](../CODEX/CAMPANHA_20261109/PLANO.md) para gates/evidências atuais.
+
 **Projeto:** SGT — Sistema de Gestão Contratual e Operacional de Trabalhadores Terceirizados  
 **Baseline comprovada:** C25-H02, build04, reprovada para aceite integral  
 **Continuação de trabalho:** checkpoint H03 avulso, NÃO homologado  

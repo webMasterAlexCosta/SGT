@@ -32,7 +32,8 @@ class ProvaHistoricaConfiguracaoAlocacaoHttpIT extends ContratosHttpBase {
         });
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
         var data = RelogioSistema.hoje().minusDays(2);
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa("dataEfetiva", data,
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data,
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Transferência com mapa documental sintético",
                 "referenciaSei", "SEI-TRANSFERENCIA-MAPA", "autorizacaoAdministrativa", "ATO-HTTP",

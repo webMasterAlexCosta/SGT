@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { descricaoDisponibilidade } from '../src/core/catalogos/catalogoTemporal.js';
-import { serializarLocalDate, serializarYearMonth } from '../src/core/http/datasHttp.js';
+import { descricaoDisponibilidade } from '../src/core/catalogos/catalogoTemporal.ts';
+import { serializarLocalDate, serializarYearMonth } from '../src/core/http/datasHttp.ts';
 
 describe('datas válidas no contrato Java', () => {
   it('rejeita um dia que não existe em fevereiro antes de enviar ao servidor', () => {

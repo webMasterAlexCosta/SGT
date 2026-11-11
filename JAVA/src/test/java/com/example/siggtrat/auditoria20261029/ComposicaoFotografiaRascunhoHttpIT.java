@@ -40,7 +40,7 @@ class ComposicaoFotografiaRascunhoHttpIT extends ContratosHttpBase {
         em.clear();
 
         var fotografia = consultar(c.localA, base(id) + "/composicoes?data=" + inicio,
-                "HIS-006/CAT-004 fotografia publicada após nova leitura do MySQL");
+                "HIS-006/CAT-004 fotografia publicada após nova leitura do PostgreSQL");
         assertThat(fotografia).hasSize(1);
         assertThat(fotografia.get(0).path("cargoId").asLong()).isEqualTo(cargoBId);
         assertThat(fotografia.get(0).path("cargoNome").asText())

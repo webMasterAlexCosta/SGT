@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * FRE-002/003/013/014: Spring MVC, autenticação, autorização, política e persistência
- * reais, com MySQL 8.0.45. Somente a leitura do relógio ZonedDateTime.now(zona) é
+ * reais, com PostgreSQL 18.6. Somente a leitura do relógio ZonedDateTime.now(zona) é
  * controlada para atingir a fronteira exata sem modificar política ou banco.
  * MockMvc não substitui o gate separado de transporte TCP/navegador do JAR.
  */
@@ -47,8 +47,8 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
     @BeforeEach
     void confirmarMySqlESchemaGeridoPeloHibernate() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -203,7 +203,7 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
 
     private void registrar(String nome, Map<String, Object> evidencia) throws Exception {
         evidencia.put("observadoEmReal", Instant.now());
-        evidencia.put("transporte", "Spring MockMvc; cadeia real de aplicação e MySQL, sem TCP");
+        evidencia.put("transporte", "Spring MockMvc; cadeia real de aplicação e PostgreSQL, sem TCP");
         evidencia.put("controleRelogio", "Somente ZonedDateTime.now(America/Sao_Paulo), CALLS_REAL_METHODS");
         Path path = Path.of("target/auditoria-http/frequencia-sete-dias-" + nome + ".json");
         Files.createDirectories(path.getParent());

@@ -8,7 +8,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.w3c.dom.Element;
@@ -153,7 +153,7 @@ class RelatorioNomeLegadoDesconhecidoHttpIT extends ContratosHttpBase {
         });
     }
 
-    private MockHttpServletRequestBuilder parametros(MockHttpServletRequestBuilder r, String tipo, Cenario c) {
+    private AbstractMockHttpServletRequestBuilder<?> parametros(AbstractMockHttpServletRequestBuilder<?> r, String tipo, Cenario c) {
         if (tipo.equals("frequencia-consolidada")) {
             return r.param("inicio", DATA.toString()).param("fim", DATA.toString())
                     .param("contratoIds", c.contratoA.getId().toString());

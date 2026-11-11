@@ -4,14 +4,15 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar, notificar, iniciarExportacao } = vi.hoisted(() => ({ requisitar: vi.fn(), notificar: vi.fn(), iniciarExportacao: vi.fn() }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-vi.mock('../src/core/events.js', () => ({ notificar }));
-vi.mock('../src/core/exportacao/context.jsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao }) }));
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+vi.mock('../src/core/events.ts', () => ({ notificar }));
+vi.mock('../src/core/exportacao/context.tsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao }) }));
 vi.mock('recharts', () => Object.fromEntries(['PieChart', 'Pie', 'Cell', 'BarChart', 'Bar', 'XAxis', 'YAxis', 'CartesianGrid', 'Tooltip', 'Legend', 'ResponsiveContainer', 'LabelList'].map(name => [name, () => null])));
 
-import { PaginaRelatorioFrequencia } from '../src/modules/rh/pages/PaginaRelatorioFrequencia/index.jsx';
-import { PaginaRelatorioAbsenteismo } from '../src/modules/rh/pages/PaginaRelatorioAbsenteismo/index.jsx';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
+import { PaginaRelatorioFrequencia } from '../src/modules/rh/pages/PaginaRelatorioFrequencia/index.tsx';
+import { PaginaRelatorioAbsenteismo } from '../src/modules/rh/pages/PaginaRelatorioAbsenteismo/index.tsx';
+import { validarFiltrosAbsenteismo } from '../src/services/rh/ServicoAbsenteismo.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
 
 const adiar = () => { let resolve, reject; const promise = new Promise((ok, falha) => { resolve = ok; reject = falha; }); return { promise, resolve, reject }; };
 const filtros = {
@@ -31,6 +32,33 @@ const botaoGerar = (tipo) => screen.getByRole('button', { name: tipo === 'freque
 const botaoExcel = () => screen.getByRole('button', { name: /Planilha.*XLSX|Excel/i });
 const mudarLotacao = () => fireEvent.change(screen.getByLabelText('Lotação', { exact: true }), { target: { value: '7' } });
 let carregarPagina, carregarResumo, carregarFiltros;
+
+describe('Competência administrativa nos limites de mês e ano', () => {
+  it.each([
+    ['2024-03-01T01:30:00Z', 2024, 2, '2024-02-01', '2024-02-29'],
+    ['2026-01-01T01:30:00Z', 2025, 12, '2025-12-01', '2025-12-31'],
+  ])('abre os filtros civis em São Paulo para %s', async (instante, ano, mes, inicio, fim) => {
+    vi.setSystemTime(new Date(instante));
+    const frequencia = await abrir('frequencia');
+    expect(screen.getByLabelText('Início', { exact: true })).toHaveValue(inicio);
+    expect(screen.getByLabelText('Fim', { exact: true })).toHaveValue(fim);
+    frequencia.unmount();
+    await abrir('absenteismo');
+    expect(screen.getByLabelText('Ano da competência')).toHaveValue(ano);
+    expect(screen.getByLabelText('Mês da competência')).toHaveValue(String(mes));
+  });
+
+  it.each([
+    ['2024-03-01T01:30:00Z', 2024, 3, false],
+    ['2024-03-01T03:30:00Z', 2024, 3, true],
+    ['2026-01-01T01:30:00Z', 2026, 1, false],
+    ['2026-01-01T03:30:00Z', 2026, 1, true],
+  ])('valida a competência %s com a mesma referência administrativa', (instante, ano, mes, valido) => {
+    const resultado = validarFiltrosAbsenteismo({ ano, mes, referencia: new Date(instante) });
+    expect(resultado.valido).toBe(valido);
+    expect(resultado.codigo).toBe(valido ? null : 'COMPETENCIA_FUTURA');
+  });
+});
 
 beforeEach(() => {
   // O cenário precisa mudar o filtro; a data real da execução não pode coincidir com o valor escolhido.

@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { requisitar, requisitarDownload } = vi.hoisted(() => ({ requisitar: vi.fn(), requisitarDownload: vi.fn() }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar, requisitarDownload }));
-import { ServicoRecursoGenerico } from '../src/services/admin/ServicoRecursoGenerico.js';
-import { ServicoOcorrencia } from '../src/services/rh/ServicoOcorrencia.js';
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar, requisitarDownload }));
+import { ServicoRecursoGenerico } from '../src/services/admin/ServicoRecursoGenerico.ts';
+import { ServicoOcorrencia } from '../src/services/rh/ServicoOcorrencia.ts';
 
 beforeEach(() => { requisitar.mockReset(); requisitarDownload.mockReset(); });
 

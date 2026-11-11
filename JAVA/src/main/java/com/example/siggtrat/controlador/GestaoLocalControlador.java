@@ -14,7 +14,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/gestoes-locais")
-public class GestaoLocalControlador {
+public class GestaoLocalControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(GestaoLocalControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final GestaoLocalServico servico;
     public GestaoLocalControlador(GestaoLocalServico servico) { this.servico = servico; }
 

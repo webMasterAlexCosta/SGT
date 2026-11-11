@@ -213,14 +213,14 @@ public class PainelRepositorio {
         MapSqlParameterSource params = parametrosBase(referencia, gestaoLocalId, superintendenciaId)
                 .addValue("inicioAdmissoes", inicio);
         String sql = """
-                SELECT YEAR(e.data_admissao) AS ano,
-                       MONTH(e.data_admissao) AS mes,
+                SELECT EXTRACT(YEAR FROM e.data_admissao) AS ano,
+                       EXTRACT(MONTH FROM e.data_admissao) AS mes,
                        COUNT(*) AS quantidade
                   FROM empregado e
                  WHERE e.data_admissao BETWEEN :inicioAdmissoes AND :referencia
                 """ + scope + """
-                 GROUP BY YEAR(e.data_admissao), MONTH(e.data_admissao)
-                 ORDER BY YEAR(e.data_admissao), MONTH(e.data_admissao)
+                 GROUP BY EXTRACT(YEAR FROM e.data_admissao), EXTRACT(MONTH FROM e.data_admissao)
+                 ORDER BY EXTRACT(YEAR FROM e.data_admissao), EXTRACT(MONTH FROM e.data_admissao)
                 """;
         return namedJdbcTemplate.query(sql, params, (rs, rowNum) -> new PainelGestaoDTO.AdmissaoMensal(
                 LocalDate.of(rs.getInt("ano"), rs.getInt("mes"), 1),
@@ -552,9 +552,9 @@ public class PainelRepositorio {
                 .addValue("inicio", inicio)
                 .addValue("fim", fim);
         // O rótulo textual do dia é calculado em Java. Mantê-lo como CASE no SELECT,
-        // agrupando apenas por WEEKDAY, falha quando o MySQL usa ONLY_FULL_GROUP_BY.
+        // a ordem numérica segue segunda=0 até domingo=6, como o contrato existente.
         String sql = """
-                SELECT WEEKDAY(f.data_referencia) AS ordem,
+                SELECT (EXTRACT(ISODOW FROM f.data_referencia) - 1) AS ordem,
                        COALESCE(SUM(CASE WHEN f.status IN ('PRESENCA','PRESENCA_PARCIAL','ATRASO','TR','FALTA','ATESTADO','SUSPENSAO') THEN 1 ELSE 0 END), 0) AS operacionais,
                        COALESCE(SUM(CASE WHEN f.status IN ('FALTA','ATESTADO','SUSPENSAO') THEN 1 ELSE 0 END), 0) AS ausencias
                   FROM frequencia f
@@ -562,8 +562,8 @@ public class PainelRepositorio {
                  WHERE f.validade_operacional = 'VALIDA'
                    AND f.data_referencia BETWEEN :inicio AND :fim
                 """ + scope + """
-                 GROUP BY WEEKDAY(f.data_referencia)
-                 ORDER BY WEEKDAY(f.data_referencia)
+                 GROUP BY (EXTRACT(ISODOW FROM f.data_referencia) - 1)
+                 ORDER BY (EXTRACT(ISODOW FROM f.data_referencia) - 1)
                 """;
         return namedJdbcTemplate.query(sql, params, (rs, rowNum) -> {
             long operacionais = rs.getLong("operacionais");

@@ -1,0 +1,27 @@
+const fs=require('node:fs'),path=require('node:path');
+const {execute}=require('./ambiente-real.cjs');const unwrap=x=>x&&Object.hasOwn(x,'data')?x.data:x;
+execute('pessoas-fuso-civil-real',async({page,fixture,check,report,open,screenshot})=>{
+ const b=JSON.parse(fs.readFileSync(path.join(process.env.SGT_TEST_RUNTIME,'private/e2e-business.json')));
+ check('Vínculo causal existente, sem nova admissão',b.vinculoId>0&&b.pessoaId>0);
+ await open('/pessoas');await page.getByRole('tab',{name:/^Vínculos/}).click();
+ await page.getByPlaceholder('Nome, CPF ou matrícula',{exact:true}).fill(fixture.pending_vinculo_request.pessoa.cpf);
+ await page.getByRole('combobox',{name:'Contrato',exact:true}).selectOption(String(fixture.ids.contrato_rascunho));
+ const pending=page.waitForResponse(r=>new URL(r.url()).pathname==='/api/vinculos-contratuais'&&r.request().method()==='GET');pending.catch(()=>{});
+ await page.getByRole('button',{name:'Aplicar filtros',exact:true}).click();const response=await pending,body=unwrap(await response.json());
+ check('Busca real distingue o vínculo peloID, sem escolher homônimo',response.status()===200&&Array.isArray(body.content)&&body.content.length===1&&body.content[0].id===b.vinculoId&&body.content[0].pessoaId===b.pessoaId);
+ await page.getByRole('button',{name:'Linha do tempo',exact:true}).click();const detail=page.getByRole('dialog',{name:'Vínculo '+b.vinculoId,exact:true});await detail.waitFor();
+ const clocks=await page.evaluate(()=>{const now=new Date(),options={year:'numeric',month:'2-digit',day:'2-digit'};return {instant:now.toISOString(),clientTimezone:Intl.DateTimeFormat().resolvedOptions().timeZone,clientDate:new Intl.DateTimeFormat('en-CA',options).format(now),businessDate:new Intl.DateTimeFormat('en-CA',{...options,timeZone:'America/Sao_Paulo'}).format(now)};});
+ report.nativeClocks=clocks;
+ check('Data padrão do vínculo segue SãoPaulo no relógio nativo',await detail.getByLabel('Data de referência',{exact:true}).inputValue()===clocks.businessDate);
+ const position=page.waitForResponse(r=>new URL(r.url()).pathname===`/api/vinculos-contratuais/pessoas/${b.pessoaId}/posicao`&&r.request().method()==='GET');position.catch(()=>{});
+ await detail.getByRole('button',{name:'Consultar servidor',exact:true}).click();const r=await position,dto=unwrap(await r.json());
+ check('Mesma data civil chega ao Java e é devolvida noDTO',r.status()===200&&new URL(r.url()).searchParams.get('data')===clocks.businessDate&&dto.dataReferencia===clocks.businessDate);
+ await screenshot('vinculo-data-negocial');await detail.getByRole('button',{name:'Abrir linha de alocações',exact:true}).click();
+ const allocations=page.getByRole('dialog',{name:'Alocações temporais · vínculo '+b.vinculoId,exact:true});await allocations.waitFor();
+ check('Consulta de alocações também inicia na data deSãoPaulo',await allocations.getByLabel('Data de referência',{exact:true}).inputValue()===clocks.businessDate);
+ await allocations.getByRole('button',{name:'Programar / alterar alocação',exact:true}).click();
+ const effective=page.getByLabel(/^Válido a partir de/);await effective.waitFor();
+ check('Novo movimento começa com data negocial sem enviar mutação',await effective.inputValue()===clocks.businessDate&&!report.http.some(x=>['POST','PUT','PATCH','DELETE'].includes(x.method)&&/^\/api\/(vinculos-contratuais|pessoas|contratos|frequencias)(\/|$)/.test(x.path)));
+ report.scope='AUXILIARY_NATIVE_BROWSER_CIVIL_DATE_NOT_PHYSICAL_MIDNIGHT_NOT_NEW_ORIGINAL_DRIVER';
+ report.limits=['Fuso doChrome é real; nenhuma substituição deDate/Clock/token/servidor. Meia-noite física não foi atravessada.','A separação de datas civis depende do instante nativo; registrar clientDate/businessDate reais, sem inventar discriminação.','Casos antes/depois/reabertura e preservaçãoD/K usam relógio controlado apenas noVitest, em recibo separado.'];await screenshot('alocacao-data-negocial');
+},{accountName:'gestor_local',reuse:false});

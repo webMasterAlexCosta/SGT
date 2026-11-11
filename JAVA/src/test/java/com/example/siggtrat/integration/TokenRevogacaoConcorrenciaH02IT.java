@@ -3,6 +3,9 @@ package com.example.siggtrat.integration;
 import com.example.siggtrat.entidade.TokenAtivo;
 import com.example.siggtrat.repositorio.TokenAtivoRepositorio;
 import org.junit.jupiter.api.Test;
+import com.example.siggtrat.configuracao.transacao.ExecutorTransacaoIdempotente;
+import org.springframework.jdbc.core.JdbcTemplate;
+import java.util.concurrent.atomic.AtomicInteger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.transaction.TransactionDefinition;
@@ -17,8 +20,8 @@ import java.util.concurrent.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-/** MySQL real: duas leituras da mesma sessão precedem revogações concorrentes. */
-class TokenRevogacaoConcorrenciaH02IT extends MySqlIntegrationTestSupport {
+/** PostgreSQL real: duas leituras da mesma sessão precedem revogações concorrentes. */
+class TokenRevogacaoConcorrenciaH02IT extends PostgresIntegrationTestSupport {
     @Autowired TokenAtivoRepositorio repositorio;
     @Autowired PlatformTransactionManager transacoes;
     @Autowired DataSource dataSource;
@@ -26,8 +29,8 @@ class TokenRevogacaoConcorrenciaH02IT extends MySqlIntegrationTestSupport {
     @Test
     void duasRevogacoesDoMesmoTokenSaoIdempotentesEPreservamOutraSessao() throws Exception {
         try (var connection = dataSource.getConnection()) {
-            assertEquals("MySQL", connection.getMetaData().getDatabaseProductName());
-            assertEquals("8.0.45", connection.getMetaData().getDatabaseProductVersion());
+            assertEquals("PostgreSQL", connection.getMetaData().getDatabaseProductName());
+            com.example.siggtrat.configuracao.VerificadorAmbientePostgres186.verificar(connection, "revogacao-concorrente");
         }
         String id = "h02-idle-" + UUID.randomUUID();
         String alvoBruto = id + "-alvo-sintetico-sem-jwt";
@@ -39,18 +42,37 @@ class TokenRevogacaoConcorrenciaH02IT extends MySqlIntegrationTestSupport {
         CountDownLatch ambasLeram = new CountDownLatch(2);
         CountDownLatch liberarRevogacao = new CountDownLatch(1);
         List<Throwable> falhas = new ArrayList<>();
+        var totalTentativas = new AtomicInteger();
+        var idsTransacoes = ConcurrentHashMap.<Long>newKeySet();
+        var provasCriadas = ConcurrentHashMap.<String>newKeySet();
+        var provasConfirmadas = ConcurrentHashMap.<String>newKeySet();
         try {
             Callable<Void> revogar = () -> {
-                TransactionTemplate tx = new TransactionTemplate(transacoes);
-                tx.setPropagationBehavior(TransactionDefinition.PROPAGATION_REQUIRES_NEW);
-                tx.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
-                tx.executeWithoutResult(status -> {
-                    assertEquals(alvo.getId(), repositorio.buscarPorTokenBruto(alvoBruto).orElseThrow().getId());
-                    ambasLeram.countDown();
-                    try { assertTrue(liberarRevogacao.await(10, TimeUnit.SECONDS)); }
-                    catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new AssertionError(e); }
+                // PostgreSQL exige repetir TODA a transação abortada; o DELETE isolado
+                // não é serialization-safe. Mesma fronteira usada pela revogação real.
+                var tentativasAtor = new AtomicInteger();
+                String ator = UUID.randomUUID().toString();
+                new ExecutorTransacaoIdempotente(transacoes).executar(TransactionDefinition.ISOLATION_REPEATABLE_READ, () -> {
+                    int tentativa = tentativasAtor.incrementAndGet();
+                    totalTentativas.incrementAndGet();
+                    var jdbc = new JdbcTemplate(dataSource);
+                    assertEquals("repeatable read", jdbc.queryForObject("show transaction_isolation", String.class));
+                    assertTrue(idsTransacoes.add(jdbc.queryForObject("select txid_current()", Long.class)), "Cada tentativa exige nova transação");
+                    if (tentativa == 1) {
+                        assertEquals(alvo.getId(), repositorio.buscarPorTokenBruto(alvoBruto).orElseThrow().getId());
+                        ambasLeram.countDown();
+                        try { assertTrue(liberarRevogacao.await(10, TimeUnit.SECONDS)); }
+                        catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new AssertionError(e); }
+                    } else {
+                        assertFalse(repositorio.existePorTokenBruto(alvoBruto), "Nova transação relê o estado confirmado pelo concorrente");
+                    }
+                    String prova = id + "-prova-" + ator + "-" + tentativa;
+                    provasCriadas.add(prova);
+                    repositorio.saveAndFlush(TokenAtivo.deTokenBruto(prova, id, agora, agora.plusHours(1)));
                     repositorio.excluirPorTokenBruto(alvoBruto);
+                    return prova;
                 });
+                provasConfirmadas.add(id + "-prova-" + ator + "-" + tentativasAtor.get());
                 return null;
             };
             List<Future<Void>> resultados = List.of(pool.submit(revogar), pool.submit(revogar));
@@ -61,6 +83,10 @@ class TokenRevogacaoConcorrenciaH02IT extends MySqlIntegrationTestSupport {
                 catch (ExecutionException e) { falhas.add(e.getCause()); }
             }
             assertTrue(falhas.isEmpty(), () -> "Revogação repetida não pode perder a causa da expiração por conflito JPA: " + falhas);
+            assertEquals(3, totalTentativas.get(), "Duas transações iniciais mais uma repetição integral");
+            assertEquals(3, idsTransacoes.size());
+            assertEquals(2, provasConfirmadas.size());
+            for (String prova : provasCriadas) assertEquals(provasConfirmadas.contains(prova), repositorio.existePorTokenBruto(prova), "Escritas da tentativa abortada devem reverter");
             assertFalse(repositorio.existePorTokenBruto(alvoBruto));
             repositorio.excluirPorTokenBruto(alvoBruto); // replay posterior também é inócuo
             TokenAtivo preservado = repositorio.findById(controle.getId()).orElseThrow();
@@ -75,6 +101,7 @@ class TokenRevogacaoConcorrenciaH02IT extends MySqlIntegrationTestSupport {
             // Somente as duas sessões sintéticas deste teste; nenhum dado compartilhado.
             repositorio.excluirPorTokenBruto(alvoBruto);
             repositorio.excluirPorTokenBruto(controleBruto);
+            provasCriadas.forEach(repositorio::excluirPorTokenBruto);
         }
     }
 }

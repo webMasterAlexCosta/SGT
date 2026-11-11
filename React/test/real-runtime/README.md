@@ -1,8 +1,16 @@
-# Runtime sintético preparado externamente
+# Histórico retirado do fluxo atual: runtime MySQL 8.0.45
 
-> Requisito vigente em 2026-11-03: MySQL exatamente 8.0.45. Os guardas atuais recusam 8.0.46 e versões com sufixos; execução real exige SELECT VERSION(), identidade do servidor e JAR desta rodada. Testes unitários dos guardas usam respostas controladas e não constituem observação de servidor.
+> **Procedimento histórico; não executar como preparação da campanha atual.** O alvo atual é **PostgreSQL 18.6 (`server_version_num=180006`) com pgJDBC 42.7.14**. Os comandos e exemplos abaixo pertencem à campanha MySQL e não validam esse alvo. `manage.py`, `snapshot.py`, `runtime-observado.cjs` e o cenário manual que importa esse gate continuam específicos de MySQL; não foram portados.
+>
+> O pacote externo `50_BROWSER_JAR_V2_PREPARACAO` prepara outro caminho explícito para JAR integrado/appv2. Ele **não é chamado por estes scripts nem os substitui automaticamente**. Seu gate de recibo, suas pré-condições e a identidade do ambiente precisam de revisão e observação próprias do coordenador. Não usar IDs, recibos ou instruções MySQL para preencher evidência PostgreSQL.
+>
+> Os sete casos Node de `test/e2e/verificar-runtime-observado.cjs` são regressão histórica do validador MySQL com recibos sintéticos. Não conectam ao banco e não constituem prova PostgreSQL. A inclusão explícita deles em um runner externo não muda esse alcance.
 
-O `manage.py` atual observa MySQL **8.0.45** e supervisiona exclusivamente o JAR candidato **0.0.4-operacional-20261101**, com Java **17**. O banco, o catálogo, a conta de aplicação e o Redis devem estar preparados externamente, com autorização. O helper não inicia MySQL/Redis, não inicializa datadir, não cria contas ou catálogo, não concede privilégios e não usa cliente administrativo. Suas únicas ações de linha de comando são `status`, `serve-app` e `stop-app`.
+## Conteúdo preservado da campanha MySQL
+
+> Requisito histórico da campanha de 2026-11-03: MySQL exatamente 8.0.45. Os guardas atuais recusam 8.0.46 e versões com sufixos; execução real exige SELECT VERSION(), identidade do servidor e JAR desta rodada. Testes unitários dos guardas usam respostas controladas e não constituem observação de servidor.
+
+Na campanha histórica, o `manage.py` observa MySQL **8.0.45** e supervisiona exclusivamente o JAR candidato **0.0.4-operacional-20261101**, com Java **17**. O banco, o catálogo, a conta de aplicação e o Redis devem estar preparados externamente, com autorização. O helper não inicia MySQL/Redis, não inicializa datadir, não cria contas ou catálogo, não concede privilégios e não usa cliente administrativo. Suas únicas ações de linha de comando são `status`, `serve-app` e `stop-app`.
 
 ## Configuração privada explícita
 

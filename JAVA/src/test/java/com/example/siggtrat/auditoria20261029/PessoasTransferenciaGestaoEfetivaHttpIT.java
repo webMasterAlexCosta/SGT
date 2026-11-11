@@ -20,7 +20,7 @@ import java.util.List;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** CT007 nos consumidores Pessoa/Vínculo, com relógio controlado e HTTP/MySQL reais. */
+/** CT007 nos consumidores Pessoa/Vínculo, com relógio controlado e HTTP/PostgreSQL reais. */
 class PessoasTransferenciaGestaoEfetivaHttpIT extends ContratosHttpBase {
     @org.springframework.beans.factory.annotation.Autowired
     private com.example.siggtrat.servico.GestaoContratoTemporalServico gestaoDaFonte;
@@ -104,7 +104,8 @@ class PessoasTransferenciaGestaoEfetivaHttpIT extends ContratosHttpBase {
         LocalDate data = RelogioSistema.hoje().plusDays(5);
         conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
         enviar(c.localA, base(contrato.id()) + "/transferir-gestao",
-                mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
+                mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                         "motivo", "Transferência futura com vínculo existente", "referenciaSei", "SEI-TRANSFERENCIA-PESSOA",
                         "autorizacaoAdministrativa", "ATO-HTTP",
                         "mapeamentos", List.of(mapa("composicaoOrigemId", contrato.composicao1(),

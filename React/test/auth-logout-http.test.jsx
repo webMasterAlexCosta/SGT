@@ -2,11 +2,11 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
-import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.jsx';
-import { ServicoAutenticacao } from '../src/services/auth/ServicoAutenticacao.js';
-import { api } from '../src/core/http.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.tsx';
+import { ServicoAutenticacao } from '../src/services/auth/ServicoAutenticacao.ts';
+import { api } from '../src/core/http.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 vi.mock('../src/modules/auth/components/ModalReautenticacao', () => ({ ModalReautenticacao: () => null }));
 const A = { id: 831, username: 'http-a-sintetico', perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' };
 const B = { id: 832, username: 'http-b-sintetico', perfil: 'OPERACIONAL', autoridade: 'PERFIL_OPERACIONAL' };

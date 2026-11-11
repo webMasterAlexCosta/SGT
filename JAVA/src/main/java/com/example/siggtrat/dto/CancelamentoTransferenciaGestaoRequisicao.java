@@ -8,5 +8,7 @@ public record CancelamentoTransferenciaGestaoRequisicao(
         LocalDate dataAto,
         String motivo,
         String referenciaSei,
-        String autorizacaoAdministrativa
+        String autorizacaoAdministrativa,
+        Boolean conferenciaDocumentalConfirmada,
+        String versaoConferenciaDocumental
 ) {}

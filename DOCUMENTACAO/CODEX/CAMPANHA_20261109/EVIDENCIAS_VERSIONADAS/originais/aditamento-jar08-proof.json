@@ -1,0 +1,54 @@
+{
+  "state": "VERIFIED_CURRENT_JAR08_BROWSER_AND_REAL_JAVA_BUSINESS_SCOPE",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "checks": 154,
+  "receipts": [
+    {
+      "receipt": "browser-jar08-aditamento-empresa02",
+      "checks": 29,
+      "sha256": "bfa692733f4874b9aba8d38691717e0e16bdae1742ab50d849aa1f03e5c49606"
+    },
+    {
+      "receipt": "browser-jar08-empresa-retificar02",
+      "checks": 21,
+      "sha256": "7ab6073a65f7a7b02ad993ae15663826b02822089fad1cef1009c358ff1c1247"
+    },
+    {
+      "receipt": "browser-jar08-empresa-retornar01",
+      "checks": 20,
+      "sha256": "b4967be2a686ca7de94bccb7a19a76caed26058684351e447701a8a1281f449f"
+    },
+    {
+      "receipt": "browser-jar08-empresa-inativar01",
+      "checks": 22,
+      "sha256": "7c88ddbfadbffca87a4dc3c9ea000c986db004289431d93b788c4eb45e1b1ec4"
+    },
+    {
+      "receipt": "browser-jar08-aditamento-sem-concessao01",
+      "checks": 18,
+      "sha256": "263f2ad52ab6a98853d873212a2a3b7d770ce462ba13a1ff107260091ccf0ee7"
+    },
+    {
+      "receipt": "browser-jar08-aditamento-conceder01",
+      "checks": 9,
+      "sha256": "741f04b90b79699f94160045edde6ed41546f85cb9b1054306c0f87ea889a62c"
+    },
+    {
+      "receipt": "browser-jar08-aditamento-excecao01",
+      "checks": 22,
+      "sha256": "2913434dbb76e8c65cdf9c96a51a53f71f91839386ad82330e4b4a16c1a96c7e"
+    },
+    {
+      "receipt": "browser-jar08-aditamento-revogar01",
+      "checks": 13,
+      "sha256": "8246fed8fe6ff456985d652541714629a322edda753f1a7b9a4b5ec9cb0e8bac"
+    }
+  ],
+  "temporary_permission_revoked": true,
+  "provider_restored": true,
+  "no_final_integrated_review_or_global_acceptance": true,
+  "early_test_locator_failures_preserved": [
+    "browser-jar08-aditamento-empresa01",
+    "browser-jar08-empresa-retificar01"
+  ]
+}

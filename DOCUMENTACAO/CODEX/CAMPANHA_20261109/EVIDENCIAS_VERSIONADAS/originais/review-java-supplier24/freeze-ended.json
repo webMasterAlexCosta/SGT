@@ -1,0 +1,9 @@
+{
+  "state": "VERIFIED_AFTER_NATIVE_REVIEW_RELEASED_FOR_TECHNICAL_INTEGRATION",
+  "freeze_sha256": "b5f703a4c189162893e6950e54deb7ce3429a22d79f5888c3f830817f7480ca4",
+  "all_source_input_bytecode_unchanged": true,
+  "JAR07_unchanged": true,
+  "parecer_sha256": "6685f64de5a9bfdcc0cef8e5b7284be246fc393e5b1a658b2e02f9b8f20c2bf1",
+  "review": "APROVADO",
+  "no_p0_p3_findings": true
+}

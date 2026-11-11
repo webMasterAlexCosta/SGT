@@ -3,6 +3,7 @@ package com.example.siggtrat.auditoria20261029;
 import com.example.siggtrat.dominio.frequencia.EstadoAuditoriaFrequencia;
 import com.example.siggtrat.dominio.frequencia.ValidadeOperacionalFrequencia;
 import com.example.siggtrat.entidade.Frequencia;
+import com.example.siggtrat.entidade.EmissaoRelatorioAdministrativo;
 import com.example.siggtrat.servico.PendenciaAdministrativaServico;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
@@ -26,6 +27,8 @@ class RelatoriosAdministrativosPendenciasHttpIT extends AuditoriaHttpSuporte {
         Cenario c = criarCenario();
         registrarFrequencia(c, "FALTA");
         Map<String,Object> filtro = filtro(c);
+        // Datas distintas detectam também a troca ou perda do limite final.
+        filtro.put("fim", DATA.plusDays(1).toString());
         JsonNode previa = dados(executar(c.localA, post("/api/relatorios/administrativos/previa")
                 .contentType(APPLICATION_JSON).content(json(filtro)), 200, "REL-001 prévia não formalizada"));
         assertEquals("PREVIA", previa.path("metadados").path("situacao").asText());
@@ -37,10 +40,22 @@ class RelatoriosAdministrativosPendenciasHttpIT extends AuditoriaHttpSuporte {
         assertEquals(1, meta.path("versao").intValue());
         assertEquals("ORIGINAL", meta.path("natureza").asText());
         assertEquals(c.localA.getId().longValue(), meta.path("usuarioId").longValue());
+        assertEquals(c.localA.getUsername(), meta.path("usuario").asText());
+        assertEquals("GESTOR_LOCAL", meta.path("perfil").asText());
         assertEquals(DATA.toString(), meta.path("inicio").asText());
+        assertEquals(DATA.plusDays(1).toString(), meta.path("fim").asText());
         assertEquals(64, meta.path("hashConteudo").asText().length());
         assertTrue(meta.path("tamanhoConteudoBytes").longValue() > 100);
         assertNotNull(Instant.parse(meta.path("geradoEm").asText()));
+        em.flush(); em.clear();
+        EmissaoRelatorioAdministrativo gravada = em.find(EmissaoRelatorioAdministrativo.class, id);
+        assertAll("Metadados do emissor e período relidos por JPA, na transação deste teste",
+                () -> assertEquals(DATA, gravada.getInicio()),
+                () -> assertEquals(DATA.plusDays(1), gravada.getFim()),
+                () -> assertEquals(c.localA.getId(), gravada.getUsuarioId()),
+                () -> assertEquals(c.localA.getUsername(), gravada.getUsuarioUsername()),
+                () -> assertEquals("GESTOR_LOCAL", gravada.getPerfilUsuario()),
+                () -> assertEquals(Instant.parse(meta.path("geradoEm").asText()), gravada.getGeradoEm()));
         Instant conhecidaAte = Instant.now();
         JsonNode repetida = dados(executar(c.localA, post("/api/relatorios/administrativos/emissoes")
                 .contentType(APPLICATION_JSON).content(json(filtro)), 201, "Emissão idempotente retorna mesma prova"));
@@ -51,6 +66,10 @@ class RelatoriosAdministrativosPendenciasHttpIT extends AuditoriaHttpSuporte {
                 200, "REL-006 emissão anterior fica SUPERADA sem perder conteúdo"));
         assertEquals("SUPERADA", historica.path("metadados").path("estado").asText());
         assertEquals(primeira.path("conteudo"), historica.path("conteudo"));
+        for (String campo : List.of("inicio", "fim", "geradoEm", "usuarioId", "usuario", "perfil")) {
+            assertEquals(meta.path(campo), historica.path("metadados").path(campo),
+                    "Superação conserva metadado original: " + campo);
+        }
         JsonNode comparacao = dados(executar(c.localA,
                 get("/api/relatorios/administrativos/emissoes/{id}/comparacao-vigente", id),
                 200, "REL-003 comparação separa prova histórica e verdade vigente"));

@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.fail;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
-/** Executor, gerador XLSX e MySQL reais; a barreira observa SQL sem substituir domínio ou persistência. */
+/** Executor, gerador XLSX e PostgreSQL reais; a barreira observa SQL sem substituir domínio ou persistência. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class RevisaoExportacaoGeracaoAutorizacaoHttpIT extends ContratosHttpBase {
     private static final Path ARQUIVOS = Path.of("target/auditoria-http/exportacao-autorizacao-geracao").toAbsolutePath();

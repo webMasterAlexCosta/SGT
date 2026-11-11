@@ -22,11 +22,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Executa todos os métodos de repositorio definidos pela aplicação contra um
- * MySQL vazio com schema real. O objetivo é detectar cedo JPQL inválida,
+ * PostgreSQL vazio com schema real. O objetivo é detectar cedo JPQL inválida,
  * derived-query quebrada, coluna/tabela divergente e SQL nativo incompatível.
  */
-@DisplayName("Integração MySQL: smoke de todas as queries de repositorio")
-class RepositoryQuerySmokeIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: smoke de todas as queries de repositorio")
+class RepositoryQuerySmokeIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private ApplicationContext context;

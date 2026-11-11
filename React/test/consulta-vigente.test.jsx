@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { expect, it } from 'vitest';
-import { useConsultaVigente } from '../src/core/hooks/useConsultaVigente.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
+import { useConsultaVigente } from '../src/core/hooks/useConsultaVigente.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
 it('invalida a operação anterior inclusive quando transporte ignora abort',()=>{
   const {result}=renderHook(()=>useConsultaVigente());
   const a=result.current.iniciar();const b=result.current.iniciar();

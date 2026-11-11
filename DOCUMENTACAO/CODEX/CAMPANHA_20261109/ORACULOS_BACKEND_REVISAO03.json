@@ -1,0 +1,282 @@
+{
+  "state": "FOCAL_CHECKS_PASS_INDEPENDENT_RE_REVIEW_PENDING",
+  "origin_review_turn": "01a1c152-0b49-7741-b97d-635268008300",
+  "jar_http": {
+    "batch": "jar-http-contextual-10",
+    "receipt_sha256": "d8706e5628a59b209efc06dc234f1d08f3183452f378e0bca047e10d73756086",
+    "scenario_index_sha256": "00afc556034952b4d5fa94c449887c0e00be6cf3fab8714254da62e365f5e0b1",
+    "sources_sha256": {
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/CaracterizacaoHttpJar.java": "d5e8c29b292d88b273327db7191c511d2b3c662bc160357473af6dd34c25768f",
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/CatalogoPostgresAssercoes.java": "19129ca4637c0db2a9e0022bce71f7ba4d027f2f92b2d5219215d042cf9c9c69",
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/JarHttpRealIT.java": "323ea2b03578a1cefee398d43d5f502846e52d4b77c023a9b566e00bd5cedc06",
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/PlanilhaXlsxAssercoes.java": "7bb3b44bd8c3b614b25fd1e1b65c04e610de45fe6710c9cc45ea756b9557f80f",
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/RecursosJarObservador.java": "374b8478e2381aafdb600cb198e3ab3e69f92742abe6e926254b3526910b72a4"
+    },
+    "reports": [
+      {
+        "name": "com.example.siggtrat.auditoria20261029.JarHttpRealIT",
+        "tests": "1",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "87.244",
+        "effective_test_context_cache_max_size": "1",
+        "xml_sha256": "4595132293ebc892399739ebce3905e652c2ee5f9b01245b465ee19e2928eb5a"
+      }
+    ],
+    "peak_aggregate_bytes": 7250309120,
+    "peak_validation_cgroup_bytes": 1150435328,
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "checkpoint_candidate": "607728909f06c68a56e3a20419592bed8ba31de54a5233a52b23ab96635d80b8",
+    "requests": 146,
+    "jar_sha256": "ae4be2592e6b460ed11a9a6503b86573a9f1ff0f42593419e175c52acea0ba27",
+    "identity": {
+      "positive_coherent_controls": 2,
+      "homonyms_distinct_ids": true,
+      "valid_link_a_employee_b_status": 409,
+      "snapshots_and_events_unchanged": true
+    },
+    "postgres_catalog": {
+      "expected_guarantees": [
+        "PK pessoa(id_pessoa)",
+        "PK empregado(id_empregado)",
+        "PK contrato(id_contrato)",
+        "PK vinculo_contratual(id_vinculo_contratual)",
+        "PK alocacao_vinculo(id_alocacao_vinculo)",
+        "PK frequencia(id)",
+        "PK ocorrencia(id)",
+        "PK contexto_ocorrencia(id)",
+        "PK anexo_ocorrencia(id)",
+        "PK documento_comprobatorio(id_documento)",
+        "PK permissao_excepcional(id_permissao_excepcional)",
+        "FK vinculo_contratual(id_pessoa)->pessoa(id_pessoa)",
+        "FK vinculo_contratual(id_contrato)->contrato(id_contrato)",
+        "FK alocacao_vinculo(id_vinculo_contratual)->vinculo_contratual(id_vinculo_contratual)",
+        "FK alocacao_vinculo(id_composicao_contratual)->composicao_contratual(id_composicao_contratual)",
+        "FK alocacao_vinculo(id_lotacao)->lotacao(id_lotacao)",
+        "FK alocacao_vinculo(id_jornada)->jornada(id_jornada)",
+        "FK alocacao_vinculo(id_cargo)->cargo(id_cargo)",
+        "FK frequencia(id_empregado)->empregado(id_empregado)",
+        "FK frequencia(id_pessoa)->pessoa(id_pessoa)",
+        "FK frequencia(id_vinculo_contratual)->vinculo_contratual(id_vinculo_contratual)",
+        "FK frequencia(id_alocacao_vinculo)->alocacao_vinculo(id_alocacao_vinculo)",
+        "FK ocorrencia(id_empregado)->empregado(id_empregado)",
+        "FK contexto_ocorrencia(ocorrencia_id)->ocorrencia(id)",
+        "FK anexo_ocorrencia(id_ocorrencia)->ocorrencia(id)",
+        "FK documento_comprobatorio(id_contrato)->contrato(id_contrato)",
+        "FK documento_comprobatorio(id_documento_anterior)->documento_comprobatorio(id_documento)",
+        "FK permissao_excepcional(id_ocorrencia)->ocorrencia(id)",
+        "FK permissao_excepcional(id_usuario_beneficiario)->usuario_aplicacao(id)",
+        "UNIQUE frequencia(id_empregado,data_referencia)",
+        "UNIQUE frequencia(id_vinculo_contratual,data_referencia)",
+        "UNIQUE contexto_ocorrencia(ocorrencia_id,data_referencia)",
+        "UNIQUE ocorrencia(id_empregado,chave_idempotencia)",
+        "UNIQUE documento_comprobatorio(chave_idempotencia)",
+        "UNIQUE documento_comprobatorio(grupo_logico_id,versao_documento)",
+        "INDEX idx_alocacao_vinculo_periodo(id_vinculo_contratual,data_inicio,data_fim)",
+        "INDEX idx_permissao_excepcional_ocorrencia(id_ocorrencia,tipo,ativo)",
+        "INDEX idx_documento_contrato_fato(id_contrato,tipo_fato,fato_id)",
+        "NOT NULL frequencia.id_empregado",
+        "NOT NULL frequencia.data_referencia",
+        "NOT NULL vinculo_contratual.id_pessoa",
+        "NOT NULL vinculo_contratual.id_contrato",
+        "NOT NULL contexto_ocorrencia.ocorrencia_id",
+        "NOT NULL contexto_ocorrencia.data_referencia",
+        "NOT NULL documento_comprobatorio.id_contrato",
+        "NOT NULL documento_comprobatorio.grupo_logico_id",
+        "NOT NULL permissao_excepcional.id_usuario_beneficiario"
+      ],
+      "column_records": 1115,
+      "constraints": 920,
+      "indexes": 341,
+      "same_database_before_after_restart": true,
+      "domain_schema_created_only_by_hibernate": true
+    },
+    "exports_after_restart": {
+      "actual_pdf_and_xlsx": true,
+      "dto_equal": true,
+      "all_stable_cells_equal": true,
+      "only_normalized_field": "Instante Gerado em da célula A2; validado contra intervalo real da requisição, células brutas preservadas."
+    },
+    "http_characterization": {
+      "percentis": "Nearest rank; amostra pequena, descritiva, sem extrapolação nacional",
+      "resumos": [
+        {
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 12.741474946684148,
+          "rota": "listagem",
+          "p99Ms": 88.233506,
+          "errosHttp": 0,
+          "p95Ms": 88.233506,
+          "p50Ms": 85.755846,
+          "estadoAplicacao": "FRIO"
+        },
+        {
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 60.30738978108367,
+          "rota": "listagem",
+          "p99Ms": 26.073864,
+          "errosHttp": 0,
+          "p95Ms": 26.073864,
+          "p50Ms": 14.539243,
+          "estadoAplicacao": "QUENTE"
+        },
+        {
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 4.909788286492235,
+          "rota": "painel",
+          "p99Ms": 228.085755,
+          "errosHttp": 0,
+          "p95Ms": 228.085755,
+          "p50Ms": 219.476625,
+          "estadoAplicacao": "FRIO"
+        },
+        {
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 70.08611609575898,
+          "rota": "painel",
+          "p99Ms": 19.888476,
+          "errosHttp": 0,
+          "p95Ms": 19.888476,
+          "p50Ms": 12.564308,
+          "estadoAplicacao": "QUENTE"
+        },
+        {
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 34.39747975628055,
+          "rota": "historico",
+          "p99Ms": 33.672443,
+          "errosHttp": 0,
+          "p95Ms": 33.672443,
+          "p50Ms": 27.523653,
+          "estadoAplicacao": "FRIO"
+        },
+        {
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 62.925671190379184,
+          "rota": "historico",
+          "p99Ms": 20.329671,
+          "errosHttp": 0,
+          "p95Ms": 20.329671,
+          "p50Ms": 14.543364,
+          "estadoAplicacao": "QUENTE"
+        },
+        {
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 24.79060737434298,
+          "rota": "frequencia",
+          "p99Ms": 44.481122,
+          "errosHttp": 0,
+          "p95Ms": 44.481122,
+          "p50Ms": 38.77632,
+          "estadoAplicacao": "FRIO"
+        },
+        {
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 49.86509497206258,
+          "rota": "frequencia",
+          "p99Ms": 24.868942,
+          "errosHttp": 0,
+          "p95Ms": 24.868942,
+          "p50Ms": 19.150941,
+          "estadoAplicacao": "QUENTE"
+        },
+        {
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 7.772262027948557,
+          "rota": "exportacao",
+          "p99Ms": 140.224508,
+          "errosHttp": 0,
+          "p95Ms": 140.224508,
+          "p50Ms": 126.191972,
+          "estadoAplicacao": "FRIO"
+        },
+        {
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 6.58040510131955,
+          "rota": "exportacao",
+          "p99Ms": 329.867021,
+          "errosHttp": 0,
+          "p95Ms": 329.867021,
+          "p50Ms": 115.253387,
+          "estadoAplicacao": "QUENTE"
+        }
+      ],
+      "escopo": "HTTP local real, um usuário, concorrência1, três ciclos por rota; sem SLA inferido",
+      "rssJarMaxAmostradoBytes": 534298624,
+      "perfilRecursos": "JMX_LOCAL_POSTGRES_REAL",
+      "cacheFrio": "Caches de negócio Redis vazios; não limpa sessões, tokens, revisões, SO nem PostgreSQL"
+    }
+  },
+  "leap_dto": {
+    "batch": "it-bissexto-01",
+    "receipt_sha256": "4ca27cab0f54b653ef09afdc89f456315a8b72500b3b0b081bd578013a77d490",
+    "scenario_index_sha256": "b4fb96319c85a79c8b8369f60d30cf5e26f5431480f17abad53f40e67e03ebcc",
+    "sources_sha256": {
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/PainelBissextoDtoRealHttpIT.java": "4de06cfdf4a9460214e0d0c84be7fa64968b31bf2da2229be1ec6bffce3a68d2"
+    },
+    "reports": [
+      {
+        "name": "com.example.siggtrat.auditoria20261029.PainelBissextoDtoRealHttpIT",
+        "tests": "1",
+        "errors": "0",
+        "failures": "0",
+        "skipped": "0",
+        "time": "37.99",
+        "effective_test_context_cache_max_size": "1",
+        "xml_sha256": "087809485885b98c809ce2eb3beac5d44cf6d75e9e94a1011ff781dd86e7bf9f"
+      }
+    ],
+    "peak_aggregate_bytes": 6766112768,
+    "peak_validation_cgroup_bytes": 669011968,
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "checkpoint_candidate": "72e9500919b5027a68ce3cd5ee69a7abf9851eb844817e092e30102f7da22f56",
+    "camada": "MOCKMVC_FILTROS_SPRING_JPA_POSTGRES_REAL",
+    "datasAtuais": 15,
+    "datasComparativas": 14,
+    "valoresAtuais": "215..229",
+    "valoresComparativos": "115..128",
+    "alocados": 0,
+    "lancamentos": 0,
+    "pontoComparativo29Inventado": false
+  },
+  "limits": [
+    "Não concede aceite backend/global nem encerramento dos635critérios.",
+    "HTTP caracteriza ambiente local, um usuário/concorrência1/amostra pequena, sem SLA inferido.",
+    "Cache frio é somente Redis de negócio; bypass HTTP de frequência e exportação preservado.",
+    "Não comprova navegador, LAN externa, capacidade nacional, upgrade de acervo ou meia-noite física."
+  ],
+  "resource_complement": {
+    "path": "DOCUMENTACAO/CODEX/CAMPANHA_20261109/RECURSOS_HTTP_ATUAL.json",
+    "sha256": "6c81a4ea8cf1590884b2e7afea1d1dbbd4b722538f7a11e9e51f670f730b786f",
+    "review": "PENDING_INCREMENTAL_PERF_REVIEW",
+    "profiled_batch": "jar-http-contextual-10",
+    "functional_opt_out_batch": "jar-http-contextual-11"
+  },
+  "review04": {
+    "turn": "01a1c195-d7b3-7db1-aafd-a631bf4fe757",
+    "four_focal_gaps_closed": [
+      "ROP025",
+      "RST002",
+      "RST004/008",
+      "MASTER_TMP012/ARQ003_BACKEND_DTO"
+    ],
+    "remaining_gap": "PERF_RESOURCES_COMPLEMENT_NOW_EXECUTED_PENDING_REVIEW"
+  }
+}

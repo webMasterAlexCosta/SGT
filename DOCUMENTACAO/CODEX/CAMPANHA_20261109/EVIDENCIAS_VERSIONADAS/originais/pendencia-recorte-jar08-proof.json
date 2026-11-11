@@ -1,0 +1,56 @@
+{
+  "state": "VERIFIED_CURRENT_JAR08_FREQUENCY_PENDING_RESTRICTED_RECUT",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "checks": 80,
+  "receipts": [
+    {
+      "phase": "fonte",
+      "receipt": "browser-jar08-pendencia-fonte01",
+      "checks": 10,
+      "sha256": "d4e02d0257d1416ac9a3661b30a60153fe52464cc6d6ad898e98e043735dffe2",
+      "preparation_only": true
+    },
+    {
+      "phase": "lancamentos",
+      "receipt": "browser-jar08-pendencia-lancamentos01",
+      "checks": 9,
+      "sha256": "0a8d41617b5c9c506ff644f359ca8363b8da480e4019ebeb2cdbbeb2896f039e",
+      "preparation_only": true
+    },
+    {
+      "phase": "retirar",
+      "receipt": "browser-jar08-pendencia-retirar01",
+      "checks": 13,
+      "sha256": "1f6e7ea4999160c3071d21a025ecfd6e30368f73655172b9dd090fea16ca9e1e",
+      "preparation_only": false
+    },
+    {
+      "phase": "escopo",
+      "receipt": "browser-jar08-pendencia-escopo01",
+      "checks": 8,
+      "sha256": "375e84636ed4b9c759a2fe72248cf48d365657889ddc535566ea32d3606b5a09",
+      "preparation_only": false
+    },
+    {
+      "phase": "contraprova",
+      "receipt": "browser-jar08-pendencia-contraprova01",
+      "checks": 18,
+      "sha256": "bb5b5120d50b61df685eab4de3d947c771927eaac07e8488c8cdbd3470db3b7a",
+      "preparation_only": false
+    },
+    {
+      "phase": "resolver",
+      "receipt": "browser-jar08-pendencia-resolver01",
+      "checks": 22,
+      "sha256": "99ab3b5ca0add782a230578e93b7036e576593fbed3cd7466a726634cda32164",
+      "preparation_only": false
+    }
+  ],
+  "preparation_is_not_individual_acceptance": true,
+  "blocked_day_and_positive_other_day_same_operational_actor": true,
+  "external_management_refused": true,
+  "resolved_after_actual_correction": true,
+  "two_integrity_chains": true,
+  "temporal_replay_management_supplement_pending": true,
+  "no_final_integrated_review_or_global_acceptance": true
+}

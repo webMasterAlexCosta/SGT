@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import java.nio.charset.StandardCharsets;
 
 @Service
-public class EmailGmailServico {
+public class EmailGmailServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return logger; }
+
 
     public static final String CID_LOGO_CORREIOS = "logoCorreios";
 
@@ -53,10 +55,7 @@ public class EmailGmailServico {
             mailSender.send(mensagem);
             return true;
         } catch (Exception e) {
-            logger.error(
-                    "Falha ao enviar e-mail transacional pelo Gmail para o destinatário informado.",
-                    e
-            );
+            logger.error("EmailGmailServico: Falha ao enviar e-mail transacional pelo Gmail para o destinatário informado. falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
             return false;
         }
     }

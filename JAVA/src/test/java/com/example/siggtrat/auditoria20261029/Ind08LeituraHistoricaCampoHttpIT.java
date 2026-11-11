@@ -4,11 +4,15 @@ import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.entidade.*;
 import com.example.siggtrat.servico.MotorTemporalContratoServico;
 import com.example.siggtrat.utilitario.RelogioSistema;
+import com.example.sgtfixture.ind08.ProvaHistoricaContratoFalhaFixture;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
+import org.springframework.boot.persistence.autoconfigure.EntityScan;
+import org.springframework.boot.test.context.TestConfiguration;
+import org.springframework.context.annotation.Import;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +27,7 @@ import java.util.Map;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.junit.jupiter.api.Assertions.assertAll;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
@@ -30,14 +35,22 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * IND-08: contrato aditivo de leitura por campo, baseado em fontes sintéticas
  * explícitas. A fixture simula perda documental por DML; não altera schema nem
  * usa cadastros atuais como substitutos da história. Cada request lê em sua
- * transação real. MockMvc prova Spring/segurança/JPA/MySQL, não transporte TCP.
+ * transação real. MockMvc prova Spring/segurança/JPA/PostgreSQL, não transporte TCP.
  *
  * Falhas que estes testes devem detectar: deduzir prova da verdade booleana,
  * ampliar máscara parcial, vazar K futuro, confundir restrição com ausência,
  * perder a origem em projeção ou certificar rótulo a partir de seu catálogo.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
+@Import(Ind08LeituraHistoricaCampoHttpIT.MapeamentoDaFalha.class)
 class Ind08LeituraHistoricaCampoHttpIT extends ContratosHttpBase {
+    @TestConfiguration(proxyBeanMethods = false)
+    @EntityScan(basePackageClasses = {
+            com.example.siggtrat.AplicacaoBackendSigGtrat.class,
+            ProvaHistoricaContratoFalhaFixture.class
+    })
+    static class MapeamentoDaFalha { }
+
     private static final String GRADE = "MONDAY|true|08:00|12:00|13:00|17:00;"
             + "TUESDAY|true|08:00|12:00|13:00|17:00;WEDNESDAY|true|08:00|12:00|13:00|17:00;"
             + "THURSDAY|true|08:00|12:00|13:00|17:00;FRIDAY|true|08:00|12:00|13:00|17:00;"
@@ -57,8 +70,8 @@ class Ind08LeituraHistoricaCampoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirPersistenciaRealSemDdlManual() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -279,12 +292,20 @@ class Ind08LeituraHistoricaCampoHttpIT extends ContratosHttpBase {
         assertThat(emTransacao(() -> em.find(ProvaHistoricaContrato.class, provaId).getNumeroRevisao()))
                 .as("A fonte canônica criou a primeira revisão válida antes da simulação")
                 .isEqualTo(1);
+        assertThatThrownBy(() -> emTransacao(() -> {
+            // Apenas interpretar: se a proteção regredir, esta contraprova não
+            // executa DML nem deixa dano artificial antes do finally abaixo.
+            em.createQuery("update ProvaHistoricaContrato p set p.numeroRevisao=3 where p.id=:id");
+            return null;
+        })).as("A entidade de produção continua recusando atualização HQL de fonte imutável")
+                .isInstanceOf(org.hibernate.query.sqm.InterpretationException.class)
+                .hasMessageContaining("immutable entity");
         boolean mutacaoConfirmada = false;
         try {
             emTransacao(() -> {
-                assertThat(em.createQuery("update ProvaHistoricaContrato p set p.numeroRevisao=3 "
-                                + "where p.id=:id and p.contrato.id=:contrato and p.eventoOrigem.id=:evento "
-                                + "and p.numeroRevisao=1 and p.provaAnterior is null")
+                assertThat(em.createQuery("update ProvaHistoricaContratoFalhaFixture p set p.numeroRevisao=3 "
+                                + "where p.id=:id and p.contratoId=:contrato and p.eventoOrigemId=:evento "
+                                + "and p.numeroRevisao=1 and p.provaAnteriorId is null")
                         .setParameter("id", provaId).setParameter("contrato", o.n().id())
                         .setParameter("evento", o.evento()).executeUpdate()).isEqualTo(1);
                 return null;
@@ -301,9 +322,9 @@ class Ind08LeituraHistoricaCampoHttpIT extends ContratosHttpBase {
                 // Desfaz somente o dano artificial deste controle negativo. Não apaga
                 // a prova ou seus fatos e não altera a política de imutabilidade.
                 emTransacao(() -> {
-                    assertThat(em.createQuery("update ProvaHistoricaContrato p set p.numeroRevisao=1 "
-                                    + "where p.id=:id and p.contrato.id=:contrato and p.eventoOrigem.id=:evento "
-                                    + "and p.numeroRevisao=3 and p.provaAnterior is null")
+                    assertThat(em.createQuery("update ProvaHistoricaContratoFalhaFixture p set p.numeroRevisao=1 "
+                                    + "where p.id=:id and p.contratoId=:contrato and p.eventoOrigemId=:evento "
+                                    + "and p.numeroRevisao=3 and p.provaAnteriorId is null")
                             .setParameter("id", provaId).setParameter("contrato", o.n().id())
                             .setParameter("evento", o.evento()).executeUpdate())
                             .as("Restaurar exclusivamente a revisão sintética alterada pelo próprio teste")

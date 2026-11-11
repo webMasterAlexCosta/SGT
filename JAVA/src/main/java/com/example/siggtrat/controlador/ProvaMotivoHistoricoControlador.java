@@ -8,7 +8,11 @@ import java.time.*;
 import java.util.*;
 @RestController
 @RequestMapping("/api/motivos-desligamento/{id}")
-public class ProvaMotivoHistoricoControlador {
+public class ProvaMotivoHistoricoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ProvaMotivoHistoricoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
  private final MotivoDesligamentoHistoricoServico servico;
  public ProvaMotivoHistoricoControlador(MotivoDesligamentoHistoricoServico servico){this.servico=servico;}
  @PostMapping("/provas-historicas/previa")

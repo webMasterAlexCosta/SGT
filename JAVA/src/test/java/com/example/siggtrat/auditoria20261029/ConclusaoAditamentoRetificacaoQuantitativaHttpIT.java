@@ -149,12 +149,16 @@ class ConclusaoAditamentoRetificacaoQuantitativaHttpIT extends ContratosHttpBase
         String conhecimento = corte == null ? "" : "&conhecidoAte=" + corte;
         var composicoes = composicoes(c, n, data, corte);
         assertThat(composicoes).hasSize(2);
+        assertThat(java.util.stream.StreamSupport.stream(composicoes.spliterator(), false)
+                .map(comp -> comp.path("id").asLong()).toList())
+                .containsExactlyInAnyOrder(n.composicao1(), n.composicao2());
         for (var comp : composicoes) {
             long id = comp.path("id").asLong();
             assertThat(id).isIn(n.composicao1(), n.composicao2());
             assertThat(comp.path("efetivoPrevisto").asInt()).isEqualTo(id == n.composicao1() ? primeira : segunda);
         }
-        assertThat(primeira + segunda).isEqualTo(total);
+        assertThat(java.util.stream.StreamSupport.stream(composicoes.spliterator(), false)
+                .mapToLong(comp -> comp.path("efetivoPrevisto").asLong()).sum()).isEqualTo(total);
         assertThat(consultar(c.localA, base(n.id()) + "/posicao-temporal?data=" + data + conhecimento,
                 "CMP003 total é a soma integral da distribuição efetiva").path("versaoContratual").path("efetivoPrevisto").asInt())
                 .isEqualTo(total);
@@ -164,7 +168,7 @@ class ConclusaoAditamentoRetificacaoQuantitativaHttpIT extends ContratosHttpBase
         if (corte == null) return consultar(c.localA, base(n.id()) + "/composicoes?data=" + data,
                 "CMP003 distribuição HTTP válida na data");
         // A rota de composição aceita data efetiva; o corte de conhecimento é
-        // verificado no serviço canônico real, com nova transação e MySQL.
+        // verificado no serviço canônico real, com nova transação e PostgreSQL.
         return emTransacao(() -> mapper.valueToTree(composicaoTemporal.projetarDTO(em.find(Contrato.class, n.id()), data, corte)));
     }
 

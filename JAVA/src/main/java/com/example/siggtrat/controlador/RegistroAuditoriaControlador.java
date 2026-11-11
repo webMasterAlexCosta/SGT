@@ -15,7 +15,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/registros-auditoria")
 @PreAuthorize("hasAuthority(T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_ADMINISTRADOR)")
-public class RegistroAuditoriaControlador {
+public class RegistroAuditoriaControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RegistroAuditoriaControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ConsultaRegistroAuditoriaServico servico;
     public RegistroAuditoriaControlador(ConsultaRegistroAuditoriaServico servico) { this.servico = servico; }
 
@@ -40,6 +44,8 @@ public class RegistroAuditoriaControlador {
     @GetMapping("/{id}")
     public ResponseEntity<RegistroAuditoriaDTO> buscarPorId(@PathVariable Long id) {
         RegistroAuditoriaDTO dto = servico.buscarPorId(id);
-        return dto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dto);
+        if (dto == null) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Registro de auditoria não encontrado no seu escopo.");
+        return ResponseEntity.ok(dto);
     }
 }

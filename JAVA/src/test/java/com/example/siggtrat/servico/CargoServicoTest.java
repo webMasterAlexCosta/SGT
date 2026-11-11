@@ -49,6 +49,7 @@ class CargoServicoTest {
 
     @Test
     void criaCargoNormalizandoCamposTextuaisNoEscopoDaGestaoLocal() {
+        when(repositorio.bloquearNamespaceDaGestaoLocal(5L)).thenReturn(Optional.of(true));
         when(repositorio.findByGestaoLocalIdAndNomeIgnoreCase(5L, "Analista")).thenReturn(Optional.empty());
         when(repositorio.save(any(Cargo.class))).thenAnswer(invocation -> {
             Cargo cargo = invocation.getArgument(0);
@@ -72,6 +73,7 @@ class CargoServicoTest {
 
     @Test
     void rejeitaCriacaoSemDto() {
+        when(repositorio.bloquearNamespaceDaGestaoLocal(5L)).thenReturn(Optional.of(true));
         IllegalArgumentException ex = assertThrows(IllegalArgumentException.class, () -> servico.criar(null));
         assertTrue(ex.getMessage().contains("cargo"));
         verify(repositorio, never()).save(any());
@@ -79,6 +81,7 @@ class CargoServicoTest {
 
     @Test
     void atualizacaoInexistenteRetornaNull() {
+        when(repositorio.bloquearNamespaceDaGestaoLocal(5L)).thenReturn(Optional.of(true));
         when(repositorio.findById(90L)).thenReturn(Optional.empty());
         assertNull(servico.atualizar(90L, dto("Cargo")));
         verify(repositorio, never()).save(any());

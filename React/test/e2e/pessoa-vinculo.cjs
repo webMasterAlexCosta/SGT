@@ -11,6 +11,8 @@ execute('pessoa-vinculo', async ({ page, fixture, check, screenshot, open, confi
   await modal.getByLabel(/^CPF/).fill(data.pessoa.cpf);
   await modal.getByLabel(/^Contrato/).selectOption(String(data.contratoId));
   await modal.getByLabel(/^Início efetivo/).fill(data.dataInicio);
+  check('Fixture fornece matrícula sintética para a prova de identificação', typeof data.matricula === 'string' && data.matricula.trim().length > 0);
+  await modal.getByLabel(/^Matrícula do vínculo/).fill(data.matricula);
   const composition = modal.getByLabel(/^Composição vigente/);
   await composition.locator(`option[value="${data.composicaoId}"]`).waitFor({ state: 'attached', timeout: 15000 });
   await composition.selectOption(String(data.composicaoId));
@@ -22,6 +24,7 @@ execute('pessoa-vinculo', async ({ page, fixture, check, screenshot, open, confi
   const body = await response.json();
   recordBusiness({ pessoaId: body.data.pessoaId, vinculoId: body.data.id });
   check('Pessoa, vínculo e alocação inicial gravados pelo Java', response.status() === 201 && !!body.data.id && !!body.data.pessoaId, { status: response.status(), pessoaId: body.data.pessoaId, vinculoId: body.data.id });
+  check('Recibo preserva matrícula, contrato e composição explicitamente escolhidos', body.data.matricula === data.matricula && body.data.contratoId === data.contratoId && body.data.composicaoInicialId === data.composicaoId);
   await modal.waitFor({ state: 'hidden', timeout: 15000 });
   await screenshot('vinculo-criado');
 });

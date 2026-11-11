@@ -41,8 +41,8 @@ class MotivosProvaContextoHistoricoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void infraestruturaReal() throws Exception {
         try (var c = dataSource.getConnection()) {
-            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(c.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(c.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -141,7 +141,8 @@ class MotivosProvaContextoHistoricoHttpIT extends ContratosHttpBase {
         conceder(p.c(), p.c().contratoA.getId(), "INCORPORACAO_PROVA_HISTORICA");
         conceder(p.c(), p.c().contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
         LocalDate transferencia = DATA.plusDays(10);
-        enviar(p.c().localA, base(p.c().contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(p.c().localA, base(p.c().contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", transferencia, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", p.c().gestaoB.getId(), "tipoContratacaoDestinoId", p.c().tipoB.getId(),
                 "motivo", "Transferência documental para testar custódia atual da prova histórica",

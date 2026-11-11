@@ -20,7 +20,11 @@ import java.util.Set;
 
 @Service
 @Transactional(isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED)
-public class CorrecaoCnpjContratoServico {
+public class CorrecaoCnpjContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CorrecaoCnpjContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ContratoRepositorio contratos;
     private final CorrecaoCnpjContratoRepositorio correcoes;
     private final AcessoOrganizacionalServico acesso;
@@ -100,9 +104,7 @@ public class CorrecaoCnpjContratoServico {
     }
 
     private String assinatura(CorrecaoCnpjContratoRequisicao req, String cnpj, Long usuarioId) {
-        return AssinaturaPreviaNegocial.sha256(List.of(cnpj, req.dataEfetiva().toString(), req.dataAto().toString(),
-                req.motivo().trim(), req.referenciaSei().trim(), String.valueOf(usuarioId),
-                AssinaturaPreviaNegocial.valor(req.eventoPrecedenteId()), AssinaturaPreviaNegocial.valor(req.relacaoPrecedencia()),
-                AssinaturaPreviaNegocial.valor(req.ordemDocumental())));
+        return AssinaturaPreviaNegocial.sha256("sgt.correcao-cnpj.intencao.v1", AssinaturaPreviaNegocial.partes(cnpj, req.dataEfetiva(), req.dataAto(),
+                req.motivo().trim(), req.referenciaSei().trim(), usuarioId, req.eventoPrecedenteId(), req.relacaoPrecedencia(), req.ordemDocumental()));
     }
 }

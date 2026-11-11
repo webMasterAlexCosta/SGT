@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -118,7 +118,7 @@ class RelatoriosMinimizacaoHttpIT extends AuditoriaHttpSuporte {
                 "justificativaRetificacao", "Conferência documental para apuração institucional",
                 "chaveIdempotencia", "minimizacao-" + UUID.randomUUID()))), 200, "Frequência real que torna o relatório não vazio");
     }
-    private MockHttpServletRequestBuilder consulta(String rota, Cenario c) {
+    private AbstractMockHttpServletRequestBuilder<?> consulta(String rota, Cenario c) {
         var r = get("/api/relatorios/" + rota);
         if (rota.startsWith("frequencia-consolidada")) return r.param("inicio", DATA.toString())
                 .param("fim", DATA.toString()).param("contratoIds", c.contratoA.getId().toString());

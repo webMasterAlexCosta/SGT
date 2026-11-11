@@ -26,7 +26,11 @@ import java.util.*;
 
 @org.springframework.stereotype.Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
-public class CalendarioEventoServico {
+public class CalendarioEventoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CalendarioEventoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final CalendarioEventoRepositorio repositorio;
     private final LotacaoRepositorio lotacaoRepositorio;
@@ -71,10 +75,10 @@ public class CalendarioEventoServico {
         List<CalendarioEvento> eventos;
         if (data != null) eventos = repositorio.findByData(data);
         else if (inicio != null && fim != null) {
-            if (inicio.isAfter(fim)) throw new IllegalArgumentException("A data inicial não pode ser posterior à data final.");
+            if (inicio.isAfter(fim)) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A data inicial não pode ser posterior à data final.");
             eventos = repositorio.findByDataBetween(inicio, fim);
         } else if (inicio != null || fim != null) {
-            throw new IllegalArgumentException("Informe as datas inicial e final para pesquisar um período.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe as datas inicial e final para pesquisar um período.");
         } else eventos = repositorio.findAll();
 
         Lotacao lotacaoFiltro = lotacaoId == null ? null : lotacaoRepositorio.findById(lotacaoId)
@@ -92,7 +96,7 @@ public class CalendarioEventoServico {
                 .map(this::paraDTO).toList();
     }
     public CalendarioEventoDTO criar(CalendarioEventoRequisicao dados) {
-        if (dados == null) throw new IllegalArgumentException("Informe os dados do evento.");
+        if (dados == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe os dados do evento.");
         UsuarioAplicacao user = acessoOrganizacionalServico.usuarioAtual();
         if (!acessoOrganizacionalServico.podeGerenciarCalendario(user)) throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                 "Somente a Gestão Local pode cadastrar o calendário do seu escopo.");
@@ -114,7 +118,7 @@ public class CalendarioEventoServico {
     }
 
     public CalendarioEventoDTO atualizar(Long id, CalendarioEventoRequisicao dados) {
-        if (dados == null) throw new IllegalArgumentException("Informe os dados do evento.");
+        if (dados == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe os dados do evento.");
         UsuarioAplicacao user = acessoOrganizacionalServico.usuarioAtual();
         exigirGestorCalendario(user);
         bloquearFontes();
@@ -348,8 +352,8 @@ public class CalendarioEventoServico {
 
     private void validarPeriodo(LocalDate data, LocalDate inicio, LocalDate fim) {
         if (data != null) return;
-        if ((inicio == null) != (fim == null)) throw new IllegalArgumentException("Informe as datas inicial e final para pesquisar um período.");
-        if (inicio != null && inicio.isAfter(fim)) throw new IllegalArgumentException("A data inicial não pode ser posterior à data final.");
+        if ((inicio == null) != (fim == null)) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe as datas inicial e final para pesquisar um período.");
+        if (inicio != null && inicio.isAfter(fim)) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A data inicial não pode ser posterior à data final.");
     }
     private boolean noPeriodo(LocalDate valor, LocalDate data, LocalDate inicio, LocalDate fim) {
         if (data != null) return data.equals(valor);

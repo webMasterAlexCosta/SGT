@@ -34,7 +34,11 @@ class CargoControladorTest {
     void updateRetorna404QuandoRegistroNaoExiste() {
         CargoDTO entrada = new CargoDTO(null, "Analista", null, null, null, null, null, null, null, null, null);
         when(servico.atualizar(77L, entrada)).thenReturn(null);
-        assertEquals(HttpStatus.NOT_FOUND, controller.atualizar(77L, entrada).getStatusCode());
+        var erro=assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                ()->controller.atualizar(77L,entrada));
+        assertEquals(HttpStatus.NOT_FOUND,erro.getStatusCode());
+        assertTrue(erro.getReason().contains("Cargo"));
+        verify(servico).atualizar(77L,entrada);
     }
 
     @Test
@@ -43,6 +47,9 @@ class CargoControladorTest {
         when(servico.excluir(2L)).thenReturn(false);
 
         assertEquals(HttpStatus.NO_CONTENT, controller.excluir(1L).getStatusCode());
-        assertEquals(HttpStatus.NOT_FOUND, controller.excluir(2L).getStatusCode());
+        var erro=assertThrows(org.springframework.web.server.ResponseStatusException.class,()->controller.excluir(2L));
+        assertEquals(HttpStatus.NOT_FOUND,erro.getStatusCode());
+        assertTrue(erro.getReason().contains("Cargo"));
+        verify(servico).excluir(2L);
     }
 }

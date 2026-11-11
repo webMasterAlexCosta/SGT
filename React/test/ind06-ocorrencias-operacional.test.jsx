@@ -4,11 +4,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar, user } = vi.hoisted(() => ({ requisitar: vi.fn(), user: { perfil: 'OPERACIONAL', vinculosGestao: [] } }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-vi.mock('../src/core/config.js', async (original) => { const m = await original(); return { ...m, CONFIG: { ...m.CONFIG, SEARCH_DEBOUNCE_MS: 0 } }; });
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null }) }));
-import { PaginaOcorrencias } from '../src/modules/rh/pages/PaginaOcorrencias/index.jsx';
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+vi.mock('../src/core/config.ts', async (original) => { const m = await original(); return { ...m, CONFIG: { ...m.CONFIG, SEARCH_DEBOUNCE_MS: 0 } }; });
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null }) }));
+import { PaginaOcorrencias } from '../src/modules/rh/pages/PaginaOcorrencias/index.tsx';
 
 const escopos = [
   { id: 1, lotacao: { id: 7, label: 'Lotação Norte' }, jornada: { id: 8, label: 'Manhã' } },

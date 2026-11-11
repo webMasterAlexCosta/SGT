@@ -1,0 +1,18 @@
+{
+  ".homologacao/20261109-sgt-final/backend-gate18-approved.json": "df6d4cb7e96b6164f2e23aa4b4f036681c64edc64442f9fe8b3d91d957482871",
+  ".homologacao/20261109-sgt-final/frontend-final07-jar-binding.json": "de548cec400a2edb4e65184fc1f6cfb9479edc5b2439d4e2101b6e791383f2fa",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/parecer.md": "c622ca121be1cc3e63f290087dece69048b9053f76164565b1e98a7cbd760178",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/freeze-ended.json": "6dc5ac7d6bb563c4e10b69449fe61183f6adfa4a506dfd0c7ddcddd3a00c2913",
+  ".homologacao/20261109-sgt-final/it-supplier-red01/result.json": "58967fca97ea5a92e42c03808b8f1cd8031ce6cfbc14545df8d03505a0cf3a7f",
+  ".homologacao/20261109-sgt-final/it-supplier-red03/result.json": "4fb85694ab1e5c6b83b82f6f2590810177d438ea5ad10bcebf27b638a931875f",
+  ".homologacao/20261109-sgt-final/it-supplier-red03/cache-isolation.json": "03e7c5ae21ffff32c8c3cf1d9ad44891ef6d9cc53bbe3416e8894430d332dbb5",
+  ".homologacao/20261109-sgt-final/it-supplier-red02/result.json": "b89fb63e18e7026f4c2f771ae19ba9994bcf38390f28685bdeeefedbf0f32000",
+  ".homologacao/20261109-sgt-final/it-supplier-green02/result.json": "c6caad67860a3497fd8268bd227ceb651a3267c4b7e12a12ae6de84b6246e5df",
+  ".homologacao/20261109-sgt-final/review-java-supplier19/parecer.md": "7934d19b2a18e3a6619ee982b954ab6d5009f73f1f5b29615560bd0ccbfc09f1",
+  ".homologacao/20261109-sgt-final/review-java-supplier19/freeze-ended.json": "b99b4da17d02ec684651d7475da231690e49e456375c82e06217be0afe2a8c32",
+  ".homologacao/20261109-sgt-final/it-supplier-green03/result.json": "de89d0f288bf3cd7f93f972eea4fd2b425cb6db32c1ae40942ef45111568abe3",
+  ".homologacao/20261109-sgt-final/it-supplier-green03/cache-isolation.json": "03e7c5ae21ffff32c8c3cf1d9ad44891ef6d9cc53bbe3416e8894430d332dbb5",
+  ".homologacao/20261109-sgt-final/java-compile-supplier04/result.json": "84b40f707aedacb20ca25b2c5a8f06ab6df7772989b529ebc8b1d0b1d3f8f63b",
+  ".homologacao/20261109-sgt-final/review-java-supplier20/brief.md": "5d10b0fa3d76c930fd6e874449c98c32c1688575746aad46093a4f91ef440c6f",
+  ".homologacao/20261109-sgt-final/review-java-supplier20/increment.patch": "1da901ea0883721010007a092690d25a3b041c0023a4eafa7c67af4c8bf718dc"
+}

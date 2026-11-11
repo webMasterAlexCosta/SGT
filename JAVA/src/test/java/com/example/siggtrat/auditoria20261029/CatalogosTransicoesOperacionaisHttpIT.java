@@ -173,10 +173,34 @@ class CatalogosTransicoesOperacionaisHttpIT extends ContratosHttpBase {
                         "cpf", cpf(670000000 + Math.toIntExact(id))), "contratoId", c.contratoA.getId(),
                 "composicaoId", c.composicaoA.getId(), "dataInicio", DATA.plusDays(2)), 201,
                 "CAT007 escolha posterior nasceu sob disponibilidade comprovada");
+        JsonNode programado=enviar(c.localA,"/api/vinculos-contratuais",mapa("pessoa",mapa("nome","Pessoa futura fonte B09 "+id,
+                "cpf",cpf(757000000+Math.toIntExact(id))),"contratoId",c.contratoA.getId(),"composicaoId",c.composicaoA.getId(),
+                "dataInicio",RelogioSistema.hoje().plusDays(5)),201,"CAT007 controle positivo de dependência futura explícita");
+        long posteriorId=vinculo.path("id").asLong(), futuroId=programado.path("id").asLong();
+        assertThat(futuroId).isNotEqualTo(posteriorId);
+        var fontesAntes=fontesB09(id);
+        var posteriorAntes=dependenteB09(posteriorId);
+        var futuroAntes=dependenteB09(futuroId);
+        assertThat(fontesAntes).isNotEmpty();assertThat(posteriorAntes).isNotEmpty();assertThat(futuroAntes).isNotEmpty();
         var req = requisicao(c, id, DATA, false);
         long antes = contar(TipoCatalogoTemporal.CARGO, id);
         enviar(c.localA, rota(id) + "/previa", req, 409,
                 "TMP009 ato invalidaria escolha posterior e exige tratamento explícito antes de continuar");
+        assertThat(fontesB09(id)).as("CAT007 recusa retroativa preserva IDs e conteúdo integral das fontes posteriores").isEqualTo(fontesAntes);
+        assertThat(dependenteB09(posteriorId)).isEqualTo(posteriorAntes);
+        assertThat(dependenteB09(futuroId)).isEqualTo(futuroAntes);
+        var inativarHoje=requisicao(c,id,RelogioSistema.hoje(),false);
+        enviar(c.localA,rota(id),inativarHoje,409,"CAT007 programação futura também impede ato atual incompatível");
+        assertThat(fontesB09(id)).as("CAT007 fonte futura e posterior não é removida ou reescrita na recusa").isEqualTo(fontesAntes);
+        assertThat(dependenteB09(posteriorId)).isEqualTo(posteriorAntes);
+        assertThat(dependenteB09(futuroId)).isEqualTo(futuroAntes);
+        emTransacao(() -> {
+            VinculoContratual f=em.find(VinculoContratual.class,futuroId);
+            assertThat(f.getPessoa().getId()).isEqualTo(programado.path("pessoaId").asLong());
+            assertThat(f.getContrato().getId()).isEqualTo(c.contratoA.getId());
+            assertThat(f.getDataInicio()).isEqualTo(RelogioSistema.hoje().plusDays(5));
+            assertThat(f.getEstadoNegocial().name()).isEqualTo("REGISTRADO");return null;
+        });
         assertThat(contar(TipoCatalogoTemporal.CARGO, id)).isEqualTo(antes);
         emTransacao(() -> {
             assertThat(em.find(VinculoContratual.class, vinculo.path("id").asLong()).getDataInicio()).isEqualTo(DATA.plusDays(2));
@@ -192,6 +216,29 @@ class CatalogosTransicoesOperacionaisHttpIT extends ContratosHttpBase {
         enviar(c.localA, rota(id), req, 409, "CAT005 nova rota mantém guarda de programação futura");
         assertThat(contar(TipoCatalogoTemporal.CARGO, id)).isEqualTo(antes);
         emTransacao(() -> { assertThat(em.find(Cargo.class, id).getAtivo()).isTrue(); return null; });
+    }
+
+    private java.util.List<String> fontesB09(long catalogoId) {
+        return emTransacao(() -> em.createQuery("select e.id,e.tipoCatalogo,e.catalogoId,e.dataEfetiva,e.registradoEm,e.ativo,e.ativoAnterior,"
+                +"e.motivo,e.evidencia,e.autorizacao,e.chaveOrigem,e.chaveIdempotencia,e.hashIntencao,"
+                +"e.versaoCatalogoApos,e.ativoAtualAposRegistro,e.responsavelId,e.responsavelUsername "
+                +"from EventoDisponibilidadeCatalogo e where e.tipoCatalogo=:t and e.catalogoId=:id order by e.id",Object[].class)
+                .setParameter("t",TipoCatalogoTemporal.CARGO).setParameter("id",catalogoId).getResultList().stream()
+                .map(java.util.Arrays::toString).toList());
+    }
+
+    private java.util.List<String> dependenteB09(long vinculoId) {
+        return emTransacao(() -> {
+            java.util.List<String> r=new java.util.ArrayList<>();
+            for(String q:java.util.List.of(
+                    "select v.id,v.pessoa.id,v.contrato.id,v.dataInicio,v.dataFim,v.estadoNegocial,v.version from VinculoContratual v where v.id=:v",
+                    "select a.id,a.vinculo.id,a.composicao.id,a.lotacao.id,a.jornada.id,a.cargo.id,a.dataInicio,a.dataFim,a.estadoNegocial,a.version from AlocacaoVinculo a where a.vinculo.id=:v order by a.id",
+                    "select e.id,e.hashEvento from EventoVinculoContratual e where e.vinculo.id=:v order by e.id",
+                    "select e.id,e.hashEvento from EventoAlocacaoVinculo e where e.vinculo.id=:v order by e.id"))
+                em.createQuery(q,Object[].class).setParameter("v",vinculoId).getResultList().stream()
+                        .map(java.util.Arrays::toString).forEach(r::add);
+            return r;
+        });
     }
 
     private long cargoNovo(Cenario c, boolean ativo) throws Exception {

@@ -1,12 +1,12 @@
 import React from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { id: 12, perfil: 'GESTOR_LOCAL' } }) }));
-import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.jsx';
-import { api } from '../src/core/http.js';
-import { EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { id: 12, perfil: 'GESTOR_LOCAL' } }) }));
+import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.tsx';
+import { api } from '../src/core/http.ts';
+import { EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
 
 const ok = (config, data) => ({ config, data, status: 200, statusText: 'OK', headers: {} });
 const pagina = { content: [{ id: 77, tipo: 'FREQUENCIA_CONSOLIDADA', versao: 1 }], number: 0, totalPages: 1, totalElements: 1, first: true, last: true };

@@ -241,11 +241,33 @@ class ContratosCriteriosComplementaresHttpIT extends ContratosHttpBase {
     @ValueSource(booleans = {false, true})
     void remanejamentoForaDaVigenciaNaoRegistraFatoNemComposicao(boolean depois) throws Exception {
         var c = criarCenario(); var n = publicado(c, 100, 25, false);
+        em.flush(); em.clear();
+        java.time.Instant inicioConsultas = java.time.Instant.now();
+        var composicoesAntes = consultar(c.localA, base(n.id()) + "/composicoes?data=" + n.inicio(),
+                "REM003 fotografia completa por ID antes da recusa de data");
+        var paresAntes = java.util.stream.StreamSupport.stream(composicoesAntes.spliterator(), false)
+                .collect(java.util.stream.Collectors.toMap(item -> item.path("id").asLong(), item -> item.path("efetivoPrevisto").asInt()));
+        assertThat(paresAntes).isEqualTo(java.util.Map.of(n.composicao1(), 25, n.composicao2(), 75));
         var req = remanejamento(n, "REM-FORA", depois ? n.fim().plusDays(1) : n.inicio().minusDays(1), 5);
         enviar(c.localA, base(n.id()) + "/remanejamentos/previa", req, 400, "CON017/REM003 data fora da vigência");
         em.flush(); em.clear();
         assertThat(consultar(c.localA, base(n.id()) + "/remanejamentos", "REM003 nenhum fato inválido").isEmpty()).isTrue();
         assertThat(consultar(c.localA, base(n.id()) + "/composicoes", "REM003 somente recortes originais").size()).isEqualTo(2);
+        var composicoesDepois = consultar(c.localA, base(n.id()) + "/composicoes?data=" + n.inicio(),
+                "REM003 nova consulta dos mesmos IDs e conteúdo após recusa de data");
+        for (var consulta : java.util.List.of(composicoesAntes, composicoesDepois)) {
+            for (var composicao : consulta) {
+                assertThat(composicao.path("conhecidoAte").isTextual()).isTrue();
+                java.time.Instant corte = java.time.Instant.parse(composicao.path("conhecidoAte").asText());
+                assertThat(corte).isBetween(inicioConsultas.minusSeconds(1), java.time.Instant.now().plusSeconds(1));
+                // Somente o instante automático do GET; datas persistidas das fontes continuam comparadas.
+                ((com.fasterxml.jackson.databind.node.ObjectNode) composicao).remove("conhecidoAte");
+            }
+        }
+        assertThat(composicoesDepois).isEqualTo(composicoesAntes);
+        assertThat(java.util.stream.StreamSupport.stream(composicoesDepois.spliterator(), false)
+                .collect(java.util.stream.Collectors.toMap(item -> item.path("id").asLong(), item -> item.path("efetivoPrevisto").asInt())))
+                .isEqualTo(paresAntes);
         assertThat(contarEventos(n.id())).isEqualTo(1L);
     }
 

@@ -14,7 +14,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.List;
 
 @Service
-public class SuperintendenciaServico {
+public class SuperintendenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(SuperintendenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final SuperintendenciaEstadualRepositorio repositorio;
     private final AcessoOrganizacionalServico acessoOrganizacionalServico;
     private final GestaoAcessoHierarquicoServico gestaoAcessoHierarquicoServico;

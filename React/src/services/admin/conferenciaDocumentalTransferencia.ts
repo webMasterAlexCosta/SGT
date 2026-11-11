@@ -1,0 +1,3 @@
+/** Política textual acordada com o contrato64; não comprova autenticidade externa. */
+export const VERSAO_CONFERENCIA_TRANSFERENCIA = "transferencia-gestao-conferencia-v1" as const;
+export const DECLARACAO_CONFERENCIA_TRANSFERENCIA = "Declaro que conferi as referências informadas e que a autorização administrativa do ato abrange esta operação, suas datas, as Gestões de origem e destino, o Tipo de Contratação, todos os mapeamentos e o ato anterior indicado, quando houver. Esta declaração registra minha conferência e não comprova leitura, autenticidade ou validação jurídica pelo SGT." as const;

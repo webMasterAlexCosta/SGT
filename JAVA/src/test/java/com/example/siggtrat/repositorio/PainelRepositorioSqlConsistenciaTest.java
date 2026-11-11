@@ -50,8 +50,13 @@ class PainelRepositorioSqlConsistenciaTest {
         );
 
         String sql = sqlCaptor.getValue();
-        assertTrue(sql.contains("GROUP BY WEEKDAY(f.data_referencia)"));
-        assertFalse(sql.contains("CASE WEEKDAY(f.data_referencia)"));
+        // Nome histórico preservado; PostgreSQL deve manter segunda=0 até domingo=6.
+        String ordem="(EXTRACT(ISODOW FROM f.data_referencia) - 1)";
+        assertTrue(sql.contains("SELECT "+ordem+" AS ordem"));
+        assertTrue(sql.contains("GROUP BY "+ordem));
+        assertTrue(sql.contains("ORDER BY "+ordem));
+        assertFalse(sql.contains("WEEKDAY("));
+        assertFalse(sql.contains("CASE "+ordem));
         assertFalse(sql.contains("AS dia"));
     }
     @SuppressWarnings({"unchecked", "rawtypes"})

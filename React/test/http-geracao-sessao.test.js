@@ -1,12 +1,12 @@
 // Transporte Axios controlado: não utiliza backend, credenciais nem cookies reais.
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { waitFor } from '@testing-library/react';
-import { api, requisitar } from '../src/core/http.js';
-import { obterGeracaoSessao, invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { configurarBuscadorTokenCsrf, invalidarTokenCsrf, obterTokenCsrf, obterTokenCsrfEmMemoria, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { registrarSolicitadorConfirmacaoSenha, resetarSolicitadorConfirmacaoSenhaParaTestes } from '../src/core/http/coordenadorConfirmacaoSenha.js';
-import { EVENT_LOGOUT, EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.js';
-import { ServicoAutenticacao } from '../src/services/auth/ServicoAutenticacao.js';
+import { api, requisitar } from '../src/core/http.ts';
+import { obterGeracaoSessao, invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { configurarBuscadorTokenCsrf, invalidarTokenCsrf, obterTokenCsrf, obterTokenCsrfEmMemoria, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { registrarSolicitadorConfirmacaoSenha, resetarSolicitadorConfirmacaoSenhaParaTestes } from '../src/core/http/coordenadorConfirmacaoSenha.ts';
+import { EVENT_LOGOUT, EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
+import { ServicoAutenticacao } from '../src/services/auth/ServicoAutenticacao.ts';
 const diferida = () => { let resolve, reject; const promise = new Promise((a, b) => { resolve = a; reject = b; }); return { promise, resolve, reject }; };
 const csrf = token => ({ headerName: 'X-XSRF-TOKEN', parameterName: '_csrf', token });
 const ok = (config, data) => ({ config, data, status: 200, headers: {}, statusText: 'OK' });

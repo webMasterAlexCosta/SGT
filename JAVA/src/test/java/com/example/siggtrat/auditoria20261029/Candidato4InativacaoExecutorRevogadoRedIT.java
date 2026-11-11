@@ -1,5 +1,7 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
@@ -37,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * C4-CON-H01 — Hipótese independente: inativarAdministrativamente carrega a
  * autorização antes de aguardar a raiz e não a revalida depois da espera.
  * Oráculo: CON-009:001 e norma §5.25/§5.26, autorização corrente do executor.
- * Usa a técnica de sincronização MySQL de Candidato3ReplayIdentificadorExecutorRevogadoRedIT,
+ * Usa a técnica de sincronização PostgreSQL de Candidato3ReplayIdentificadorExecutorRevogadoRedIT,
  * preservando sua origem; cenário e assertivas de inativação por este revisor.
  * Fonte auditada: manifesto C4 13c84fd30b668335228704fd1028ddea11adad6f607458a7b7fa993dcbc64a89.
  * Proposta não compilada nem executada por este revisor; execução reservada à raiz.
@@ -77,7 +79,7 @@ class Candidato4InativacaoExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, n.id(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarContrato.await(30, TimeUnit.SECONDS))
@@ -89,8 +91,11 @@ class Candidato4InativacaoExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("inativacao-contrato");
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", n.id()),
+                    "Contrato da inativação administrativa", tentativa);
 
             Map<String, Object> revogacao = rebaixarPerfil
                     ? mapa("perfil", "OPERACIONAL", "gestaoLocalId", c.gestaoA.getId(),
@@ -116,7 +121,7 @@ class Candidato4InativacaoExecutorRevogadoRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
                     "hipotese", "C4-CON-H01", "rebaixarPerfil", rebaixarPerfil,
-                    "esperaMySqlObservada", true, "revogacaoCommitadaAntesDaLiberacao", true,
+                    "esperaPostgresObservada", espera, "revogacaoCommitadaAntesDaLiberacao", true,
                     "statusInativação", resultado.getResponse().getStatus(), "antes", antes, "depois", depois)));
             assertAll("Inativação depende de executor ainda autorizado no instante da mutação",
                     () -> assertThat(resultado.getResponse().getStatus())
@@ -127,32 +132,6 @@ class Candidato4InativacaoExecutorRevogadoRedIT extends ContratosHttpBase {
             liberarContrato.countDown();
             pool.shutdownNow();
             pool.awaitTermination(10, TimeUnit.SECONDS);
-        }
-    }
-
-    private void aguardarBloqueioReal(long conexaoBloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<Void> esperaObservada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        // A cadência apenas limita consultas; a ordem depende exclusivamente
-        // da espera real no performance_schema, nunca de um sleep presumido.
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
-                if (esperas != null && esperas >= 1) esperaObservada.complete(null);
-                else if (tentativa.isDone()) esperaObservada.completeExceptionally(
-                        new AssertionError("Inativação não alcançou a espera real no Contrato"));
-            } catch (Throwable ex) {
-                esperaObservada.completeExceptionally(ex);
-            }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { esperaObservada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true);
-            observador.shutdownNow();
-            observador.awaitTermination(5, TimeUnit.SECONDS);
         }
     }
 

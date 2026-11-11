@@ -15,7 +15,11 @@ import java.util.List;
  * configurada (por padrão, 52min30s).</p>
  */
 @Service
-public class CalculadoraJornadaNoturnaServico {
+public class CalculadoraJornadaNoturnaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CalculadoraJornadaNoturnaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final int MINUTOS_DIA = 24 * 60;
 
@@ -143,7 +147,7 @@ public class CalculadoraJornadaNoturnaServico {
 
     public record Periodo(int inicio, int fim) {
         public Periodo {
-            if (fim < inicio) throw new IllegalArgumentException("O fim do período não pode anteceder o início.");
+            if (fim < inicio) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O fim do período não pode anteceder o início.");
         }
 
         public int minutosTotais() {

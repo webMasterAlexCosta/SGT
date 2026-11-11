@@ -6,6 +6,8 @@ import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.GestaoLocal;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.Timeout;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -37,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Autoria /root, revisão independente separada. Hipótese de atomicidade da
  * proibição já existente de duas concessões vigentes do mesmo tipo e escopo.
  * Dois pedidos válidos de administradores distintos concorrem.
- * A barreira MySQL é a referência persistida, não um mock do repositório.
+ * A barreira PostgreSQL é a referência persistida, não um mock do repositório.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class Candidato9ConcessoesMesmoEscopoConcorrentesRedIT extends ContratosHttpBase {
@@ -70,10 +72,11 @@ class Candidato9ConcessoesMesmoEscopoConcorrentesRedIT extends ContratosHttpBase
         var pool = Executors.newFixedThreadPool(3);
         CountDownLatch liberar = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBloqueadora = new CompletableFuture<>();
+        var atorA=new Ator("concessao-A");var atorB=new Ator("concessao-B");
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 assertThat(em.find(entidade, alvo, LockModeType.PESSIMISTIC_WRITE)).isNotNull();
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(40, TimeUnit.SECONDS)) throw new AssertionError("Referência não liberada");
@@ -83,9 +86,11 @@ class Candidato9ConcessoesMesmoEscopoConcorrentesRedIT extends ContratosHttpBase
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> primeira = pool.submit(() -> mvc.perform(pedidoA).andReturn());
-            Future<MvcResult> segunda = pool.submit(() -> mvc.perform(pedidoB).andReturn());
-            var esperas = aguardarDuasEsperas(conexao, tabela, alvo, primeira, segunda);
+            Future<MvcResult> primeira = pool.submit(() -> atorA.executar(() -> mvc.perform(pedidoA).andReturn()));
+            Future<MvcResult> segunda = pool.submit(() -> atorB.executar(() -> mvc.perform(pedidoB).andReturn()));
+            var esperas = EsperaJdbcPostgres.aguardarAmbos(new JdbcTemplate(dataSource),conexao,
+                    atorA,sql->sql.selecaoChave(tabela,"id_"+tabela,alvo),
+                    atorB,sql->sql.selecaoChave(tabela,"id_"+tabela,alvo),tabela+"/"+alvo,primeira,segunda);
             assertThat(primeira.isDone()).isFalse();
             assertThat(segunda.isDone()).isFalse();
             liberar.countDown();
@@ -136,31 +141,5 @@ class Candidato9ConcessoesMesmoEscopoConcorrentesRedIT extends ContratosHttpBase
         });
     }
 
-    private List<Map<String, Object>> aguardarDuasEsperas(long bloqueadora, String tabela, long id,
-                                                        Future<?> primeira, Future<?> segunda) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<List<Map<String, Object>>> observadas = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                var linhas = jdbc.queryForList("select w.REQUESTING_THREAD_ID as solicitante, "
-                        + "r.OBJECT_SCHEMA as esquema,r.OBJECT_NAME as tabela,r.INDEX_NAME as indice,"
-                        + "r.LOCK_DATA as registro,r.LOCK_MODE as modo,r.LOCK_STATUS as estado "
-                        + "from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "join performance_schema.data_locks r on r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID "
-                        + "and r.ENGINE=w.ENGINE where t.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() "
-                        + "and r.OBJECT_NAME=? and r.INDEX_NAME='PRIMARY' and r.LOCK_TYPE='RECORD' "
-                        + "and r.LOCK_DATA=? and r.LOCK_STATUS='WAITING'", bloqueadora, tabela, Long.toString(id));
-                if (linhas.stream().map(x -> x.get("solicitante")).distinct().count() == 2)
-                    observadas.complete(List.copyOf(linhas));
-                else if (primeira.isDone() || segunda.isDone())
-                    observadas.completeExceptionally(new AssertionError("Ambas as concessões precisam alcançar a barreira"));
-            } catch (Throwable ex) { observadas.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observadas.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
+
 }

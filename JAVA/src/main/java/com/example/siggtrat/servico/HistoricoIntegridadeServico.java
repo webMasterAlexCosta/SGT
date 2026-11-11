@@ -19,7 +19,11 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
-public class HistoricoIntegridadeServico {
+public class HistoricoIntegridadeServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(HistoricoIntegridadeServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     public static final String PREFIXO = "HMAC-SHA256:";
     private static final String GENESIS = "GENESIS";
@@ -48,7 +52,7 @@ public class HistoricoIntegridadeServico {
         validar(historico);
         Long empregadoId = historico.getEmpregado().getId();
         Empregado empregadoBloqueado = entityManager.find(Empregado.class, empregadoId, LockModeType.PESSIMISTIC_WRITE);
-        if (empregadoBloqueado == null) throw new IllegalArgumentException("Empregado do histórico não encontrado.");
+        if (empregadoBloqueado == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Empregado do histórico não encontrado.");
 
         List<HistoricoEmpregado> existentes = repositorio.findByEmpregado_IdOrderByIdAsc(empregadoId);
         long quantidadeAnterior = empregadoBloqueado.getHistoricoQuantidadeAssinada();
@@ -97,7 +101,7 @@ public class HistoricoIntegridadeServico {
     @Transactional(readOnly = true)
     public ResultadoVerificacao verificarEmpregado(Long empregadoId) {
         Empregado empregado = empregadoRepositorio.findById(empregadoId)
-                .orElseThrow(() -> new IllegalArgumentException("Empregado não encontrado."));
+                .orElseThrow(() -> new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Empregado não encontrado."));
         List<HistoricoEmpregado> itens = repositorio.findByEmpregado_IdOrderByIdAsc(empregadoId);
         return verificar(empregado, itens);
     }
@@ -196,17 +200,17 @@ public class HistoricoIntegridadeServico {
 
     private void validar(HistoricoEmpregado historico) {
         if (historico == null || historico.getEmpregado() == null || historico.getEmpregado().getId() == null) {
-            throw new IllegalArgumentException("Empregado é obrigatório no histórico.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Empregado é obrigatório no histórico.");
         }
-        if (historico.getDataEvento() == null) throw new IllegalArgumentException("Data do histórico é obrigatória.");
+        if (historico.getDataEvento() == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Data do histórico é obrigatória.");
         if (historico.getDescricao() == null || historico.getDescricao().isBlank()) {
-            throw new IllegalArgumentException("Descrição do histórico é obrigatória.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Descrição do histórico é obrigatória.");
         }
         if (historico.getOcorrencia() != null && (historico.getOcorrencia().getId() == null
                 || historico.getOcorrencia().getEmpregado() == null
                 || !java.util.Objects.equals(historico.getOcorrencia().getEmpregado().getId(), historico.getEmpregado().getId())
                 || !java.util.Objects.equals(historico.getOcorrencia().getDataOcorrencia(), historico.getDataEfetiva()))) {
-            throw new IllegalArgumentException("A fonte do histórico deve comprovar o mesmo empregado e data efetiva.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A fonte do histórico deve comprovar o mesmo empregado e data efetiva.");
         }
     }
 

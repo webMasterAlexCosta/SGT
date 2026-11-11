@@ -21,7 +21,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class RemanejamentoContratualServico {
+public class RemanejamentoContratualServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RemanejamentoContratualServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private record ItemPreparado(
             ComposicaoContratual composicaoBase,
@@ -438,30 +442,17 @@ public class RemanejamentoContratualServico {
     }
 
     private String gerarTokenPrevia(Contrato contrato, RemanejamentoContratualRequisicao req, Preparacao p) {
-        List<String> partes = new ArrayList<>();
-        partes.add("REMANEJAMENTO");
-        partes.add(AssinaturaPreviaNegocial.valor(contrato.getId()));
-        partes.add(AssinaturaPreviaNegocial.valor(contrato.getVersion()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.identificacao()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.dataEfetiva()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.justificativa()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.referenciaSei()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.eventoPrecedenteId()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.relacaoPrecedencia()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.ordemDocumental()));
-        partes.add("TOTAL:" + p.totalAntes() + ":" + p.totalDepois() + ":" + p.somaVariacoes());
+        List<Object> partes = new ArrayList<>(AssinaturaPreviaNegocial.partes(contrato.getId(), contrato.getVersion(), req.identificacao(),
+                req.dataEfetiva(), req.justificativa(), req.referenciaSei(), req.eventoPrecedenteId(), req.relacaoPrecedencia(), req.ordemDocumental()));
+        partes.add(AssinaturaPreviaNegocial.partes("TOTAL", p.totalAntes(), p.totalDepois(), p.somaVariacoes()));
         p.itens().stream().sorted(Comparator.comparing(ItemPreparado::chave)).forEach(i -> {
-            partes.add("ITEM:" + i.chave() + ":" + i.anterior() + ":" + i.variacao() + ":" + i.resultante() + ":" + i.colaboradoresAtuais());
-            partes.add("CONFIGURACAO:" + i.chave() + ":" + AssinaturaPreviaNegocial.valor(i.lotacaoMunicipio())
-                    + ":" + AssinaturaPreviaNegocial.valor(i.jornadaSemanal()));
+            partes.add(AssinaturaPreviaNegocial.partes("ITEM", i.chave(), i.anterior(), i.variacao(), i.resultante(), i.colaboradoresAtuais()));
+            partes.add(AssinaturaPreviaNegocial.partes("CONFIGURACAO", i.chave(), i.lotacaoMunicipio(), i.jornadaSemanal()));
         });
-        for (EventoCicloVidaContrato e : motor.eventosValidosOrdenados(contrato.getId(), req.dataEfetiva(), Instant.now())) {
-            partes.add("EV:" + AssinaturaPreviaNegocial.valor(e.getId()) + ":" + AssinaturaPreviaNegocial.valor(e.getFatoLogicoId()) + ":" +
-                    AssinaturaPreviaNegocial.valor(e.getVersaoNegocial()) + ":" + AssinaturaPreviaNegocial.valor(e.getTipoEvento()) + ":" +
-                    AssinaturaPreviaNegocial.valor(e.getChaveNegocial()) + ":" + AssinaturaPreviaNegocial.valor(e.getDataEfetiva()));
-        }
+        for (EventoCicloVidaContrato e : motor.eventosValidosOrdenados(contrato.getId(), req.dataEfetiva(), Instant.now()))
+            partes.add(AssinaturaPreviaNegocial.partes("EV", e.getId(), e.getFatoLogicoId(), e.getVersaoNegocial(), e.getTipoEvento(), e.getChaveNegocial(), e.getDataEfetiva()));
         if (assinaturaImpacto != null) partes.addAll(assinaturaImpacto.partesPorContrato(contrato.getId(), req.dataEfetiva(), null));
-        return AssinaturaPreviaNegocial.sha256(partes);
+        return AssinaturaPreviaNegocial.sha256("sgt.previa.remanejamento.v1", partes);
     }
 
     private ImpactoComposicaoContratoDTO impactoDTO(ItemPreparado i) {

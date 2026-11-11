@@ -1,0 +1,46 @@
+{
+  "state": "CURRENT_MAIN35_LOCAL_DATABASE_LOAD_PASS_NATIVE_REVIEW_PENDING",
+  "batch": "it-load-current41-01",
+  "receipt_sha256": "d332df0d3e9282e1510b7d39f4ed310bb922837ec811f793d94ad168f59ff6f5",
+  "report_sha256": "9d6888362de509fdf2405a1d8ff30b035711d489a907eacd6f4cf8f75164a23c",
+  "test_source": "JAVA/src/test/java/com/example/siggtrat/integration/DatabaseLoadIT.java",
+  "test_source_sha256": "100033ba56ced4ab7c30bad8bbc336b8efbb36ab67196bba76f4bb7f9b1d23c8",
+  "metrics": {
+    "Gerado em": "2026-11-10T06:22:20.340061185Z",
+    "Banco": "PostgreSQL nativo via INTEGRATION_POSTGRES_URL",
+    "Escrita": "incremento atômico por HQL/Hibernate, transação por operação",
+    "Leitura e contraprova": "SQL SELECT, sem DML JDBC manual",
+    "Usuários virtuais": "24",
+    "Duração configurada": "15s",
+    "Chaves concorridas": "50",
+    "Percentual de escrita": "20.00%",
+    "Operações": "139819",
+    "Leituras concluídas": "111701",
+    "Escritas concluídas": "28118",
+    "Falhas": "0",
+    "Taxa de erro": "0.0000%",
+    "Throughput": "9317.05 ops/s",
+    "P50": "1ms",
+    "P95": "8ms",
+    "P99": "14ms",
+    "Incrementos persistidos": "28118",
+    "Incrementos esperados": "28118"
+  },
+  "pool_max_connections": 8,
+  "peak_aggregate_bytes": 7221067776,
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "compiled_receipt": "compile-contextual-41",
+  "lab_memory_high_bytes": 449998848,
+  "limits": [
+    "24virtualusers/15s/50keys/20percentwrite/HQLtransactions/SELECTreads.",
+    "Localdatabaseonly;notHTTP/national/productioncapacityorSLA."
+  ]
+}

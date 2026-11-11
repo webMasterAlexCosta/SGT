@@ -13,7 +13,11 @@ import java.time.LocalDateTime;
 import java.time.ZoneId;
 
 @Service
-public class PainelCalculoRecuperacaoServico {
+public class PainelCalculoRecuperacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PainelCalculoRecuperacaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final PainelCalculoRepositorio repositorio;
     private final PainelCalculoEstadoServico stateServico;

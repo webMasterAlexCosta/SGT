@@ -1,0 +1,1 @@
+var e=e=>typeof e==`object`&&e?e:null;function t(t,n){let r=e(t),i=e(e(r?.response)?.data),a=e(r?.data);for(let e of[i?.message,i?.mensagem,a?.message,a?.mensagem,r?.message])if(typeof e==`string`&&e)return e;return n}export{t};

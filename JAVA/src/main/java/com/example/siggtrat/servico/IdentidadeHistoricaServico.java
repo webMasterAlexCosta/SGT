@@ -15,7 +15,11 @@ import java.util.*;
 /** Resolve apenas fontes da identidade canônica e do vínculo consultado. */
 @Service
 @Transactional(readOnly = true)
-public class IdentidadeHistoricaServico {
+public class IdentidadeHistoricaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(IdentidadeHistoricaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ProvaNomePessoaHistoricoRepositorio provas;
     private final EventoVinculoContratualRepositorio eventos;
     public IdentidadeHistoricaServico(ProvaNomePessoaHistoricoRepositorio provas, EventoVinculoContratualRepositorio eventos) {

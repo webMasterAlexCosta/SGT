@@ -1,5 +1,7 @@
 # Levantamento dos 198 requisitos atualizados — enunciados consolidados
 
+> **Corte histórico preservado.** Para implementação/aceite atuais, aplique o [suplemento da janela configurável/padrão30](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) e o [plano de09/11](CODEX/CAMPANHA_20261109/PLANO.md). Os estados históricos abaixo não são aprovação atual.
+
 Fonte: `MATRIZ_198_GRUPOS_NOVA.md` (corte documental C03 de 04/11/2026). Este índice transcreve os enunciados por ID e respectivo status; a decomposição em 635 critérios, predicados e evidências permanece na matriz original, incluída neste ZIP. A classificação `PARCIAL` não equivale a reprovação de cada predicado técnico e não equivale à homologação final.
 
 ## Grupo GOV — 2 requisitos

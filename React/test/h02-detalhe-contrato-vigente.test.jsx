@@ -5,18 +5,18 @@ import { act, cleanup, fireEvent, render, screen, within } from '@testing-librar
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({
+vi.mock('../src/core/http.ts', () => ({
   requisitar,
   requisitarDownload: vi.fn(),
   extrairLista: value => Array.isArray(value) ? value : value?.content || [],
   extrairPagina: value => value,
 }));
-vi.mock('../src/modules/auth/context.jsx', () => ({
+vi.mock('../src/modules/auth/context.tsx', () => ({
   useAutenticacao: () => ({ user: { id: 991, authorities: ['PERFIL_GESTOR_LOCAL'], gestaoLocalId: 1 } }),
 }));
 
-import { PaginaContratos } from '../src/modules/admin/pages/PaginaContratos/index.jsx';
-import * as eventos from '../src/core/events.js';
+import { PaginaContratos } from '../src/modules/admin/pages/PaginaContratos/index.tsx';
+import * as eventos from '../src/core/events.ts';
 
 // Componentes, serviços e diálogo reais. Somente a fronteira HTTP e a identidade
 // são controladas. O transporte abaixo resolve mesmo após AbortSignal, como uma

@@ -30,7 +30,7 @@ class DataJornadaSinteticaTest {
             LocalDate hoje, LocalDate esperada) {
         Jornada jornada = jornada(EnumSet.range(DayOfWeek.MONDAY, DayOfWeek.FRIDAY));
         LocalDate obtida = DataJornadaSintetica.ultimoDiaDeTrabalhoAnterior(jornada, hoje);
-        PoliticaTemporalFrequenciaServico politica = new PoliticaTemporalFrequenciaServico();
+        PoliticaTemporalFrequenciaServico politica = new PoliticaTemporalFrequenciaServico(7);
         assertAll(
                 () -> assertEquals(esperada, obtida, "Datas esperadas explícitas incluem a virada do mês e o fim de semana"),
                 () -> assertTrue(obtida.isBefore(hoje), "A fixture nunca lança hoje ou no futuro"),

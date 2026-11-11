@@ -53,7 +53,7 @@ class PendenciaAdministrativaServicoEtapa11Test {
         });
         var escopoProva = mock(ResolvedorEscopoProvaFrequenciaServico.class);
         // Estes testes unitários partem de responsabilidade histórica inalterada.
-        // Transferências e releitura transacional são exercitadas no HTTP/MySQL.
+        // Transferências e releitura transacional são exercitadas no HTTP/PostgreSQL.
         when(escopoProva.realinhar(any(), any())).thenAnswer(inv -> inv.getArgument(0));
         servico = new PendenciaAdministrativaServico(
                 repositorio, frequencias, vinculos,

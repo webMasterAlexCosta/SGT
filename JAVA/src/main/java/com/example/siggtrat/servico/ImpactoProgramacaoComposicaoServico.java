@@ -15,7 +15,11 @@ import java.util.function.Function;
 /** Verifica os pontos de mudança futuros, sem percorrer artificialmente cada dia. */
 @Service
 @Transactional(readOnly = true)
-public class ImpactoProgramacaoComposicaoServico {
+public class ImpactoProgramacaoComposicaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ImpactoProgramacaoComposicaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public record Alteracao(Long composicaoId, Long lotacaoId, Long jornadaId, Long cargoId, int variacao) {
         String chave() { return ComposicaoContratualTemporalServico.ComposicaoProjetada.chave(lotacaoId, jornadaId, cargoId); }
     }

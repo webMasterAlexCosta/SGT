@@ -18,7 +18,9 @@ class LogoutRevocationContractTest {
         assertTrue(security.contains("\"/api/autenticacao/autenticar\""));
         assertTrue(security.contains("\"/api/autenticacao/cadastrar\""));
         assertTrue(security.contains("\"/api/autenticacao/encerrar-sessao\""));
-        assertTrue(authServico.contains("tokenAtivoRepositorio.excluirPorTokenBruto(token)"));
+        assertTrue(authServico.contains("revogacaoSessaoServico.revogarToken(token)"));
+        String revogacao = Files.readString(Path.of("src/main/java/com/example/siggtrat/servico/RevogacaoSessaoServico.java"));
+        assertTrue(revogacao.contains("tokens.excluirPorTokenBruto(tokenBruto)"));
         assertTrue(authServico.contains("jwtAuthenticationFilter.removerTokenDoCache(token)"));
         assertTrue(authServico.contains("ResponseCookie.from(ConstantesDominio.COOKIE_AUTH, \"\")"));
         assertTrue(authServico.contains(".maxAge(0)"));

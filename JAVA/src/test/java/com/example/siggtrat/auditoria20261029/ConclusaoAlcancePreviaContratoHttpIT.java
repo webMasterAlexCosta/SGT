@@ -33,6 +33,9 @@ class ConclusaoAlcancePreviaContratoHttpIT extends ContratosHttpBase {
             conceder(c, contratoId, "TRANSFERENCIA_GESTAO_LOCAL");
             req.put("gestaoLocalDestinoId", c.gestaoB.getId()); req.put("tipoContratacaoDestinoId", c.tipoB.getId());
             req.put("autorizacaoAdministrativa", "ATO-HTTP");
+            // Fixture sintética: conferência explícita do ATO ORIGINAL, sem default em helper.
+            req.put("conferenciaDocumentalConfirmada", true);
+            req.put("versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1");
             req.put("mapeamentos", List.of(mapa("composicaoOrigemId", c.composicaoA.getId(),
                     "lotacaoDestinoId", c.lotacaoB.getId(), "jornadaDestinoId", c.jornadaB.getId(), "cargoDestinoId", c.cargoB.getId())));
         } else {
@@ -53,12 +56,21 @@ class ConclusaoAlcancePreviaContratoHttpIT extends ContratosHttpBase {
         req.put("dataEfetiva", corrigida); req.put("motivo", "Correção que retira dois dias do alcance anterior");
         req.put("eventoPrecedenteId", eventoId); req.put("relacaoPrecedencia", "RETIFICA");
         req.remove("tokenPrevia"); req.remove("confirmarImpacto");
+        if (operacao.equals("transferir-gestao")) {
+            // Data/motivo/alvo mudaram: a retificação é outro ato; não herda a conferência original.
+            req.remove("conferenciaDocumentalConfirmada"); req.remove("versaoConferenciaDocumental");
+        }
         String rotaPrevia = base(contratoId) + (operacao.equals("transferir-gestao")
                 ? "/transferencias-gestao/previa" : "/previas/inativar");
         var previa = enviar(executor, rotaPrevia, req, 200, "AUD004 a prévia cobre ambos os alcances da retificação");
         assertThat(previa.path("quantidadeFrequenciasAfetadas").asLong()).isEqualTo(1L);
         assertThat(previa.path("datasComFrequenciasAfetadas").toString()).contains(frequenciaData.toString());
         req.put("tokenPrevia", previa.path("tokenPrevia").asText()); req.put("confirmarImpacto", true);
+        if (operacao.equals("transferir-gestao")) {
+            // Nova conferência sintética da intenção de RETIFICAÇÃO agora apresentada na prévia.
+            req.put("conferenciaDocumentalConfirmada", true);
+            req.put("versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1");
+        }
         emTransacao(() -> {
             // Simula modificação concorrente da dependência em transação distinta.
             em.find(Frequencia.class, frequenciaId).setObservacao("Dependência alterada após a prévia na faixa retirada");
@@ -66,9 +78,17 @@ class ConclusaoAlcancePreviaContratoHttpIT extends ContratosHttpBase {
         });
         enviar(executor, base(contratoId) + "/" + operacao, req, 409,
                 "AUD004 mudança apenas na faixa retirada também invalida o token anterior");
+        if (operacao.equals("transferir-gestao")) {
+            // Após409, a fixture volta a conferir o contexto recalculado; não reaproveita aceite anterior.
+            req.remove("conferenciaDocumentalConfirmada"); req.remove("versaoConferenciaDocumental");
+        }
         var atualizada = enviar(executor, rotaPrevia, req, 200, "Recalcular após alteração real da dependência");
         assertThat(atualizada.path("tokenPrevia").asText()).isNotEqualTo(previa.path("tokenPrevia").asText());
         req.put("tokenPrevia", atualizada.path("tokenPrevia").asText());
+        if (operacao.equals("transferir-gestao")) {
+            req.put("conferenciaDocumentalConfirmada", true);
+            req.put("versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1");
+        }
         enviar(executor, base(contratoId) + "/" + operacao, req, 200, "Confirmação corresponde ao alcance integral conhecido");
     }
 }

@@ -1,0 +1,27 @@
+{
+  "state": "APPROVED_FUNCTIONAL_LABORATORY_CHROME_CHROMIUM_DESKTOP",
+  "frontend12": "APROVADO",
+  "integrated_functional_laboratory": "APROVADO_NO_ESCOPO_DECLARADO",
+  "findings_P0_to_P3": 0,
+  "remaining_applicable_obligations_in_examined_scope": 0,
+  "review": ".homologacao/20261109-sgt-final/review-integrated64-frontend12",
+  "parecer_sha256": "0b45efcb4d141febab4cd2ea2d0a3324eefdaeffcee76b9f982f49c13311dda8",
+  "runtime": {
+    "thread_id": "01a1c50d-6d2d-74e3-910d-86635b797156",
+    "turn_id": "01a1c8c3-9318-7031-92c8-1aa63eb74725",
+    "model": "gpt-6.1-sol",
+    "effort": "xhigh",
+    "cwd": "/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT",
+    "source": "actual turn_context, not saved configuration",
+    "read_only": true
+  },
+  "freeze_ended_sha256": "bdd5ad36130be6c07bdd6cf5b34d83678ae13970a37d9fbb2773f9ee1fd746bd",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "backend26_approved_sha256": "fc23c828c7f067061b2dc88e55b925b2faaea737e3f0c93b44edc918dbc89584",
+  "not_collective_acceptance_of_entire_matrix": true,
+  "limits": [
+    "Synthetic functional laboratory and reconciled predicates only.",
+    "Reuse retains artifact, byte and layer limits of each original proof.",
+    "No production, corpus migration, national-scale, institutional authenticity or integral PDF/UA approval."
+  ]
+}

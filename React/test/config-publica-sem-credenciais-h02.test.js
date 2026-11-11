@@ -1,5 +1,5 @@
 import { afterEach, expect, test, vi } from 'vitest';
-import { ServicoSistema } from '../src/services/system/ServicoSistema.js';
+import { ServicoSistema } from '../src/services/system/ServicoSistema.ts';
 
 afterEach(() => vi.unstubAllGlobals());
 

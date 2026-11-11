@@ -24,7 +24,11 @@ import java.util.Objects;
 
 /** Auditoria da escrita canônica: captura valores, sem manter um segundo cadastro editável. */
 @Service
-public class AuditoriaPessoaServico {
+public class AuditoriaPessoaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AuditoriaPessoaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final String MOTIVO = "Atualização de dados opcionais da Pessoa";
     private static final Map<String, String> ROTULOS = Map.of(
             "rg", "RG", "ctpsSerie", "CTPS", "nitPisPasep", "NIT/PIS/PASEP",

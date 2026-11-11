@@ -234,7 +234,8 @@ class RevisaoHistoricaCatalogosIdentidadeHttpIT extends ContratosHttpBase {
     }
 
     private Map<String, Object> transferencia(Cenario c, NovoContrato n, LocalDate efeito) {
-        return mapa("dataEfetiva", efeito, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", efeito, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Reorganização documentada do contexto operacional",
                 "referenciaSei", "SEI-REVISOR-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", n.composicao1(), "lotacaoDestinoId", c.lotacaoB.getId(),

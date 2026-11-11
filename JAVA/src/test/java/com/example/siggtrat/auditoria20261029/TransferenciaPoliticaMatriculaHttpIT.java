@@ -204,7 +204,8 @@ class TransferenciaPoliticaMatriculaHttpIT extends ContratosHttpBase {
     }
 
     private Map<String, Object> requisicao(Fixture f) {
-        return mapa("dataEfetiva", f.transferencia(), "dataAto", RelogioSistema.hoje(),
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", f.transferencia(), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", f.c().gestaoB.getId(), "tipoContratacaoDestinoId", f.c().tipoB.getId(),
                 "motivo", "Transferência documentada para Tipo com matrícula obrigatória", "referenciaSei", "SEI-RI06",
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(mapa("composicaoOrigemId", f.n().composicao1(),

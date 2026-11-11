@@ -17,6 +17,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
+import java.time.LocalDate;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
@@ -73,6 +74,8 @@ class RelatorioComparacaoEscopoHttpIT extends AuditoriaHttpSuporte {
         Cenario c = criarCenario();
         long pendencia = marcarRevisao(c, false);
         marcarRevisao(c, true);
+        marcarRevisao(c, false, DATA.minusDays(1));
+        marcarRevisao(c, false, DATA.plusDays(1));
         Map<String, Object> filtro = filtro(tipo);
         filtro.put("contratoIds", List.of(c.contratoA.getId()));
         JsonNode local = previa(c.localA, filtro);
@@ -86,6 +89,29 @@ class RelatorioComparacaoEscopoHttpIT extends AuditoriaHttpSuporte {
                         "O filtro de contrato exclui a pendência de B, mas inclui a pendência real de A."),
                 () -> assertFalse(presidente.path("conteudo").toString().contains(c.pessoaA.getNome()),
                         "O aviso não concede exposição nominal à Presidência."));
+        assertTrue(presidente.path("metadados").path("aviso").asText().contains("SUJEITO A REVISÃO"));
+        // O mesmo leitor pode ver as fontes excluídas: o resultado 1 não decorre
+        // de falta de acesso a B ou da ausência dos dois dias fora do período.
+        Map<String, Object> outroContrato = new LinkedHashMap<>(filtro);
+        outroContrato.put("contratoIds", List.of(c.contratoB.getId()));
+        JsonNode controleB = previa(c.presidente, outroContrato);
+        assertTrue(controleB.path("metadados").path("sujeitoARevisao").asBoolean());
+        assertEquals(1, controleB.path("metadados").path("quantidadePendencias").asLong());
+        Map<String, Object> periodoAmpliado = new LinkedHashMap<>(filtro);
+        periodoAmpliado.put("inicio", DATA.minusDays(1).toString());
+        periodoAmpliado.put("fim", DATA.plusDays(1).toString());
+        JsonNode controlePeriodo = previa(c.presidente, periodoAmpliado);
+        assertTrue(controlePeriodo.path("metadados").path("sujeitoARevisao").asBoolean());
+        assertEquals(3, controlePeriodo.path("metadados").path("quantidadePendencias").asLong(),
+                "As duas pendências de A fora do dia estreito existem e ficam visíveis no período ampliado");
+        JsonNode recorteRelido = previa(c.presidente, filtro);
+        assertEquals(1, recorteRelido.path("metadados").path("quantidadePendencias").asLong());
+        Map<String, Object> periodoSemPendencias = new LinkedHashMap<>(filtro);
+        periodoSemPendencias.put("inicio", DATA.plusDays(2).toString());
+        periodoSemPendencias.put("fim", DATA.plusDays(2).toString());
+        JsonNode semPendencias = previa(c.presidente, periodoSemPendencias);
+        assertFalse(semPendencias.path("metadados").path("sujeitoARevisao").asBoolean());
+        assertEquals(0, semPendencias.path("metadados").path("quantidadePendencias").asLong());
         executar(c.presidente, post("/api/pendencias/{id}/iniciar-tratamento", pendencia),
                 403, "Contar pendências não concede tratamento negocial à Presidência");
     }
@@ -105,7 +131,11 @@ class RelatorioComparacaoEscopoHttpIT extends AuditoriaHttpSuporte {
     }
 
     private long marcarRevisao(Cenario c, boolean ladoB) throws Exception {
-        JsonNode dto = registrar(c, ladoB, "FALTA");
+        return marcarRevisao(c, ladoB, DATA);
+    }
+
+    private long marcarRevisao(Cenario c, boolean ladoB, LocalDate data) throws Exception {
+        JsonNode dto = registrar(c, ladoB, "FALTA", data);
         Frequencia f = em.find(Frequencia.class, dto.path("id").asLong());
         f.setEstadoAuditoria(EstadoAuditoriaFrequencia.SUJEITA_REVISAO);
         f.setValidadeOperacional(ValidadeOperacionalFrequencia.SUJEITA_REVISAO);
@@ -116,10 +146,14 @@ class RelatorioComparacaoEscopoHttpIT extends AuditoriaHttpSuporte {
     }
 
     private JsonNode registrar(Cenario c, boolean ladoB, String status) throws Exception {
+        return registrar(c, ladoB, status, DATA);
+    }
+
+    private JsonNode registrar(Cenario c, boolean ladoB, String status, LocalDate data) throws Exception {
         return dados(executar(ladoB ? c.localB : c.localA, post("/api/frequencias")
                 .contentType(APPLICATION_JSON).content(json(Map.of(
                         "vinculoContratualId", (ladoB ? c.vinculoB : c.vinculoA).getId(),
-                        "dataReferencia", DATA.toString(), "status", status,
+                        "dataReferencia", data.toString(), "status", status,
                         "justificativaRetificacao", "Conferência documental da frequência no recorte",
                         "chaveIdempotencia", "escopo-frequencia-" + UUID.randomUUID()))),
                 200, "Fonte real do relatório " + (ladoB ? "B" : "A")));

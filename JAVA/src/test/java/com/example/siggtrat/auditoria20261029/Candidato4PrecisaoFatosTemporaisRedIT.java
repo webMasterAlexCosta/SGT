@@ -140,7 +140,7 @@ class Candidato4PrecisaoFatosTemporaisRedIT extends ContratosHttpBase {
                     "consultadoHttp", consultado));
             verificacoes.add(() -> assertThat(m.instante()).as(m.entidade() + ": precisão persistível do novo fato")
                     .isEqualTo(m.instante().truncatedTo(ChronoUnit.MICROS)));
-            verificacoes.add(() -> assertThat(m.instante()).as(m.entidade() + ": instante não muda ao reler o MySQL")
+            verificacoes.add(() -> assertThat(m.instante()).as(m.entidade() + ": instante não muda ao reler o PostgreSQL")
                     .isEqualTo(gravado));
             verificacoes.add(() -> assertThat(consultado).as(m.entidade() + ": GET coincide com persistência").isEqualTo(gravado));
         }

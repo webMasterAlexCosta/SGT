@@ -1,0 +1,9 @@
+{
+  "observed_turn_context": {
+    "turn_id": "01a1c48d-b218-7bc0-8d0e-a8c210bc9394",
+    "model": "gpt-6.1-sol",
+    "effort": "xhigh",
+    "source_timestamp": "2026-11-10T08:23:02.992Z"
+  },
+  "saved_configuration_is_not_execution_proof": true
+}

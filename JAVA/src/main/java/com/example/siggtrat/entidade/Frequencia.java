@@ -5,7 +5,6 @@ import com.example.siggtrat.dominio.frequencia.EstadoAuditoriaFrequencia;
 import com.example.siggtrat.dominio.frequencia.EstadoNegocialFrequencia;
 import com.example.siggtrat.dominio.frequencia.ValidadeOperacionalFrequencia;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import org.hibernate.annotations.Check;
 
@@ -259,12 +258,6 @@ public class Frequencia {
     }
 
     public Frequencia() {}
-
-    @Transient
-    @JsonProperty("prazoEdicao")
-    public LocalDateTime getPrazoEdicao() {
-        return dataReferencia == null ? null : dataReferencia.plusDays(7).atStartOfDay();
-    }
 
     @Transient
     public boolean possuiSnapshotJornada() {

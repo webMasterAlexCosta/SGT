@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
-import { ServicoHistorico } from '../src/services/historico/ServicoHistorico.js';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
+import { ServicoHistorico } from '../src/services/historico/ServicoHistorico.ts';
 
 beforeEach(() => { requisitar.mockReset(); requisitar.mockResolvedValue([]); });
 

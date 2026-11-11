@@ -21,7 +21,11 @@ import java.util.*;
 /** Atos documentados de disponibilidade, inclusive conhecidos depois da data efetiva. */
 @Service
 @Transactional(readOnly = true)
-public class TransicaoDisponibilidadeCatalogoServico {
+public class TransicaoDisponibilidadeCatalogoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(TransicaoDisponibilidadeCatalogoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final Comparator<EventoDisponibilidadeCatalogo> ORDEM = Comparator
             .comparing(EventoDisponibilidadeCatalogo::getDataEfetiva)
             .thenComparing(EventoDisponibilidadeCatalogo::getRegistradoEm)
@@ -128,13 +132,12 @@ public class TransicaoDisponibilidadeCatalogoServico {
         LocalDate fimAfetado = proximaData == null ? null : proximaData.minusDays(1);
         if (!req.ativo()) validarFatosPosteriores(tipo, id, req.dataEfetiva(), fimAfetado, atualApos, contratos);
 
-        List<String> partes = new ArrayList<>();
+        List<Object> partes = new ArrayList<>();
         partes.add("disponibilidade-documentada-v1"); partes.add(intencao(tipo, id, req, usuario));
-        partes.add(String.valueOf(versao(item))); partes.add(AssinaturaPreviaNegocial.valor(ativo(item)));
-        partes.add(hoje.toString()); partes.add(AssinaturaPreviaNegocial.valor(anterior)); partes.add(String.valueOf(atualApos));
+        partes.add(String.valueOf(versao(item))); partes.add(ativo(item));
+        partes.add(hoje.toString()); partes.add(anterior); partes.add(String.valueOf(atualApos));
         for (EventoDisponibilidadeCatalogo e : trilha.stream().sorted(ORDEM).toList())
-            partes.add(e.getId() + ":" + e.getDataEfetiva() + ":" + e.getRegistradoEm() + ":" + e.getAtivo()
-                    + ":" + AssinaturaPreviaNegocial.valor(e.getAtivoAnterior()));
+            partes.add(AssinaturaPreviaNegocial.partes(e.getId(), e.getDataEfetiva(), e.getRegistradoEm(), e.getAtivo(), e.getAtivoAnterior()));
         for (Contrato contrato : contratos) partes.addAll(assinaturaImpacto.partesPorContrato(contrato.getId(), req.dataEfetiva(), null));
         List<String> impactos = new ArrayList<>();
         impactos.add("Disponibilidade documentada a partir de " + req.dataEfetiva()
@@ -143,7 +146,7 @@ public class TransicaoDisponibilidadeCatalogoServico {
         impactos.add("Estado atual após o registro: " + (atualApos ? "ativo" : "inativo") + ".");
         impactos.add("Contratos com referências revalidadas: " + contratos.size() + ".");
         return new PreviaTransicaoCatalogoDTO(tipo, id, req.dataEfetiva(), anterior, req.ativo(), atualApos,
-                versao(item), AssinaturaPreviaNegocial.sha256(partes), List.copyOf(impactos));
+                versao(item), AssinaturaPreviaNegocial.sha256("sgt.previa.disponibilidade.v1", partes), List.copyOf(impactos));
     }
 
     private void validarFatosPosteriores(TipoCatalogoTemporal tipo, Long id, LocalDate desde, LocalDate ate,
@@ -202,8 +205,8 @@ public class TransicaoDisponibilidadeCatalogoServico {
     }
 
     private String intencao(TipoCatalogoTemporal tipo, Long id, TransicaoDisponibilidadeCatalogoRequisicao req, UsuarioAplicacao usuario) {
-        return AssinaturaPreviaNegocial.sha256(List.of(tipo.name(), String.valueOf(id), String.valueOf(usuario.getId()),
-                req.dataEfetiva().toString(), req.ativo().toString(), req.motivo().trim(), req.evidencia().trim(), req.autorizacao().trim()));
+        return AssinaturaPreviaNegocial.sha256("sgt.catalogo.intencao.v1", AssinaturaPreviaNegocial.partes(tipo, id, usuario.getId(),
+                req.dataEfetiva(), req.ativo(), req.motivo().trim(), req.evidencia().trim(), req.autorizacao().trim()));
     }
 
     private TransicaoCatalogoDTO recibo(EventoDisponibilidadeCatalogo e, boolean reenvio) {

@@ -29,7 +29,9 @@ import java.util.stream.Stream;
  * são isolados, nunca apagados silenciosamente.
  */
 @Service
-public class ConsistenciaArmazenamentoAnexoServico {
+public class ConsistenciaArmazenamentoAnexoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(ConsistenciaArmazenamentoAnexoServico.class);
     private static final Pattern NOME_GERENCIADO = Pattern.compile(
@@ -81,7 +83,7 @@ public class ConsistenciaArmazenamentoAnexoServico {
             isolarArquivosOrfaos(referenciados);
             registrarReferenciasAusentes(referenciados);
         } catch (Exception ex) {
-            log.error("Falha na verificação de consistência do armazenamento de anexos.", ex);
+            log.error("ConsistenciaArmazenamentoAnexoServico: Falha na verificação de consistência do armazenamento de anexos. falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
         } finally {
             executando.set(false);
         }
@@ -108,7 +110,7 @@ public class ConsistenciaArmazenamentoAnexoServico {
                     Files.move(arquivo, destino, StandardCopyOption.REPLACE_EXISTING);
                     log.warn("Anexo físico sem registro foi isolado em: {}", destino);
                 } catch (IOException ex) {
-                    log.error("Não foi possível isolar o anexo órfão: {}", arquivo, ex);
+                    log.error("ConsistenciaArmazenamentoAnexoServico: Não foi possível isolar o anexo órfão falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
                 }
             });
         }
@@ -128,7 +130,7 @@ public class ConsistenciaArmazenamentoAnexoServico {
                     log.error("INTEGRIDADE: o banco referencia um anexo físico ausente: {}", nome);
                 }
             } catch (RuntimeException ex) {
-                log.error("Registro de anexo contém nome inválido no banco: {}", nome, ex);
+                log.error("ConsistenciaArmazenamentoAnexoServico: Registro de anexo contém nome inválido no banco falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
             }
         }
     }
@@ -139,7 +141,7 @@ public class ConsistenciaArmazenamentoAnexoServico {
             Instant limite = Instant.now().minus(IDADE_MINIMA_RECUPERACAO);
             return Files.getLastModifiedTime(arquivo).toInstant().isBefore(limite);
         } catch (IOException ex) {
-            log.warn("Não foi possível verificar a idade do arquivo: {}", arquivo, ex);
+            log.warn("ConsistenciaArmazenamentoAnexoServico: Não foi possível verificar a idade do arquivo falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
             return false;
         }
     }
@@ -147,7 +149,7 @@ public class ConsistenciaArmazenamentoAnexoServico {
     private Path destinoOrfaoUnico(String nome) {
         Path destino = orphanRoot.resolve(nome).normalize();
         if (!destino.startsWith(orphanRoot)) {
-            throw new IllegalArgumentException("Nome de anexo órfão inválido.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Nome de anexo órfão inválido.");
         }
         if (!Files.exists(destino)) return destino;
 
@@ -162,7 +164,7 @@ public class ConsistenciaArmazenamentoAnexoServico {
         try {
             Files.deleteIfExists(arquivo);
         } catch (IOException ex) {
-            log.warn("Não foi possível remover arquivo temporário interrompido: {}", arquivo, ex);
+            log.warn("ConsistenciaArmazenamentoAnexoServico: Não foi possível remover arquivo temporário interrompido falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(ex));
         }
     }
 }

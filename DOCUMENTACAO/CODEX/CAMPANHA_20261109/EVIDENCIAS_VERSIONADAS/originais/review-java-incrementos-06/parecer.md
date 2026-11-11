@@ -1,0 +1,10 @@
+Não identifiquei novos achados P0–P3 no incremento06. Os quatro recortes estão suficientemente demonstrados:
+
+- **CON-023:001 — fechado.** As duas direções do mapa parcial recebem409 com a mensagem específica e preservam integralmente os snapshots negociais. Acrescentar somente o mapa faltante permite a transferência, com dois mapas e um uso da concessão. [Oráculo revisado](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/JAVA/src/test/java/com/example/siggtrat/auditoria20261029/TransferenciaMapaIntegralHttpIT.java:55).
+- **CON-013:002 e CON-023:005 — pendências de execução fechadas.** Conferi hashes, fontes e XMLs: concessão1/1, política de matrícula9/9 e mapa integral2/2; lote12/12, sem falhas, erros ou pulos. [Recibo](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/.homologacao/20261109-sgt-final/it-contextual-con023001-02/result.json).
+- **P2 de restauração Python — fechado.** O callback é registrado antes do `ALTER DATABASE`, abrange as exceções de preparação e termina antes do resultado. A falha controlada comprova restauração−1, tabelas0 e nenhum Java próprio; o caminho normal confirma146 respostas esperadas,45 janelas instrumentadas e restauração anterior ao recibo. [Proteção](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/.homologacao/20261109-sgt-final/run_unit.py:95).
+- **Detectores dos dois testes de painel — aceitos.** Comparei com o snapshot anterior: somente predicado, comentário e formatação mudaram. Permanecem filtros, latches, uso único, prazos e oráculos. Os lotes atuais passaram1/1 e4/4; o lote20 permanece falho, sem aceite retroativo.
+
+O freeze de1351 fontes,3 documentos e3 scripts confere. Produção814 arquivos,823 classes principais e JAR `ae4be259…a0ba27` permanecem inalterados.
+
+Revisão somente leitura, sem executar novos testes. O fechamento abrange esses recortes; não concede homologação global, UI/LAN ou capacidade nacional. Encerramento abrupto do supervisor continua fora da garantia de cleanup. O P2 de unicidade concorrente de Cargo permanece aberto para seu incremento próprio.

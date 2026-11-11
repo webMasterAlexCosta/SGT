@@ -16,7 +16,11 @@ import java.time.Instant;
 import java.util.*;
 
 @Service
-public class AuditoriaFrequenciaServico {
+public class AuditoriaFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AuditoriaFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final String SNAPSHOT_V2 = "snapshotVersao=2;";
     private static final Set<String> CAMPOS_AUDITORIA = Set.of(
             "snapshotVersao", "status", "dataReferencia", "entrada1", "saida1", "entrada2", "saida2",

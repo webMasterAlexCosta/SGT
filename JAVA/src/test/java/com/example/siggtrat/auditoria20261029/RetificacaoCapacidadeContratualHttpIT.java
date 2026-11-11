@@ -20,6 +20,9 @@ class RetificacaoCapacidadeContratualHttpIT extends ContratosHttpBase {
                 201, "CMP-006 vínculo depende da capacidade do instrumento a retificar");
         em.flush(); em.clear();
         var eventosAntes = consultar(c.localA, base(n.id()) + "/eventos", "CMP-007 fatos antes de retificação incompatível");
+        var instrumentosAntes = consultar(c.localA, base(n.id()) + "/aditamentos", "Fotografia integral sintética do instrumento antes da recusa");
+        assertThat(instrumentosAntes).hasSize(1);
+        assertThat(instrumentosAntes.get(0)).isEqualTo(instrumento);
         var retificar = aditamento("ADI-CAPACIDADE-RETIFICADA", efeito); retificar.put("novaDescricao", "Somente descrição revisada");
         retificar.put("eventoPrecedenteId", instrumento.path("eventoId").asLong()); retificar.put("relacaoPrecedencia", "RETIFICA");
         previaAditamento(c, n.id(), retificar);
@@ -28,6 +31,8 @@ class RetificacaoCapacidadeContratualHttpIT extends ContratosHttpBase {
         em.flush(); em.clear();
         assertThat(consultar(c.localA, base(n.id()) + "/eventos", "CMP-007 versão anterior preservada após recusa")).isEqualTo(eventosAntes);
         assertThat(consultar(c.localA, base(n.id()) + "/aditamentos", "ADI-007 retificação recusada não cria versão")).hasSize(1);
+        assertThat(consultar(c.localA, base(n.id()) + "/aditamentos", "Releitura do instrumento original por ID, versão, itens e situação"))
+                .isEqualTo(instrumentosAntes);
     }
 
     @Test
@@ -51,6 +56,9 @@ class RetificacaoCapacidadeContratualHttpIT extends ContratosHttpBase {
                 "CMP-006 programação usa B publicada pelo remanejamento");
         em.flush(); em.clear();
         var eventosAntes = consultar(c.localA, base(id) + "/eventos", "CMP-007 estado antes da retificação de destino");
+        var instrumentosAntes = consultar(c.localA, base(id) + "/remanejamentos", "Fotografia integral sintética do instrumento antes da recusa");
+        assertThat(instrumentosAntes).hasSize(1);
+        assertThat(instrumentosAntes.get(0)).isEqualTo(instrumento);
         var retificar = mapa("identificacao", "REM-CAPACIDADE-RETIFICADA", "dataEfetiva", efeito, "justificativa", "Destinar a C em vez de B",
                 "confirmarImpacto", true, "eventoPrecedenteId", instrumento.path("eventoId").asLong(), "relacaoPrecedencia", "RETIFICA",
                 "itens", List.of(mapa("composicaoId", a, "variacao", -1), mapa("composicaoId", destinoC, "variacao", 1)));
@@ -60,5 +68,7 @@ class RetificacaoCapacidadeContratualHttpIT extends ContratosHttpBase {
         em.flush(); em.clear();
         assertThat(consultar(c.localA, base(id) + "/eventos", "CMP-007 eventos preservados após recusa")).isEqualTo(eventosAntes);
         assertThat(consultar(c.localA, base(id) + "/remanejamentos", "REM-004 recusa não cria versão parcial")).hasSize(1);
+        assertThat(consultar(c.localA, base(id) + "/remanejamentos", "Releitura do instrumento original por ID, versão, itens e situação"))
+                .isEqualTo(instrumentosAntes);
     }
 }

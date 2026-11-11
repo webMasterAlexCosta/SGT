@@ -1,0 +1,12 @@
+{
+  "state": "ENDED_AFTER_APPROVED_READ_ONLY_REVIEW",
+  "source_files_verified": 2730,
+  "input_files_verified": 21,
+  "freeze_sha256": "f52f75d62c910d0e8a84643ca1c62efed56d4bbb0e470ceacb8108e19d5770f2",
+  "source_manifest_sha256": "506ab3e20825b89578850f960aa526d5101be1adffa36ca58561622dc7af46fc",
+  "input_manifest_sha256": "e24206b860493c9fba5e3be8a3b6db4f1ffbc768a2f605f73371cedd43dc6137",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "source_and_inputs_unchanged_during_review": true,
+  "parecer_sha256": "0b45efcb4d141febab4cd2ea2d0a3324eefdaeffcee76b9f982f49c13311dda8",
+  "runtime_proof_sha256": "654ac3f69cd5b7ed1c65c4f79e37caaa10be42b230089dd3420a5a79c24743b8"
+}

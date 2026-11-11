@@ -2,6 +2,8 @@ package com.example.siggtrat.entidade;
 
 import com.example.siggtrat.constante.ConstantesDominio;
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.Check;
 
 import java.time.LocalDate;
@@ -68,7 +70,8 @@ public class PainelCalculo {
     @Column(name = "progresso", nullable = false)
     private int progresso;
 
-    @Column(name = "payload_json", columnDefinition = "LONGTEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR)
+    @Column(name = "payload_json", columnDefinition = "text")
     private String payloadJson;
 
     @Column(name = "mensagem", length = 500)

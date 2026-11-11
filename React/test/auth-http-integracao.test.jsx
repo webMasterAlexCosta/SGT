@@ -2,10 +2,10 @@
 import React from 'react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { act, cleanup, render, waitFor } from '@testing-library/react';
-import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.jsx';
-import { api } from '../src/core/http.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.tsx';
+import { api } from '../src/core/http.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 vi.mock('../src/modules/auth/components/ModalReautenticacao', () => ({ ModalReautenticacao: () => null }));
 const A = { id: 901, username: 'a-sintetico', email: 'antes@example.invalid', perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' };
 let contexto, adapter;

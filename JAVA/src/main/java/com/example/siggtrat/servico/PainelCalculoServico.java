@@ -31,7 +31,9 @@ import java.util.HexFormat;
 import java.util.Objects;
 
 @Service
-public class PainelCalculoServico {
+public class PainelCalculoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(PainelCalculoServico.class);
     private final PainelCalculoRepositorio repositorio;
@@ -191,7 +193,8 @@ public class PainelCalculoServico {
             normalizarRegistrosLancados(raiz);
             return objectMapper.treeToValue(raiz, PainelGestaoDTO.class);
         } catch (Exception erro) {
-            log.warn("Não foi possível desserializar o payload do painel id={}: {}", calculoId, erro.getMessage());
+            log.warn("Não foi possível desserializar painel: referencia=PAINEL-{} falha={}", calculoId,
+                    com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erro));
             return null;
         }
     }

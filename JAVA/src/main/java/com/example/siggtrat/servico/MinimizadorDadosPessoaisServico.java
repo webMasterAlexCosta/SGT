@@ -7,7 +7,11 @@ import org.springframework.stereotype.Service;
 
 /** Política única de exposição de dados pessoais aplicada a todos os DTOs. */
 @Service
-public class MinimizadorDadosPessoaisServico {
+public class MinimizadorDadosPessoaisServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(MinimizadorDadosPessoaisServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     public NivelExposicaoDadosPessoais nivelPadrao(UsuarioAplicacao usuario) {
         PerfilAcesso perfil = usuario == null ? null : usuario.getPerfil();

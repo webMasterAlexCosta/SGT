@@ -21,7 +21,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * Contrato operacional do cadastro extraído. Cadeia MVC da aplicação via MockMvc, com filtros,
- * serviço e MySQL; as mutações são confirmadas e relidas em novas transações.
+ * serviço e PostgreSQL; as mutações são confirmadas e relidas em novas transações.
  * Não usa a entidade/DTO/serviço de governança para preparar nem consultar dados.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -51,7 +51,7 @@ class FornecedorOperacionalHttpIT extends ContratosHttpBase {
         var atualizado = dados(executar(c.localA, put(F + "/{id}", id).contentType(APPLICATION_JSON)
                         .content(json(mapa("razaoSocial", "Aaaa Prestadora atualizada", "cnpj", cnpj,
                                 "email", "novo@example.test", "ativo", false))), 200,
-                "Atualização cadastral conserva ID e é confirmada no MySQL"));
+                "Atualização cadastral conserva ID e é confirmada no PostgreSQL"));
         campos(atualizado, "id", "razaoSocial", "cnpj", "email", "ativo");
         EstadoFornecedor depois = estadoFornecedor(id);
         assertThat(depois.id()).isEqualTo(antes.id());

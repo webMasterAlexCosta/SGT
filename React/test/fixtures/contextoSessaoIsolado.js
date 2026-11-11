@@ -1,5 +1,5 @@
-import { invalidarGeracaoSessao } from '../../src/core/security/geracaoSessao.js';
-import { confirmarLoginExplicito, obterIntencaoSaida } from '../../src/core/security/saidaSessao.js';
+import { invalidarGeracaoSessao } from '../../src/core/security/geracaoSessao.ts';
+import { confirmarLoginExplicito, obterIntencaoSaida } from '../../src/core/security/saidaSessao.ts';
 
 // Somente antes de cada caso independente. Não usar entre as ações de um caso:
 // remount, logout, storage/focus e corridas devem preservar seus próprios sinais.

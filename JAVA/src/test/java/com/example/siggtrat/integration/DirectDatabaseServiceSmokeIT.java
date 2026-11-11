@@ -29,12 +29,12 @@ import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * Enquanto alguns services ainda possuem JDBC/EntityManager direto, estes
- * testes garantem que essas chamadas também sejam exercitadas contra o MySQL.
+ * testes garantem que essas chamadas também sejam exercitadas contra o PostgreSQL.
  * Se essas consultas forem movidas para repositories no futuro, o teste pode
  * acompanhar a refatoração sem perder cobertura do SQL.
  */
-@DisplayName("Integração MySQL: chamadas diretas de banco ainda existentes em services")
-class DirectDatabaseServiceSmokeIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: chamadas diretas de banco ainda existentes em services")
+class DirectDatabaseServiceSmokeIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private JdbcTemplate jdbc;

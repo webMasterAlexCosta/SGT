@@ -33,7 +33,7 @@ class MotorTemporalAlocacaoEtapa07Test {
         evento.setJornadaNovaId(11L); evento.setJornadaNovaDescricao("12x36");
         evento.setCargoNovoId(12L); evento.setCargoNovoNome("Técnico"); evento.setInicioNovo(LocalDate.of(2026, 6, 1));
         evento.setFimNovo(LocalDate.of(2026, 6, 30));
-        evento.setHashEvento("d7fd86b211f619e07d4ab9ecd1a3a6bf473fb451dee88e2e64806b66592ceabf");
+        evento.setHashEvento("bf1af6114caa42eafbfbbb5a6b54219b469ae2b5790f906c12cd8468bd39a1d6");
         Instant conhecido = Instant.now();
         when(eventos.findByVinculoIdAndRegistradoEmLessThanEqualOrderByRegistradoEmAscIdAsc(eq(7L), any())).thenReturn(List.of(evento));
         when(eventos.findByVinculoIdOrderByRegistradoEmAscIdAsc(7L)).thenReturn(List.of(evento));

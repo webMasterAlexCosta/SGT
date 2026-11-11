@@ -2,10 +2,10 @@ import React from 'react';
 import { afterEach, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
-vi.mock('../src/core/ui/acessibilidadeDialogo.js', () => ({ useDialogoAcessivel: () => ({ current: null }) }));
-vi.mock('../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.jsx', () => ({ PainelAlteracoesContrato: () => null }));
-vi.mock('../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.jsx', () => ({ PainelExcecoesContrato: () => null }));
-import { ModalDetalhesContrato } from '../src/modules/admin/pages/PaginaContratos/components/ModalDetalhesContrato/index.jsx';
+vi.mock('../src/core/ui/acessibilidadeDialogo.ts', () => ({ useDialogoAcessivel: () => ({ current: null }) }));
+vi.mock('../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx', () => ({ PainelAlteracoesContrato: () => null }));
+vi.mock('../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.tsx', () => ({ PainelExcecoesContrato: () => null }));
+import { ModalDetalhesContrato } from '../src/modules/admin/pages/PaginaContratos/components/ModalDetalhesContrato/index.tsx';
 const six = Array.from({ length: 6 }, (_, i) => i + 1);
 const props = {
   aberto: true, contrato: { id: 1, numeroContrato: 'SINTETICO', anoContrato: 2026, estadoNegocial: 'PUBLICADO' },

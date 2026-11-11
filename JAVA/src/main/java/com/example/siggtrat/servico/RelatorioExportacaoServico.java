@@ -52,7 +52,11 @@ import java.util.function.LongConsumer;
  * está íntegro e finalizado, o arquivo é enviado ao cliente e removido do temporário.</p>
  */
 @Service
-public class RelatorioExportacaoServico {
+public class RelatorioExportacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioExportacaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final int LOTE = RelatorioFrequenciaConsolidadoServico.TAMANHO_LOTE_EXPORTACAO;
     private static final DateTimeFormatter DATA_BR = DateTimeFormatter.ofPattern("dd/MM/yyyy");

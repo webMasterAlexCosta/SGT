@@ -165,6 +165,59 @@ class PessoasPoliticaMatriculaFuturaHttpIT extends ContratosHttpBase {
         }
     }
 
+    @ParameterizedTest
+    @org.junit.jupiter.params.provider.CsvSource({
+            "VIGENTE,SEM_MATRICULA", "PROGRAMADO,SEM_MATRICULA", "FIM_ANTERIOR,SEM_MATRICULA",
+            "VIGENTE,MATRICULA_INFORMADA", "PROGRAMADO,MATRICULA_INFORMADA"})
+    void novaObrigacaoFuturaRevalidaVinculoExistenteOuProgramadoNaFronteira(String situacao,String controle) throws Exception {
+        Fixture f=preparar(false,false);
+        LocalDate fronteira=f.fronteira().plusDays(1);
+        LocalDate inicio=situacao.equals("PROGRAMADO")?fronteira:RelogioSistema.hoje();
+        LocalDate fim=situacao.equals("FIM_ANTERIOR")?fronteira.minusDays(1):null;
+        String matricula=controle.equals("MATRICULA_INFORMADA")?"MAT-B07-FUTURA-"+f.n().id():null;
+        JsonNode criado=enviar(f.c().localA,V,cadastro(f,cpf(Math.toIntExact(754000000L+f.n().id())),inicio,fim,matricula),201,
+                "MAT005 vínculo "+situacao+" existe antes do ato futuro de exigência");
+        long id=criado.path("id").asLong(), pessoa=criado.path("pessoaId").asLong();
+        List<String> antes=estado(f);
+        Map<String,Object> adi=aditamento("ADI-OBRIGACAO-SOBRE-EXISTENTE-"+f.n().id(),fronteira);
+        adi.put("novaMatriculaVinculoObrigatoria",true);
+        JsonNode previa=emTransacao(() -> {
+            try { return previaAditamento(f.c(),f.n().id(),adi); }
+            catch(Exception e) { throw new IllegalStateException(e); }
+        });
+        assertThat(previa.path("tokenPrevia").asText()).hasSize(64);
+        assertThat(estado(f)).as("Prévia não altera pessoas, vínculos, faixas, política ou eventos").isEqualTo(antes);
+        if(matricula==null && fim==null) {
+            negarPorMatricula(f,base(f.n().id())+"/aditamentos",adi,
+                    "MAT005 nova exigência futura não pode deixar vínculo "+situacao+" sem matrícula em D");
+            assertThat(estado(f)).as("Recusa do ato conserva estado em transação independente").isEqualTo(antes);
+            JsonNode politica=consultar(f.c().localA,base(f.n().id())+"/posicao-temporal?data="+fronteira,
+                    "MAT005 rollback mantém dispensa anterior em D").path("versaoContratual");
+            assertThat(politica.path("matriculaVinculoObrigatoriaEfetiva").isBoolean()).isTrue();
+            assertThat(politica.path("matriculaVinculoObrigatoriaEfetiva").asBoolean()).isFalse();
+        } else {
+            enviar(f.c().localA,base(f.n().id())+"/aditamentos",adi,201,
+                    "MAT005 controle positivo: matrícula informada ou fim inclusivo em D-1");
+            JsonNode anterior=consultar(f.c().localA,base(f.n().id())+"/posicao-temporal?data="+fronteira.minusDays(1),
+                    "MAT005 nova obrigação não retroage para D-1").path("versaoContratual");
+            JsonNode naFronteira=consultar(f.c().localA,base(f.n().id())+"/posicao-temporal?data="+fronteira,
+                    "MAT005 obrigação passa a valer inclusive em D").path("versaoContratual");
+            assertThat(anterior.path("matriculaVinculoObrigatoriaEfetiva").isBoolean()).isTrue();
+            assertThat(anterior.path("matriculaVinculoObrigatoriaEfetiva").asBoolean()).isFalse();
+            assertThat(naFronteira.path("matriculaVinculoObrigatoriaEfetiva").isBoolean()).isTrue();
+            assertThat(naFronteira.path("matriculaVinculoObrigatoriaEfetiva").asBoolean()).isTrue();
+        }
+        emTransacao(() -> {
+            VinculoContratual v=em.find(VinculoContratual.class,id);
+            assertThat(v.getPessoa().getId()).isEqualTo(pessoa);assertThat(v.getContrato().getId()).isEqualTo(f.n().id());
+            assertThat(v.getDataInicio()).isEqualTo(inicio);assertThat(v.getDataFim()).isEqualTo(fim);
+            assertThat(v.getMatricula()).isEqualTo(matricula);
+            assertThat(em.createQuery("select count(v) from VinculoContratual v where v.pessoa.id=:p",Long.class)
+                    .setParameter("p",pessoa).getSingleResult()).isEqualTo(1);
+            return null;
+        });
+    }
+
     private Fixture preparar(boolean originalObrigatoria, boolean futuraObrigatoria) {
         return emTransacao(() -> {
             try {
@@ -198,8 +251,8 @@ class PessoasPoliticaMatriculaFuturaHttpIT extends ContratosHttpBase {
         return emTransacao(() -> {
             List<String> r = new ArrayList<>();
             for (String jpql : List.of(
-                    "select v.id,v.pessoa.id,v.dataInicio,v.dataFim,v.estadoNegocial,v.matricula from VinculoContratual v where v.contrato.id=:c order by v.id",
-                    "select a.id,a.vinculo.id,a.dataInicio,a.dataFim,a.estadoNegocial from AlocacaoVinculo a where a.vinculo.contrato.id=:c order by a.id",
+                    "select v.id,v.pessoa.id,v.dataInicio,v.dataFim,v.estadoNegocial,v.matricula,v.version from VinculoContratual v where v.contrato.id=:c order by v.id",
+                    "select a.id,a.vinculo.id,a.dataInicio,a.dataFim,a.estadoNegocial,a.version from AlocacaoVinculo a where a.vinculo.contrato.id=:c order by a.id",
                     "select e.id,e.hashEvento from EventoVinculoContratual e where e.vinculo.contrato.id=:c order by e.id",
                     "select e.id,e.hashEvento from EventoAlocacaoVinculo e where e.vinculo.contrato.id=:c order by e.id",
                     "select e.id,e.situacaoFato,e.dataEfetiva from EventoCicloVidaContrato e where e.contrato.id=:c order by e.id",

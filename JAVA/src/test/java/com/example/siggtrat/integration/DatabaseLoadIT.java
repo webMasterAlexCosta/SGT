@@ -29,8 +29,8 @@ import java.util.concurrent.ThreadLocalRandom;
 import static org.junit.jupiter.api.Assertions.*;
 
 @Tag("load")
-@DisplayName("Carga MySQL: leitura/escrita concorrente e integridade")
-class DatabaseLoadIT extends MySqlIntegrationTestSupport {
+@DisplayName("Carga PostgreSQL: leitura/escrita concorrente e integridade")
+class DatabaseLoadIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private JdbcTemplate jdbc;
@@ -151,12 +151,10 @@ class DatabaseLoadIT extends MySqlIntegrationTestSupport {
         double rps = operations.get() / Math.max(0.001, elapsedSeconds);
 
         Long persistedWrites = jdbc.queryForObject(
-                "SELECT COALESCE(SUM(CAST(valor AS UNSIGNED)), 0) FROM configuracao_sistema WHERE chave LIKE ?",
+                "SELECT COALESCE(SUM(CAST(valor AS bigint)), 0) FROM configuracao_sistema WHERE chave LIKE ?",
                 Long.class, prefix + "%");
 
-        String origemBanco = MYSQL_NATIVO
-                ? "MySQL nativo via INTEGRATION_MYSQL_URL"
-                : MYSQL.getDockerImageName() + " via Testcontainers";
+        String origemBanco = "PostgreSQL nativo via INTEGRATION_POSTGRES_URL";
         String report = String.format(Locale.ROOT, """
                 SIG GTRAT - TESTE DE CARGA DO BANCO
                 Gerado em: %s

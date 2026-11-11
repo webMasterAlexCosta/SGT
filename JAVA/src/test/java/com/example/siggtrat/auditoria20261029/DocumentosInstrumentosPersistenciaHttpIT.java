@@ -74,4 +74,47 @@ class DocumentosInstrumentosPersistenciaHttpIT extends ContratosHttpBase {
             catch (Exception e) { throw new IllegalStateException(e); }
         });
     }
+
+    @Test
+    void postFinalSemFonteRecusaAditamentoSemFatoParcialESeiPermaneceAlternativaLegitima() throws Exception {
+        Cenario c = criarCenarioPersistido(); NovoContrato n = publicar(c, false);
+        String identificacao = "ADI-SEM-FONTE-" + n.id();
+        var req = aditamento(identificacao, n.inicio().plusDays(1)); req.remove("referenciaSei");
+        req.put("novaDescricao", "Condição válida cujo único suporte será retirado antes do POST final");
+        JsonNode preparado = dados(executar(c.localA, multipart(base(n.id()) + "/documentos")
+                .file(metadados(mapa("tipoFato", "ADITAMENTO", "fatoChave", identificacao,
+                        "titulo", "Fonte sintética exclusiva ainda em rascunho", "classificacaoAcesso", "NEGOCIAL",
+                        "dataEfetiva", n.inicio().plusDays(1))))
+                .file(new MockMultipartFile("arquivo", "fonte-temporaria.pdf", "application/pdf", PDF)),
+                201, "Controle positivo: fonte existente permite preparar a intenção sem SEI"));
+        assertEquals("RASCUNHO", preparado.path("estado").asText());
+        JsonNode previa = enviar(c.localA, base(n.id()) + "/aditamentos/previa", req, 200,
+                "Demais campos e token provêm da prévia pública válida");
+        req.put("tokenPrevia", previa.path("tokenPrevia").asText());
+        assertFalse(req.get("tokenPrevia").toString().isBlank());
+        executar(c.localA, delete(base(n.id()) + "/documentos/" + preparado.path("id").asLong()), 204,
+                "Apenas o rascunho sintético exclusivo sem SEI é retirado antes do comando final");
+        JsonNode antes = fotografiaFato(c, n.id());
+        var negada = executar(c.localA, post(base(n.id()) + "/aditamentos")
+                .contentType(org.springframework.http.MediaType.APPLICATION_JSON).content(json(req)),
+                400, "DOC002 POST final revalida ausência de anexo e de SEI");
+        assertTrue(mapper.readTree(negada.getResponse().getContentAsString()).path("message").asText()
+                .contains("fonte comprobatória"), "Recusa deve identificar a fonte, não token ou sintaxe");
+        assertEquals(antes, fotografiaFato(c, n.id()), "Não cria instrumento, evento, versão ou alteração parcial do contrato");
+        req.put("referenciaSei", "SEI-ALTERNATIVA-LEGITIMA-" + n.id());
+        req.put("tokenPrevia", enviar(c.localA, base(n.id()) + "/aditamentos/previa", req, 200,
+                "SEI é fonte suficiente sem tornar upload obrigatório").path("tokenPrevia").asText());
+        JsonNode controle = enviar(c.localA, base(n.id()) + "/aditamentos", req, 201,
+                "Controle positivo do mesmo ato com referência SEI legítima no modelo");
+        assertEquals(identificacao, controle.path("identificacao").asText());
+    }
+
+    private JsonNode fotografiaFato(Cenario c, long contrato) throws Exception {
+        return mapper.valueToTree(mapa(
+                "contrato", consultar(c.localA, base(contrato), "Estado integral do contrato no recorte da fixture"),
+                "instrumentos", consultar(c.localA, base(contrato) + "/aditamentos", "Instrumentos antes/depois do POST"),
+                "eventos", consultar(c.localA, base(contrato) + "/eventos", "Eventos antes/depois do POST"),
+                "versoes", consultar(c.localA, base(contrato) + "/versoes", "Versões antes/depois do POST"),
+                "documentos", consultar(c.localA, base(contrato) + "/documentos", "Fontes antes/depois do POST")));
+    }
 }

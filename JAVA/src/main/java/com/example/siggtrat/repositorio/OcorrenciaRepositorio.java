@@ -9,6 +9,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -26,4 +27,16 @@ public interface OcorrenciaRepositorio extends JpaRepository<Ocorrencia, Long>, 
     @EntityGraph(attributePaths = {"empregado"})
     List<Ocorrencia> findByEmpregadoIdAndCanceladoEmIsNullAndDataOcorrenciaBetweenOrderByDataOcorrenciaDesc(
             Long empregadoId, LocalDate inicio, LocalDate fim);
+    /** Fonte já registrada e contextualizada no dia; não infere associação pelo texto/CPF. */
+    @EntityGraph(attributePaths = {"empregado", "empregado.pessoaCanonica", "contextos"})
+    @Query("""
+        select distinct o from Ocorrencia o
+         where o.empregado.id=:empregadoId and o.canceladoEm is null
+           and o.registradoEm is not null and o.registradoEm<=:conhecidoAte
+           and exists (select c.id from ContextoOcorrencia c
+                        where c.ocorrencia=o and c.dataReferencia=:dia)
+         order by o.dataOcorrencia desc, o.id desc
+        """)
+    List<Ocorrencia> buscarFontesRegistradasDoDia(@Param("empregadoId") Long empregadoId,
+            @Param("dia") LocalDate dia, @Param("conhecidoAte") Instant conhecidoAte);
 }

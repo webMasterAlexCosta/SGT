@@ -231,6 +231,45 @@ class ConclusaoAud02DesligamentoHttpIT extends ContratosHttpBase {
                 () -> assertThat(estado(c)).isEqualTo(antes));
     }
 
+    @Test
+    void reabrirFimNaturalAposProrrogacaoRecusaSobreposicaoComVinculoPosteriorDaMesmaPessoa() throws Exception {
+        Cenario c=criarCenarioPersistido();
+        long natural=motivo(c,CategoriaTerminoVinculo.FIM_VIGENCIA_CONTRATO);
+        fonteMotivo(c,natural,CategoriaTerminoVinculo.FIM_VIGENCIA_CONTRATO,DATA,DATA,"B07-REABERTURA-CONFLITO");
+        definirFimOriginalDaFixture(c,DATA);
+        enviar(c.localA,"/api/vinculos-contratuais/contratos/"+c.contratoA.getId()+"/tratar-fim-natural",null,200,
+                "VIN012 vínculo original encerra no fim natural verdadeiro");
+        EstadoVinculo original=estado(c);
+        prorrogar(c,DATA.minusDays(1),FIM);
+        assertThat(estado(c)).isEqualTo(original);
+        JsonNode posterior=enviar(c.localA,"/api/vinculos-contratuais",mapa("pessoaId",c.pessoaA.getId(),
+                "contratoId",c.contratoA.getId(),"composicaoId",c.composicaoA.getId(),"dataInicio",DATA.plusDays(1)),201,
+                "VIN012 a Pessoa original é reaproveitada em novo vínculo válido, sem sobreposição na origem");
+        long posteriorId=posterior.path("id").asLong();
+        assertThat(posterior.path("pessoaId").asLong()).isEqualTo(c.pessoaA.getId());
+        assertThat(posteriorId).isNotEqualTo(c.vinculoA.getId());
+        var req=pedido(FIM,natural);
+        JsonNode previa=enviar(c.localA,vinculo(c)+"/previas/retificacao-desligamento",req,200,
+                "VIN012 prévia mostra conflito da faixa que seria restaurada");
+        assertThat(java.util.stream.StreamSupport.stream(previa.path("vinculosConflitantes").spliterator(),false)
+                .map(JsonNode::asLong).toList()).containsExactly(posteriorId);
+        req.put("confirmarImpacto",true);req.put("tokenPrevia",previa.path("token").asText());
+        JsonNode trilhaAntes=consultar(c.localA,vinculo(c)+"/eventos","VIN012 fotografia da trilha antes da recusa");
+        JsonNode erro=enviar(c.localA,vinculo(c)+"/retificar-desligamento",req,409,
+                "VIN012 confirmação válida não autoriza reabrir sobre outro vínculo da mesma Pessoa");
+        assertThat(erro.path("message").asText()).containsIgnoringCase("sobreposição");
+        assertThat(estado(c)).as("Recusa preserva vínculo original, versão, motivo e faixa em transação nova").isEqualTo(original);
+        assertThat(consultar(c.localA,vinculo(c)+"/eventos","VIN012 trilha após rollback")).isEqualTo(trilhaAntes);
+        emTransacao(() -> {
+            VinculoContratual p=em.find(VinculoContratual.class,posteriorId);
+            assertThat(p.getPessoa().getId()).isEqualTo(c.pessoaA.getId());
+            assertThat(p.getDataInicio()).isEqualTo(DATA.plusDays(1));assertThat(p.getDataFim()).isNull();
+            assertThat(em.createQuery("select count(v) from VinculoContratual v where v.pessoa.id=:p",Long.class)
+                    .setParameter("p",c.pessoaA.getId()).getSingleResult()).isEqualTo(2);
+            return null;
+        });
+    }
+
     private void fonteMotivo(Cenario c, long motivoId, CategoriaTerminoVinculo categoria,
                              LocalDate inicio, LocalDate fim, String identificacao) {
         emTransacao(() -> {
@@ -305,7 +344,7 @@ class ConclusaoAud02DesligamentoHttpIT extends ContratosHttpBase {
         emTransacao(() -> {
             em.find(Contrato.class, c.contratoA.getId()).setDataFim(fim);
             // A versão é imutável (updatable=false): seu setter apenas alterava
-            // o objeto em memória e não preparava a prova no MySQL. Este DML é
+            // o objeto em memória e não preparava a prova no PostgreSQL. Este DML é
             // exclusivo da fixture sintética, antes de qualquer ato sob teste.
             assertThat(em.createQuery("update VersaoContratoNegocial v set v.dataFim=:fim where v.contrato.id=:c")
                     .setParameter("fim", fim).setParameter("c", c.contratoA.getId()).executeUpdate()).isEqualTo(1);

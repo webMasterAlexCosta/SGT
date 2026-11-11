@@ -11,7 +11,7 @@ import java.util.Map;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Regressões pelos controladores reais, serviços reais e persistência MySQL. */
+/** Regressões pelos controladores reais, serviços reais e persistência PostgreSQL. */
 class ContratosLacunasHttpIT extends AuditoriaHttpSuporte {
 
     @Test
@@ -74,7 +74,7 @@ class ContratosLacunasHttpIT extends AuditoriaHttpSuporte {
         body.put("tipoFato", "CONTRATO_ORIGINAL");
         body.put("fatoChave", "ORIGINAL");
         body.put("titulo", "Referência preparada");
-        body.put("referenciaSei", "SEI-HASH-MYSQL");
+        body.put("referenciaSei", "SEI-HASH-POSTGRES");
         body.put("classificacaoAcesso", "NEGOCIAL");
         body.put("dataEfetiva", DATA);
         var metadados = new MockMultipartFile("metadados", "metadados.json", MediaType.APPLICATION_JSON_VALUE,
@@ -88,7 +88,7 @@ class ContratosLacunasHttpIT extends AuditoriaHttpSuporte {
         em.clear();
         JsonNode eventos = dados(executar(c.localA,
                 get("/api/contratos/{id}/documentos/{doc}/eventos", contratoId, documentoId),
-                200, "DOC-005 cadeia hash deve sobreviver à precisão temporal do MySQL"));
+                200, "DOC-005 cadeia hash deve sobreviver à precisão temporal do PostgreSQL"));
         assertThat(eventos.isArray()).isTrue();
         assertThat(eventos.size()).isGreaterThan(0);
         assertThat(eventos.get(0).path("hashEvento").asText()).hasSize(64);

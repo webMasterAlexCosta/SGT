@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.ObservadorAtorPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.Pessoa;
 import com.example.siggtrat.entidade.VinculoContratual;
@@ -41,7 +44,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * RED de contrato da incorporação documental nominal: ausência, prova válida,
  * prova tardia, conhecimento anterior, escopo, idempotência e concorrência.
  * A prova não modifica Pessoa.nome nem os eventos/fotografias originais.
- * MySQL 8.0.45 e Redis reais; nenhuma transação externa envolve os comandos HTTP.
+ * PostgreSQL 18.6 e Redis reais; nenhuma transação externa envolve os comandos HTTP.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @TestPropertySource(properties = {"spring.cache.type=redis", "spring.sql.init.mode=never",
@@ -54,8 +57,8 @@ class PessoasProvaNomeHistoricoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void infraestruturaReal() throws Exception {
         try (var c = dataSource.getConnection()) {
-            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(c.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(c.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -217,15 +220,16 @@ class PessoasProvaNomeHistoricoHttpIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, c.contratoA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 try { if (!liberar.await(15, TimeUnit.SECONDS)) throw new AssertionError("Limite de espera da fixture"); }
                 catch (InterruptedException ex) { Thread.currentThread().interrupt(); throw new IllegalStateException(ex); }
                 return null;
             }));
             long idConexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa1 = pool.submit(() -> mvc.perform(request1).andReturn());
-            Future<MvcResult> tentativa2 = pool.submit(() -> mvc.perform(request2).andReturn());
-            aguardarDuasEsperasReais(idConexao, tentativa1, tentativa2);
+            var ator1 = new Ator("confirmacao-nome-1"); var ator2 = new Ator("confirmacao-nome-2");
+            Future<MvcResult> tentativa1 = pool.submit(() -> ator1.executar(() -> mvc.perform(request1).andReturn()));
+            Future<MvcResult> tentativa2 = pool.submit(() -> ator2.executar(() -> mvc.perform(request2).andReturn()));
+            aguardarDuasEsperasReais(idConexao, c.contratoA.getId(), ator1, ator2, tentativa1, tentativa2);
             liberar.countDown(); bloqueador.get(10, TimeUnit.SECONDS);
             assertThat(List.of(tentativa1.get(10, TimeUnit.SECONDS).getResponse().getStatus(),
                     tentativa2.get(10, TimeUnit.SECONDS).getResponse().getStatus())).containsExactlyInAnyOrder(201, 409);
@@ -237,18 +241,12 @@ class PessoasProvaNomeHistoricoHttpIT extends ContratosHttpBase {
         assertThat(contarEventosOriginais(c)).isZero();
     }
 
-    private void aguardarDuasEsperasReais(long bloqueador, Future<?> a, Future<?> b) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < limite) {
-            Long quantidade = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                    + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                    + "where t.PROCESSLIST_ID=?", Long.class, bloqueador);
-            if (quantidade != null && quantidade >= 2) return;
-            if (a.isDone() || b.isDone()) throw new AssertionError("Confirmação não esperou o lock real do Contrato");
-            Thread.sleep(25);
-        }
-        throw new AssertionError("Duas confirmações não apareceram aguardando no performance_schema");
+    private void aguardarDuasEsperasReais(long bloqueador,long contratoId,Ator ator1,Ator ator2,
+                                        Future<?> a,Future<?> b) throws Exception {
+        com.example.siggtrat.infra.EsperaJdbcPostgres.aguardarAmbos(new JdbcTemplate(dataSource),bloqueador,
+                ator1,sql->sql.selecaoChave("contrato","id_contrato",contratoId),
+                ator2,sql->sql.selecaoChave("contrato","id_contrato",contratoId),
+                "contrato/"+contratoId,a,b);
     }
 
     private String rota(Cenario c) { return "/api/pessoas/" + c.pessoaA.getId() + "/provas-nome"; }

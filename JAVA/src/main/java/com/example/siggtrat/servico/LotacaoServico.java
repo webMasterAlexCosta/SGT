@@ -23,7 +23,11 @@ import java.util.*;
  */
 @Service
 @Transactional(readOnly = true)
-public class LotacaoServico {
+public class LotacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(LotacaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final LotacaoRepositorio repositorio;
     private final JornadaRepositorio jornadaRepositorio;

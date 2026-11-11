@@ -29,7 +29,11 @@ import java.util.*;
  * modifica fatos negociais e limita cada bloqueio ao recorte explicitado.
  */
 @Service
-public class PendenciaAdministrativaServico {
+public class PendenciaAdministrativaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PendenciaAdministrativaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int TAMANHO_MAXIMO = 500;
 
     private final PendenciaAdministrativaRepositorio repositorio;
@@ -79,7 +83,7 @@ public class PendenciaAdministrativaServico {
     @Transactional
     public PendenciaAdministrativa registrarRevisaoFrequencia(Frequencia frequencia, String motivo) {
         if (frequencia == null || frequencia.getId() == null) {
-            throw new IllegalArgumentException("Frequência persistida é obrigatória para gerar pendência.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Frequência persistida é obrigatória para gerar pendência.");
         }
         bloquearOrigemFrequencia(frequencia);
         ContextoComplementoFrequenciaDTO responsabilidade = resolverResponsabilidadeFrequencia(frequencia);
@@ -148,7 +152,7 @@ public class PendenciaAdministrativaServico {
     @Transactional(isolation = Isolation.READ_COMMITTED)
     public PendenciaAdministrativa registrarFimNatural(VinculoContratual vinculo) {
         if (vinculo == null || vinculo.getId() == null || vinculo.getContrato() == null) {
-            throw new IllegalArgumentException("Vínculo persistido e contrato são obrigatórios para gerar pendência.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Vínculo persistido e contrato são obrigatórios para gerar pendência.");
         }
         bloquearFonteFimNatural(vinculo);
         LocalDate fim = fimNaturalPendente(vinculo, RelogioSistema.hoje());
@@ -205,7 +209,7 @@ public class PendenciaAdministrativaServico {
             Contrato contrato, ComposicaoContratualTemporalServico.ConflitoReplay conflito,
             String operacaoOrigem) {
         if (contrato == null || contrato.getId() == null || conflito == null || conflito.eventoId() == null)
-            throw new IllegalArgumentException("Contrato e conflito temporal persistidos são obrigatórios.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Contrato e conflito temporal persistidos são obrigatórios.");
         bloquearContrato(contrato.getId());
         String chave = "CONFLITO_REPLAY:" + contrato.getId() + ":EVENTO:" + conflito.eventoId();
         Optional<PendenciaAdministrativa> existente = repositorio.findByChaveOrigem(chave);

@@ -38,7 +38,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
- * DEF-H04-CLOSURE-CANCEL: MockMvc/security/JPA e MySQL real; não é ensaio TCP.
+ * DEF-H04-CLOSURE-CANCEL: MockMvc/security/JPA e PostgreSQL real; não é ensaio TCP.
  * O spy identifica exclusivamente o job do cenário e executa o método real.
  * O inspector não modifica SQL nem resultados: suspende somente o segundo
  * SELECT de confirmação do progresso, depois da leitura inicial e da escrita
@@ -46,7 +46,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * liberação. No controle, a mesma barreira é liberada sem cancelar.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-@TestPropertySource(properties = "app.homologacao.mysql8045=true")
+@TestPropertySource(properties = "app.homologacao.postgres186=true")
 class FechamentoCancelamentoConcorrenteH04HttpIT extends AuditoriaHttpSuporte {
     @Autowired JdbcTemplate jdbc;
     @MockitoSpyBean FrequenciaServico frequencias;
@@ -88,7 +88,7 @@ class FechamentoCancelamentoConcorrenteH04HttpIT extends AuditoriaHttpSuporte {
                     frame.getClassName().equals(FrequenciaServico.class.getName())
                             && frame.getMethodName().equals("atualizarProgressoDoFechamentoNaMesmaTransacao"));
             if (confirmandoBloco && normal.startsWith("select ")
-                    && normal.contains(" from fechamento_frequencia ") && normal.contains(" for update")
+                    && normal.contains(" from fechamento_frequencia ") && normal.matches("(?s).*\\bfor\\s+(?:no\\s+key\\s+)?update\\b.*")
                     && c.confirmacoes.incrementAndGet() == 2) {
                 assertTrue(TransactionSynchronizationManager.isActualTransactionActive(),
                         "A barreira deve estar na transação real do segundo bloco");
@@ -131,11 +131,11 @@ class FechamentoCancelamentoConcorrenteH04HttpIT extends AuditoriaHttpSuporte {
             BarreiraProgresso.jobNoBloco.set(id);
             try { return invocacao.callRealMethod(); }
             finally { BarreiraProgresso.jobNoBloco.remove(); }
-        }).when(frequencias).processarBlocoFechamento(anyLong(), anyList(), any(LocalDate.class), anyMap(), anyLong());
+        }).when(org.springframework.test.util.AopTestUtils.<FrequenciaServico>getUltimateTargetObject(frequencias)).processarBlocoFechamento(anyLong(), anyList(), any(LocalDate.class), anyMap(), anyLong());
 
         ExecutorService requisicao = Executors.newSingleThreadExecutor();
         Map<String, Object> prova = new LinkedHashMap<>();
-        prova.put("layer", "MockMvc/security/JPA/MySQL real; no TCP claim");
+        prova.put("layer", "MockMvc/security/JPA/PostgreSQL real; no TCP claim");
         prova.put("cancelar", cancelar);
         prova.put("gestorLocal", gestorLocal);
         prova.put("massa", 3);
@@ -288,13 +288,13 @@ class FechamentoCancelamentoConcorrenteH04HttpIT extends AuditoriaHttpSuporte {
         leitura.setReadOnly(true);
         leitura.setIsolationLevel(TransactionDefinition.ISOLATION_REPEATABLE_READ);
         return leitura.execute(status -> {
-            Map<String, String> identidade = linhas("SELECT @@transaction_read_only AS tx_read_only, "
-                    + "@@transaction_isolation AS tx_isolation, CONNECTION_ID() AS connection_id, "
-                    + "VERSION() AS server_version, @@server_uuid AS server_uuid").get(0);
+            Map<String, String> identidade = linhas("SELECT CASE current_setting('transaction_read_only') WHEN 'on' THEN '1' ELSE '0' END AS tx_read_only, "
+                    + "current_setting('transaction_isolation') AS tx_isolation, pg_backend_pid() AS connection_id, "
+                    + "VERSION() AS server_version, current_database() || ':' || inet_server_addr()::text || ':' || inet_server_port()::text AS server_identity").get(0);
             assertEquals("1", identidade.get("tx_read_only"));
-            assertEquals("REPEATABLE-READ", identidade.get("tx_isolation"));
-            assertEquals("8.0.45", identidade.get("server_version"));
-            String uuidEsperado = System.getenv("SGT_MYSQL_SERVER_UUID");
+            assertEquals("repeatable read", identidade.get("tx_isolation"));
+            assertTrue(identidade.get("server_version").startsWith("PostgreSQL 18.6 "));
+            String uuidEsperado = System.getenv("SGT_POSTGRES_SERVER_UUID");
             if (uuidEsperado != null && !uuidEsperado.isBlank()) {
                 assertEquals(uuidEsperado, identidade.get("server_uuid"),
                         "A conexão real deve corresponder ao UUID explícito da campanha");
@@ -316,8 +316,14 @@ class FechamentoCancelamentoConcorrenteH04HttpIT extends AuditoriaHttpSuporte {
         return jdbc.query(sql, (rs, numero) -> {
             Map<String, String> row = new TreeMap<>();
             var metadados = rs.getMetaData();
-            for (int coluna = 1; coluna <= metadados.getColumnCount(); coluna++)
-                row.put(metadados.getColumnLabel(coluna), rs.getString(coluna));
+            for (int coluna = 1; coluna <= metadados.getColumnCount(); coluna++) {
+                Object valor = rs.getObject(coluna);
+                // Fotografia lógica 0/1 preservada, independente de bool nativo PG.
+                String canonico = valor instanceof Boolean flag ? (flag ? "1" : "0")
+                        : valor instanceof Number valorNumerico ? new java.math.BigDecimal(valorNumerico.toString()).stripTrailingZeros().toPlainString()
+                        : rs.getString(coluna);
+                row.put(metadados.getColumnLabel(coluna), canonico);
+            }
             return row;
         }, argumentos);
     }

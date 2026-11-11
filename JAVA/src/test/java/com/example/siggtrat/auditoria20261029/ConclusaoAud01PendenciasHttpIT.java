@@ -1,5 +1,9 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.dominio.pendencia.EstadoPendencia;
 import com.example.siggtrat.dominio.pendencia.EscopoBloqueioPendencia;
@@ -37,6 +41,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /** AUD-01: a decisão humana não substitui a remoção comprovada da causa negocial. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ConclusaoAud01PendenciasHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSource;
     @Autowired private ComposicaoContratualTemporalServico composicaoTemporal;
 
     private record Conflito(Cenario c, NovoContrato contrato, long remanejamentoId,
@@ -173,7 +178,7 @@ class ConclusaoAud01PendenciasHttpIT extends ContratosHttpBase {
         try {
             Future<?> alteracao = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, f.contrato.id(), LockModeType.PESSIMISTIC_WRITE);
-                contratoBloqueado.complete(((Number) em.createNativeQuery("select connection_id()")
+                contratoBloqueado.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarContrato.await(20, TimeUnit.SECONDS))
@@ -184,18 +189,13 @@ class ConclusaoAud01PendenciasHttpIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = contratoBloqueado.get(10, TimeUnit.SECONDS);
-            var confirmacao = pool.submit(() -> mvc.perform(requisicao).andReturn());
-            long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-            boolean bloqueioContratual = false;
-            while (System.nanoTime() < limite && !confirmacao.isDone()) {
-                long bloqueios = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexao).getSingleResult()).longValue());
-                if (bloqueios > 0) { bloqueioContratual = true; break; }
-                TimeUnit.MILLISECONDS.sleep(20);
-            }
+            var atorConfirmacao = new Ator("confirmacao-AUD004");
+            var confirmacao = pool.submit(() -> atorConfirmacao.executar(() -> mvc.perform(requisicao).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, atorConfirmacao,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", f.contrato.id()),
+                    "AUD004 confirmação/Contrato " + f.contrato.id(), confirmacao);
+            boolean bloqueioContratual = !espera.isEmpty();
+            assertThat(confirmacao.isDone()).as("O ator identificado ainda aguarda o Contrato pelo binding de sua PK").isFalse();
             liberarContrato.countDown();
             alteracao.get(10, TimeUnit.SECONDS);
             var resposta = confirmacao.get(10, TimeUnit.SECONDS);

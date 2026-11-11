@@ -7,7 +7,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -108,7 +108,8 @@ class ConclusaoAud06FrequenciaEscopoPaginaHttpIT extends ContratosHttpBase {
                     "Registro compatível com a Jornada antes de conhecer o ato retroativo").path("id").asLong());
         }
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.plusDays(2), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Documento comprovou responsabilidade de B desde o terceiro dia",
@@ -126,7 +127,7 @@ class ConclusaoAud06FrequenciaEscopoPaginaHttpIT extends ContratosHttpBase {
                 "Autorização temporal é aplicada antes de selecionar e contar a página " + pagina));
     }
 
-    private MockHttpServletRequestBuilder consulta(Preparado f, String rota, int pagina, int tamanho, boolean semContagem) {
+    private AbstractMockHttpServletRequestBuilder<?> consulta(Preparado f, String rota, int pagina, int tamanho, boolean semContagem) {
         var req = switch (rota) {
             case "dia" -> get("/api/frequencias").param("data", DATA.plusDays(3).toString());
             case "mensal" -> get("/api/frequencias/mensal").param("mes", "6").param("ano", "2026");

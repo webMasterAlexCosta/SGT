@@ -6,11 +6,11 @@ import '@testing-library/jest-dom/vitest';
 const { requisitar, autenticacao } = vi.hoisted(() => ({
   requisitar: vi.fn(), autenticacao: { user: null },
 }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => autenticacao }));
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { PaginaHistorico } from '../src/modules/historico/PaginaHistorico.jsx';
-import { FormularioProvaHistorica } from '../src/modules/historico/FormularioProvaHistorica.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => autenticacao }));
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { PaginaHistorico } from '../src/modules/historico/PaginaHistorico.tsx';
+import { FormularioProvaHistorica } from '../src/modules/historico/FormularioProvaHistorica.tsx';
 
 const gestor = (id) => ({ id, username: `gestor-sintetico-${id}`, perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' });
 const nome = (valor) => ({ nome: valor, comprovado: true, tipoFonte: 'PROVA_NOME_HISTORICO', fonteId: 81,

@@ -163,7 +163,8 @@ class AuditoriaFinalPendenciaFimNaturalProrrogacaoHttpIT extends ContratosHttpBa
         prorrogacao.put("novaDataFim", novoFim);
         tx(() -> registrarAditamento(c, n.id(), prorrogacao));
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", n.fim().plusDays(5), "dataAto", hoje,
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Gestão destino responsável no término prorrogado", "referenciaSei", "SEI-PENDENCIA-" + n.id(),

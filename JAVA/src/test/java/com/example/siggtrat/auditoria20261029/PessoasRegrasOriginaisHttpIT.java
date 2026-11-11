@@ -25,7 +25,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
 /**
- * Regressões derivadas das regras originais, verificadas pela API, serviços e MySQL.
+ * Regressões derivadas das regras originais, verificadas pela API, serviços e PostgreSQL.
  * Cada comando tem sua própria transação, inclusive os comandos recusados.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)

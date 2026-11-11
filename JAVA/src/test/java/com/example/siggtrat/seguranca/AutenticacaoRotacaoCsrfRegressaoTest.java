@@ -66,7 +66,7 @@ class AutenticacaoRotacaoCsrfRegressaoTest {
                 mock(TentativaLoginServico.class), mock(LotacaoRepositorio.class), mock(JornadaRepositorio.class),
                 mock(SuperintendenciaEstadualRepositorio.class), mock(GestaoLocalRepositorio.class),
                 mock(EscopoAcessoUsuarioServico.class), mock(FiltroAutenticacaoJwt.class), mock(TotpServico.class),
-                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."));
+                new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."), mock(com.example.siggtrat.servico.RevogacaoSessaoServico.class));
         SecurityContextHolder.getContext().setAuthentication(principal);
         requisicao = new MockHttpServletRequest();
         requisicao.setCookies(new Cookie("XSRF-TOKEN", "CSRF-SINTETICO-ANTERIOR"),

@@ -1,0 +1,86 @@
+schema_version = 1
+
+[project]
+name = "SGT"
+frontend = "React"
+backend = "JAVA"
+static = "JAVA/src/main/resources/static"
+frontend_lint_available = false
+
+[toolchain]
+node = "26.13.0"
+npm = "12.2.2"
+java_release = 25
+spring_boot = "4.1.2"
+lockfile_version = 3
+
+[resources]
+heavy_queue = "~/.codex/tools/heavy-run.py"
+heavy_suites_parallel = false
+maven_heap_mib = 512
+test_fork_heap_mib = 768
+node_heap_mib = 768
+
+[commands.frontend_install]
+cwd = "React"
+argv = ["npm", "ci", "--ignore-scripts", "--no-audit", "--no-fund"]
+changes_dependencies_directory = true
+
+[commands.frontend_typecheck]
+cwd = "React"
+argv = ["npm", "run", "typecheck"]
+heavy = true
+
+[commands.frontend_test]
+cwd = "React"
+argv = ["npm", "run", "test"]
+heavy = true
+
+[commands.frontend_build]
+public_environment_template = "React/.env.example"
+cwd = "React"
+argv = ["npm", "run", "build"]
+heavy = true
+
+[commands.java_test]
+cwd = "JAVA"
+argv = ["bash", "./mvnw", "-B", "-ntp", "-T1", "test"]
+heavy = true
+requires_database = false
+
+[commands.java_package]
+cwd = "JAVA"
+argv = ["bash", "./mvnw", "-B", "-ntp", "-T1", "package"]
+heavy = true
+includes_java_unit_tests = true
+requires_database = false
+
+[integration]
+postgresql = "18.6"
+requires_isolated_resources_and_ownership = true
+load_operational_dotenv = false
+schema_management = "Hibernate/JPA conforme AGENTS; sem DDL manual"
+results_apply_only_to_recorded_hashes = true
+
+[commands.frontend_preparation_test]
+cwd = "React"
+argv = ["npm", "run", "test:preparacao"]
+heavy = true
+
+[commands.assets_check]
+cwd = "React"
+argv = ["npm", "run", "sync:java:check"]
+read_only = true
+
+[commands.assets_sync]
+cwd = "React"
+argv = ["npm", "run", "sync:java"]
+changes_static_assets = true
+
+[commands.java_integration]
+cwd = "JAVA"
+argv = ["bash", "./mvnw", "-B", "-ntp", "-T1", "-Pintegration", "verify"]
+heavy = true
+requires_database = true
+required_environment_names = ["INTEGRATION_POSTGRES_URL", "INTEGRATION_POSTGRES_USER", "INTEGRATION_POSTGRES_PASSWORD"]
+redis_only_when_required_by_scenario = true

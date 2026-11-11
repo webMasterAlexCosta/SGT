@@ -1,15 +1,15 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import * as dominio from '../src/services/admin/ServicoDominioExcecoesContrato.js';
+import * as dominio from '../src/services/admin/ServicoDominioExcecoesContrato.ts';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({
+vi.mock('../src/core/http.ts', () => ({
   requisitar,
   extrairLista: (dados) => Array.isArray(dados) ? dados : dados?.content || [],
   requisitarDownload: vi.fn(),
 }));
 
-import { ServicoContrato } from '../src/services/admin/ServicoContrato.js';
-import { ServicoExcecoesContrato } from '../src/services/admin/ServicoExcecoesContrato.js';
+import { ServicoContrato } from '../src/services/admin/ServicoContrato.ts';
+import { ServicoExcecoesContrato } from '../src/services/admin/ServicoExcecoesContrato.ts';
 
 const formularioTransferencia = () => ({
   dataEfetiva: '2026-11-05', dataAto: '2026-10-31', gestaoLocalDestinoId: '23',
@@ -30,6 +30,7 @@ describe('Contrato congelado de transferência e ciclo de vida', () => {
       referenciaSei: 'TESTE-TRANSFERENCIA', autorizacaoAdministrativa: 'AUTORIZACAO-SINTETICA',
       eventoPrecedenteId: null, relacaoPrecedencia: null, ordemDocumental: null,
       tokenPrevia: 'token-da-previa', confirmarImpacto: true,
+      conferenciaDocumentalConfirmada: false, versaoConferenciaDocumental: null,
       mapeamentos: [{ composicaoOrigemId: 31, lotacaoOrigemId: 32, jornadaOrigemId: 33, cargoOrigemId: 34, lotacaoDestinoId: 42, jornadaDestinoId: 43, cargoDestinoId: 44 }],
     });
   });

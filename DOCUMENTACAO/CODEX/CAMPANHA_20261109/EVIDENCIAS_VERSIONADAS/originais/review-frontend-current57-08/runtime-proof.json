@@ -1,0 +1,10 @@
+{
+  "state": "ACTUAL_NATIVE_DESKTOP_COMPLETED",
+  "thread_id": "01a1c50d-6d2d-74e3-910d-86635b797156",
+  "turn_id": "01a1c73e-74ec-7683-94eb-ceb605200645",
+  "model": "gpt-6.1-sol",
+  "effort": "xhigh",
+  "duration_ms": 275379,
+  "cursor": "17a84ccf-2a21-40e4-a2d9-d62093b24fb8:48",
+  "proof_source": "matching_native_turn_context_and_completed_Desktop_wait_snapshot"
+}

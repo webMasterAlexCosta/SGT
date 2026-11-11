@@ -80,5 +80,9 @@ class ContratoTemporalidadeEtapa02Test {
                 .collect(Collectors.toSet());
 
         assertTrue(restricoes.contains(Set.of("numero_contrato", "ano_contrato")));
+        assertTrue(Arrays.stream(table.uniqueConstraints()).anyMatch(r ->
+                "uk_contrato_numero_ano".equals(r.name())
+                        && Set.of(r.columnNames()).equals(Set.of("numero_contrato","ano_contrato"))),
+                "CON-001:004 nome e colunas pertencem à mesma restrição composta");
     }
 }

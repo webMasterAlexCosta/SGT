@@ -16,8 +16,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integração MySQL: disponibilidade e pool de conexões")
-class DatabaseAvailabilityIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: disponibilidade e pool de conexões")
+class DatabaseAvailabilityIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private JdbcTemplate jdbc;

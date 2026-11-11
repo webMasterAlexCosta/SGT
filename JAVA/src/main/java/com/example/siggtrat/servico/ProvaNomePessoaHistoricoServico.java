@@ -13,7 +13,11 @@ import static com.example.siggtrat.servico.SuporteProvaHistoricaServico.*;
 
 @Service
 @Transactional(readOnly = true)
-public class ProvaNomePessoaHistoricoServico {
+public class ProvaNomePessoaHistoricoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ProvaNomePessoaHistoricoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EntityManager em;
     private final ProvaNomePessoaHistoricoRepositorio provas;
     private final SuporteProvaHistoricaServico suporte;
@@ -155,7 +159,7 @@ public class ProvaNomePessoaHistoricoServico {
         }
         String dependencias=trilha.stream().map(p->p.getId()+":"+p.getHashConteudo()).toList().toString();
         String eventos=fontes.stream().map(e->e.getId()+":"+e.getHashEvento()).toList().toString();
-        return new PreviaProvaHistoricaDTO(hash(intencao(v.getPessoa().getId(),r,u),v.getPessoa().getVersion(),v.getVersion(),v.getContrato().getVersion(),dependencias,eventos,
+        return new PreviaProvaHistoricaDTO(hash("sgt.previa.prova-nome.v1", intencao(v.getPessoa().getId(),r,u),v.getPessoa().getVersion(),v.getVersion(),v.getContrato().getVersion(),dependencias,eventos,
                 doc==null?null:doc.id(),doc==null?null:doc.version(),doc==null?null:doc.estado()),
                 List.of("Enriquece a identidade no intervalo documentado; preserva cadastro, fotografias e conhecimento anteriores.","Emissões atingidas serão marcadas para reemissão."));
     }
@@ -168,7 +172,7 @@ public class ProvaNomePessoaHistoricoServico {
     static boolean intersecta(LocalDate a,LocalDate b,LocalDate c,LocalDate d) { return (b==null || !c.isAfter(b)) && (d==null || !a.isAfter(d)); }
     private boolean sobrepoe(ProvaNomePessoaHistorico p,RegistroProvaNomeHistoricoRequisicao r) { return intersecta(p.getDataInicioEfetiva(),p.getDataFimEfetiva(),r.dataInicioEfetiva(),r.dataFimEfetiva()); }
     private String intencao(Long pessoaId,RegistroProvaNomeHistoricoRequisicao r,UsuarioAplicacao u) {
-        return hash("nome-v1",pessoaId,r.vinculoId(),u.getId(),nome(r),r.dataInicioEfetiva(),r.dataFimEfetiva(),normalizar(r.referenciaSei()),r.documentoComprobatorioId(),normalizar(r.finalidadeAcessoDocumento()),r.motivo().trim(),r.autorizacao().trim(),r.provaAnteriorId(),r.eventoOrigemRetificadoId());
+        return hash("sgt.prova-nome.intencao.v1",pessoaId,r.vinculoId(),u.getId(),nome(r),r.dataInicioEfetiva(),r.dataFimEfetiva(),normalizar(r.referenciaSei()),r.documentoComprobatorioId(),normalizar(r.finalidadeAcessoDocumento()),r.motivo().trim(),r.autorizacao().trim(),r.provaAnteriorId(),r.eventoOrigemRetificadoId());
     }
     private Map<String,Object> dto(ProvaNomePessoaHistorico p,UsuarioAplicacao u,boolean reenvio) {
         var nivel=minimizador.nivelPadrao(u); boolean completo=minimizador.completo(nivel);

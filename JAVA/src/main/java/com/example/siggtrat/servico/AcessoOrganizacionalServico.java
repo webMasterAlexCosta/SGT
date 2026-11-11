@@ -12,7 +12,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.*;
 
 @Service
-public class AcessoOrganizacionalServico {
+public class AcessoOrganizacionalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AcessoOrganizacionalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final UsuarioAplicacaoRepositorio userRepositorio;
     private final EscopoAcessoUsuarioServico userAccessScopeServico;
@@ -51,12 +55,27 @@ public class AcessoOrganizacionalServico {
 
     /** Chamar depois do lock negocial: uma espera não conserva autorização revogada. */
     public void revalidarAposEspera(UsuarioAplicacao usuario) {
+        revalidarAposEspera(usuario, true);
+    }
+
+    /** Evita fechar um ciclo com a edição administrativa após bloquear o namespace de Cargo. */
+    public void revalidarAposEsperaSemAguardarExecutor(UsuarioAplicacao usuario) {
+        revalidarAposEspera(usuario, false);
+    }
+
+    private void revalidarAposEspera(UsuarioAplicacao usuario, boolean aguardarExecutor) {
         if (usuario == null || usuario.getId() == null)
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado.");
         if (entityManager != null) {
             PerfilAcesso perfilAnterior = usuario.getPerfil();
             List<Long> escopoAnterior = escopoIdentificado(usuario);
-            entityManager.refresh(usuario, jakarta.persistence.LockModeType.PESSIMISTIC_READ);
+            if (aguardarExecutor) {
+                entityManager.refresh(usuario, jakarta.persistence.LockModeType.PESSIMISTIC_READ);
+            } else {
+                // A disputa aborta a transação pelo handler409; não aguardar quem pode precisar da Gestão.
+                entityManager.refresh(usuario, jakarta.persistence.LockModeType.PESSIMISTIC_READ,
+                        Map.of("jakarta.persistence.lock.timeout", 0));
+            }
             if (perfilAnterior != usuario.getPerfil() || !escopoAnterior.equals(escopoIdentificado(usuario)))
                 throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                         "O perfil ou escopo do executor mudou enquanto a operação aguardava. Refaça a autorização.");

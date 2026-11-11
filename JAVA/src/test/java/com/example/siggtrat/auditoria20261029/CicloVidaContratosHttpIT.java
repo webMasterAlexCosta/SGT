@@ -38,8 +38,27 @@ class CicloVidaContratosHttpIT extends ContratosHttpBase {
         var c = criarCenario();
         var inativar = mapa("dataEfetiva", DATA, "motivo", "Suspensão administrativa");
         previa(c, c.contratoA.getId(), "inativar", inativar);
-        enviar(c.localA, base(c.contratoA.getId()) + "/inativar", inativar, 200, "CON-010 inativação explícita");
+        var inativo=enviar(c.localA, base(c.contratoA.getId()) + "/inativar", inativar, 200, "CON-010 inativação explícita");
+        assertThat(inativo.path("id").asLong()).isEqualTo(c.contratoA.getId());
+        assertThat(inativo.path("dataInicio").asText()).isEqualTo("2026-01-01");
+        assertThat(inativo.path("dataFim").asText()).isEqualTo("2027-12-31");
         var reativar = mapa("dataEfetiva", DATA.plusDays(2), "motivo", "Retomada administrativa documentada");
+        // ALO008: injeta somente referência a composição de outro Contrato.
+        // É contraprova de integridade por JPA, não fluxo legítimo de cadastro.
+        c.alocacaoA.setComposicao(c.composicaoB); em.flush();
+        previa(c, c.contratoA.getId(), "reativar", reativar);
+        long eventosAntes = em.createQuery("select count(e) from EventoCicloVidaContrato e where e.contrato.id=:c",Long.class)
+                .setParameter("c",c.contratoA.getId()).getSingleResult();
+        var erro = enviar(c.localA, base(c.contratoA.getId()) + "/reativar", reativar, 400,
+                "ALO008 composição alheia impede retomada antes de registrar evento");
+        assertThat(erro.path("message").asText()).containsIgnoringCase("composição");
+        assertThat(em.createQuery("select count(e) from EventoCicloVidaContrato e where e.contrato.id=:c",Long.class)
+                .setParameter("c",c.contratoA.getId()).getSingleResult()).isEqualTo(eventosAntes);
+        assertThat(c.vinculoA.getDataFim()).isNull();
+        assertThat(c.alocacaoA.getComposicao().getId()).isEqualTo(c.composicaoB.getId());
+        assertThat(consultar(c.localA,base(c.contratoA.getId())+"/posicao-temporal?data="+DATA.plusDays(2),
+                "ALO008 recusa preserva habilitação inativa").path("habilitacaoAdministrativa").asText()).isEqualTo("INATIVO");
+        c.alocacaoA.setComposicao(c.composicaoA); em.flush();
         previa(c, c.contratoA.getId(), "reativar", reativar);
         enviar(c.localA, base(c.contratoA.getId()) + "/reativar", reativar, 200, "CON-010 reativação é novo evento");
         var noBloqueio = consultar(c.localA, base(c.contratoA.getId()) + "/posicao-temporal?data=" + DATA.plusDays(1), "CON-022 habilitação distinta da vigência");
@@ -91,14 +110,30 @@ class CicloVidaContratosHttpIT extends ContratosHttpBase {
         previa(c, c.contratoA.getId(), "anular", req);
         var anulacao = enviar(c.localA, base(c.contratoA.getId()) + "/anular", req, 200, "CON-015/018/024 anulação com alcance documental");
         assertThat(anulacao.path("estadoNegocial").asText()).isEqualTo("ANULADO");
-        long eventoId = consultar(c.localA, base(c.contratoA.getId()) + "/eventos", "CON-024 datas ato/efeito/registro distintas").get(0).path("id").asLong();
+        JsonNode anulacaoOriginal=consultar(c.localA,base(c.contratoA.getId())+"/eventos","CON019 fonte original da anulação").get(0).deepCopy();
+        long eventoId = anulacaoOriginal.path("id").asLong();
+        assertThat(anulacaoOriginal.path("tipoEvento").asText()).isEqualTo("ANULACAO");
         var cor = mapa("dataEfetiva", DATA, "dataAto", DATA.plusDays(5), "motivo", "Anulação registrada indevidamente",
                 "referenciaSei", "SEI-COR-ANU", "eventoPrecedenteId", eventoId, "relacaoPrecedencia", "CANCELA");
         previa(c, c.contratoA.getId(), "corrigir-anulacao", cor);
         var corrigido = enviar(c.localA, base(c.contratoA.getId()) + "/corrigir-anulacao", cor, 200, "CON-020 correção por novo evento");
         assertThat(corrigido.path("estadoNegocial").asText()).isEqualTo("PUBLICADO");
         assertThat(corrigido.path("habilitacaoAdministrativa").asText()).isEqualTo("INATIVO");
-        assertThat(consultar(c.localA, base(c.contratoA.getId()) + "/eventos", "CON-020 preserva anulação e correção").size()).isEqualTo(2);
+        var fatos=consultar(c.localA,base(c.contratoA.getId())+"/eventos","CON019 preserva os dois fatos por ID e tipo");
+        assertThat(fatos).hasSize(2);
+        JsonNode original=null,correcao=null;
+        for(JsonNode fato:fatos) {
+            if(fato.path("id").asLong()==eventoId) original=fato;
+            if(fato.path("tipoEvento").asText().equals("CORRECAO_ANULACAO")) correcao=fato;
+        }
+        assertThat(original).isNotNull();assertThat(correcao).isNotNull();
+        assertThat(original.path("tipoEvento").asText()).isEqualTo("ANULACAO");
+        assertThat(correcao.path("id").asLong()).isPositive().isNotEqualTo(eventoId);
+        assertThat(correcao.path("tipoEvento").asText()).isEqualTo("CORRECAO_ANULACAO");
+        assertThat(correcao.path("dataEfetiva").asText()).isEqualTo(DATA.toString());
+        for(String campo:java.util.List.of("id","tipoEvento","dataEfetiva","dataAto","registradoEm","motivo","referenciaSei",
+                "usuarioResponsavelId","usuarioResponsavelUsername"))
+            assertThat(original.path(campo)).as("CON019 fato original preserva "+campo).isEqualTo(anulacaoOriginal.path(campo));
     }
 
     @Test

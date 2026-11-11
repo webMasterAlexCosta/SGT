@@ -29,7 +29,11 @@ import java.util.*;
 
 @Service
 @Transactional(isolation = Isolation.READ_COMMITTED)
-public class FrequenciaAdicionalServico {
+public class FrequenciaAdicionalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FrequenciaAdicionalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final long MAX_RANGE_DAYS = 366;
     private final FrequenciaAdicionalRepositorio repositorio;
     private final UsuarioAplicacaoRepositorio usuarios;

@@ -23,12 +23,29 @@ import java.util.List;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-/** Cadeia MVC/autorização/MySQL real, cache HTTP habilitado com armazenamento em memória. */
+/** Cadeia MVC/autorização/PostgreSQL real, cache HTTP habilitado com armazenamento em memória. */
 @Import(CacheEscopoTemporalHttpIT.CacheMemoria.class)
 class CacheEscopoTemporalHttpIT extends ContratosHttpBase {
     @TestConfiguration
     static class CacheMemoria {
-        @Bean @Primary CacheManager cacheAuditoria() { return new ConcurrentMapCacheManager(); }
+        @Bean @Primary CacheManager cacheAuditoria() {
+            return new ConcurrentMapCacheManager() {
+                @Override protected org.springframework.cache.Cache createConcurrentMapCache(String nome) {
+                    return new CacheObservadoB06(nome);
+                }
+            };
+        }
+    }
+
+    static class CacheObservadoB06 extends org.springframework.cache.concurrent.ConcurrentMapCache {
+        int carregamentos, acertos;
+        CacheObservadoB06(String nome) { super(nome); }
+        @Override public <T> T get(Object chave, java.util.concurrent.Callable<T> loader) {
+            boolean presente = lookup(chave) != null;
+            T valor = super.get(chave, () -> { carregamentos++; return loader.call(); });
+            if (presente) acertos++;
+            return valor;
+        }
     }
 
     @DynamicPropertySource
@@ -47,23 +64,49 @@ class CacheEscopoTemporalHttpIT extends ContratosHttpBase {
     @Test
     void cacheInternoNaoConservaEstadoAbertoDepoisDoInicioDoOitavoDia() throws Exception {
         var c = criarCenario();
-        LocalDate hoje = RelogioSistema.hoje(), data = hoje.minusDays(6), amanha = hoje.plusDays(1);
+        LocalDate hoje = RelogioSistema.hoje(), data = hoje.minusDays(politica.diasJanela() - 1L), amanha = hoje.plusDays(1);
         String statusCompativel = data.getDayOfWeek().getValue() >= 6 ? "DESCANSO" : "FALTA";
         var criada = enviar(c.operacionalA, "/api/frequencias", mapa("vinculoContratualId", c.vinculoA.getId(),
-                "dataReferencia", data, "status", statusCompativel), 200, "Frequência operacional dentro do sétimo dia");
+                "dataReferencia", data, "status", statusCompativel), 200, "Frequência operacional no último dia da janela vigente");
         String rota = "/api/frequencias?data=" + data + "&contratoId=" + c.contratoA.getId();
         limparCaches();
         var primeira = consultar(c.operacionalA, rota, "Consulta preenche o cache paginado com estado aberto");
         assertEquals("ABERTA", primeira.path("content").get(0).path("estadoNegocial").asText());
+        CacheObservadoB06 cache = (CacheObservadoB06) caches.getCache(com.example.siggtrat.configuracao.NomesCache.FREQUENCIAS_CONSULTA);
+        assertNotNull(cache);
+        var chavesAntes = java.util.Set.copyOf(cache.getNativeCache().keySet());
+        assertEquals(1, chavesAntes.size(), "FRE-013:002[0] esta rota materializou exatamente uma página no cache interno");
+        Object chaveAntiga = chavesAntes.iterator().next();
+        var paginaAntiga = (com.example.siggtrat.dto.PaginaCacheDTO<?>) cache.get(chaveAntiga).get();
+        assertEquals(criada.path("id").asLong(), ((com.example.siggtrat.dto.FrequenciaDTO) paginaAntiga.content().get(0)).getId().longValue());
+        int cargasAntes = cache.carregamentos, acertosAntes = cache.acertos;
+        var repetida = consultar(c.operacionalA, rota, "FRE013 controle de HIT da mesma rota e usuário antes da fronteira");
+        assertEquals(primeira, repetida);
+        assertEquals(cargasAntes, cache.carregamentos, "HIT não executa novamente o loader de consulta");
+        assertEquals(acertosAntes + 1, cache.acertos);
+        assertSame(paginaAntiga, cache.get(chaveAntiga).get());
+        assertEquals(data.plusDays(politica.diasJanela()).atStartOfDay(RelogioSistema.ZONA), politica.instanteFechamento(data));
         ZonedDateTime depoisDaVirada = amanha.atStartOfDay(RelogioSistema.ZONA).plusSeconds(1);
         try (var calendario = Mockito.mockStatic(RelogioSistema.class, Mockito.CALLS_REAL_METHODS);
              var instante = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
             calendario.when(RelogioSistema::hoje).thenReturn(amanha);
             instante.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(depoisDaVirada);
-            assertTrue(politica.fechada(data, null), "Controle: regra vigente já considera o oitavo dia fechado");
+            assertTrue(politica.fechada(data, null), "Controle: regra vigente já considera a fronteira configurada fechada");
             var atual = consultar(c.operacionalA, rota, "FRE-003 cache acompanha fechamento derivado da passagem do tempo");
             assertEquals("FECHADA", atual.path("content").get(0).path("estadoNegocial").asText());
             assertEquals(criada.path("id").asLong(), atual.path("content").get(0).path("id").asLong());
+            var novas = new java.util.HashSet<>(cache.getNativeCache().keySet()); novas.removeAll(chavesAntes);
+            assertEquals(1, novas.size(), "FRE013 nova data negocial usa uma entrada distinta, sem servir a ABERTA anterior");
+            var paginaAtual = (com.example.siggtrat.dto.PaginaCacheDTO<?>) cache.get(novas.iterator().next()).get();
+            var linhaAtual = (com.example.siggtrat.dto.FrequenciaDTO) paginaAtual.content().get(0);
+            assertEquals(criada.path("id").asLong(), linhaAtual.getId().longValue());
+            assertEquals("FECHADA", linhaAtual.getEstadoNegocial().name());
+            assertEquals(cargasAntes + 1, cache.carregamentos);
+            int acertosNaVirada = cache.acertos;
+            var repetidaFechada = consultar(c.operacionalA, rota, "FRE013 HIT da entrada vigente após a fronteira");
+            assertEquals("FECHADA", repetidaFechada.path("content").get(0).path("estadoNegocial").asText());
+            assertEquals(acertosNaVirada + 1, cache.acertos);
+            assertEquals(cargasAntes + 1, cache.carregamentos);
         }
         var fonte = em.find(com.example.siggtrat.entidade.Frequencia.class, criada.path("id").asLong());
         assertEquals(com.example.siggtrat.dominio.frequencia.EstadoNegocialFrequencia.ABERTA, fonte.getEstadoNegocial(),
@@ -83,7 +126,8 @@ class CacheEscopoTemporalHttpIT extends ContratosHttpBase {
         long empregadoId = em.createQuery("select e.id from Empregado e where e.pessoaCanonica.id=:p", Long.class)
                 .setParameter("p", v.path("pessoaId").asLong()).getSingleResult();
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", data, "dataAto", hoje, "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência programada deve revogar acesso na virada do dia",
                 "referenciaSei", "SEI-CACHE-TEMPORAL", "autorizacaoAdministrativa", "ATO-HTTP",

@@ -15,7 +15,11 @@ import java.util.LinkedHashSet;
 import java.util.Set;
 
 @Service
-public class FechamentoFrequenciaRecuperacaoServico {
+public class FechamentoFrequenciaRecuperacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FechamentoFrequenciaRecuperacaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final ZoneId ZONE_ID = ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO);
 

@@ -16,7 +16,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @org.springframework.stereotype.Service
-public class JornadaServico {
+public class JornadaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(JornadaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final JornadaRepositorio repositorio;
     private final EmpregadoRepositorio empregadoRepositorio;
@@ -58,9 +62,9 @@ public class JornadaServico {
     }
 
     private void validar(JornadaDTO dto, GestaoLocal gestaoLocal, Long idAtual) {
-        if (dto == null) throw new IllegalArgumentException("Turno inválido.");
+        if (dto == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Turno inválido.");
         if (dto.descricao() == null || dto.descricao().isBlank()) {
-            throw new IllegalArgumentException("Descrição do turno é obrigatória.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Descrição do turno é obrigatória.");
         }
         validarGestaoLocalAtiva(gestaoLocal);
         String descricao = dto.descricao().trim().replaceAll("\\s+", " ").toUpperCase(Locale.ROOT);
@@ -75,7 +79,7 @@ public class JornadaServico {
         if (dto.regrasAdicionais() != null) {
             for (RegraAdicionalDTO regra : dto.regrasAdicionais()) {
                 if (regra.tipo() == null || regra.tipo().isBlank()) {
-                    throw new IllegalArgumentException("Tipo da regra adicional é obrigatório.");
+                    throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Tipo da regra adicional é obrigatório.");
                 }
                 UtilitarioHorario.validarPar(regra.inicio(), regra.fim(), "início da regra", "fim da regra");
             }
@@ -84,32 +88,32 @@ public class JornadaServico {
 
     private void validarSeteDiasEIntervalos(List<JornadaDiaSemanaDTO> dias) {
         if (dias == null || dias.size() != java.time.DayOfWeek.values().length) {
-            throw new IllegalArgumentException("O turno deve conter exatamente os sete dias da semana.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O turno deve conter exatamente os sete dias da semana.");
         }
 
         EnumSet<java.time.DayOfWeek> encontrados = EnumSet.noneOf(java.time.DayOfWeek.class);
         for (JornadaDiaSemanaDTO dia : dias) {
             if (dia == null || dia.diaSemana() == null) {
-                throw new IllegalArgumentException("Todos os dias do turno devem informar o dia da semana.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Todos os dias do turno devem informar o dia da semana.");
             }
             if (!encontrados.add(dia.diaSemana())) {
-                throw new IllegalArgumentException("O dia " + dia.diaSemana() + " foi informado mais de uma vez.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O dia " + dia.diaSemana() + " foi informado mais de uma vez.");
             }
             if (dia.diaTrabalho() == null) {
-                throw new IllegalArgumentException("Informe se " + dia.diaSemana() + " é dia de trabalho ou descanso.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe se " + dia.diaSemana() + " é dia de trabalho ou descanso.");
             }
 
             boolean possuiHorario = possuiValor(dia.entrada1()) || possuiValor(dia.saida1())
                     || possuiValor(dia.entrada2()) || possuiValor(dia.saida2());
             if (!dia.diaTrabalho()) {
                 if (possuiHorario) {
-                    throw new IllegalArgumentException("Dia de descanso não pode possuir horários: " + dia.diaSemana() + ".");
+                    throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Dia de descanso não pode possuir horários: " + dia.diaSemana() + ".");
                 }
                 continue;
             }
 
             if (!possuiValor(dia.entrada1()) && !possuiValor(dia.saida1())) {
-                throw new IllegalArgumentException("Dia de trabalho deve possuir ao menos o primeiro intervalo: " + dia.diaSemana() + ".");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Dia de trabalho deve possuir ao menos o primeiro intervalo: " + dia.diaSemana() + ".");
             }
 
             Intervalo primeiro = validarIntervalo(dia.diaSemana(), 1, dia.entrada1(), dia.saida1(), true);
@@ -118,20 +122,20 @@ public class JornadaServico {
             if (segundo != null) {
                 segundo = posicionarDepoisDoPrimeiro(segundo, primeiro);
                 if (segundo.fimAbsoluto() - primeiro.inicioAbsoluto() > 24 * 60) {
-                    throw new IllegalArgumentException("A jornada de " + dia.diaSemana()
+                    throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A jornada de " + dia.diaSemana()
                             + " deve terminar em até 24 horas após a primeira entrada.");
                 }
             }
 
             long total = primeiro.minutos() + (segundo == null ? 0 : segundo.minutos());
             if (total > maxJornadaMinutes) {
-                throw new IllegalArgumentException("A jornada excede o limite de " + maxJornadaMinutes
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A jornada excede o limite de " + maxJornadaMinutes
                         + " minutos em " + dia.diaSemana() + ".");
             }
         }
 
         if (encontrados.size() != java.time.DayOfWeek.values().length) {
-            throw new IllegalArgumentException("O turno deve conter os sete dias da semana, sem repetição.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O turno deve conter os sete dias da semana, sem repetição.");
         }
     }
 
@@ -140,7 +144,7 @@ public class JornadaServico {
         boolean temSaida = possuiValor(saida);
         if (!temEntrada && !temSaida && !obrigatorio) return null;
         if (temEntrada != temSaida) {
-            throw new IllegalArgumentException("Entrada e saída do intervalo " + numero + " devem ser informadas juntas em " + dia + ".");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Entrada e saída do intervalo " + numero + " devem ser informadas juntas em " + dia + ".");
         }
 
         String entradaNormalizada = UtilitarioHorario.normalizarHorario(entrada, "entrada " + numero + " de " + dia);
@@ -148,7 +152,7 @@ public class JornadaServico {
         int inicio = UtilitarioHorario.horarioParaMinutos(entradaNormalizada, "entrada " + numero + " de " + dia);
         int fim = UtilitarioHorario.horarioParaMinutos(saidaNormalizada, "saída " + numero + " de " + dia);
         if (fim == inicio) {
-            throw new IllegalArgumentException("O intervalo " + numero + " deve possuir duração maior que zero em " + dia + ".");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O intervalo " + numero + " deve possuir duração maior que zero em " + dia + ".");
         }
         int fimAbsoluto = fim > inicio ? fim : fim + (24 * 60);
         return new Intervalo(inicio, fimAbsoluto, fimAbsoluto - inicio);

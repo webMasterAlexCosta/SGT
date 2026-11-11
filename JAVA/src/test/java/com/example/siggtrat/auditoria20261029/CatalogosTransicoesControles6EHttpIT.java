@@ -8,6 +8,8 @@ import com.example.siggtrat.servico.FilaRegistroAuditoria;
 import com.example.siggtrat.servico.GestaoContratoTemporalServico;
 import com.example.siggtrat.utilitario.RelogioSistema;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,7 +25,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.TransactionDefinition;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
@@ -55,7 +57,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Controles 6_E: CAT-007:004/007/008 e controles de CAT-005.
  *
- * Dispatcher MVC, filtros, autorização, serviços, JPA e MySQL reais. A base
+ * Dispatcher MVC, filtros, autorização, serviços, JPA e PostgreSQL reais. A base
  * suprime somente TaskScheduler; por isso a fila real de auditoria é descarregada
  * explicitamente antes das leituras. Não é prova de transporte TCP/JAR/reinício.
  *
@@ -79,8 +81,8 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
         assertThat(TransactionSynchronizationManager.isActualTransactionActive())
                 .as("Cada comando HTTP deve encerrar sua própria transação").isFalse();
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -124,6 +126,8 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
         CountDownLatch iniciar = new CountDownLatch(1);
         CountDownLatch liberar = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBloqueadora = new CompletableFuture<>();
+        var atorA=new Ator("transicao-A");var atorB=new Ator("transicao-B");
+        String tabelaAlvo=classe(tipo).getAnnotation(jakarta.persistence.Table.class).name();
         MvcResult respostaA;
         MvcResult respostaB;
         List<Map<String, Object>> esperas;
@@ -132,7 +136,7 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
                 try {
                     emTransacao(() -> {
                         em.find(classe(tipo), id, LockModeType.PESSIMISTIC_WRITE);
-                        conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                        conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                                 .getSingleResult()).longValue());
                         aguardar(liberar, 25, "A fixture não liberou o catálogo");
                         return null;
@@ -143,10 +147,12 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
                 }
             });
             long bloqueadora = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativaA = pool.submit(() -> executarConcorrente(pedidoA, iniciar));
-            Future<MvcResult> tentativaB = pool.submit(() -> executarConcorrente(pedidoB, iniciar));
+            Future<MvcResult> tentativaA = pool.submit(() -> atorA.executar(() -> executarConcorrente(pedidoA, iniciar)));
+            Future<MvcResult> tentativaB = pool.submit(() -> atorB.executar(() -> executarConcorrente(pedidoB, iniciar)));
             iniciar.countDown();
-            esperas = aguardarDuasEsperasReais(tipo, id, bloqueadora, tentativaA, tentativaB);
+            esperas = EsperaJdbcPostgres.aguardarAmbos(new JdbcTemplate(dataSource),bloqueadora,
+                    atorA,sql->sql.selecaoChave(tabelaAlvo,"id_"+tabelaAlvo,id),
+                    atorB,sql->sql.selecaoChave(tabelaAlvo,"id_"+tabelaAlvo,id),tabelaAlvo+"/"+id,tentativaA,tentativaB);
             assertThat(tentativaA.isDone()).isFalse();
             assertThat(tentativaB.isDone()).isFalse();
             liberar.countDown();
@@ -386,7 +392,7 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
         return "/api/catalogos-temporais/" + tipo + "/" + id + "/transicoes";
     }
 
-    private MvcResult executarConcorrente(MockHttpServletRequestBuilder req, CountDownLatch iniciar) throws Exception {
+    private MvcResult executarConcorrente(AbstractMockHttpServletRequestBuilder<?> req, CountDownLatch iniciar) throws Exception {
         aguardar(iniciar, 10, "Barreira inicial não liberada");
         try {
             return mvc.perform(req).andReturn();
@@ -395,32 +401,7 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
         }
     }
 
-    private List<Map<String, Object>> aguardarDuasEsperasReais(
-            TipoCatalogoTemporal tipo, long id, long bloqueadora, Future<?> a, Future<?> b)
-            throws InterruptedException {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        String tabela = classe(tipo).getAnnotation(jakarta.persistence.Table.class).name();
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < limite) {
-            List<Map<String, Object>> esperas = jdbc.queryForList(
-                    "select distinct r.PROCESSLIST_ID as solicitante, b.PROCESSLIST_ID as bloqueadora, "
-                            + "l.OBJECT_NAME as tabela, l.LOCK_DATA as chave "
-                            + "from performance_schema.data_lock_waits w "
-                            + "join performance_schema.threads b on b.THREAD_ID=w.BLOCKING_THREAD_ID "
-                            + "join performance_schema.threads r on r.THREAD_ID=w.REQUESTING_THREAD_ID "
-                            + "join performance_schema.data_locks l on l.ENGINE=w.ENGINE "
-                            + "and l.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID "
-                            + "where b.PROCESSLIST_ID=? and l.OBJECT_SCHEMA=database() "
-                            + "and l.OBJECT_NAME=? and l.INDEX_NAME='PRIMARY' and l.LOCK_DATA=?",
-                    bloqueadora, tabela, Long.toString(id));
-            if (esperas.size() >= 2) return esperas;
-            if (a.isDone() || b.isDone())
-                throw new AssertionError("A corrida não foi exercitada: comando terminou antes de duas esperas MySQL");
-            Thread.sleep(25); // Só intervalo de sondagem; a prova é data_lock_waits.
-        }
-        throw new AssertionError("Fixture não observou duas conexões HTTP bloqueadas no mesmo catálogo; "
-                + "conferir privilégios de performance_schema e pool (mínimo quatro conexões)");
-    }
+
 
     private static void aguardar(CountDownLatch latch, int segundos, String mensagem) {
         try {
@@ -443,7 +424,7 @@ class CatalogosTransicoesControles6EHttpIT extends ContratosHttpBase {
     }
 
     private EstadoCatalogo estado(TipoCatalogoTemporal tipo, long id) {
-        // Scheduler é suprimido pela base; este bean real persiste o lote em MySQL.
+        // Scheduler é suprimido pela base; este bean real persiste o lote em PostgreSQL.
         fila.descarregar();
         return emNovaTransacao(() -> {
             Object item = em.find(classe(tipo), id);

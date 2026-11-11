@@ -103,7 +103,8 @@ class EmpregadoHistoricoEscopoAtualHttpIT extends ContratosHttpBase {
         if (mudanca.equals("transferencia")) {
             conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
             enviar(c.localA, base(contrato.id()) + "/transferir-gestao",
-                    mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
+                    mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                             "motivo", "Transferência com histórico pessoal anterior preservado", "referenciaSei", "SEI-HISTORICO-ESCOPO",
                             "autorizacaoAdministrativa", "ATO-HTTP",
                             "mapeamentos", List.of(mapa("composicaoOrigemId", contrato.composicao1(),

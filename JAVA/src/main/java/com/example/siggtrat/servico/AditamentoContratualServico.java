@@ -26,7 +26,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional(readOnly = true)
-public class AditamentoContratualServico {
+public class AditamentoContratualServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AditamentoContratualServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private record ItemPreparado(
             ComposicaoContratual composicaoBase,
@@ -92,6 +96,9 @@ public class AditamentoContratualServico {
     private VinculoContratualRepositorio vinculosRepositorio;
     private MotorTemporalVinculoServico motorVinculo;
     private TransferenciaGestaoContratoRepositorio transferenciasRepositorio;
+
+    @jakarta.persistence.PersistenceContext
+    private jakarta.persistence.EntityManager entityManager;
 
     @org.springframework.beans.factory.annotation.Autowired
     public void configurarTransferencias(TransferenciaGestaoContratoRepositorio repositorio) {
@@ -186,7 +193,7 @@ public class AditamentoContratualServico {
         Contrato contrato = obterPublicadoNoEscopo(contratoId, user, false);
         validarCamposBasicos(contrato, req);
         Preparacao p = preparar(contrato, req);
-        validarAlteracoesNaoQuantitativas(contrato, req, p.eventosIgnorados());
+        validarAlteracoesNaoQuantitativas(contrato, req, p.eventosIgnorados(), obterFornecedor(req.novoFornecedorId(), false));
         return paraPrevia(contrato, req, p);
     }
 
@@ -196,8 +203,13 @@ public class AditamentoContratualServico {
         Contrato contrato = obterPublicadoNoEscopo(contratoId, user, true, true);
         LocalDate fimContratoAntes = contrato.getDataFim();
         validarCamposBasicos(contrato, req);
+        Fornecedor fornecedor = obterFornecedor(req.novoFornecedorId(), true);
+        if (fornecedor != null) {
+            acesso.revalidarAposEspera(user);
+            acesso.exigirAcessoContrato(user, contrato);
+        }
         Preparacao p = preparar(contrato, req);
-        validarAlteracoesNaoQuantitativas(contrato, req, p.eventosIgnorados());
+        validarAlteracoesNaoQuantitativas(contrato, req, p.eventosIgnorados(), fornecedor);
         if (!administrativamenteAtivo(contrato)) {
             VersaoContratoNegocialDTO anterior = projetarVersaoContrato(contrato, req.dataEfetiva(), Instant.now(), p.eventosIgnorados());
             boolean prorrogacaoRetroativa = req.dataEfetiva().isBefore(RelogioSistema.hoje())
@@ -261,10 +273,7 @@ public class AditamentoContratualServico {
             a.setMatriculaNovoTipoFotografada(Boolean.TRUE.equals(a.getNovoTipoContratacao().getMatriculaVinculoObrigatoria()));
             a.setNovoTipoDescricaoFotografia(limpar(a.getNovoTipoContratacao().getDescricao()));
         }
-        if (req.novoFornecedorId() != null) {
-            a.setNovoFornecedor(fornecedorRepositorio.findById(req.novoFornecedorId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor não encontrado.")));
-        }
+        if (fornecedor != null) a.setNovoFornecedor(fornecedor);
         a.setNovoCnpjEmpresa(normalizarCnpj(req.novoCnpjEmpresa()));
         a.setNovaRazaoSocialEmpresa(limpar(req.novaRazaoSocialEmpresa()));
         a.setNovoNomeFantasiaEmpresa(limpar(req.novoNomeFantasiaEmpresa()));
@@ -710,8 +719,7 @@ public class AditamentoContratualServico {
         if (inicio == null || !data.isBefore(inicio)) {
             var composicoes = (entradas==null?composicaoTemporal.projetarEntidades(contrato, data, conhecimento, ignorar):composicaoTemporal.projetarEntidades(contrato, data, conhecimento, ignorar,entradas));
             if (!composicoes.isEmpty()) {
-                efetivo = composicoes.stream()
-                    .mapToInt(ComposicaoContratualTemporalServico.ComposicaoProjetada::efetivoPrevisto).sum();
+                efetivo = ComposicaoContratualTemporalServico.totalRepresentavel(composicoes);
                 provas.put("efetivoPrevisto",ProvasCamposHistoricos.derivado(efetivo,
                         composicoes.stream().map(p->p.provaCampos().get("efetivoPrevisto")).toList()));
             }
@@ -1077,7 +1085,8 @@ public class AditamentoContratualServico {
         }
     }
 
-    private void validarAlteracoesNaoQuantitativas(Contrato contrato, AditamentoContratualRequisicao req, Set<Long> ignorados) {
+    private void validarAlteracoesNaoQuantitativas(Contrato contrato, AditamentoContratualRequisicao req,
+            Set<Long> ignorados, Fornecedor fornecedor) {
         if (Boolean.TRUE.equals(req.restaurarPoliticaMatriculaDoTipo()) && req.novaMatriculaVinculoObrigatoria() != null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "Informe a nova política de matrícula ou a restauração da política do Tipo, sem combinar as duas ações.");
@@ -1122,21 +1131,80 @@ public class AditamentoContratualServico {
         if (req.novoTipoContratacaoId() != null) {
             obterTipoContratacao(contrato, req.novoTipoContratacaoId(), req.dataEfetiva());
         }
-        if (req.novoFornecedorId() != null) {
-            Fornecedor fornecedor = fornecedorRepositorio.findById(req.novoFornecedorId())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor não encontrado."));
+        AditamentoContratual original = encontrarAditamentoAntecessorVersionado(contrato, req);
+        String cnpjInformado = normalizarCnpj(req.novoCnpjEmpresa());
+        String cnpjAnterior = normalizarCnpj(antes.cnpjEmpresa());
+        validarDadosEmpresariaisDaNovaVersao(original, req, cnpjInformado);
+        String cnpjResultante = cnpjInformado;
+        if (fornecedor != null) {
             String cnpjFornecedor = normalizarCnpj(fornecedor.getCnpj());
-            String cnpjInformado = normalizarCnpj(req.novoCnpjEmpresa());
-            if (cnpjInformado != null && !Objects.equals(cnpjInformado, cnpjFornecedor)) {
+            boolean preservaEmpresaDocumentada = original != null
+                    && req.relacaoPrecedencia() == TipoRelacaoPrecedenciaNegocial.RETIFICA
+                    && original.getIdentificacao().equalsIgnoreCase(req.identificacao().trim())
+                    && Objects.equals(original.getDataEfetiva(), req.dataEfetiva())
+                    && original.getNovoFornecedor() != null && Objects.equals(original.getNovoFornecedor().getId(), fornecedor.getId())
+                    && Objects.equals(normalizarCnpj(original.getNovoCnpjEmpresa()), cnpjInformado);
+            cnpjResultante = preservaEmpresaDocumentada ? cnpjInformado : cnpjFornecedor;
+            boolean trocaEmpresa = !Objects.equals(antes.fornecedorId(), fornecedor.getId())
+                    || cnpjResultante != null && !Objects.equals(cnpjAnterior, cnpjResultante);
+            if (!preservaEmpresaDocumentada && trocaEmpresa && !Boolean.TRUE.equals(fornecedor.getAtivo())) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "O fornecedor escolhido está inativo. Selecione uma empresa ativa para a troca.");
+            }
+            if (!preservaEmpresaDocumentada && cnpjInformado != null && !Objects.equals(cnpjInformado, cnpjFornecedor)) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                         "O CNPJ informado no aditamento deve corresponder ao fornecedor escolhido.");
             }
-            if (!Objects.equals(cnpjFornecedor, normalizarCnpj(antes.cnpjEmpresa()))
-                    && (cnpjInformado == null || limpar(req.novaRazaoSocialEmpresa()) == null
-                        || limpar(req.novoNomeFantasiaEmpresa()) == null)) {
+        }
+        // A projeção conserva os campos não informados. Se o CNPJ muda, ela
+        // não pode herdar nomes ou uma associação da empresa anterior.
+        if (cnpjResultante != null && !Objects.equals(cnpjAnterior, cnpjResultante)) {
+            if (fornecedor == null && antes.fornecedorId() != null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                        "A troca de fornecedor exige CNPJ, razão social e nome fantasia da nova empresa no aditamento.");
+                        "O contrato tem fornecedor associado. Selecione o fornecedor correspondente ao novo CNPJ.");
             }
+            if (cnpjInformado == null || limpar(req.novaRazaoSocialEmpresa()) == null
+                    || limpar(req.novoNomeFantasiaEmpresa()) == null) {
+                throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                        "A troca de empresa exige CNPJ, razão social e nome fantasia da nova empresa no aditamento.");
+            }
+        }
+    }
+
+    private Fornecedor obterFornecedor(Long id, boolean escrita) {
+        if (id == null) return null;
+        Fornecedor fornecedor = (escrita ? fornecedorRepositorio.buscarPorIdParaAtualizacao(id) : fornecedorRepositorio.findById(id))
+                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor não encontrado."));
+        // O cadastro e a gravação disputam a mesma linha. Releia após a espera,
+        // inclusive se a entidade já estava no contexto de persistência.
+        if (escrita) entityManager.refresh(fornecedor);
+        return fornecedor;
+    }
+
+    private AditamentoContratual encontrarAditamentoAntecessorVersionado(Contrato contrato, AditamentoContratualRequisicao req) {
+        if (req.eventoPrecedenteId() == null || (req.relacaoPrecedencia() != TipoRelacaoPrecedenciaNegocial.RETIFICA
+                && req.relacaoPrecedencia() != TipoRelacaoPrecedenciaNegocial.SUBSTITUI)) return null;
+        return aditamentoRepositorio.findByEventoId(req.eventoPrecedenteId())
+                .filter(original -> Objects.equals(original.getContrato().getId(), contrato.getId())
+                        && original.getEvento().getSituacaoFato() == SituacaoFatoNegocial.VIGENTE)
+                .orElse(null);
+    }
+
+    private void validarDadosEmpresariaisDaNovaVersao(AditamentoContratual original, AditamentoContratualRequisicao req,
+            String cnpjInformado) {
+        if (original == null) return;
+        // A substituição pode retirar por inteiro o efeito empresarial anterior.
+        // Se o novo ato trata da empresa, não pode combinar uma parte da
+        // fotografia nova com outra herdada da empresa que antecedeu o ato.
+        if (req.relacaoPrecedencia() == TipoRelacaoPrecedenciaNegocial.SUBSTITUI
+                && req.novoFornecedorId() == null && cnpjInformado == null
+                && limpar(req.novaRazaoSocialEmpresa()) == null && limpar(req.novoNomeFantasiaEmpresa()) == null) return;
+        if ((original.getNovoFornecedor() != null && req.novoFornecedorId() == null)
+                || (normalizarCnpj(original.getNovoCnpjEmpresa()) != null && cnpjInformado == null)
+                || (limpar(original.getNovaRazaoSocialEmpresa()) != null && limpar(req.novaRazaoSocialEmpresa()) == null)
+                || (limpar(original.getNovoNomeFantasiaEmpresa()) != null && limpar(req.novoNomeFantasiaEmpresa()) == null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Informe na nova versão todos os dados empresariais documentados no ato anterior.");
         }
     }
 
@@ -1334,63 +1402,31 @@ public class AditamentoContratualServico {
     }
 
     private String gerarTokenPrevia(Contrato contrato, AditamentoContratualRequisicao req, Preparacao p) {
-        List<String> partes = new ArrayList<>();
-        partes.add("ADITAMENTO");
-        partes.add(AssinaturaPreviaNegocial.valor(contrato.getId()));
-        partes.add(AssinaturaPreviaNegocial.valor(contrato.getVersion()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.identificacao()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.dataDocumento()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.dataAssinatura()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.dataEfetiva()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.justificativa()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.referenciaSei()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novaDescricao()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novoTipoContratacaoId()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novoFornecedorId()));
-        partes.add(AssinaturaPreviaNegocial.valor(normalizarCnpj(req.novoCnpjEmpresa())));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novaRazaoSocialEmpresa()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novoNomeFantasiaEmpresa()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novaDataInicio()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novaDataFim()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novoEfetivoTotal()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novaMatriculaVinculoObrigatoria()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novoDiaSemanaReduzido()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.novasHorasDiaReduzido()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.restaurarPoliticaMatriculaDoTipo()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.removerConfiguracaoDiaReduzido()));
+        List<Object> partes = new ArrayList<>(AssinaturaPreviaNegocial.partes(contrato.getId(), contrato.getVersion(),
+                req.identificacao(), req.dataDocumento(), req.dataAssinatura(), req.dataEfetiva(), req.justificativa(), req.referenciaSei(),
+                req.novaDescricao(), req.novoTipoContratacaoId(), req.novoFornecedorId(), normalizarCnpj(req.novoCnpjEmpresa()),
+                req.novaRazaoSocialEmpresa(), req.novoNomeFantasiaEmpresa(), req.novaDataInicio(), req.novaDataFim(), req.novoEfetivoTotal(),
+                req.novaMatriculaVinculoObrigatoria(), req.novoDiaSemanaReduzido(), req.novasHorasDiaReduzido(),
+                req.restaurarPoliticaMatriculaDoTipo(), req.removerConfiguracaoDiaReduzido(), req.reducaoExcepcional(), req.fundamentoExcecao(),
+                req.eventoPrecedenteId(), req.relacaoPrecedencia(), req.ordemDocumental()));
         if (req.novoTipoContratacaoId() != null) {
             TipoContratacao tipoNovo = obterTipoContratacao(contrato, req.novoTipoContratacaoId(), req.dataEfetiva());
-            partes.add("TIPO_NOVO:" + tipoNovo.getId() + ":" + tipoNovo.getVersion()
-                    + ":" + tipoNovo.getMatriculaVinculoObrigatoria());
+            partes.add(AssinaturaPreviaNegocial.partes("TIPO_NOVO", tipoNovo.getId(), tipoNovo.getVersion(), tipoNovo.getMatriculaVinculoObrigatoria()));
         }
-        partes.add(AssinaturaPreviaNegocial.valor(req.reducaoExcepcional()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.fundamentoExcecao()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.eventoPrecedenteId()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.relacaoPrecedencia()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.ordemDocumental()));
-        partes.add("TOTAL:" + p.efetivoAnterior() + ":" + p.efetivoResultante() + ":" + p.efetivoOriginal() + ":" + p.pisoNormal());
+        partes.add(AssinaturaPreviaNegocial.partes("TOTAL", p.efetivoAnterior(), p.efetivoResultante(), p.efetivoOriginal(), p.pisoNormal()));
         p.itens().stream().sorted(Comparator.comparing(ItemPreparado::chave)).forEach(i -> {
-            partes.add("ITEM:" + i.chave() + ":" + i.anterior() + ":" + i.resultante() + ":" + i.colaboradoresAtuais());
-            partes.add("CONFIGURACAO:" + i.chave() + ":" + AssinaturaPreviaNegocial.valor(i.lotacaoMunicipio())
-                    + ":" + AssinaturaPreviaNegocial.valor(i.jornadaSemanal()));
+            partes.add(AssinaturaPreviaNegocial.partes("ITEM", i.chave(), i.anterior(), i.resultante(), i.colaboradoresAtuais()));
+            partes.add(AssinaturaPreviaNegocial.partes("CONFIGURACAO", i.chave(), i.lotacaoMunicipio(), i.jornadaSemanal()));
         });
         VersaoContratoNegocialDTO antes = projetarVersaoContrato(contrato, req.dataEfetiva(), Instant.now(), p.eventosIgnorados());
-        partes.add("ESCALAR:" + AssinaturaPreviaNegocial.valor(antes.descricao()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.tipoContratacaoId()) + ":" + AssinaturaPreviaNegocial.valor(antes.fornecedorId()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.cnpjEmpresa()) + ":" + AssinaturaPreviaNegocial.valor(antes.razaoSocialEmpresa()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.nomeFantasiaEmpresa()) + ":" + AssinaturaPreviaNegocial.valor(antes.dataInicio()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.dataFim()) + ":" + AssinaturaPreviaNegocial.valor(antes.efetivoPrevisto()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.matriculaVinculoObrigatoria()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.matriculaTipoContratacaoObrigatoria()) + ":" +
-                AssinaturaPreviaNegocial.valor(antes.diaSemanaReduzido()) + ":" + AssinaturaPreviaNegocial.valor(antes.horasDiaReduzido()));
-        for (EventoCicloVidaContrato e : motor.eventosValidosOrdenados(contrato.getId(), req.dataEfetiva(), Instant.now())) {
-            partes.add("EV:" + AssinaturaPreviaNegocial.valor(e.getId()) + ":" + AssinaturaPreviaNegocial.valor(e.getFatoLogicoId()) + ":" +
-                    AssinaturaPreviaNegocial.valor(e.getVersaoNegocial()) + ":" + AssinaturaPreviaNegocial.valor(e.getTipoEvento()) + ":" +
-                    AssinaturaPreviaNegocial.valor(e.getChaveNegocial()) + ":" + AssinaturaPreviaNegocial.valor(e.getDataEfetiva()));
-        }
+        partes.add(AssinaturaPreviaNegocial.partes("ESCALAR", antes.descricao(), antes.tipoContratacaoId(), antes.fornecedorId(),
+                antes.cnpjEmpresa(), antes.razaoSocialEmpresa(), antes.nomeFantasiaEmpresa(), antes.dataInicio(), antes.dataFim(), antes.efetivoPrevisto(),
+                antes.matriculaVinculoObrigatoria(), antes.matriculaTipoContratacaoObrigatoria(), antes.diaSemanaReduzido(), antes.horasDiaReduzido()));
+        for (EventoCicloVidaContrato e : motor.eventosValidosOrdenados(contrato.getId(), req.dataEfetiva(), Instant.now()))
+            partes.add(AssinaturaPreviaNegocial.partes("EV", e.getId(), e.getFatoLogicoId(), e.getVersaoNegocial(), e.getTipoEvento(), e.getChaveNegocial(), e.getDataEfetiva()));
         if (assinaturaImpacto != null) partes.addAll(assinaturaImpacto.partesPorContrato(contrato.getId(), req.dataEfetiva(), null));
-        p.alertas().forEach(alerta -> partes.add("ALERTA:" + alerta));
-        return AssinaturaPreviaNegocial.sha256(partes);
+        p.alertas().forEach(alerta -> partes.add(AssinaturaPreviaNegocial.partes("ALERTA", alerta)));
+        return AssinaturaPreviaNegocial.sha256("sgt.previa.aditamento.v1", partes);
     }
 
     private ImpactoComposicaoContratoDTO impactoDTO(ItemPreparado i) {
@@ -1482,7 +1518,15 @@ public class AditamentoContratualServico {
                 contrato.setTipo(atual.tipoContratacaoDescricao());
             });
         }
-        if (atual.fornecedorId() != null) fornecedorRepositorio.findById(atual.fornecedorId()).ifPresent(contrato::setFornecedor);
+        if (atual.fornecedorId() != null) {
+            fornecedorRepositorio.findById(atual.fornecedorId()).ifPresent(contrato::setFornecedor);
+        } else {
+            var provaFornecedor = projecao.provaCampos().get("fornecedorId");
+            if (ProvasCamposHistoricos.conhecido(provaFornecedor)
+                    && provaFornecedor.estado() == ProvaCampoHistoricoDTO.Estado.AUSENCIA_COMPROVADA) {
+                contrato.setFornecedor(null);
+            }
+        }
         contratoRepositorio.save(contrato);
     }
 

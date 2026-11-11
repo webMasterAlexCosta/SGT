@@ -37,7 +37,11 @@ import java.util.List;
 import java.util.Map;
 
 @Service
-public class PainelServico {
+public class PainelServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PainelServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EmpregadoRepositorio empregadoRepositorio;
     private final CargoRepositorio cargoRepositorio;
     private final LotacaoRepositorio lotacaoRepositorio;
@@ -303,7 +307,7 @@ public class PainelServico {
                 case "LOTACAO" -> { id = linha.lotacaoId(); nome = linha.lotacao(); }
                 case "TURNO" -> { id = linha.jornadaId(); nome = linha.turno(); }
                 case "CARGO" -> { id = linha.cargoId(); nome = linha.cargo(); }
-                default -> throw new IllegalArgumentException("Dimensão operacional inválida: " + dimensao);
+                default -> throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Dimensão operacional inválida: " + dimensao);
             }
             String nomeSeguro = nome == null || nome.isBlank() ? "Não informado" : nome;
             String chave = String.valueOf(id) + "|" + nomeSeguro;
@@ -452,7 +456,7 @@ public class PainelServico {
             Integer periodoDiasInformado
     ) {
         if (contexto == null) {
-            throw new IllegalArgumentException("Contexto do painel não informado.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Contexto do painel não informado.");
         }
 
         LocalDate hoje = LocalDate.now(ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO));

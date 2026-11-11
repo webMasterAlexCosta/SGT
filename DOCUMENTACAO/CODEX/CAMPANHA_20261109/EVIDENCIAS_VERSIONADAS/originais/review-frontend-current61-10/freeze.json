@@ -1,0 +1,11 @@
+{
+  "state": "ACTIVE",
+  "source_manifest_sha256": "6a8fbc57fa09bc5c10f4b210d22d607717668e85a00ea4fedb713dfa5615a0fe",
+  "input_manifest_sha256": "aba882f81424d7d75245e5f368b73ca5055b1b5bc741d509f1ae0230c950192f",
+  "dist_manifest_sha256": "669982b7288a880453bbc1082cbe1b1f4b265b57e8d6666a0c2452a9039c440f",
+  "source_files": 2491,
+  "input_files": 27,
+  "dist_files": 102,
+  "jar_sha256": "7ae557a625ea9f35fd2db4644dc3f43d6ba568bdd6e1ed55caa2d4ccb701ac84",
+  "no_changes_until_review_final": true
+}

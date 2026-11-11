@@ -6,11 +6,11 @@ const { requisitar, notificar, atualizarPerfil, confirmarComSenha, user } = vi.h
   confirmarComSenha: vi.fn(async ({ acao }) => acao('senha-sintetica')),
   user: { perfil: 'OPERACIONAL', vinculosGestao: [{ lotacao: { id: 7, label: 'Lotação 7' }, jornada: { id: 8, label: 'Turno 8' } }] },
 }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-vi.mock('../src/core/events.js', () => ({ notificar }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user, atualizarPerfil }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha, ModalConfirmacao: () => null }) }));
-import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.js';
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+vi.mock('../src/core/events.ts', () => ({ notificar }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user, atualizarPerfil }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha, ModalConfirmacao: () => null }) }));
+import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.ts';
 
 let frequencias;
 let historicos;

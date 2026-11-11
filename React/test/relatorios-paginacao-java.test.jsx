@@ -6,13 +6,13 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar, iniciarExportacao } = vi.hoisted(() => ({ requisitar: vi.fn(), iniciarExportacao: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: value => Array.isArray(value) ? value : value?.content || [] }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-vi.mock('../src/core/exportacao/context.jsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao }) }));
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: value => Array.isArray(value) ? value : value?.content || [] }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+vi.mock('../src/core/exportacao/context.tsx', () => ({ useExportacaoRelatorio: () => ({ iniciarExportacao }) }));
 vi.mock('recharts', () => Object.fromEntries(['PieChart', 'Pie', 'Cell', 'BarChart', 'Bar', 'XAxis', 'YAxis', 'CartesianGrid', 'Tooltip', 'Legend', 'ResponsiveContainer', 'LabelList'].map(name => [name, () => null])));
 
-import { PaginaRelatorioFrequencia } from '../src/modules/rh/pages/PaginaRelatorioFrequencia/index.jsx';
-import { PaginaRelatorioAbsenteismo } from '../src/modules/rh/pages/PaginaRelatorioAbsenteismo/index.jsx';
+import { PaginaRelatorioFrequencia } from '../src/modules/rh/pages/PaginaRelatorioFrequencia/index.tsx';
+import { PaginaRelatorioAbsenteismo } from '../src/modules/rh/pages/PaginaRelatorioAbsenteismo/index.tsx';
 
 let totalColaboradores;
 let contextosDoPrimeiro;

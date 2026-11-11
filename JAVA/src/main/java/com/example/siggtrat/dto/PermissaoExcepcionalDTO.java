@@ -27,5 +27,6 @@ public record PermissaoExcepcionalDTO(
         Long revogadoPorId,
         String revogadoPor,
         String motivoRevogacao,
-        long version
+        long version,
+        Long ocorrenciaId
 ) {}

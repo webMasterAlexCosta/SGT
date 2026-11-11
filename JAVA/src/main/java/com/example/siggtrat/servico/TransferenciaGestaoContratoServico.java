@@ -6,7 +6,7 @@ import com.example.siggtrat.dominio.documento.TipoFatoDocumental;
 import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.dto.*;
 import com.example.siggtrat.entidade.*;
-import com.example.siggtrat.regra.AssinaturaPreviaNegocial;
+import com.example.siggtrat.regra.IntencaoAtoTransferencia;
 import com.example.siggtrat.repositorio.*;
 import com.example.siggtrat.utilitario.FotografiaJornada;
 import com.example.siggtrat.utilitario.RelogioSistema;
@@ -23,7 +23,11 @@ import java.util.stream.Collectors;
 /** Fluxo excepcional, explícito e auditável de transferência de Gestão Local. */
 @Service
 @Transactional(readOnly = true)
-public class TransferenciaGestaoContratoServico {
+public class TransferenciaGestaoContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(TransferenciaGestaoContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final TransferenciaGestaoContratoRepositorio transferenciaRepositorio;
     private final GestaoLocalRepositorio gestaoRepositorio;
     private final LotacaoRepositorio lotacaoRepositorio;
@@ -44,7 +48,8 @@ public class TransferenciaGestaoContratoServico {
     private PreviaCicloVidaContratoServico previaCicloVida;
 
     private record Preparacao(TransferenciaGestaoContrato retificada, GestaoLocal origem, String nomeOrigem, GestaoLocal destino,
-                             TipoContratacao tipoDestino, List<MapeamentoTransferenciaGestao> mapeamentos) {}
+                             TipoContratacao tipoDestino, List<MapeamentoTransferenciaGestao> mapeamentos,
+                             LocalDate inicioVigencia, LocalDate fimVigencia) {}
 
     public TransferenciaGestaoContratoServico(TransferenciaGestaoContratoRepositorio transferenciaRepositorio,
                                               GestaoLocalRepositorio gestaoRepositorio,
@@ -108,7 +113,7 @@ public class TransferenciaGestaoContratoServico {
     public PreviaCicloVidaContratoDTO previa(Contrato contrato, TransferenciaGestaoContratoRequisicao req,
                                             UsuarioAplicacao usuario) {
         Preparacao p = preparar(contrato, req);
-        return previaCicloVida.gerar(contrato, "transferir-gestao", acao(req), usuario, partesDaIntencao(req, p));
+        return previaCicloVida.gerar(contrato, "transferir-gestao", acao(req), usuario, partesDaIntencao(contrato, req, p));
     }
 
     @Transactional
@@ -123,11 +128,14 @@ public class TransferenciaGestaoContratoServico {
         boolean retificacaoComAlcanceAtualOuPassado = retificada != null
                 && (!retificada.getDataEfetiva().isAfter(RelogioSistema.hoje()) || !req.dataEfetiva().isAfter(RelogioSistema.hoje()));
         if (retificacaoComAlcanceAtualOuPassado || !vazio(req.tokenPrevia()) || Boolean.TRUE.equals(req.confirmarImpacto()))
-            previaCicloVida.validarConfirmacao(contrato, "transferir-gestao", acao, usuario, partesDaIntencao(req, p));
-        String autorizacaoConcedida = exigirAutorizacao(contrato, usuario, req.motivo(), req.autorizacaoAdministrativa());
+            previaCicloVida.validarConfirmacao(contrato, "transferir-gestao", acao, usuario, partesDaIntencao(contrato, req, p));
+        exigirConferencia(req.conferenciaDocumentalConfirmada(), req.versaoConferenciaDocumental());
+        var consumo = exigirAutorizacao(contrato, usuario, req.motivo());
+        var conferencia = new ConferenciaDocumentalTransferencia(intencao(contrato, req, p),
+                normalizar(req.autorizacaoAdministrativa()), consumo.uso());
         EventoCicloVidaContrato evento = motorTemporal.registrarEvento(contrato,
                 TipoEventoCicloVidaContrato.TRANSFERENCIA_GESTAO_LOCAL, acao, usuario,
-                resumoGestao(origem.getId(), p.nomeOrigem()), resumoGestao(destino));
+                resumoGestao(origem.getId(), p.nomeOrigem()), resumoGestao(destino), null, conferencia);
 
         TransferenciaGestaoContrato transferencia = new TransferenciaGestaoContrato();
         transferencia.setContrato(contrato); transferencia.setEvento(evento); transferencia.setGestaoOrigem(origem);
@@ -136,7 +144,7 @@ public class TransferenciaGestaoContratoServico {
         transferencia.setGestaoDestinoNomeFotografia(destino.getNome());
         transferencia.setTipoContratacaoDestino(tipoDestino);
         transferencia.setTipoDestinoDescricaoFotografia(tipoDestino.getDescricao());
-        transferencia.setReferenciaSei(req.referenciaSei()); transferencia.setAutorizacaoAdministrativa(autorizacaoConcedida);
+        transferencia.setReferenciaSei(req.referenciaSei()); transferencia.setAutorizacaoAdministrativa(normalizar(req.autorizacaoAdministrativa()));
         transferencia.setResponsavelId(usuario == null ? null : usuario.getId());
         transferencia.setResponsavelUsername(usuario == null ? null : usuario.getUsername());
         transferencia.setMapeamentos(mapeamentos);
@@ -191,7 +199,8 @@ public class TransferenciaGestaoContratoServico {
         // Projeções atuais ainda contêm o mapa substituído; a retificação valida
         // as decisões independentes após reconstruir toda a cadeia na transação.
         if (retificada == null) validarCoberturaDasAlocacoesPosteriores(contrato, req.dataEfetiva(), mapeamentos);
-        return new Preparacao(retificada, origem, nomeFotografado(posicaoAnterior.gestaoLocalNome()), destino, tipoDestino, mapeamentos);
+        return new Preparacao(retificada, origem, nomeFotografado(posicaoAnterior.gestaoLocalNome()), destino, tipoDestino, mapeamentos,
+                posicaoAnterior.dataInicio(), posicaoAnterior.dataFim());
     }
 
     private AcaoCicloVidaContratoDTO acao(TransferenciaGestaoContratoRequisicao req) {
@@ -199,26 +208,61 @@ public class TransferenciaGestaoContratoServico {
                 req.eventoPrecedenteId(), req.relacaoPrecedencia(), req.ordemDocumental(), req.tokenPrevia(), req.confirmarImpacto());
     }
 
-    private List<String> partesDaIntencao(TransferenciaGestaoContratoRequisicao req, Preparacao p) {
-        List<String> partes = new ArrayList<>();
-        partes.add("transferencia-gestao-v1");
-        partes.add(AssinaturaPreviaNegocial.valor(req.autorizacaoAdministrativa()));
-        partes.add("origem:" + p.origem().getId());
-        partes.add("origemNome:" + p.nomeOrigem());
-        partes.add("destino:" + p.destino().getId() + ":" + p.destino().getVersion() + ":" + p.destino().getNome());
-        partes.add("tipo:" + p.tipoDestino().getId() + ":" + p.tipoDestino().getVersion() + ":"
-                + p.tipoDestino().getDescricao() + ":" + p.tipoDestino().getMatriculaVinculoObrigatoria());
-        p.mapeamentos().stream().sorted(Comparator.comparing(m -> chave(m.getLotacaoOrigem(), m.getJornadaOrigem(), m.getCargoOrigem())))
-                .forEach(m -> {
-                    partes.add("mapa:" + chave(m.getLotacaoOrigem(), m.getJornadaOrigem(), m.getCargoOrigem()) + "->"
-                            + chave(m.getLotacaoDestino(), m.getJornadaDestino(), m.getCargoDestino()));
-                    partes.add("lotacao:" + m.getLotacaoDestino().getVersion() + ":" + m.getLotacaoDestino().getNome()
-                            + ":" + m.getLotacaoDestino().getMunicipio());
-                    partes.add("jornada:" + m.getJornadaDestino().getVersion() + ":" + m.getJornadaDestino().getDescricao()
-                            + ":" + FotografiaJornada.capturar(m.getJornadaDestino()));
-                    partes.add("cargo:" + m.getCargoDestino().getVersion() + ":" + m.getCargoDestino().getNome());
-                });
-        return partes;
+    private List<Object> partesDaIntencao(Contrato contrato, TransferenciaGestaoContratoRequisicao req, Preparacao p) {
+        // Um digest sem delimitadores livres integra a prévia. Consentimento é exigido separadamente no definitivo.
+        return List.of(IntencaoAtoTransferencia.VERSAO, intencao(contrato, req, p).hash());
+    }
+
+    private IntencaoAtoTransferencia.Material intencao(Contrato contrato,
+            TransferenciaGestaoContratoRequisicao req, Preparacao p) {
+        return IntencaoAtoTransferencia.capturar(campos("versao", IntencaoAtoTransferencia.VERSAO,
+                "operacao", p.retificada() == null ? "TRANSFERIR_GESTAO" : "RETIFICAR_TRANSFERENCIA_GESTAO",
+                "contratoId", contrato.getId(), "dataEfetiva", textoData(req.dataEfetiva()),
+                "dataAto", textoData(req.dataAto()), "inicioVigencia", textoData(p.inicioVigencia()),
+                "fimVigencia", textoData(p.fimVigencia()), "gestaoOrigemId", p.origem().getId(),
+                "gestaoOrigemNome", p.nomeOrigem(), "gestaoDestinoId", p.destino().getId(),
+                "gestaoDestinoNome", p.destino().getNome(), "gestaoDestinoVersao", p.destino().getVersion(),
+                "tipoDestinoId", p.tipoDestino().getId(), "tipoDestinoVersao", p.tipoDestino().getVersion(),
+                "tipoDestinoDescricao", p.tipoDestino().getDescricao(),
+                "tipoDestinoMatriculaObrigatoria", p.tipoDestino().getMatriculaVinculoObrigatoria(),
+                "eventoPrecedenteId", req.eventoPrecedenteId(), "relacaoPrecedencia", req.relacaoPrecedencia() == null ? null : req.relacaoPrecedencia().name(),
+                "transferenciaAlvoId", p.retificada() == null ? null : p.retificada().getId(),
+                "ordemDocumental", req.ordemDocumental(), "motivo", normalizar(req.motivo()),
+                "referenciaSei", req.referenciaSei().trim(), "autorizacaoAdministrativaAto", normalizar(req.autorizacaoAdministrativa()),
+                "versaoConferenciaDocumental", ConferenciaDocumentalTransferencia.VERSAO_DECLARACAO,
+                "mapeamentos", mapasCanonicos(p.mapeamentos(), false)));
+    }
+
+    private List<Map<String, Object>> mapasCanonicos(List<MapeamentoTransferenciaGestao> mapas, boolean fotografados) {
+        return mapas.stream().sorted(Comparator.comparing(m -> chave(m.getLotacaoOrigem(), m.getJornadaOrigem(), m.getCargoOrigem())))
+                .map(m -> campos("composicaoOrigemId", m.getComposicaoOrigem() == null ? null : m.getComposicaoOrigem().getId(),
+                        "lotacaoOrigemId", m.getLotacaoOrigem().getId(), "jornadaOrigemId", m.getJornadaOrigem().getId(),
+                        "cargoOrigemId", m.getCargoOrigem().getId(), "lotacaoOrigemNome", m.getLotacaoOrigemNomeFotografia(),
+                        "jornadaOrigemDescricao", m.getJornadaOrigemDescricaoFotografia(), "cargoOrigemNome", m.getCargoOrigemNomeFotografia(),
+                        "lotacaoDestinoId", m.getLotacaoDestino().getId(), "jornadaDestinoId", m.getJornadaDestino().getId(),
+                        "cargoDestinoId", m.getCargoDestino().getId(),
+                        "lotacaoDestinoNome", fotografados ? m.getLotacaoDestinoNomeFotografia() : m.getLotacaoDestino().getNome(),
+                        "jornadaDestinoDescricao", fotografados ? m.getJornadaDestinoDescricaoFotografia() : m.getJornadaDestino().getDescricao(),
+                        "cargoDestinoNome", fotografados ? m.getCargoDestinoNomeFotografia() : m.getCargoDestino().getNome(),
+                        "lotacaoDestinoMunicipio", fotografados ? m.getLotacaoDestinoMunicipioFotografia() : m.getLotacaoDestino().getMunicipio(),
+                        "jornadaDestinoSemanal", fotografados ? m.getJornadaDestinoSemanalFotografia() : FotografiaJornada.capturar(m.getJornadaDestino()),
+                        "lotacaoDestinoVersao", fotografados ? null : m.getLotacaoDestino().getVersion(),
+                        "jornadaDestinoVersao", fotografados ? null : m.getJornadaDestino().getVersion(),
+                        "cargoDestinoVersao", fotografados ? null : m.getCargoDestino().getVersion())).toList();
+    }
+
+    private Map<String, Object> campos(Object... pares) {
+        Map<String, Object> resultado = new LinkedHashMap<>();
+        for (int i = 0; i < pares.length; i += 2) resultado.put((String) pares[i], pares[i + 1]);
+        return resultado;
+    }
+    private String textoData(LocalDate data) { return data == null ? null : data.toString(); }
+
+    private void exigirConferencia(Boolean confirmada, String versao) {
+        if (!Boolean.TRUE.equals(confirmada)
+                || !ConferenciaDocumentalTransferencia.VERSAO_DECLARACAO.equals(versao))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Confirme a conferência documental específica deste ato com a declaração vigente.");
     }
 
     @Transactional
@@ -238,14 +282,39 @@ public class TransferenciaGestaoContratoServico {
         if (req.dataEfetiva() != null && !req.dataEfetiva().equals(original.getDataEfetiva()))
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
                     "O cancelamento retira o efeito da transferência original na sua data programada.");
-        exigirAutorizacao(contrato, usuario, req.motivo(), req.autorizacaoAdministrativa());
+        exigirConferencia(req.conferenciaDocumentalConfirmada(), req.versaoConferenciaDocumental());
+        var consumo = exigirAutorizacao(contrato, usuario, req.motivo());
         AcaoCicloVidaContratoDTO acao = new AcaoCicloVidaContratoDTO(original.getDataEfetiva(),
                 req.dataAto() == null ? RelogioSistema.hoje() : req.dataAto(), req.motivo(), req.referenciaSei(),
                 original.getEvento().getId(), TipoRelacaoPrecedenciaNegocial.CANCELA, null);
+        var contextoReposto = projecaoContratual.projetarVersaoContrato(contrato,
+                original.getDataEfetiva(), Instant.now(), Set.of(original.getEvento().getId()));
+        var intencao = IntencaoAtoTransferencia.capturar(campos("versao", IntencaoAtoTransferencia.VERSAO,
+                "operacao", "CANCELAR_TRANSFERENCIA_GESTAO", "contratoId", contrato.getId(),
+                "inicioVigencia", textoData(contextoReposto.dataInicio()), "fimVigencia", textoData(contextoReposto.dataFim()),
+                "tipoDestinoId", contextoReposto.tipoContratacaoId(), "tipoDestinoDescricao", contextoReposto.tipoContratacaoDescricao(),
+                "tipoDestinoMatriculaObrigatoria", contextoReposto.matriculaTipoContratacaoObrigatoria(),
+                "dataEfetiva", textoData(acao.dataEfetiva()), "dataAto", textoData(acao.dataAto()),
+                "gestaoOrigemId", original.getGestaoDestino().getId(),
+                "gestaoOrigemNome", original.getGestaoDestinoNomeFotografia(),
+                "gestaoDestinoId", original.getGestaoOrigem().getId(),
+                "gestaoDestinoNome", original.getGestaoOrigemNomeFotografia(),
+                "tipoTransferenciaOriginalId", original.getTipoContratacaoDestino() == null ? null : original.getTipoContratacaoDestino().getId(),
+                "tipoTransferenciaOriginalDescricao", original.getTipoDestinoDescricaoFotografia(),
+                "transferenciaAlvoId", original.getId(), "eventoPrecedenteId", original.getEvento().getId(),
+                "relacaoPrecedencia", TipoRelacaoPrecedenciaNegocial.CANCELA.name(),
+                "motivo", normalizar(req.motivo()), "referenciaSei", req.referenciaSei().trim(),
+                "autorizacaoAdministrativaAto", normalizar(req.autorizacaoAdministrativa()),
+                "versaoConferenciaDocumental", ConferenciaDocumentalTransferencia.VERSAO_DECLARACAO,
+                "hashIntencaoOriginal", original.getEvento().getConferenciaDocumental() == null ? null
+                        : original.getEvento().getConferenciaDocumental().getHashIntencao(),
+                "mapeamentosDaTransferenciaCancelada", mapasCanonicos(original.getMapeamentos(), true)));
+        var conferencia = new ConferenciaDocumentalTransferencia(intencao,
+                normalizar(req.autorizacaoAdministrativa()), consumo.uso());
         motorTemporal.registrarEvento(contrato, TipoEventoCicloVidaContrato.CANCELAMENTO_TRANSFERENCIA_GESTAO,
                 acao, usuario, resumoGestao(original.getGestaoDestino().getId(), original.getGestaoDestinoNomeFotografia()),
                 resumoGestao(original.getGestaoOrigem().getId(), original.getGestaoOrigemNomeFotografia()),
-                "CANCELAMENTO_TRANSFERENCIA_GESTAO:" + original.getId());
+                "CANCELAMENTO_TRANSFERENCIA_GESTAO:" + original.getId(), conferencia);
         validarContextoNasPosicoesPosteriores(contrato, original.getDataEfetiva());
         projecaoContratual.exigirMatriculasCompativeisAposTransferencia(contrato, original.getDataEfetiva());
         alocacaoServico.reprocessarTransferenciasGestao(contrato, original.getDataEfetiva(), usuario, req.motivo());
@@ -257,15 +326,12 @@ public class TransferenciaGestaoContratoServico {
         return original;
     }
 
-    private String exigirAutorizacao(Contrato contrato, UsuarioAplicacao usuario, String motivo, String autorizacao) {
-        PermissaoExcepcional permissao = permissaoExcepcionalServico.exigirERegistrarUso(usuario,
+    private PermissaoExcepcionalServico.ConsumoPermissao exigirAutorizacao(
+            Contrato contrato, UsuarioAplicacao usuario, String motivo) {
+        // Capacidade vigente HOJE, separada da data efetiva e da referência declarada para o ato.
+        return permissaoExcepcionalServico.exigirERegistrarUsoComRecibo(usuario,
                 TipoPermissaoExcepcional.TRANSFERENCIA_GESTAO_LOCAL, contrato,
                 gestaoContratoTemporal.gestaoAtual(contrato), motivo, "Contrato", contrato.getId());
-        String concedida = permissao.getAutorizacaoAdministrativa();
-        if (!Objects.equals(concedida, normalizar(autorizacao)))
-            throw new ResponseStatusException(HttpStatus.CONFLICT,
-                    "A autorização informada não corresponde à concessão administrativa vigente.");
-        return concedida;
     }
 
     private TransferenciaGestaoContrato obterTransferenciaRetificada(Contrato contrato, TransferenciaGestaoContratoRequisicao req) {
@@ -395,7 +461,7 @@ public class TransferenciaGestaoContratoServico {
                 t.getReferenciaSei(), t.getAutorizacaoAdministrativa(), t.getRegistradoEm(), t.getResponsavelId(),
                 t.getResponsavelUsername(), t.getMapeamentos().stream().map(this::paraDTO).toList(),
                 t.getTipoContratacaoDestino() == null ? null : t.getTipoContratacaoDestino().getId(),
-                nomeFotografado(t.getTipoDestinoDescricaoFotografia()));
+                nomeFotografado(t.getTipoDestinoDescricaoFotografia()), MotorTemporalContratoServico.paraConferenciaDocumentalDTO(t.getEvento()));
     }
 
     private List<MapeamentoTransferenciaGestao> prepararMapeamentos(Contrato contrato, GestaoLocal origem, GestaoLocal destino,

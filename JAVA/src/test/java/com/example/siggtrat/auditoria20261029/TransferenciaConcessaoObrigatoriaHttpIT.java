@@ -24,7 +24,8 @@ class TransferenciaConcessaoObrigatoriaHttpIT extends ContratosHttpBase {
             catch (Exception e) { throw new IllegalStateException(e); }
         });
         LocalDate data = n.inicio().plusDays(1);
-        var req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        var req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência dependente de autorização específica documentada",
                 "referenciaSei", "SEI-TRANSFERENCIA-CONCESSAO", "autorizacaoAdministrativa", "ATO-HTTP",

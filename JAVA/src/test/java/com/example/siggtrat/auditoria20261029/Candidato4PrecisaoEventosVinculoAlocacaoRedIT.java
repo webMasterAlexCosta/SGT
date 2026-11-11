@@ -24,7 +24,7 @@ import static org.assertj.core.api.Assertions.assertThat;
  * Autoria independente: /root/revisao_final_pessoas. Hipótese C4-PES-H05.
  * Base C4 13c84fd30b668335228704fd1028ddea11adad6f607458a7b7fa993dcbc64a89.
  * Um ato legítimo cria os dois tipos de evento. Captura entidades gerenciadas
- * na mesma transação da escrita, confirma e relê em nova transação MySQL.
+ * na mesma transação da escrita, confirma e relê em nova transação PostgreSQL.
  * Não altera Instant legado, não cria evento diretamente nem fornece história
  * pelo mestre. A publicação do helper é fonte sintética integral declarada.
  * Teste proposto: não compilado/executado pelo revisor.
@@ -40,8 +40,8 @@ class Candidato4PrecisaoEventosVinculoAlocacaoRedIT extends ContratosHttpBase {
     @Test
     void eventosDoCadastroConservamInstanteGerenciadoAposCommitMysql() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -88,7 +88,7 @@ class Candidato4PrecisaoEventosVinculoAlocacaoRedIT extends ContratosHttpBase {
         Files.createDirectories(evidencia.getParent());
         Files.writeString(evidencia, json(mapa("hipotese", "C4-PES-H05", "gerenciada_antes_commit", gerenciada,
                 "persistida_nova_transacao", persistida, "origem", "cadastro HTTP MVC contemporâneo e canônico",
-                "infraestrutura", "MySQL8.0.45 e Redis reais; não TCP do JAR")));
+                "infraestrutura", "PostgreSQL18.6 e Redis reais; não TCP do JAR")));
         SoftAssertions.assertSoftly(soft -> {
             soft.assertThat(gerenciada.registroVinculo()).as("EventoVinculo conserva seu Instant após commit")
                     .isEqualTo(persistida.registroVinculo());

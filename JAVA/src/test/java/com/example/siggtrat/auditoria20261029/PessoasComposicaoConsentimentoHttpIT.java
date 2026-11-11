@@ -11,6 +11,12 @@ import java.time.Instant;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
+import java.util.ArrayList;
+import java.util.HexFormat;
+import java.nio.charset.StandardCharsets;
+import java.security.MessageDigest;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -63,6 +69,12 @@ class PessoasComposicaoConsentimentoHttpIT extends ContratosHttpBase {
         req.put("justificativaExcedente", "Substituição extraordinária formalmente aprovada");
         req.put("evidenciaExcedente", "SEI-PROVA-EVENTO-EXCEDENTE");
         req.put("autorizacaoExcedente", "ATO-PROVA-EVENTO-EXCEDENTE");
+        FatoHashExcedente esperadoDasEntradas = new FatoHashExcedente(dataEfetiva, null,
+                (String) req.get("matricula"), cpf, f.contrato().id(), f.c().localA.getId(),
+                f.contrato().composicao1(), f.c().lotacaoA.getId(), f.c().jornadaA.getId(), f.c().cargoA.getId(),
+                1, 2L, (String) req.get("justificativaExcedente"), (String) req.get("evidenciaExcedente"),
+                (String) req.get("autorizacaoExcedente"));
+        String hashEsperado = hashDoFatoTipadoEsperado(esperadoDasEntradas);
         Instant antes = Instant.now().minusSeconds(1);
         JsonNode criado = enviar(f.c().localA, ROTA, req, 201,
                 "CMP009 Gestor Local pode confirmar excedente com documentação completa");
@@ -87,7 +99,7 @@ class PessoasComposicaoConsentimentoHttpIT extends ContratosHttpBase {
         assertThat(evento.path("cargoExcedenteId").asLong()).isEqualTo(f.c().cargoA.getId());
         assertThat(evento.path("efetivoPrevistoExcedente").asInt()).isEqualTo(1);
         assertThat(evento.path("ocupacaoAposInclusaoExcedente").asLong()).isEqualTo(2);
-        assertThat(evento.path("hashEvento").asText()).hasSize(64);
+        assertThat(evento.path("hashEvento").asText()).hasSize(64).isEqualTo(hashEsperado);
         emTransacao(() -> {
             EventoVinculoContratual persistido = em.find(EventoVinculoContratual.class, evento.path("id").asLong());
             assertThat(persistido.getVinculo().getId()).isEqualTo(vinculoId);
@@ -101,9 +113,82 @@ class PessoasComposicaoConsentimentoHttpIT extends ContratosHttpBase {
             assertThat(persistido.isInclusaoExcedente()).isTrue();
             assertThat(persistido.getEfetivoPrevistoExcedente()).isEqualTo(1);
             assertThat(persistido.getOcupacaoAposInclusaoExcedente()).isEqualTo(2L);
-            assertThat(persistido.getHashEvento()).isEqualTo(evento.path("hashEvento").asText());
+            assertThat(persistido.getComposicaoExcedenteId()).isEqualTo(f.contrato().composicao1());
+            assertThat(persistido.getLotacaoExcedenteId()).isEqualTo(f.c().lotacaoA.getId());
+            assertThat(persistido.getJornadaExcedenteId()).isEqualTo(f.c().jornadaA.getId());
+            assertThat(persistido.getCargoExcedenteId()).isEqualTo(f.c().cargoA.getId());
+            assertThat(persistido.getPessoaCpfFotografia()).isEqualTo(cpf);
+            assertThat(persistido.getInicioNovo()).isEqualTo(dataEfetiva);
+            assertThat(persistido.getFimNovo()).isNull();
+            assertThat(persistido.getMatriculaNova()).isEqualTo(req.get("matricula"));
+            assertThat(persistido.getHashAnterior()).isNull();
+            assertThat(persistido.getHashEvento()).isEqualTo(hashEsperado).isEqualTo(evento.path("hashEvento").asText());
             return null;
         });
+    }
+
+    @Test
+    void oraculoDasEntradasCorrespondeAosVetoresTipadosIndependentes() throws Exception {
+        FatoHashExcedente fixo = new FatoHashExcedente(LocalDate.of(2026, 6, 1), LocalDate.of(2026, 6, 30),
+                "MAT-001", "52998224725", 2L, 42L, null, 10L, 11L, 12L, 1, 2L,
+                "Excedente autorizado", "SEI-TESTE", "ATO-TESTE");
+        // Literais gerados offline por Python/struct/hashlib a partir do contrato tipado documentado.
+        assertThat(digestEsperado(materialBaseDeCriacao(fixo)))
+                .isEqualTo("31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158");
+        assertThat(hashDoFatoTipadoEsperado(fixo))
+                .isEqualTo("531972581e0b28a4a0209a07b5daa48afa62f44e53a9acb25090caca12266a81");
+    }
+
+    private record FatoHashExcedente(LocalDate inicio, LocalDate fim, String matricula, String cpf,
+                                    long contratoId, long autorId, Long composicaoId, long lotacaoId,
+                                    long jornadaId, long cargoId, int previsto, long ocupacao,
+                                    String justificativa, String evidencia, String autorizacao) { }
+
+    /** Oráculo separado: fatos vêm das entradas; ByteBuffer/JDK, sem serializador ou hash do produto. */
+    private byte[] materialBaseDeCriacao(FatoHashExcedente f) {
+        return materialEsperado("sgt.evento-vinculo.base", List.of(
+                new CampoEsperado(1, null), new CampoEsperado(5, "CRIACAO"),
+                new CampoEsperado(4, f.inicio().toString()), new CampoEsperado(4, null),
+                new CampoEsperado(4, f.inicio().toString()), new CampoEsperado(4, null),
+                new CampoEsperado(4, f.fim() == null ? null : f.fim().toString()),
+                new CampoEsperado(1, null), new CampoEsperado(1, f.matricula()), new CampoEsperado(1, f.cpf()),
+                new CampoEsperado(2, Long.toString(f.contratoId())), new CampoEsperado(2, Long.toString(f.autorId())),
+                new CampoEsperado(1, "Cadastro integrado de Pessoa, Vínculo e Alocação inicial"),
+                new CampoEsperado(2, null), new CampoEsperado(1, null), new CampoEsperado(5, null)));
+    }
+
+    private String hashDoFatoTipadoEsperado(FatoHashExcedente f) throws Exception {
+        return digestEsperado(materialEsperado("sgt.evento-vinculo.excedente", List.of(
+                new CampoEsperado(1, digestEsperado(materialBaseDeCriacao(f))),
+                new CampoEsperado(2, f.composicaoId() == null ? null : Long.toString(f.composicaoId())),
+                new CampoEsperado(2, Long.toString(f.lotacaoId())), new CampoEsperado(2, Long.toString(f.jornadaId())),
+                new CampoEsperado(2, Long.toString(f.cargoId())), new CampoEsperado(3, Integer.toString(f.previsto())),
+                new CampoEsperado(2, Long.toString(f.ocupacao())), new CampoEsperado(1, f.justificativa()),
+                new CampoEsperado(1, f.evidencia()), new CampoEsperado(1, f.autorizacao()))));
+    }
+
+    private record CampoEsperado(int tipo, String valor) { }
+
+    private byte[] materialEsperado(String dominio, List<CampoEsperado> campos) {
+        List<CampoEsperado> todos = new ArrayList<>();
+        todos.add(new CampoEsperado(1, dominio)); todos.addAll(campos);
+        int tamanho = 4 + 2 + 4;
+        for (CampoEsperado f : todos) tamanho += 6 + (f.valor() == null ? 0 : f.valor().getBytes(StandardCharsets.UTF_8).length);
+        ByteBuffer bytes = ByteBuffer.allocate(tamanho).order(ByteOrder.BIG_ENDIAN);
+        bytes.putInt(0x53475448).putShort((short) 1);
+        escreverEsperado(bytes, todos.get(0));
+        bytes.putInt(campos.size());
+        for (CampoEsperado f : campos) escreverEsperado(bytes, f);
+        return bytes.array();
+    }
+
+    private void escreverEsperado(ByteBuffer destino, CampoEsperado f) {
+        byte[] valor = f.valor() == null ? new byte[0] : f.valor().getBytes(StandardCharsets.UTF_8);
+        destino.put((byte) f.tipo()).put((byte) (f.valor() == null ? 0 : 1)).putInt(valor.length).put(valor);
+    }
+
+    private String digestEsperado(byte[] material) throws Exception {
+        return HexFormat.of().formatHex(MessageDigest.getInstance("SHA-256").digest(material));
     }
 
     private Preparado preparar() {

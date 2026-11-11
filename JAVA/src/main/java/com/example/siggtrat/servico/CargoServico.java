@@ -17,7 +17,11 @@ import org.springframework.web.server.ResponseStatusException;
 import java.util.Objects;
 
 @Service
-public class CargoServico {
+public class CargoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CargoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final CargoRepositorio repositorio;
     private final AcessoOrganizacionalServico acesso;
     private final ProgramacaoFuturaCatalogoServico programacaoFutura;
@@ -65,10 +69,11 @@ public class CargoServico {
         return paraDTO(cargo);
     }
 
-    @Transactional
+    @Transactional(isolation = org.springframework.transaction.annotation.Isolation.READ_COMMITTED)
     public CargoDTO criar(CargoDTO dto) {
         UsuarioAplicacao usuario = acesso.usuarioAtual();
         GestaoLocal gestao = exigirGestorLocalAtivo(usuario);
+        bloquearNamespaceAtivo(gestao);
         validar(dto, gestao, null);
 
         Cargo entity = new Cargo();
@@ -79,7 +84,7 @@ public class CargoServico {
         registrarDisponibilidade(salvo, null, salvo.getAtivo(), "Criação do Cargo", usuario);
         // Sincronizar o item e seu fato antes do lock do executor original.
         repositorio.flush();
-        acesso.revalidarAposEspera(usuario);
+        acesso.revalidarAposEsperaSemAguardarExecutor(usuario);
         auditar("CARGO_CRIADO", salvo, null, salvo.getAtivo());
         return paraDTO(salvo);
     }
@@ -91,7 +96,9 @@ public class CargoServico {
         Cargo entity = repositorio.findById(id).orElse(null);
         if (entity != null && disponibilidadeTemporal != null)
             disponibilidadeTemporal.bloquearParaAlteracao(TipoCatalogoTemporal.CARGO, id);
-        acesso.revalidarAposEspera(usuario);
+        // Não reter a Gestão enquanto se aguarda um Cargo já usado por outro comando.
+        bloquearNamespaceAtivo(gestao);
+        acesso.revalidarAposEsperaSemAguardarExecutor(usuario);
         if (entity == null || entity.getGestaoLocal() == null
                 || !Objects.equals(entity.getGestaoLocal().getId(), gestao.getId())) {
             return null;
@@ -144,7 +151,7 @@ public class CargoServico {
     }
 
     private void validar(CargoDTO dto, GestaoLocal gestao, Long idAtual) {
-        if (dto == null) throw new IllegalArgumentException("Dados do cargo não informados.");
+        if (dto == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Dados do cargo não informados.");
         if (dto.nome() == null || dto.nome().isBlank()) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "O nome do cargo é obrigatório.");
         }
@@ -154,6 +161,14 @@ public class CargoServico {
                 .ifPresent(outro -> { throw new ResponseStatusException(HttpStatus.CONFLICT,
                         "Já existe um Cargo com este nome na Gestão Local."); });
 
+    }
+
+    private void bloquearNamespaceAtivo(GestaoLocal gestao) {
+        // O escalar relê a condição após a espera, sem reutilizar a entidade gerenciada anterior.
+        if (!repositorio.bloquearNamespaceDaGestaoLocal(gestao.getId()).orElse(false)) {
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "Somente o Gestor Local ativo administra Cargos.");
+        }
     }
 
     private GestaoLocal exigirGestorLocalAtivo(UsuarioAplicacao usuario) {

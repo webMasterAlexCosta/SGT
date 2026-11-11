@@ -1,0 +1,7 @@
+{
+  "state": "VERIFIED_AFTER_NATIVE_REVIEW_RELEASED_FOR_COPY",
+  "freeze_sha256": "f9caf8c38fc850bdaaa7bcf3e1e8b980faa37b6c0e6061f220e86c2ec10384a6",
+  "all_source_input_dist_unchanged": true,
+  "old_JAR07_unchanged": true,
+  "parecer_sha256": "6f0322959ccb9ae99e890e1bb30d18cc2a56b3b11ef7fde7a669880f9adea256"
+}

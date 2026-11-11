@@ -1,0 +1,9 @@
+{
+  "baseline_jar_sha256": "3c5cd0a6d616737efb3c85b8922294fadf53cfe231022edd1d9503242b7c87c9",
+  "allowed_updated_entries": {
+    "BOOT-INF/classes/com/example/siggtrat/servico/AditamentoContratualServico$1.class": "6032195890e557bfb9e0a20b3d6ce27e7d22a9fdf88884d7a9c2d569dc478a35",
+    "BOOT-INF/classes/com/example/siggtrat/servico/AditamentoContratualServico.class": "4869187cc173506d9059404afcee1618f83bedb456d0e93e46d6335f5a3abae5"
+  },
+  "unchanged_classes": 821,
+  "class_count": 823
+}

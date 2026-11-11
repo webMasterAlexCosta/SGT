@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-const novaInstancia = async () => { vi.resetModules(); return import('../src/core/security/saidaSessao.js'); };
+const novaInstancia = async () => { vi.resetModules(); return import('../src/core/security/saidaSessao.ts'); };
 beforeEach(() => { localStorage.clear(); sessionStorage.clear(); });
 afterEach(() => { vi.restoreAllMocks(); });
 describe('Intenção de saída atravessa nova instância JavaScript', () => {

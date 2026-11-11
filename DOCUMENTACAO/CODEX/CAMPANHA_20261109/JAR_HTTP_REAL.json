@@ -1,0 +1,1758 @@
+{
+  "state": "CURRENT_MAIN35_REAL_HTTP_PASS_NATIVE_REVIEW_PENDING",
+  "batch": "jar-http-current40-02",
+  "receipt_sha256": "d185922486940028699f3904fa7e768cb826c44c57161c17af9e2289ee4b942d",
+  "source": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/JarHttpRealIT.java",
+  "test_source_sha256": "323ea2b03578a1cefee398d43d5f502846e52d4b77c023a9b566e00bd5cedc06",
+  "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+  "requests": 146,
+  "resource_windows": 45,
+  "reports": [
+    {
+      "name": "com.example.siggtrat.auditoria20261029.JarHttpRealIT",
+      "tests": "1",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "137.608",
+      "effective_test_context_cache_max_size": "1",
+      "xml_sha256": "62afcaecc4b7e6a75f547dc2f0d9035d39039d3535f120ac0cf3f0bbe1395fff"
+    }
+  ],
+  "scenario_manifest_sha256": "79771eb3623a3c1a5c25a5a220d5ebe1f4d6bf2e2afa118477516f01cf09b776",
+  "current_execution_proof": {
+    "state": "PASS_CURRENT_MAIN35_JARdcb_NATIVE_FINAL_REVIEW_PENDING",
+    "jar_sha256": "dcb3a38443c0f941d70f95f10a3a9f80bb44ee1a6aa57f1c29006fc3bf726f7d",
+    "receipt_sha256": "d185922486940028699f3904fa7e768cb826c44c57161c17af9e2289ee4b942d",
+    "scenario_index_sha256": "79771eb3623a3c1a5c25a5a220d5ebe1f4d6bf2e2afa118477516f01cf09b776",
+    "resources_proof_sha256": "73d10ca964596dbd36cc3da4c1b84adf4aed856d461133cc625bd5782dbc16de",
+    "requests": 146,
+    "resource_windows": 45,
+    "own_memory_high": "1099997184",
+    "peak": 7652139008,
+    "no_oom_or_leftovers": true,
+    "first_preventive_attempt_preserved": "jar-http-current40-01/partial-scenario-index.json",
+    "not_browser_or_global_approval": true
+  },
+  "resource_profile": {
+    "state": "INSTRUMENTED_FOCAL_PASS_INDEPENDENT_REVIEW_PENDING",
+    "batch": "jar-http-current40-02",
+    "receipt_sha256": "d185922486940028699f3904fa7e768cb826c44c57161c17af9e2289ee4b942d",
+    "scenario_manifest_sha256": "79771eb3623a3c1a5c25a5a220d5ebe1f4d6bf2e2afa118477516f01cf09b776",
+    "source_sha256": {
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/CaracterizacaoHttpJar.java": "d5e8c29b292d88b273327db7191c511d2b3c662bc160357473af6dd34c25768f",
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/JarHttpRealIT.java": "323ea2b03578a1cefee398d43d5f502846e52d4b77c023a9b566e00bd5cedc06",
+      "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/RecursosJarObservador.java": "374b8478e2381aafdb600cb198e3ab3e69f92742abe6e926254b3526910b72a4"
+    },
+    "http_characterization": {
+      "perfilRecursos": "JMX_LOCAL_POSTGRES_REAL",
+      "cacheFrio": "Caches de negócio Redis vazios; não limpa sessões, tokens, revisões, SO nem PostgreSQL",
+      "percentis": "Nearest rank; amostra pequena, descritiva, sem extrapolação nacional",
+      "resumos": [
+        {
+          "p99Ms": 91.43518,
+          "errosHttp": 0,
+          "p95Ms": 91.43518,
+          "p50Ms": 85.690502,
+          "estadoAplicacao": "FRIO",
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 11.784883729197922,
+          "rota": "listagem"
+        },
+        {
+          "p99Ms": 27.216753,
+          "errosHttp": 0,
+          "p95Ms": 27.216753,
+          "p50Ms": 16.110899,
+          "estadoAplicacao": "QUENTE",
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 52.63625064547396,
+          "rota": "listagem"
+        },
+        {
+          "p99Ms": 218.484966,
+          "errosHttp": 0,
+          "p95Ms": 218.484966,
+          "p50Ms": 217.405341,
+          "estadoAplicacao": "FRIO",
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 4.833418798918629,
+          "rota": "painel"
+        },
+        {
+          "p99Ms": 20.669444,
+          "errosHttp": 0,
+          "p95Ms": 20.669444,
+          "p50Ms": 18.288238,
+          "estadoAplicacao": "QUENTE",
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 53.824437065911525,
+          "rota": "painel"
+        },
+        {
+          "p99Ms": 35.920933,
+          "errosHttp": 0,
+          "p95Ms": 35.920933,
+          "p50Ms": 31.946202,
+          "estadoAplicacao": "FRIO",
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 30.418584051414708,
+          "rota": "historico"
+        },
+        {
+          "p99Ms": 15.65008,
+          "errosHttp": 0,
+          "p95Ms": 15.65008,
+          "p50Ms": 14.709442,
+          "estadoAplicacao": "QUENTE",
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 68.51839376851703,
+          "rota": "historico"
+        },
+        {
+          "p99Ms": 75.734255,
+          "errosHttp": 0,
+          "p95Ms": 75.734255,
+          "p50Ms": 43.626368,
+          "estadoAplicacao": "FRIO",
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 18.758486573807073,
+          "rota": "frequencia"
+        },
+        {
+          "p99Ms": 24.730362,
+          "errosHttp": 0,
+          "p95Ms": 24.730362,
+          "p50Ms": 18.693393,
+          "estadoAplicacao": "QUENTE",
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 48.21847676096047,
+          "rota": "frequencia"
+        },
+        {
+          "p99Ms": 135.166452,
+          "errosHttp": 0,
+          "p95Ms": 135.166452,
+          "p50Ms": 129.404312,
+          "estadoAplicacao": "FRIO",
+          "amostras": 3,
+          "requisicoesPorSegundoEmServico": 8.31768328876007,
+          "rota": "exportacao"
+        },
+        {
+          "p99Ms": 338.046456,
+          "errosHttp": 0,
+          "p95Ms": 338.046456,
+          "p50Ms": 109.586317,
+          "estadoAplicacao": "QUENTE",
+          "amostras": 6,
+          "requisicoesPorSegundoEmServico": 6.515424076894201,
+          "rota": "exportacao"
+        }
+      ],
+      "escopo": "HTTP local real, um usuário, concorrência1, três ciclos por rota; sem SLA inferido",
+      "rssJarMaxAmostradoBytes": 542814208
+    },
+    "resource_windows": [
+      {
+        "route": "listagem",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 51,
+        "sql_total_ms": 1.8189999999999997,
+        "sql_operations": {
+          "OUTRO": 1,
+          "SELECT": 42,
+          "BEGIN": 4,
+          "COMMIT": 4
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 50,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.33000000000000007,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.402,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 50,
+        "sql_total_ms": 1.6809999999999998,
+        "sql_operations": {
+          "SELECT": 42,
+          "BEGIN": 4,
+          "COMMIT": 4
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 67,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.387,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 5,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.27699999999999997,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 50,
+        "sql_total_ms": 1.6369999999999993,
+        "sql_operations": {
+          "SELECT": 42,
+          "BEGIN": 4,
+          "COMMIT": 4
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 71,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 12,
+        "sql_total_ms": 0.526,
+        "sql_operations": {
+          "OUTRO": 1,
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 9,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "listagem",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.28700000000000003,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 4,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 201,
+        "sql_total_ms": 5.2229999999999945,
+        "sql_operations": {
+          "SELECT": 193,
+          "BEGIN": 3,
+          "COMMIT": 3,
+          "OUTRO": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 5,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 97,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "IO/DataFileRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.30700000000000005,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 4,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.36100000000000004,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 4,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 201,
+        "sql_total_ms": 5.4599999999999955,
+        "sql_operations": {
+          "SELECT": 193,
+          "BEGIN": 3,
+          "COMMIT": 3,
+          "OUTRO": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 4,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 84,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.42500000000000004,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.3600000000000001,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 3,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 201,
+        "sql_total_ms": 5.737000000000001,
+        "sql_operations": {
+          "SELECT": 193,
+          "BEGIN": 3,
+          "COMMIT": 3,
+          "OUTRO": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 1,
+            "collection_time_ms_delta": 29
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 5,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 84,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.42200000000000004,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 6,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "painel",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 12,
+        "sql_total_ms": 0.4680000000000001,
+        "sql_operations": {
+          "OUTRO": 1,
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 9,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 24,
+        "sql_total_ms": 0.9980000000000004,
+        "sql_operations": {
+          "SELECT": 18,
+          "BEGIN": 3,
+          "COMMIT": 3
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.263,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.354,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 24,
+        "sql_total_ms": 0.9870000000000003,
+        "sql_operations": {
+          "SELECT": 18,
+          "BEGIN": 3,
+          "COMMIT": 3
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.38,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.342,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "FRIO",
+        "http_cache": "MISS",
+        "queries_executed": 24,
+        "sql_total_ms": 0.8100000000000003,
+        "sql_operations": {
+          "SELECT": 18,
+          "BEGIN": 3,
+          "COMMIT": 3
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.21400000000000002,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "historico",
+        "application_cache": "QUENTE",
+        "http_cache": "HIT",
+        "queries_executed": 11,
+        "sql_total_ms": 0.37100000000000005,
+        "sql_operations": {
+          "SELECT": 7,
+          "BEGIN": 2,
+          "COMMIT": 2
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "FRIO",
+        "http_cache": "BYPASS",
+        "queries_executed": 30,
+        "sql_total_ms": 1.428,
+        "sql_operations": {
+          "SELECT": 25,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 114,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 14,
+        "sql_total_ms": 0.5990000000000001,
+        "sql_operations": {
+          "SELECT": 9,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 14,
+        "sql_total_ms": 0.5680000000000001,
+        "sql_operations": {
+          "SELECT": 9,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 3,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "FRIO",
+        "http_cache": "BYPASS",
+        "queries_executed": 30,
+        "sql_total_ms": 0.8920000000000005,
+        "sql_operations": {
+          "SELECT": 25,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 14,
+        "sql_total_ms": 0.42600000000000005,
+        "sql_operations": {
+          "SELECT": 9,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 14,
+        "sql_total_ms": 0.41500000000000015,
+        "sql_operations": {
+          "SELECT": 9,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "FRIO",
+        "http_cache": "BYPASS",
+        "queries_executed": 30,
+        "sql_total_ms": 0.8150000000000004,
+        "sql_operations": {
+          "SELECT": 25,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 14,
+        "sql_total_ms": 0.4010000000000001,
+        "sql_operations": {
+          "SELECT": 9,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 3,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "frequencia",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 14,
+        "sql_total_ms": 0.34000000000000014,
+        "sql_operations": {
+          "SELECT": 9,
+          "BEGIN": 2,
+          "COMMIT": 2,
+          "SHOW": 1
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 1,
+        "hikari_active_max_sampled": 0,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 0,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "FRIO",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.2409999999999983,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 3,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 134,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.0359999999999996,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 3,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 134,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.5629999999999993,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 3,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 134,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "FRIO",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 2.8659999999999988,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 65,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.185999999999999,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 3,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 166,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 2.9429999999999974,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 61,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "FRIO",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.2949999999999986,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 3,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 134,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.002999999999999,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 1,
+            "collection_time_ms_delta": 250
+          }
+        ],
+        "inflight_samples": 7,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 62,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      },
+      {
+        "route": "exportacao",
+        "application_cache": "QUENTE",
+        "http_cache": "BYPASS",
+        "queries_executed": 87,
+        "sql_total_ms": 3.223999999999998,
+        "sql_operations": {
+          "SELECT": 73,
+          "BEGIN": 7,
+          "COMMIT": 7
+        },
+        "gc_delta": [
+          {
+            "mbean": "java.lang:name=Copy,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          },
+          {
+            "mbean": "java.lang:name=MarkSweepCompact,type=GarbageCollector",
+            "collections_delta": 0,
+            "collection_time_ms_delta": 0
+          }
+        ],
+        "inflight_samples": 2,
+        "hikari_active_max_sampled": 1,
+        "hikari_awaiting_max_sampled": 0,
+        "tomcat_busy_max_sampled": 1,
+        "postgres_locks_granted_max_sampled": 34,
+        "postgres_locks_waiting_max_sampled": 0,
+        "postgres_blocking_pids_max_sampled": 0,
+        "postgres_wait_categories_observed": [
+          "Client/ClientRead",
+          "NONE/NONE"
+        ]
+      }
+    ],
+    "total_child_sql_executions_in_windows": 1983,
+    "total_inflight_samples": 79,
+    "duration_logging_reset_proof_sha256": "25304c47b3f5dfb58128a9b4351e6fa96f491188f4241f6f38712eddfe934032",
+    "peak_aggregate_bytes": 7652139008,
+    "memory_events_delta": {
+      "low": 0,
+      "high": 0,
+      "max": 0,
+      "oom": 0,
+      "oom_kill": 0,
+      "oom_group_kill": 0,
+      "sock_throttled": 0
+    },
+    "limits": [
+      "One user/concurrency1/local synthetic corpus; descriptive small sample, no SLA or national extrapolation.",
+      "JMX/PG observations instrumented; CPU/GC/SQL include own background work in the window.",
+      "Queues/locks/waits sampled at boundaries and every50ms; no continuous peak or universal absence claim.",
+      "PostgreSQL log is private; no SQL/bind/params copied. Application role privileges and production logging unchanged.",
+      "Only the isolated new database used duration logging; reset to prior value verified."
+    ],
+    "exporter_sha256": "3e22b4ee135edc37fa8f218ad2950ec44f00f659776b0d574e01b0625cc42461"
+  },
+  "peak_aggregate_bytes": 7652139008,
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "frontend_assets_scope": "190previousassets_preserved_NOT_finalReactbundle",
+  "independent_review": "PENDING_NATIVE15",
+  "limits": [
+    "ActualHTTP/TCPandrestartsameJAR;source/class/artifactbindingchecked.",
+    "Resourcewindowslocalconcurrency1;notnationalSLAorpool-capacityclaim.",
+    "Previous/failedreceiptsretainownbytesandareexcludedfromPASS.",
+    "NoChrome/LANorfullhomologationapproval."
+  ]
+}

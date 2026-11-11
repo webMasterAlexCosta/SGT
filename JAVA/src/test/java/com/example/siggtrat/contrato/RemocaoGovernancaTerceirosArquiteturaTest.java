@@ -15,7 +15,6 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -28,7 +27,7 @@ import static org.junit.jupiter.api.Assertions.*;
 /**
  * Gate sem contexto Spring, sem DataSource e sem mocks. Examina o artefato
  * compilado e os contratos de entrada do produto. A prova HTTP/persistência
- * permanece nas ITs com aplicação, filtros e MySQL reais.
+ * permanece nas ITs com aplicação, filtros e PostgreSQL reais.
  */
 class RemocaoGovernancaTerceirosArquiteturaTest {
     private static final String PACOTE = "com.example.siggtrat.";
@@ -104,10 +103,10 @@ class RemocaoGovernancaTerceirosArquiteturaTest {
     }
 
     @Test
-    void fornecedorNaoOfereceRiscoESoConservaColunaLegadaImutavel() {
+    void fornecedorNaoOfereceRiscoNemMonitoramentoObsoleto() {
         Set<String> metodos = Arrays.stream(Fornecedor.class.getMethods()).map(Method::getName)
                 .collect(Collectors.toSet());
-        for (String sufixo : List.of("RiscoScore", "RiscoNivel", "ProximaAvaliacao", "MonitoramentoStatus")) {
+        for (String sufixo : List.of("RiscoScore", "RiscoNivel", "ProximaAvaliacao", "MonitoramentoStatus", "EstadoMonitoramentoLegado")) {
             assertFalse(metodos.contains("get" + sufixo), "Leitura de risco ainda exposta: " + sufixo);
             assertFalse(metodos.contains("set" + sufixo), "Mutação de risco ainda exposta: " + sufixo);
         }
@@ -117,17 +116,11 @@ class RemocaoGovernancaTerceirosArquiteturaTest {
         assertFalse(colunas.contains("risco_score"));
         assertFalse(colunas.contains("risco_nivel"));
         assertFalse(colunas.contains("proxima_avaliacao"));
-        var legadas = Arrays.stream(Fornecedor.class.getDeclaredFields())
-                .filter(campo -> campo.isAnnotationPresent(Column.class))
-                .filter(campo -> campo.getAnnotation(Column.class).name().equals("monitoramento_status")).toList();
-        assertEquals(1, legadas.size(), "Schema legado exige preenchimento desta coluna no INSERT");
-        var campo = legadas.get(0);
-        assertTrue(Modifier.isPrivate(campo.getModifiers()));
-        assertFalse(campo.getAnnotation(Column.class).updatable(),
-                "Edição cadastral não pode regravar o valor histórico de monitoramento");
-        String sufixo = Character.toUpperCase(campo.getName().charAt(0)) + campo.getName().substring(1);
-        assertFalse(metodos.contains("get" + sufixo), "A exceção de INSERT não é uma API de consulta");
-        assertFalse(metodos.contains("set" + sufixo), "A exceção de INSERT não é uma API de edição");
+        assertFalse(colunas.contains("monitoramento_status"),
+                "Monitoramento obsoleto não deve continuar mapeado no cadastro de Fornecedor");
+        assertTrue(Arrays.stream(Fornecedor.class.getDeclaredFields())
+                        .noneMatch(campo -> campo.getName().equals("estadoMonitoramentoLegado")),
+                "A compatibilidade de INSERT não deve sobreviver como estado privado sem uso");
     }
 
     private static Class<?> exigirClasse(String nome) {

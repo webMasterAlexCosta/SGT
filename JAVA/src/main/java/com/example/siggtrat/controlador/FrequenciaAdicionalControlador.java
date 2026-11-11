@@ -19,7 +19,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/frequencias-adicionais")
-public class FrequenciaAdicionalControlador {
+public class FrequenciaAdicionalControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FrequenciaAdicionalControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final FrequenciaAdicionalServico servico;
 

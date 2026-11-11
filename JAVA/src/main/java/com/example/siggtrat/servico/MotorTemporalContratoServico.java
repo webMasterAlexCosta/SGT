@@ -30,7 +30,11 @@ import java.util.stream.Collectors;
  * - retificação/cancelamento/substituição preservam o fato anterior.
  */
 @Service
-public class MotorTemporalContratoServico {
+public class MotorTemporalContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(MotorTemporalContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final EventoCicloVidaContratoRepositorio eventoRepositorio;
     private final RelacaoPrecedenciaEventoContratoRepositorio relacaoRepositorio;
@@ -147,6 +151,13 @@ public class MotorTemporalContratoServico {
             String valorNovo,
             String chaveNegocialCustomizada
     ) {
+        return registrarEvento(contrato, tipo, acao, usuario, valorAnterior, valorNovo, chaveNegocialCustomizada, null);
+    }
+
+    @Transactional
+    public EventoCicloVidaContrato registrarEvento(Contrato contrato, TipoEventoCicloVidaContrato tipo,
+            AcaoCicloVidaContratoDTO acao, UsuarioAplicacao usuario, String valorAnterior, String valorNovo,
+            String chaveNegocialCustomizada, ConferenciaDocumentalTransferencia conferencia) {
         if (contrato == null || contrato.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Contrato persistido é obrigatório para registrar fato temporal.");
         }
@@ -233,6 +244,17 @@ public class MotorTemporalContratoServico {
             evento.setVersaoNegocial(Optional.ofNullable(precedente.getVersaoNegocial()).orElse(1) + 1);
         }
 
+        if (conferencia != null) {
+            if (tipo != TipoEventoCicloVidaContrato.TRANSFERENCIA_GESTAO_LOCAL
+                    && tipo != TipoEventoCicloVidaContrato.CANCELAMENTO_TRANSFERENCIA_GESTAO)
+                throw new IllegalStateException("Conferência de transferência não pertence a esta operação.");
+            var uso = conferencia.getUsoPermissaoExcepcional();
+            if (!Objects.equals(uso.getRecursoId(), contrato.getId()) || !"Contrato".equals(uso.getTipoRecurso())
+                    || !Objects.equals(uso.getUsuarioId(), evento.getUsuarioResponsavelId())
+                    || uso.getTipo() != com.example.siggtrat.dominio.acesso.TipoPermissaoExcepcional.TRANSFERENCIA_GESTAO_LOCAL)
+                throw new IllegalStateException("O uso da concessão não corresponde ao evento protegido.");
+            evento.registrarConferenciaDocumental(conferencia);
+        }
         EventoCicloVidaContrato salvo = eventoRepositorio.save(evento);
 
         if (precedente != null && acao.relacaoPrecedencia() != null) {
@@ -1052,8 +1074,18 @@ public class MotorTemporalContratoServico {
                 e.getVersaoNegocial(), e.getOrdemDocumental(), situacaoNoCorte,
                 e.getDataEfetiva(), e.getDataAto(), e.getRegistradoEm(),
                 e.getUsuarioResponsavelId(), e.getUsuarioResponsavelUsername(),
-                e.getMotivo(), e.getReferenciaSei(), e.getValorAnterior(), e.getValorNovo()
+                e.getMotivo(), e.getReferenciaSei(), e.getValorAnterior(), e.getValorNovo(),
+                paraConferenciaDocumentalDTO(e)
         );
+    }
+
+    public static ConferenciaDocumentalAtoDTO paraConferenciaDocumentalDTO(EventoCicloVidaContrato evento) {
+        if (evento == null || evento.getConferenciaDocumental() == null) return null;
+        var c = evento.getConferenciaDocumental();
+        var uso = c.getUsoPermissaoExcepcional();
+        return new ConferenciaDocumentalAtoDTO(c.getVersaoDeclaracao(), c.getDeclaracao(), c.getVersaoIntencao(),
+                c.getIntencaoCanonica(), c.getHashIntencao(), c.getAutorizacaoAdministrativaAto(),
+                uso == null ? null : uso.getId(), uso == null ? null : uso.getPermissao().getId());
     }
 
     public RelacaoPrecedenciaEventoContratoDTO paraRelacaoDTO(RelacaoPrecedenciaEventoContrato r) {

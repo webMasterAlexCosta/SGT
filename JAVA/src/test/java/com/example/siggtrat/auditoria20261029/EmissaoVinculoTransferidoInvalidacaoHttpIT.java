@@ -37,7 +37,8 @@ class EmissaoVinculoTransferidoInvalidacaoHttpIT extends ContratosHttpBase {
                     "dataInicio", preparacao),
                     201, "Vínculo canônico criado na Gestão de origem").path("id").asLong();
             conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-            JsonNode atualizado = enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(
+            JsonNode atualizado = enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                     "dataEfetiva", transferencia, "dataAto", preparacao,
                     "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                     "motivo", "Responsabilidade de B programada com mapeamento explícito",

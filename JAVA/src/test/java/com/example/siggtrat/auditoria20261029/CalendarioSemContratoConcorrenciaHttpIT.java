@@ -58,11 +58,11 @@ class CalendarioSemContratoConcorrenciaHttpIT extends AuditoriaHttpSuporte {
             Object resultado = invocacao.callRealMethod();
             if (evento != null && p.lotacaoId().equals(evento.getLotacaoId()) && primeira.compareAndSet(true, false)) {
                 assertNotNull(evento.getId(), "A barreira vem depois do INSERT real da primeira raiz");
-                primeiraFonteInserida.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                primeiraFonteInserida.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 if (!liberarPrimeira.await(25, TimeUnit.SECONDS)) throw new AssertionError("Barreira de concorrencia nao foi liberada.");
             }
             return resultado;
-        }).when(invalidacao).invalidarPorCalendario(isNull(), any(CalendarioEvento.class), anyString(), any(UsuarioAplicacao.class));
+        }).when(org.springframework.test.util.AopTestUtils.<InvalidacaoEmissaoRelatorioServico>getUltimateTargetObject(invalidacao)).invalidarPorCalendario(isNull(), any(CalendarioEvento.class), anyString(), any(UsuarioAplicacao.class));
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {
             Future<MvcResult> um = pool.submit(() -> mvc.perform(req1).andReturn());
@@ -73,10 +73,8 @@ class CalendarioSemContratoConcorrenciaHttpIT extends AuditoriaHttpSuporte {
             while (System.nanoTime() < limite) {
                 if (dois.isDone()) { observado = true; break; }
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexao).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexao).getSingleResult()).longValue());
                 if (esperas > 0) { observado = true; break; }
                 TimeUnit.MILLISECONDS.sleep(20);
             }

@@ -43,7 +43,11 @@ import java.util.*;
 
 @Service
 @Transactional(readOnly = true)
-public class RelatorioFrequenciaConsolidadoServico {
+public class RelatorioFrequenciaConsolidadoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioFrequenciaConsolidadoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final ZoneId ZONA = ZoneId.of("America/Sao_Paulo");
     private static final int LIMITE_DIAS = 366;

@@ -22,7 +22,11 @@ import java.util.*;
  * Contrato/Lotação/Turno/Cargo.
  */
 @Service
-public class ResolvedorContextoTemporalFrequenciaServico {
+public class ResolvedorContextoTemporalFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ResolvedorContextoTemporalFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public record Contexto(
             Pessoa pessoa,
             VinculoContratual vinculo,

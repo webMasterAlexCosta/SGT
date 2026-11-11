@@ -1,5 +1,9 @@
 package com.example.siggtrat.servico;
 
+import com.example.siggtrat.regra.MaterialHashEventos;
+import static com.example.siggtrat.regra.MaterialHashEventos.*;
+
+
 import com.example.siggtrat.dominio.alocacao.*;
 import com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo;
 import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
@@ -9,7 +13,6 @@ import com.example.siggtrat.regra.AssinaturaPreviaNegocial;
 import com.example.siggtrat.regra.RegraDisponibilidadeCatalogo;
 import com.example.siggtrat.repositorio.*;
 import com.example.siggtrat.utilitario.RelogioSistema;
-import com.example.siggtrat.utilitario.UtilitarioHashSeguranca;
 import jakarta.persistence.EntityManager;
 import jakarta.persistence.PersistenceContext;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,7 +33,11 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(readOnly = true)
-public class AlocacaoVinculoServico {
+public class AlocacaoVinculoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AlocacaoVinculoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public record CapacidadeInclusao(int efetivoPrevisto, long ocupacaoAtual,
                                      long ocupacaoAposInclusao, long excedenteAposInclusao,
                                      LocalDate primeiroDiaExcedente, LocalDate fimAvaliado, String assinaturaFaixa) {
@@ -75,10 +82,8 @@ public class AlocacaoVinculoServico {
             trechos = trechos == null ? List.of() : List.copyOf(trechos);
         }
         public String assinatura() {
-            return AssinaturaPreviaNegocial.sha256(List.of(
-                    String.valueOf(combinacao.lotacao().getId()), String.valueOf(combinacao.jornada().getId()),
-                    String.valueOf(combinacao.cargo().getId()), String.valueOf(inicio), String.valueOf(fim),
-                    AssinaturaPreviaNegocial.valor(capacidade.assinaturaFaixa())));
+            return AssinaturaPreviaNegocial.sha256("sgt.previa.ampliacao.v1", AssinaturaPreviaNegocial.partes(
+                    combinacao.lotacao().getId(), combinacao.jornada().getId(), combinacao.cargo().getId(), inicio, fim, capacidade.assinaturaFaixa()));
         }
     }
 
@@ -355,7 +360,7 @@ public class AlocacaoVinculoServico {
         CapacidadeInclusao c = maior.capacidade();
         return new AmpliacaoFim(maior.combinacao(), new CapacidadeInclusao(c.efetivoPrevisto(), c.ocupacaoAtual(),
                 c.ocupacaoAposInclusao(), c.excedenteAposInclusao(), primeiroExcedente, ate,
-                AssinaturaPreviaNegocial.sha256(assinaturas)), desde, ate, trechos);
+                AssinaturaPreviaNegocial.sha256("sgt.previa.ampliacao-trechos.v1", assinaturas)), desde, ate, trechos);
     }
 
     /** Varredura de fronteiras: uma consulta de ocupação e deltas, sem consulta para cada pessoa/dia. */
@@ -391,7 +396,7 @@ public class AlocacaoVinculoServico {
         datas.removeIf(d -> d.isBefore(inicio) || fim != null && d.isAfter(fim));
         CapacidadeInclusao maior = null;
         LocalDate primeiroExcedente = null;
-        List<String> assinatura = new ArrayList<>();
+        List<Object> assinatura = new ArrayList<>();
         for (LocalDate data : datas) {
             ocupacao += deltas.getOrDefault(data, 0L);
             var projetadas = composicaoTemporal.projetarEntidades(contrato, data, Instant.now());
@@ -406,11 +411,11 @@ public class AlocacaoVinculoServico {
             CapacidadeInclusao atual = new CapacidadeInclusao(previsto, ocupacao, apos, Math.max(0L, apos - previsto));
             if (atual.excede() && primeiroExcedente == null) primeiroExcedente = data;
             if (maior == null || atual.excedenteAposInclusao() > maior.excedenteAposInclusao()) maior = atual;
-            assinatura.add(data + ":" + previsto + ":" + ocupacao);
+            assinatura.add(AssinaturaPreviaNegocial.partes(data, previsto, ocupacao));
         }
         if (maior == null) return capacidadeInclusao(contrato, composicao, inicio);
         return new CapacidadeInclusao(maior.efetivoPrevisto(), maior.ocupacaoAtual(), maior.ocupacaoAposInclusao(),
-                maior.excedenteAposInclusao(), primeiroExcedente, fim, AssinaturaPreviaNegocial.sha256(assinatura));
+                maior.excedenteAposInclusao(), primeiroExcedente, fim, AssinaturaPreviaNegocial.sha256("sgt.previa.capacidade-faixa.v1", assinatura));
     }
 
     public CombinacaoResolvida resolverCombinacaoInicial(Contrato contrato, LocalDate dataEfetiva,
@@ -1471,19 +1476,14 @@ public class AlocacaoVinculoServico {
         LocalDate data = req.dataEfetiva();
         String hash = eventoRepositorio.findTopByVinculoIdOrderByRegistradoEmDescIdDesc(vinculo.getId())
                 .map(EventoAlocacaoVinculo::getHashEvento).orElse("SEM_EVENTO_ALOCACAO");
-        List<String> partes = new ArrayList<>(List.of(String.valueOf(vinculo.getId()), String.valueOf(vinculo.getVersion()),
-                AssinaturaPreviaNegocial.valor(data), AssinaturaPreviaNegocial.valor(alvo.composicao() == null ? null : alvo.composicao().getId()),
-                AssinaturaPreviaNegocial.valor(alvo.lotacao().getId()), AssinaturaPreviaNegocial.valor(alvo.jornada().getId()),
-                AssinaturaPreviaNegocial.valor(alvo.cargo().getId()), hash));
-        ativas(vinculo.getId()).forEach(a -> partes.add(a.getId() + ":" + a.getVersion() + ":" + a.getDataInicio() + ":" + a.getDataFim()));
+        List<Object> partes = new ArrayList<>(AssinaturaPreviaNegocial.partes(vinculo.getId(), vinculo.getVersion(), data,
+                alvo.composicao() == null ? null : alvo.composicao().getId(), alvo.lotacao().getId(), alvo.jornada().getId(), alvo.cargo().getId(), hash));
+        ativas(vinculo.getId()).forEach(a -> partes.add(AssinaturaPreviaNegocial.partes("ALOCACAO", a.getId(), a.getVersion(), a.getDataInicio(), a.getDataFim())));
         CapacidadeInclusao capacidade = capacidadeInclusao(vinculo, alvo, data);
-        partes.add("capacidade:" + capacidade.efetivoPrevisto() + ":" + capacidade.ocupacaoAtual());
-        partes.add(AssinaturaPreviaNegocial.valor(capacidade.assinaturaFaixa()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.justificativa()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.evidencia()));
-        partes.add(AssinaturaPreviaNegocial.valor(req.autorizacao()));
+        partes.add(AssinaturaPreviaNegocial.partes("CAPACIDADE", capacidade.efetivoPrevisto(), capacidade.ocupacaoAtual(), capacidade.assinaturaFaixa()));
+        partes.addAll(AssinaturaPreviaNegocial.partes(req.justificativa(), req.evidencia(), req.autorizacao()));
         if (assinaturaImpacto != null) partes.addAll(assinaturaImpacto.partesPorVinculo(vinculo, data, null));
-        return AssinaturaPreviaNegocial.sha256(partes);
+        return AssinaturaPreviaNegocial.sha256("sgt.previa.alocacao.v1", partes);
     }
 
     private void exigirAutorizacaoExcedente(UsuarioAplicacao usuario, AlteracaoAlocacaoVinculoRequisicao req,
@@ -1552,18 +1552,17 @@ public class AlocacaoVinculoServico {
         }
         String hashAnterior = precedente == null ? null : precedente.getHashEvento();
         evento.setHashAnterior(hashAnterior);
-        evento.setHashEvento(UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|",
-                AssinaturaPreviaNegocial.valor(hashAnterior), tipo.name(), AssinaturaPreviaNegocial.valor(dataEfetiva),
-                fotoTexto(anterior), fotoTexto(novaFoto), AssinaturaPreviaNegocial.valor(usuario == null ? null : usuario.getId()),
-                AssinaturaPreviaNegocial.valor(justificativa), AssinaturaPreviaNegocial.valor(transferencia == null ? null : transferencia.getId()))));
+        evento.setHashEvento(MaterialHashEventos.sha256("sgt.evento-alocacao.base",
+                texto(hashAnterior), enumeracao(tipo), data(dataEfetiva), fotoHash(anterior), fotoHash(novaFoto),
+                longo(usuario == null ? null : usuario.getId()), texto(justificativa),
+                longo(transferencia == null ? null : transferencia.getId())));
         if (capacidade != null && capacidade.excede()) {
             evento.setInclusaoExcedente(true);
             evento.setEfetivoPrevistoExcedente(capacidade.efetivoPrevisto());
             evento.setOcupacaoAposInclusaoExcedente(capacidade.ocupacaoAposInclusao());
-            evento.setHashEvento(UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|", evento.getHashEvento(),
-                    "EXCEDENTE", String.valueOf(capacidade.efetivoPrevisto()),
-                    String.valueOf(capacidade.ocupacaoAposInclusao()),
-                    AssinaturaPreviaNegocial.valor(evidencia), AssinaturaPreviaNegocial.valor(autorizacao))));
+            evento.setHashEvento(MaterialHashEventos.sha256("sgt.evento-alocacao.excedente",
+                    texto(evento.getHashEvento()), texto("EXCEDENTE"), inteiro(capacidade.efetivoPrevisto()),
+                    longo(capacidade.ocupacaoAposInclusao()), texto(evidencia), texto(autorizacao)));
         }
         return eventoRepositorio.save(evento);
     }
@@ -1602,11 +1601,10 @@ public class AlocacaoVinculoServico {
 
     private static String rotuloFotografado(String valor) { return valor == null || valor.isBlank() ? null : valor; }
 
-    private String fotoTexto(FotoAlocacao f) {
-        return f == null ? "" : String.join(":", AssinaturaPreviaNegocial.valor(f.id()), AssinaturaPreviaNegocial.valor(f.composicaoId()),
-                AssinaturaPreviaNegocial.valor(f.lotacaoId()), AssinaturaPreviaNegocial.valor(f.jornadaId()),
-                AssinaturaPreviaNegocial.valor(f.cargoId()), AssinaturaPreviaNegocial.valor(f.inicio()),
-                AssinaturaPreviaNegocial.valor(f.fim()), AssinaturaPreviaNegocial.valor(f.estado()));
+    private MaterialHashEventos.Campo fotoHash(FotoAlocacao f) {
+        return f == null ? grupo((MaterialHashEventos.Campo[]) null) : grupo(
+                longo(f.id()), longo(f.composicaoId()), longo(f.lotacaoId()), longo(f.jornadaId()), longo(f.cargoId()),
+                data(f.inicio()), data(f.fim()), enumeracao(f.estado()));
     }
 
     private boolean mesmaCombinacao(AlocacaoVinculo a, CombinacaoResolvida b) {

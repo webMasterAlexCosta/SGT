@@ -68,9 +68,9 @@ class ContraprovasPendenciasH04HttpIT extends ContratosHttpBase {
         assertThat(raiz1.path("status").asText()).isEqualTo("FOLGA");
         assertThat(raiz1.path("estado_auditoria").asText()).isEqualTo("SUJEITA_REVISAO");
         assertThat(raiz1.path("validade_operacional").asText()).isNotEqualTo("VALIDA");
-        assertThat(raiz1.path("bloqueada_edicao_operacional").asText()).isEqualTo("1");
+        assertThat(raiz1.path("bloqueada_edicao_operacional").asText()).isEqualTo("t");
         assertThat(raiz2.path("validade_operacional").asText()).isEqualTo("VALIDA");
-        assertThat(raiz2.path("bloqueada_edicao_operacional").asText()).isEqualTo("0");
+        assertThat(raiz2.path("bloqueada_edicao_operacional").asText()).isEqualTo("f");
         assertThat(raiz2).isEqualTo(linhaId(antesRetirada.path("frequencias"), f2, "id"));
         assertThat(revisao.path("pendencias")).hasSize(1);
         var pendencia = revisao.path("pendencias").get(0);
@@ -146,7 +146,8 @@ class ContraprovasPendenciasH04HttpIT extends ContratosHttpBase {
             em.persist(origem); em.flush(); return cargo.getId();
         });
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", t, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Transferência futura entre R1 e R2",
                 "referenciaSei", "SEI-H04-AUD006-004", "autorizacaoAdministrativa", "ATO-HTTP",
@@ -318,7 +319,7 @@ class ContraprovasPendenciasH04HttpIT extends ContratosHttpBase {
 
     private void registrar(String criterio, Map<String, Object> evidencia) throws Exception {
         evidencia.put("criterio", criterio); evidencia.put("resultado", "PASS"); evidencia.put("observadoEm", Instant.now());
-        evidencia.put("camada", "MockMvc + segurança real + JPA + MySQL; sem TCP/Chrome ou relógio simulado");
+        evidencia.put("camada", "MockMvc + segurança real + JPA + PostgreSQL; sem TCP/Chrome ou relógio simulado");
         var arquivo = Path.of("target/auditoria-http/h04-contraprovas/" + criterio + ".json");
         Files.createDirectories(arquivo.getParent());
         Files.writeString(arquivo, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(evidencia));

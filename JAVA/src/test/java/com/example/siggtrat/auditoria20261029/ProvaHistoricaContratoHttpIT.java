@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.ObservadorAtorPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.entidade.*;
 import com.example.siggtrat.servico.MotorTemporalContratoServico;
 import com.example.siggtrat.servico.ComposicaoContratualTemporalServico;
@@ -24,6 +27,8 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 /** Fontes são documentos sintéticos explícitos; nenhum dado mestre fornece a lacuna. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ProvaHistoricaContratoHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSourceObservador;
+
     @Autowired MotorTemporalContratoServico motor;
     @Autowired ComposicaoContratualTemporalServico composicaoTemporal;
 
@@ -128,7 +133,8 @@ class ProvaHistoricaContratoHttpIT extends ContratosHttpBase {
         var c=criarCenarioPersistido();var n=novo(c);
         conceder(c,n.id(),"TRANSFERENCIA_GESTAO_LOCAL");
         LocalDate data=RelogioSistema.hoje().minusDays(2);
-        var transferencia=mapa("dataEfetiva",data,"dataAto",RelogioSistema.hoje(),
+        var transferencia=mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva",data,"dataAto",RelogioSistema.hoje(),
                 "gestaoLocalDestinoId",c.gestaoB.getId(),"tipoContratacaoDestinoId",c.tipoB.getId(),
                 "motivo","Transferência sintética respaldada por documento original",
                 "referenciaSei","SEI-TRANSFERENCIA-SINTETICA","autorizacaoAdministrativa","ATO-HTTP",
@@ -259,24 +265,21 @@ class ProvaHistoricaContratoHttpIT extends ContratosHttpBase {
         try {
             var bloqueador=pool.submit(()->emTransacao(()->{
                 em.find(Contrato.class,n.id(),LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number)em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                conexaoBloqueadora.complete(((Number)em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 try {if(!liberar.await(20,TimeUnit.SECONDS))throw new AssertionError("Fixture excedeu espera de lock");}
                 catch(InterruptedException e){Thread.currentThread().interrupt();throw new IllegalStateException(e);}
                 return null;
             }));
             long conexao=conexaoBloqueadora.get(10,TimeUnit.SECONDS);
-            var primeiro=pool.submit(()->mvc.perform(pedido1).andReturn());
-            var segundo=pool.submit(()->mvc.perform(pedido2).andReturn());
-            long limite=System.nanoTime()+TimeUnit.SECONDS.toNanos(10);boolean esperaram=false;
-            while(System.nanoTime()<limite){
-                long esperas=emTransacao(()->((Number)em.createNativeQuery("select count(*) from performance_schema.data_lock_waits w "
-                        +"join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID where t.PROCESSLIST_ID=:c")
-                        .setParameter("c",conexao).getSingleResult()).longValue());
-                if(esperas>=2){esperaram=true;break;}
-                if(primeiro.isDone()||segundo.isDone())break;
-                Thread.sleep(25);
-            }
-            assertThat(esperaram).as("duas confirmações aguardaram a mesma raiz no MySQL real").isTrue();
+            var ator1=new Ator("confirmacao-contrato-1");var ator2=new Ator("confirmacao-contrato-2");
+            var primeiro=pool.submit(()->ator1.executar(()->mvc.perform(pedido1).andReturn()));
+            var segundo=pool.submit(()->ator2.executar(()->mvc.perform(pedido2).andReturn()));
+            var esperas=com.example.siggtrat.infra.EsperaJdbcPostgres.aguardarAmbos(
+                    new org.springframework.jdbc.core.JdbcTemplate(dataSourceObservador),conexao,
+                    ator1,sql->sql.selecaoChave("contrato","id_contrato",n.id()),
+                    ator2,sql->sql.selecaoChave("contrato","id_contrato",n.id()),
+                    "contrato/"+n.id(),primeiro,segundo);
+            assertThat(esperas).as("duas confirmações aguardaram a mesma raiz com alvo/JDBC exatos e somente atores conhecidos").isNotEmpty();
             liberar.countDown();bloqueador.get(10,TimeUnit.SECONDS);
             var a=primeiro.get(15,TimeUnit.SECONDS);var b=segundo.get(15,TimeUnit.SECONDS);
             assertThat(a.getResponse().getStatus()).isEqualTo(201);assertThat(b.getResponse().getStatus()).isEqualTo(201);

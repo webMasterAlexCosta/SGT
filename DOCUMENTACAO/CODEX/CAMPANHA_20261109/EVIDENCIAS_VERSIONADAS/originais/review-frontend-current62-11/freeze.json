@@ -1,0 +1,12 @@
+{
+  "state": "ACTIVE",
+  "source_manifest_sha256": "9f9dc22058b041b389938501abb97254aed04a5b0d539081bb381883b01ac80c",
+  "input_manifest_sha256": "afd85532bf46e1431f32ba0d7bf34a3ef8fc3f177b2f3f933a205dbf44751a1a",
+  "dist_manifest_sha256": "c833bbad9c1ed83bb52455a3db1e5dca27318f58f4f3a137e45e8d0d3c8e84e8",
+  "source_files": 2493,
+  "input_files": 21,
+  "dist_files": 102,
+  "jar_sha256": "7ae557a625ea9f35fd2db4644dc3f43d6ba568bdd6e1ed55caa2d4ccb701ac84",
+  "backend_gate24_sha256": "212a1483960b3725c2861515bcd194cb1f88c632fad663533221404a8f564397",
+  "no_changes_until_review_final": true
+}

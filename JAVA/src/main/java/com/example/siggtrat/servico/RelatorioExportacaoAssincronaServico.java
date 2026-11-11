@@ -34,7 +34,9 @@ import java.util.function.LongConsumer;
  * progresso para a interface consultar periodicamente.
  */
 @Service
-public class RelatorioExportacaoAssincronaServico {
+public class RelatorioExportacaoAssincronaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOGGER; }
+
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RelatorioExportacaoAssincronaServico.class);
     private static final long TOTAL_MAXIMO_ESTIMADO = 20_000_000L;
@@ -113,6 +115,14 @@ public class RelatorioExportacaoAssincronaServico {
         return tarefaDoUsuario(id).paraDto(armazenamentoTemporario);
     }
 
+    public ExportacaoRelatorioStatusDTO cancelar(UUID id) {
+        TarefaExportacao tarefa = tarefaDoUsuario(id);
+        if (tarefa.cancelar()) {
+            LOGGER.info("Cancelamento da exportação: relatorio={} formato={} id={}", tarefa.relatorio, tarefa.formato, tarefa.id);
+        }
+        return tarefa.paraDto(armazenamentoTemporario);
+    }
+
     /**
      * Autoriza o download ainda na thread HTTP autenticada e devolve um handle
      * imutável para a fase de streaming. O StreamingResponseBody é executado
@@ -144,8 +154,8 @@ public class RelatorioExportacaoAssincronaServico {
      * reconstruir 268 mil registros.
      */
     public void transferirArquivo(TransferenciaExportacao transferencia, OutputStream destino) throws IOException {
-        if (transferencia == null) throw new IllegalArgumentException("Transferência da exportação é obrigatória.");
-        if (destino == null) throw new IllegalArgumentException("Destino da exportação é obrigatório.");
+        if (transferencia == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Transferência da exportação é obrigatória.");
+        if (destino == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Destino da exportação é obrigatório.");
 
         TarefaExportacao tarefa = tarefas.get(transferencia.id());
         if (tarefa == null) throw new IOException("Exportação não encontrada ou expirada durante o download.");
@@ -241,8 +251,9 @@ public class RelatorioExportacaoAssincronaServico {
             if (arquivoGerado != null) armazenamentoTemporario.excluir(arquivoGerado);
             if (tarefa.arquivo != null) armazenamentoTemporario.excluir(tarefa.arquivo);
             tarefa.falhar(e);
-            LOGGER.error("Falha na exportação {} ({}) id={}: {}",
-                    tarefa.relatorio, tarefa.formato, tarefa.id, e.getMessage(), e);
+            if (!(e instanceof java.util.concurrent.CancellationException && tarefa.status == Status.CANCELADO)) {
+                LOGGER.error("Falha na exportação: relatorio={} formato={} id={} falha={}", tarefa.relatorio, tarefa.formato, tarefa.id, com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
+            }
         } finally {
             SecurityContextHolder.setContext(anterior);
         }
@@ -317,6 +328,7 @@ public class RelatorioExportacaoAssincronaServico {
         CONCLUIDO,
         BAIXANDO,
         BAIXADO,
+        CANCELADO,
         FALHA
     }
 
@@ -352,7 +364,8 @@ public class RelatorioExportacaoAssincronaServico {
             this.totalEstimado = new AtomicLong(totalEstimado);
         }
 
-        private void iniciarProcessamento() {
+        private synchronized void iniciarProcessamento() {
+            exigirNaoCancelada();
             status = Status.PROCESSANDO;
             etapa = "Processando dados";
             mensagem = "Os dados do relatório estão sendo processados.";
@@ -360,7 +373,8 @@ public class RelatorioExportacaoAssincronaServico {
             atualizadoEm = iniciadoEm;
         }
 
-        private void registrarLote(long quantidade) {
+        private synchronized void registrarLote(long quantidade) {
+            exigirNaoCancelada();
             long atual = processados.addAndGet(Math.max(0L, quantidade));
             long total = totalEstimado.get();
             if (total > 0 && atual >= total) {
@@ -373,7 +387,8 @@ public class RelatorioExportacaoAssincronaServico {
             atualizadoEm = Instant.now();
         }
 
-        private void concluir(Path arquivo, long tamanhoBytes) {
+        private synchronized void concluir(Path arquivo, long tamanhoBytes) {
+            exigirNaoCancelada();
             this.arquivo = arquivo;
             this.tamanhoBytes = Math.max(0L, tamanhoBytes);
             long atual = processados.get();
@@ -384,21 +399,36 @@ public class RelatorioExportacaoAssincronaServico {
             atualizadoEm = Instant.now();
         }
 
-        private void falhar(Exception erro) {
+        private synchronized void falhar(Exception erro) {
+            if (status == Status.CANCELADO) return;
             status = Status.FALHA;
             etapa = "Falha na exportação";
-            String detalhe = erro == null ? "" : erro.getMessage();
-            mensagem = detalhe == null || detalhe.isBlank()
-                    ? "Não foi possível concluir o relatório. Tente novamente."
-                    : "Não foi possível concluir o relatório: " + detalhe;
+            mensagem = com.example.siggtrat.diagnostico.MensagemFalhaAssincrona.criar(
+                    "a exportação do relatório", "EXPORTACAO-" + id, erro);
             atualizadoEm = Instant.now();
+        }
+
+        private synchronized boolean cancelar() {
+            if (status == Status.CANCELADO) return false;
+            if (status != Status.NA_FILA && status != Status.PROCESSANDO) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT, "Somente exportação em andamento pode ser cancelada.");
+            }
+            status = Status.CANCELADO;
+            etapa = "Exportação cancelada";
+            mensagem = "A exportação foi cancelada. Você pode solicitar um novo arquivo.";
+            atualizadoEm = Instant.now();
+            return true;
+        }
+
+        private void exigirNaoCancelada() {
+            if (status == Status.CANCELADO) throw new java.util.concurrent.CancellationException("Exportação cancelada pelo proprietário.");
         }
 
         private boolean emAndamento() {
             return status == Status.NA_FILA || status == Status.PROCESSANDO || status == Status.BAIXANDO;
         }
 
-        private ExportacaoRelatorioStatusDTO paraDto(ArmazenamentoTemporarioRelatorioServico armazenamento) {
+        private synchronized ExportacaoRelatorioStatusDTO paraDto(ArmazenamentoTemporarioRelatorioServico armazenamento) {
             long quantidade = processados.get();
             long total = totalEstimado.get();
             int percentual = percentual(quantidade, total);

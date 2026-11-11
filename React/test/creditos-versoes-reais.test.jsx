@@ -3,7 +3,7 @@ import { afterEach, describe, expect, it } from 'vitest';
 import { cleanup, render, screen } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 import manifesto from '../package.json';
-import { ModalCreditosColaboracao } from '../src/core/ui/ModalCreditosColaboracao.jsx';
+import { ModalCreditosColaboracao } from '../src/core/ui/ModalCreditosColaboracao.tsx';
 
 afterEach(cleanup);
 
@@ -32,13 +32,14 @@ describe('créditos correspondem à candidata distribuída', () => {
     expect.soft(screen.queryByText(/^Apache HttpClient /)).not.toBeInTheDocument();
   });
 
-  it('identifica Java 17 e Spring Boot 3.5.16 da candidata operacional', () => {
+  it('identifica Java 25 e Spring Boot 4.1.2 da toolchain atual', () => {
     abrir();
-    expect.soft(screen.queryByText('Java 17', { exact: true })).toBeInTheDocument();
-    expect.soft(screen.queryByText('Compilação Java 17', { exact: true })).toBeInTheDocument();
-    expect.soft(screen.queryByText('Spring Boot 3.5.16', { exact: true })).toBeInTheDocument();
-    expect.soft(screen.queryByText(/Java 25/)).not.toBeInTheDocument();
+    expect.soft(screen.queryByText('Java 25', { exact: true })).toBeInTheDocument();
+    expect.soft(screen.queryByText('Compilação Java 25', { exact: true })).toBeInTheDocument();
+    expect.soft(screen.queryByText('Spring Boot 4.1.2', { exact: true })).toBeInTheDocument();
+    expect.soft(screen.queryByText(/Java 17/)).not.toBeInTheDocument();
     expect.soft(screen.queryByText('Spring Boot 4.1.0', { exact: true })).not.toBeInTheDocument();
+    expect.soft(screen.queryByText('Spring Boot 3.5.16', { exact: true })).not.toBeInTheDocument();
   });
 
   it('mostra a versão do frontend, sem usar o ano como número de versão', () => {

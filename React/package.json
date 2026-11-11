@@ -3,16 +3,17 @@
   "private": true,
   "version": "1.4.4-operacional.20261101",
   "type": "module",
-  "packageManager": "npm@10.9.2",
+  "packageManager": "npm@12.2.2",
   "engines": {
-    "node": ">=22.16.0 <23"
+    "node": "26.13.0",
+    "npm": "12.2.2"
   },
   "scripts": {
     "dev": "vite",
-    "build": "vite build",
+    "build": "npm run typecheck && vite build",
     "preview": "vite preview",
-    "build:java": "node scripts/bloquear-mutacao-backend.mjs",
-    "sync:java": "node scripts/bloquear-mutacao-backend.mjs",
+    "build:java": "npm run build && npm run sync:java",
+    "sync:java": "node scripts/sincronizar-java.mjs --execute",
     "diagnostico:dependencias": "node scripts/verificar-dependencias-locais.mjs",
     "test:preparacao": "node --test test/preparacao-local.test.mjs",
     "dependencias:verificar": "node scripts/verificar-dependencias-locais.mjs",
@@ -21,7 +22,9 @@
     "test": "vitest run --config vitest.config.js",
     "test:watch": "vitest --config vitest.config.js",
     "test:coverage": "vitest run --config vitest.config.js --coverage",
-    "test:completo": "npm run test:preparacao && npm run test:coverage && npm run build"
+    "test:completo": "npm run test:preparacao && npm run test:coverage && npm run build",
+    "typecheck": "tsc --noEmit",
+    "sync:java:check": "node scripts/sincronizar-java.mjs --dry-run"
   },
   "dependencies": {
     "@vladmandic/face-api": "1.7.15",
@@ -38,10 +41,13 @@
   "devDependencies": {
     "@testing-library/jest-dom": "6.9.1",
     "@testing-library/react": "16.3.3",
+    "@types/react": "19.2.18",
+    "@types/react-dom": "19.2.7",
     "@vitejs/plugin-basic-ssl": "2.3.0",
     "@vitejs/plugin-react": "6.1.1",
     "@vitest/coverage-v8": "4.1.12",
     "jsdom": "27.4.0",
+    "typescript": "5.9.3",
     "vite": "8.2.4",
     "vitest": "4.1.12"
   },

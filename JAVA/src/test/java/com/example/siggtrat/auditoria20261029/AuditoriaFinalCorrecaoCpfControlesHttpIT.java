@@ -6,6 +6,11 @@ import com.example.siggtrat.entidade.Pessoa;
 import com.example.siggtrat.servico.PessoaServico;
 import com.example.siggtrat.utilitario.RelogioSistema;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import javax.sql.DataSource;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.jdbc.core.JdbcTemplate;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -35,12 +40,13 @@ import static org.mockito.Mockito.doAnswer;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 
 /**
- * PER-007:002 / COL-005 / COL-006 / COL-007: correção excepcional usa HTTP real,
- * JPA e MySQL. O spy chama PessoaServico real e apenas retém o retorno até que
+ * PER-007:002 / COL-005 / COL-006 / COL-007: correção excepcional usa MockMvc,
+ * JPA e PostgreSQL. O spy chama PessoaServico real e apenas retém o retorno até que
  * outra transação esteja bloqueada na identidade persistida ainda sem commit.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
+    @Autowired private DataSource dataSource;
     @MockitoSpyBean PessoaServico pessoaServico;
 
     @Test
@@ -111,6 +117,10 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
         var threadA = new AtomicReference<Thread>();
         var threadB = new AtomicReference<Thread>();
         var liberarCommit = new CountDownLatch(1);
+        var atorA=new Ator("cpf-A");var atorB=new Ator("cpf-B");
+        // Configurar o spy subjacente, sem executar advice/getters com matchers pendentes.
+        PessoaServico pessoaSpy=org.springframework.test.util.AopTestUtils.getUltimateTargetObject(pessoaServico);
+        assertThat(org.mockito.Mockito.mockingDetails(pessoaSpy).isSpy()).isTrue();
         doAnswer(invocacao -> {
             long pessoa = invocacao.getArgument(0, Long.class);
             if (pessoa != pessoaA && pessoa != pessoaB) return invocacao.callRealMethod();
@@ -118,7 +128,7 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
             try {
                 assertThat(TransactionSynchronizationManager.isActualTransactionActive())
                         .as("O spy está dentro da transação real do HTTP, antes do commit").isTrue();
-                long conexaoEntrada = ((Number) em.createNativeQuery("select connection_id()")
+                long conexaoEntrada = ((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue();
                 etapa.set("ENTROU_SERVICO_REAL");
                 if (pessoa == pessoaB) conexaoSegunda.complete(conexaoEntrada);
@@ -127,7 +137,7 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
                 if (pessoa == pessoaB) return resposta;
                 em.flush();
                 assertThat(TransactionSynchronizationManager.isActualTransactionActive()).isTrue();
-                long conexaoAposFlush = ((Number) em.createNativeQuery("select connection_id()")
+                long conexaoAposFlush = ((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue();
                 assertThat(conexaoAposFlush).as("A permanece na mesma transação/conexão até o flush")
                         .isEqualTo(conexaoEntrada);
@@ -142,7 +152,7 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
                 (pessoa == pessoaA ? conexaoBloqueadora : conexaoSegunda).completeExceptionally(falha);
                 throw falha;
             }
-        }).when(pessoaServico).corrigirIdentidade(anyLong(), any(CorrecaoIdentidadePessoaRequisicao.class));
+        }).when(pessoaSpy).corrigirIdentidade(anyLong(), any(CorrecaoIdentidadePessoaRequisicao.class));
 
         var executor = Executors.newFixedThreadPool(2);
         Instant inicio = Instant.now().minusSeconds(1);
@@ -154,18 +164,18 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
         try {
             a = executor.submit(() -> {
                 threadA.set(Thread.currentThread()); etapaA.set("HTTP_INICIADO");
-                return mvc.perform(httpA).andReturn();
+                return atorA.executar(() -> mvc.perform(httpA).andReturn());
             });
             long bloqueador = conexaoBloqueadora.get(15, TimeUnit.SECONDS);
             b = executor.submit(() -> {
                 threadB.set(Thread.currentThread()); etapaB.set("HTTP_INICIADO");
-                return mvc.perform(httpB).andReturn();
+                return atorB.executar(() -> mvc.perform(httpB).andReturn());
             });
             try {
                 long solicitante = conexaoSegunda.get(10, TimeUnit.SECONDS);
                 assertThat(solicitante).as("B entrou no serviço real usando uma conexão independente")
                         .isNotEqualTo(bloqueador);
-                aguardarDisputaDeIdentidade(bloqueador, solicitante, a, b);
+                aguardarDisputaDeIdentidade(bloqueador, solicitante, atorB, destino, pessoaB, antesB.empregadoId(), a, b);
                 gateConfirmado = true;
             } catch (Throwable falhaGate) {
                 diagnosticarEspera(bloqueador, conexaoSegunda, etapaA.get(), etapaB.get(), threadA.get(), threadB.get());
@@ -234,97 +244,34 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
         });
     }
 
-    private void aguardarDisputaDeIdentidade(long bloqueador, long solicitante,
-                                             Future<?> a, Future<?> b) throws Exception {
-        // O THREAD_ID de um lock RECORD implícito materializado pode pertencer
-        // a outro executor (MySQL bug 104431). Correlacionamos os donos pelo
-        // ENGINE_TRANSACTION_ID e pelos locks TABLE/IX explícitos que cada
-        // conexão adquiriu antes de alterar Pessoa/Empregado. Assim não precisamos
-        // de INNODB_TRX/PROCESS e não confundimos criador da estrutura com dono.
-        // https://dev.mysql.com/doc/refman/8.0/en/innodb-locking.html
-        // https://dev.mysql.com/doc/refman/8.0/en/performance-schema-data-locks-table.html
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        List<Object[]> esperas = List.of();
-        do {
-            esperas = tx(() -> em.createNativeQuery("""
-                    select distinct retentor.PROCESSLIST_ID as conexao_bloqueadora,
-                           requisitante.PROCESSLIST_ID as conexao_solicitante,
-                           cast(w.BLOCKING_ENGINE_TRANSACTION_ID as char) as transacao_bloqueadora,
-                           cast(w.REQUESTING_ENGINE_TRANSACTION_ID as char) as transacao_solicitante,
-                           l.OBJECT_NAME as tabela_solicitada, l.INDEX_NAME as indice_solicitado,
-                           l.LOCK_TYPE as tipo_lock_solicitado, l.LOCK_STATUS as estado_lock_solicitado,
-                           ancora_retida.LOCK_MODE as intencao_conexao_bloqueadora,
-                           ancora_solicitada.LOCK_MODE as intencao_conexao_solicitante,
-                           detido.LOCK_STATUS as estado_lock_bloqueador
-                    from performance_schema.data_lock_waits w
-                    join performance_schema.data_locks ancora_retida
-                        on ancora_retida.ENGINE_TRANSACTION_ID=w.BLOCKING_ENGINE_TRANSACTION_ID
-                        and ancora_retida.ENGINE=w.ENGINE and ancora_retida.LOCK_TYPE='TABLE'
-                        and ancora_retida.LOCK_STATUS='GRANTED' and ancora_retida.LOCK_MODE='IX'
-                    join performance_schema.threads retentor on retentor.THREAD_ID=ancora_retida.THREAD_ID
-                    join performance_schema.data_locks ancora_solicitada
-                        on ancora_solicitada.ENGINE_TRANSACTION_ID=w.REQUESTING_ENGINE_TRANSACTION_ID
-                        and ancora_solicitada.ENGINE=w.ENGINE and ancora_solicitada.LOCK_TYPE='TABLE'
-                        and ancora_solicitada.LOCK_STATUS='GRANTED' and ancora_solicitada.LOCK_MODE='IX'
-                    join performance_schema.threads requisitante on requisitante.THREAD_ID=ancora_solicitada.THREAD_ID
-                    join performance_schema.data_locks l
-                        on l.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID and l.ENGINE=w.ENGINE
-                        and l.ENGINE_TRANSACTION_ID=w.REQUESTING_ENGINE_TRANSACTION_ID
-                    join performance_schema.data_locks detido
-                        on detido.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID and detido.ENGINE=w.ENGINE
-                        and detido.ENGINE_TRANSACTION_ID=w.BLOCKING_ENGINE_TRANSACTION_ID
-                    where retentor.PROCESSLIST_ID=:bloqueador
-                        and requisitante.PROCESSLIST_ID=:solicitante
-                        and w.BLOCKING_ENGINE_TRANSACTION_ID<>w.REQUESTING_ENGINE_TRANSACTION_ID
-                        and l.OBJECT_SCHEMA=database()
-                        and l.OBJECT_NAME in ('pessoa','empregado')
-                        and l.LOCK_TYPE='RECORD' and l.LOCK_STATUS='WAITING'
-                        and ancora_retida.OBJECT_SCHEMA=l.OBJECT_SCHEMA
-                        and ancora_retida.OBJECT_NAME=l.OBJECT_NAME
-                        and ancora_solicitada.OBJECT_SCHEMA=l.OBJECT_SCHEMA
-                        and ancora_solicitada.OBJECT_NAME=l.OBJECT_NAME
-                        and detido.LOCK_TYPE='RECORD' and detido.LOCK_STATUS='GRANTED'
-                        and detido.OBJECT_SCHEMA=l.OBJECT_SCHEMA
-                        and detido.OBJECT_NAME=l.OBJECT_NAME and detido.INDEX_NAME=l.INDEX_NAME
-                        and exists (
-                            select 1 from information_schema.statistics indice
-                            where indice.TABLE_SCHEMA=l.OBJECT_SCHEMA and indice.TABLE_NAME=l.OBJECT_NAME
-                                and indice.INDEX_NAME=l.INDEX_NAME and indice.NON_UNIQUE=0
-                            group by indice.INDEX_NAME
-                            having count(*)=1 and max(indice.COLUMN_NAME)='cpf'
-                        )
-                    """, Object[].class).setParameter("bloqueador", bloqueador)
-                    .setParameter("solicitante", solicitante).getResultList());
-            assertThat(a.isDone()).as("Vencedora continua aguardando liberação, sem commit antecipado").isFalse();
-            assertThat(b.isDone()).as("Perdedora está em curso, aguardando a identidade ainda não confirmada").isFalse();
-            if (!esperas.isEmpty()) break;
-            // A aprovação depende da aresta e dos locks observados, não do tempo decorrido.
-            TimeUnit.MILLISECONDS.sleep(50);
-        } while (System.nanoTime() < limite);
-        assertThat(esperas).as("MySQL deve comprovar que a transação de B espera a transação de A no CPF único")
-                .isNotEmpty();
-        for (Object[] espera : esperas) {
-            assertThat(((Number) espera[0]).longValue()).as("Dono do lock retido é a conexão A").isEqualTo(bloqueador);
-            assertThat(((Number) espera[1]).longValue()).as("Dono do lock solicitado é a conexão B").isEqualTo(solicitante);
-            assertThat(espera[2].toString()).matches("[0-9]+").isNotEqualTo(espera[3].toString());
-            assertThat(espera[3].toString()).matches("[0-9]+");
-            assertThat(espera[4].toString()).isIn("pessoa", "empregado");
-            assertThat(espera[5]).as("O índice persistido é único e composto somente por CPF").isNotNull();
-            assertThat(espera[6]).isEqualTo("RECORD");
-            assertThat(espera[7]).isEqualTo("WAITING");
-            assertThat(espera[8]).as("Lock de intenção explícito liga a transação à conexão A").isEqualTo("IX");
-            assertThat(espera[9]).as("Lock de intenção explícito liga a transação à conexão B").isEqualTo("IX");
-            assertThat(espera[10]).isEqualTo("GRANTED");
+    private void aguardarDisputaDeIdentidade(long bloqueador,long solicitante,Ator atorB,
+            String destino,long pessoaB,long empregadoB,Future<?> a,Future<?> b) throws Exception {
+        var jdbc=new JdbcTemplate(dataSource);
+        var indicesPessoa=EsperaJdbcPostgres.indicesUnicosDaColuna(jdbc,"pessoa","cpf");
+        var indicesEmpregado=EsperaJdbcPostgres.indicesUnicosDaColuna(jdbc,"empregado","cpf");
+        assertThat(indicesPessoa).as("UNIQUE física simples de CPF em Pessoa").isNotEmpty();
+        assertThat(indicesEmpregado).as("UNIQUE física simples de CPF em Empregado").isNotEmpty();
+        var esperas=EsperaJdbcPostgres.aguardar(jdbc,bloqueador,atorB,
+                sql->sql.atualizacao("pessoa","cpf",destino,"id_pessoa",pessoaB)
+                        ||sql.atualizacao("empregado","cpf",destino,"id_empregado",empregadoB),
+                "UPDATE de CPF único da identidade B",b);
+        assertThat(a.isDone()).as("Vencedora aguarda liberação sem commit antecipado").isFalse();
+        assertThat(b.isDone()).as("Perdedora aguarda a identidade ainda não confirmada").isFalse();
+        for(var espera:esperas) {
+            assertThat(((Number)espera.get("solicitante")).longValue()).isEqualTo(solicitante);
+            assertThat(((Number)espera.get("bloqueador")).longValue()).isEqualTo(bloqueador);
+            assertThat(espera.get("transacao_bloqueadora").toString()).matches("[0-9]+");
+            assertThat(espera.get("transacao_solicitante").toString()).matches("[0-9]+")
+                    .isNotEqualTo(espera.get("transacao_bloqueadora").toString());
+            assertThat(espera.get("recurso_postgres")).isEqualTo("transactionid");
+            assertThat(espera.get("solicitado_concedido")).isEqualTo(false);
+            assertThat(espera.get("bloqueador_concedido")).isEqualTo(true);
         }
-        // Evidência sanitizada do gate, sem CPF, lock_data, SQL de negócio ou credenciais.
-        System.out.println("CPF_CONCORRENCIA_PROVA_DONOS " + json(mapa(
-                "conexaoA", bloqueador, "conexaoB", solicitante,
-                "ambosFuturesPendentes", !a.isDone() && !b.isDone(),
-                "colunas", List.of("conexaoDonoBloqueador", "conexaoDonoSolicitante", "transacaoBloqueadora",
-                        "transacaoSolicitante", "tabela", "indiceCpfUnico", "tipoLockSolicitado",
-                        "estadoLockSolicitado", "intencaoConexaoBloqueadora", "intencaoConexaoSolicitante",
-                        "estadoLockBloqueador"),
-                "arestas", esperas)));
+        System.out.println("CPF_CONCORRENCIA_PROVA_DONOS "+json(mapa(
+                "conexaoA",bloqueador,"conexaoB",solicitante,"ambosFuturesPendentes",true,
+                "indicesCpfPessoa",indicesPessoa,"indicesCpfEmpregado",indicesEmpregado,
+                "arestas",esperas,
+                "limite","Índices confirmados no catálogo e CPF/chave associados pelo JDBC; pg_locks fornece o recurso de transação, não o nome do índice.")));
     }
 
     private void diagnosticarEspera(long bloqueador, CompletableFuture<Long> segunda,
@@ -333,43 +280,20 @@ class AuditoriaFinalCorrecaoCpfControlesHttpIT extends ContratosHttpBase {
         // As arestas completas ajudam a distinguir um lock anterior do filtro
         // restrito às identidades sem transformar esse outro lock em aprovação.
         List<Object[]> arestas = tx(() -> em.createNativeQuery("""
-                select distinct retentor.PROCESSLIST_ID as conexao_dono_bloqueador,
-                       requisitante.PROCESSLIST_ID as conexao_dono_solicitante,
-                       cast(w.BLOCKING_ENGINE_TRANSACTION_ID as char) as transacao_bloqueadora,
-                       cast(w.REQUESTING_ENGINE_TRANSACTION_ID as char) as transacao_solicitante,
-                       w.BLOCKING_THREAD_ID as thread_criador_estrutura_bloqueadora,
-                       w.REQUESTING_THREAD_ID as thread_criador_estrutura_solicitante,
-                       l.OBJECT_NAME as tabela_solicitada, l.INDEX_NAME as indice_solicitado,
-                       l.LOCK_TYPE as tipo_lock_solicitado, l.LOCK_STATUS as estado_lock_solicitado,
-                       detido.LOCK_STATUS as estado_lock_bloqueador,
-                       case when l.OBJECT_SCHEMA=database() then 1 else 0 end as mesmo_banco
-                from performance_schema.data_lock_waits w
-                left join performance_schema.data_locks l on l.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID
-                    and l.ENGINE=w.ENGINE
-                left join performance_schema.data_locks detido on detido.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID
-                    and detido.ENGINE=w.ENGINE
-                left join performance_schema.data_locks ancora_retida
-                    on ancora_retida.ENGINE_TRANSACTION_ID=w.BLOCKING_ENGINE_TRANSACTION_ID
-                    and ancora_retida.ENGINE=w.ENGINE and ancora_retida.LOCK_TYPE='TABLE'
-                    and ancora_retida.LOCK_STATUS='GRANTED' and ancora_retida.LOCK_MODE in ('IS','IX')
-                    and ancora_retida.OBJECT_SCHEMA=l.OBJECT_SCHEMA and ancora_retida.OBJECT_NAME=l.OBJECT_NAME
-                left join performance_schema.threads retentor on retentor.THREAD_ID=ancora_retida.THREAD_ID
-                left join performance_schema.data_locks ancora_solicitada
-                    on ancora_solicitada.ENGINE_TRANSACTION_ID=w.REQUESTING_ENGINE_TRANSACTION_ID
-                    and ancora_solicitada.ENGINE=w.ENGINE and ancora_solicitada.LOCK_TYPE='TABLE'
-                    and ancora_solicitada.LOCK_STATUS='GRANTED' and ancora_solicitada.LOCK_MODE in ('IS','IX')
-                    and ancora_solicitada.OBJECT_SCHEMA=l.OBJECT_SCHEMA and ancora_solicitada.OBJECT_NAME=l.OBJECT_NAME
-                left join performance_schema.threads requisitante on requisitante.THREAD_ID=ancora_solicitada.THREAD_ID
-                order by transacao_bloqueadora, transacao_solicitante
-                """, Object[].class).getResultList());
+                select a.pid,p.pid,a.backend_xid::text,r.backend_xid::text,
+                       a.wait_event_type,a.wait_event,l.locktype,l.mode,l.granted,l.transactionid::text
+                  from pg_stat_activity a
+                  cross join lateral unnest(pg_blocking_pids(a.pid)) p(pid)
+                  left join pg_stat_activity r on r.pid=p.pid
+                  left join pg_locks l on l.pid=a.pid and not l.granted
+                 where a.datname=current_database() and (a.pid=:raiz or p.pid=:raiz)
+                """,Object[].class).setParameter("raiz",bloqueador).getResultList());
         Object conexaoB = segunda.isDone() && !segunda.isCompletedExceptionally() ? segunda.getNow(null) : null;
         Map<String, Object> diagnostico = new LinkedHashMap<>();
         diagnostico.put("conexaoA", bloqueador); diagnostico.put("conexaoB", conexaoB);
         diagnostico.put("etapaA", etapaA); diagnostico.put("etapaB", etapaB);
-        diagnostico.put("colunasArestas", List.of("conexaoDonoBloqueador", "conexaoDonoSolicitante",
-                "transacaoBloqueadora", "transacaoSolicitante", "threadCriadorEstruturaBloqueadora",
-                "threadCriadorEstruturaSolicitante", "tabela", "indice", "tipoLockSolicitado",
-                "estadoLockSolicitado", "estadoLockBloqueador", "mesmoBancoDoObservador"));
+        diagnostico.put("colunasArestas",List.of("solicitante","bloqueador","xidSolicitante","xidBloqueador",
+                "waitEventType","waitEvent","recursoPG","modoSolicitado","concedido","transactionId"));
         diagnostico.put("arestasSemDadosDeNegocio", arestas);
         diagnostico.put("workerA", estadoThread(a)); diagnostico.put("workerB", estadoThread(b));
         System.out.println("CPF_CONCORRENCIA_DIAGNOSTICO " + json(diagnostico));

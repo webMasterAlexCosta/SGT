@@ -24,13 +24,13 @@ public final class UtilitarioHorario {
         if (valor == null || valor.isBlank()) return null;
         String limpo = valor.trim();
         if (!HORARIO.matcher(limpo).matches()) {
-            throw new IllegalArgumentException(nomeCampo(campo) + " deve estar no formato HH:mm, entre 00:00 e 23:59.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(nomeCampo(campo) + " deve estar no formato HH:mm, entre 00:00 e 23:59.");
         }
         try {
             LocalTime.parse(limpo, FORMATTER);
             return limpo;
         } catch (DateTimeParseException ex) {
-            throw new IllegalArgumentException(nomeCampo(campo) + " contém um horário inválido.", ex);
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(nomeCampo(campo) + " contém um horário inválido.", ex);
         }
     }
 
@@ -47,19 +47,19 @@ public final class UtilitarioHorario {
             long horas = Long.parseLong(matcher.group(1));
             long minutos = Long.parseLong(matcher.group(2));
             long total = Math.addExact(Math.multiplyExact(horas, 60L), minutos);
-            if (total > Integer.MAX_VALUE) throw new IllegalArgumentException(nomeCampo(campo) + " excede o limite permitido.");
+            if (total > Integer.MAX_VALUE) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(nomeCampo(campo) + " excede o limite permitido.");
             return (int) total;
         }
         if (DECIMAL.matcher(limpo).matches()) {
             double horas = Double.parseDouble(limpo.replace(',', '.'));
             if (!Double.isFinite(horas) || horas < 0) {
-                throw new IllegalArgumentException(nomeCampo(campo) + " contém uma duração inválida.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(nomeCampo(campo) + " contém uma duração inválida.");
             }
             double total = horas * 60.0;
-            if (total > Integer.MAX_VALUE) throw new IllegalArgumentException(nomeCampo(campo) + " excede o limite permitido.");
+            if (total > Integer.MAX_VALUE) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(nomeCampo(campo) + " excede o limite permitido.");
             return (int) Math.round(total);
         }
-        throw new IllegalArgumentException(nomeCampo(campo) + " deve usar HH:mm ou horas decimais não negativas.");
+        throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(nomeCampo(campo) + " deve usar HH:mm ou horas decimais não negativas.");
     }
 
     public static long calcularIntervaloMinutos(String entrada, String saida, String campoEntrada, String campoSaida) {
@@ -67,7 +67,7 @@ public final class UtilitarioHorario {
         String saidaNormalizada = normalizarHorario(saida, campoSaida);
         if (entradaNormalizada == null && saidaNormalizada == null) return 0;
         if (entradaNormalizada == null || saidaNormalizada == null) {
-            throw new IllegalArgumentException("Informe " + nomeCampo(campoEntrada) + " e " + nomeCampo(campoSaida) + " em conjunto.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe " + nomeCampo(campoEntrada) + " e " + nomeCampo(campoSaida) + " em conjunto.");
         }
         LocalTime ent = LocalTime.parse(entradaNormalizada, FORMATTER);
         LocalTime sai = LocalTime.parse(saidaNormalizada, FORMATTER);

@@ -5,6 +5,8 @@ import com.example.siggtrat.dto.MensagemApiDTO;
 import com.example.siggtrat.dto.ConfiguracaoSistemaDTO;
 import com.example.siggtrat.dto.ConfiguracaoPublicaSistemaDTO;
 import com.example.siggtrat.entidade.ConfiguracaoSistema;
+import com.example.siggtrat.regra.MaterialHashEventos;
+import com.example.siggtrat.regra.AssinaturaPreviaNegocial;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.example.siggtrat.repositorio.ConfiguracaoSistemaRepositorio;
 import org.springframework.stereotype.Service;
@@ -19,7 +21,11 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
-public class ConfiguracaoSistemaServico {
+public class ConfiguracaoSistemaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ConfiguracaoSistemaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final DateTimeFormatter HORA_FORMAT = DateTimeFormatter.ofPattern("HH:mm")
             .withResolverStyle(ResolverStyle.STRICT);
     private static final Set<String> CHAVES_EDITAVEIS = Set.of(
@@ -55,14 +61,17 @@ public class ConfiguracaoSistemaServico {
 
     @Transactional(readOnly = true)
     public List<ConfiguracaoSistemaDTO> listar() {
-        return repositorio.findAll().stream().map(this::paraDTO).toList();
+        return repositorio.findAll().stream()
+                .filter(c -> !MaterialHashEventos.CHAVE_MARCADOR.equals(c.getChave())
+                        && !AssinaturaPreviaNegocial.CHAVE_MARCADOR.equals(c.getChave()))
+                .map(this::paraDTO).toList();
     }
 
     @Transactional
     public MensagemApiDTO salvar(List<ConfiguracaoSistemaDTO> configuracoes) {
         UsuarioAplicacao usuario = acesso.usuarioAtual();
         if (configuracoes == null || configuracoes.isEmpty()) {
-            throw new IllegalArgumentException("Informe ao menos uma configuração.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe ao menos uma configuração.");
         }
         List<ConfiguracaoSistema> entities = configuracoes.stream().map(dto -> {
             validar(dto);
@@ -81,25 +90,25 @@ public class ConfiguracaoSistemaServico {
 
     private void validar(ConfiguracaoSistemaDTO config) {
         if (config == null || config.chave() == null || !CHAVES_EDITAVEIS.contains(config.chave())) {
-            throw new IllegalArgumentException("Chave de configuração não permitida.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Chave de configuração não permitida.");
         }
         String valor = config.valor();
         if (valor == null || valor.isBlank()) {
-            throw new IllegalArgumentException("O valor da configuração " + config.chave() + " é obrigatório.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O valor da configuração " + config.chave() + " é obrigatório.");
         }
         switch (config.chave()) {
             case "HORAS_DIA_TRABALHO" -> {
                 int horas = Integer.parseInt(valor);
-                if (horas < 1 || horas > 24) throw new IllegalArgumentException("HORAS_DIA_TRABALHO deve estar entre 1 e 24.");
+                if (horas < 1 || horas > 24) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("HORAS_DIA_TRABALHO deve estar entre 1 e 24.");
             }
             case "HORA_INICIO_NOTURNO" -> LocalTime.parse(valor, HORA_FORMAT);
             case "MINUTOS_HORA_NOTURNA" -> {
                 double minutos = Double.parseDouble(valor);
                 if (!Double.isFinite(minutos) || minutos <= 0 || minutos > 60) {
-                    throw new IllegalArgumentException("MINUTOS_HORA_NOTURNA deve ser maior que zero e no máximo 60.");
+                    throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("MINUTOS_HORA_NOTURNA deve ser maior que zero e no máximo 60.");
                 }
             }
-            default -> throw new IllegalArgumentException("Chave de configuração não permitida.");
+            default -> throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Chave de configuração não permitida.");
         }
     }
 

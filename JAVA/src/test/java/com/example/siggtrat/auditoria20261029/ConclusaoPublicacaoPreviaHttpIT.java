@@ -71,7 +71,7 @@ class ConclusaoPublicacaoPreviaHttpIT extends ContratosHttpBase {
                 "CON014 nova prévia descreve os dados de preparação atuais");
         assertThat(atualizada.path("tokenPrevia").asText()).isNotBlank().isNotEqualTo(tokenAntigo);
         publicar.put("tokenPrevia", atualizada.path("tokenPrevia").asText());
-        Instant antesDePublicar = Instant.now().minusSeconds(1);
+        Instant antesDePublicar = com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros();
         enviar(c.localA, base(id) + "/publicar", publicar, 200,
                 "CON014 confirmação atualizada publica exatamente a nova preparação");
         var versoes = consultar(c.localA, base(id) + "/versoes", "HIS006 uma fotografia original após a confirmação válida");

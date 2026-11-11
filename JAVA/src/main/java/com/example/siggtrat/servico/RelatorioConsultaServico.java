@@ -29,7 +29,11 @@ import java.util.*;
  * Estadual e Gestão Local permanecem restritas às respectivas atribuições.
  */
 @org.springframework.stereotype.Service
-public class RelatorioConsultaServico {
+public class RelatorioConsultaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioConsultaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final JdbcTemplate jdbcTemplate;
     private final ContratoRepositorio contratoRepositorio;

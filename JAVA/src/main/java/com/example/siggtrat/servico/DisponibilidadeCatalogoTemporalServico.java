@@ -21,7 +21,11 @@ import java.util.Objects;
 
 /** Disponibilidade comprovada por data efetiva e pelo instante de conhecimento. */
 @Service
-public class DisponibilidadeCatalogoTemporalServico {
+public class DisponibilidadeCatalogoTemporalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(DisponibilidadeCatalogoTemporalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EventoDisponibilidadeCatalogoRepositorio repositorio;
     @PersistenceContext private EntityManager em;
     private AcessoOrganizacionalServico acesso;
@@ -128,7 +132,7 @@ public class DisponibilidadeCatalogoTemporalServico {
         LockModeType lock = em.getLockMode(item);
         if (lock != LockModeType.PESSIMISTIC_READ && lock != LockModeType.PESSIMISTIC_WRITE
                 && lock != LockModeType.PESSIMISTIC_FORCE_INCREMENT)
-            em.refresh(item, LockModeType.PESSIMISTIC_READ);
+            relerSobLock(item, LockModeType.PESSIMISTIC_READ);
     }
 
     /** Deve anteceder a leitura do estado anterior e das dependências administrativas. */
@@ -137,7 +141,21 @@ public class DisponibilidadeCatalogoTemporalServico {
         Object item = obterCatalogo(tipo, id, null);
         LockModeType lock = em.getLockMode(item);
         if (lock != LockModeType.PESSIMISTIC_WRITE && lock != LockModeType.PESSIMISTIC_FORCE_INCREMENT)
-            em.refresh(item, LockModeType.PESSIMISTIC_WRITE);
+            relerSobLock(item, LockModeType.PESSIMISTIC_WRITE);
+    }
+
+    private void relerSobLock(Object item, LockModeType modo) {
+        if (item instanceof Jornada jornada) {
+            // O refresh em cascata da Jornada pode carregar a versão antes do lock
+            // subsequente no PostgreSQL. Travar primeiro a linha escalar evita usar
+            // esse retrato anterior à espera, conservando compartilhamento/escrita.
+            String lock = modo == LockModeType.PESSIMISTIC_READ ? " for share" : " for no key update";
+            var linhas = em.createNativeQuery("select id_jornada from jornada where id_jornada=:id" + lock)
+                    .setParameter("id", jornada.getId()).getResultList();
+            if (linhas.isEmpty()) throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Turno não encontrado.");
+            em.refresh(item);
+            em.lock(item, modo);
+        } else em.refresh(item, modo);
     }
 
     private boolean transacaoDeEscrita() {

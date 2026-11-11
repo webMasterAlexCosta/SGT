@@ -24,7 +24,9 @@ import java.util.function.Supplier;
  * Specifications.
  */
 @Service
-public class ConsultaCacheRedisServico {
+public class ConsultaCacheRedisServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(ConsultaCacheRedisServico.class);
 

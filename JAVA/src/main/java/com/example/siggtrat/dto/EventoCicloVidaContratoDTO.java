@@ -22,6 +22,7 @@ public record EventoCicloVidaContratoDTO(
         String motivo,
         String referenciaSei,
         String valorAnterior,
-        String valorNovo
+        String valorNovo,
+        ConferenciaDocumentalAtoDTO conferenciaDocumental
 ) {
 }

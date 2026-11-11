@@ -22,7 +22,7 @@ class AuditoriaTransversalHttpIT extends AuditoriaHttpSuporte {
             assertEquals(status,response.path("status").asText());respostas.add(response);
         }
         em.flush();em.clear();
-        var events=dados(executar(f.localA,get("/api/frequencias/{id}/eventos",id),200,"AUD-007 consulta preserva cadeia completa após MySQL"));
+        var events=dados(executar(f.localA,get("/api/frequencias/{id}/eventos",id),200,"AUD-007 consulta preserva cadeia completa após PostgreSQL"));
         assertEquals(25,events.size());String anterior=null;Set<Long> ids=new HashSet<>();
         for(int i=0;i<25;i++) {
             var e=events.get(i);assertEquals(i+1,e.path("numeroVersao").asInt());assertTrue(ids.add(e.path("id").asLong()));

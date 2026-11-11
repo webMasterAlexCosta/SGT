@@ -51,8 +51,8 @@ class Candidato5ComplementoNomePeriodoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirInfraestruturaEPeriodoReais() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -298,7 +298,7 @@ class Candidato5ComplementoNomePeriodoHttpIT extends ContratosHttpBase {
         Files.createDirectories(p.getParent());
         conteudo.put("autoria", "/root/revisao_final_pessoas");
         conteudo.put("fontes", "SEIs e cenários sintéticos explícitos; incorporação nominal por HTTP canônico");
-        conteudo.put("transporte", "MockMvc/dispatcher, MySQL8.0.45 e Redis reais; não TCP do JAR");
+        conteudo.put("transporte", "MockMvc/dispatcher, PostgreSQL18.6 e Redis reais; não TCP do JAR");
         Files.writeString(p, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(conteudo));
     }
     private record Estado(long id, long empregadoId, String nome, LocalDate inicio, LocalDate fim, List<Versao> versoes) { }

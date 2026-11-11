@@ -8,7 +8,7 @@ cd "$ROOT"
 for command in node npm python3 zip unzip sha256sum; do
   command -v "$command" >/dev/null || { echo "ERRO: comando obrigatório ausente: $command" >&2; exit 2; }
 done
-node -e "if (process.platform !== 'linux' || process.arch !== 'x64' || parseInt(process.versions.node,10)!==22) { console.error('Necessário Linux x86_64 + Node 22 para este pacote.'); process.exit(2) }"
+node -e "if (process.platform !== 'linux' || process.arch !== 'x64' || process.versions.node!=='26.13.0') { console.error('Necessário Linux x86_64 + Node 26.13.0 para este pacote.'); process.exit(2) }"
 [[ -f package-lock.json ]] || { echo 'ERRO: não existe package-lock.json. Rode npm install no Fedora antes.' >&2; exit 2; }
 [[ -d node_modules ]] || { echo 'ERRO: node_modules ausente.' >&2; exit 2; }
 CACHE="${SGT_NPM_CACHE:-$ROOT/.npm-cache-sgt-gtrat}"
@@ -17,8 +17,8 @@ OUT="${SGT_DEPENDENCIAS_OUT:-$ROOT/artefatos_codex}"
 mkdir -p "$OUT"
 OUT="$(cd "$OUT" && pwd -P)"
 [[ "$OUT" != "$ROOT" ]] || { echo 'ERRO: o diretório de saída não pode ser o projeto.' >&2; exit 2; }
-ARQUIVO=SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE22.zip
-BASE=SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE22
+ARQUIVO=SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE26.zip
+BASE=SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE26
 TEMP="$(mktemp -d "$OUT/.geracao-dependencias-XXXXXX")"
 trap 'rm -rf -- "$TEMP"' EXIT
 mkdir -p "$TEMP/logs" "$TEMP/offline-ci" "$TEMP/stage/$BASE/npm-cache"
@@ -72,15 +72,15 @@ cp -a "$CACHE/_cacache" "$PACK/npm-cache/_cacache"
 mkdir -p "$PACK/comprovacao"
 cp "$TEMP/logs/"* "$PACK/comprovacao/"
 cat > "$PACK/README_RESTAURACAO.md" <<'TXT'
-# SGT/GTRAT — dependências completas Linux/Node 22
+# SGT/GTRAT — dependências completas Linux/Node 26.13.0
 
 Este ZIP foi gerado no Fedora com dependências instaladas e verificadas, inclusive Vitest, React Testing Library, jsdom, coverage-v8 e plugin-basic-ssl. É **somente dependências**, não contém fontes React nem Java.
 
-**Requisitos:** Linux x86_64, Node.js 22.x e npm compatível com o pacote.
+**Requisitos:** Linux x86_64, Node.js 26.13.0 e npm 12.2.2.
 
 ## Restaurar no projeto React recebido
 
-1. Extraia este ZIP e localize `SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE22/`.
+1. Extraia este ZIP e localize `SGT_GTRAT_DEPENDENCIAS_COMPLETAS_FEDORA_NODE26/`.
 2. Execute `bash restaurar-no-fedora.sh /caminho/SGT_GTRAT_REACT_FEDORA/frontend`.
 3. O instalador compara o `package.json` da pasta alvo antes de copiar; não sobrescreve projeto incompatível.
 4. O script copia `package-lock.json`, `node_modules` e cache isolado. Execute `npm run dependencias:verificar` e `npm run test:vitest:dependencias` no projeto React.

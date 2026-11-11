@@ -2,16 +2,16 @@ import { act, cleanup, renderHook } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 const { atualizarPerfil } = vi.hoisted(() => ({ atualizarPerfil: vi.fn() }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({
   user: { id: 81, perfil: 'OPERACIONAL', autoridade: 'PERFIL_OPERACIONAL', vinculosGestao: [] }, atualizarPerfil,
 }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({
   confirmarComSenha: () => Promise.resolve(false), ModalConfirmacao: () => null,
 }) }));
 
-import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.js';
-import { api } from '../src/core/http.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
+import { useLogicaFrequencia } from '../src/modules/rh/pages/PaginaFrequencia/useLogicaFrequencia.ts';
+import { api } from '../src/core/http.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
 
 let adapterOriginal;
 
@@ -29,7 +29,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-// O prazo é fornecido pelo Java: D+7 no início do dia em America/Sao_Paulo.
+// O prazo do cenário é fornecido pelo Java no início do dia em America/Sao_Paulo; N é configurável no servidor.
 // O React somente representa esse instante; não decide autorização retroativa.
 describe('Frequência no fuso de negócio confirmado pelo Java', () => {
   it('inicia a referência em 01/11 quando o UTC já está em 02/11', async () => {
@@ -60,6 +60,19 @@ describe('Frequência no fuso de negócio confirmado pelo Java', () => {
     let hook;
     await act(async () => { hook = renderHook(() => useLogicaFrequencia()); });
     expect(hook.result.current.utilitarios.obterRelatorioDaJanelaDeEdicao(prazo)).toMatchObject({ isValid: true, remaining: '30m' });
+  });
+
+  it.each(['2026-11-15T00:00:00', '2026-12-01T00:00:00'])('exibe prazo variável recebido do Java sem derivar N: %s', async (prazo) => {
+    let hook;
+    await act(async () => { hook = renderHook(() => useLogicaFrequencia()); });
+    expect(hook.result.current.utilitarios.obterRelatorioDaJanelaDeEdicao(prazo).isValid).toBe(true);
+  });
+
+  it.each(['2026-10-01', '2026-09-15'])('não inventa limite retroativo local para consultar %s', async (referencia) => {
+    let hook;
+    await act(async () => { hook = renderHook(() => useLogicaFrequencia()); });
+    await act(async () => hook.result.current.acoes.setDataReferenciaAtiva(referencia));
+    expect(hook.result.current.estado.statusDaDataValidada).toEqual({ valid: true, reason: '' });
   });
 
   it('respeita o início de dia histórico ajustado pelo horário de verão de São Paulo', async () => {

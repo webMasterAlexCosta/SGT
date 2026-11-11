@@ -18,8 +18,8 @@ import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integração MySQL: persistência da Etapa 11")
-class Etapa11PersistenceIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: persistência da Etapa 11")
+class Etapa11PersistenceIT extends PostgresIntegrationTestSupport {
     @Autowired private PendenciaAdministrativaRepositorio pendencias;
     @Autowired private EmissaoRelatorioAdministrativoRepositorio emissoes;
 

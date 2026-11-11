@@ -32,7 +32,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * Revisão independente C3: hipótese de diferença entre o instante recebido no
- * POST e o instante realmente confirmado no MySQL, com efeito sobre o corte K.
+ * POST e o instante realmente confirmado no PostgreSQL, com efeito sobre o corte K.
  * HTTP pelo dispatcher Spring/MockMvc real, autenticação/serviços/transações/JPA
  * reais; não é uma prova de transporte TCP. Não há mocks de relógio/banco.
  * Fontes SEI são explicitamente sintéticas e as fixtures são descartáveis.
@@ -50,8 +50,8 @@ class Candidato3PrecisaoConhecimentoProvasHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirInfraestruturaRealESchemaHibernate() throws Exception {
         try (var c = dataSource.getConnection()) {
-            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(c.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(c.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -213,7 +213,7 @@ class Candidato3PrecisaoConhecimentoProvasHttpIT extends ContratosHttpBase {
     private void conferirInstantes(SoftAssertions soft, Instant recebido, Instant persistido, JsonNode relida, JsonNode reenvio) {
         // Equality é sobre o instante, não sobre formatação JSON. Não truncar,
         // arredondar ou aceitar tolerância aqui: o recibo deve dizer a verdade.
-        soft.assertThat(recebido).as("Recibo inicial deve representar o instante realmente confirmado no MySQL")
+        soft.assertThat(recebido).as("Recibo inicial deve representar o instante realmente confirmado no PostgreSQL")
                 .isEqualTo(persistido);
         soft.assertThat(instante(relida)).as("GET deve representar o instante efetivamente persistido")
                 .isEqualTo(persistido);
@@ -235,7 +235,7 @@ class Candidato3PrecisaoConhecimentoProvasHttpIT extends ContratosHttpBase {
                 "registradoEm_get", relida.path("registradoEm").asText(),
                 "registradoEm_reenvio", reenvio.path("registradoEm").asText(),
                 "consulta_K_exato", noK, "consulta_K_menos_1_nanossegundo", antesK,
-                "transporte", "MockMvc/dispatcher Spring real; JPA/MySQL 8.0.45 e Redis reais; não TCP")));
+                "transporte", "MockMvc/dispatcher Spring real; JPA/PostgreSQL 18.6 e Redis reais; não TCP")));
     }
 
     private Map<String, Object> fonteContratualSintetica(Cenario c, NovoContrato n) {

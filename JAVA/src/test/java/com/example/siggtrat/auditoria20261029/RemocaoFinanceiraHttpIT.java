@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Aplicação, filtros e MySQL reais; não confunde tabela preservada com entidade ativa. */
+/** Aplicação, filtros e PostgreSQL reais; não confunde tabela preservada com entidade ativa. */
 class RemocaoFinanceiraHttpIT extends AuditoriaHttpSuporte {
     private static final String G = "/api/governanca-terceiros";
     private static final Set<String> ENTIDADES_RETIRADAS = Set.of(

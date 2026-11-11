@@ -46,7 +46,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  * Grade, município, origens, eventos, predecessor e fotografias individuais
  * não são fabricados nem corrigidos por DML. Fontes novas entram por HTTP.
  *
- * MockMvc percorre dispatcher/filtros/serviços reais, com MySQL 8.0.45 e Hibernate.
+ * MockMvc percorre dispatcher/filtros/serviços reais, com PostgreSQL 18.6 e Hibernate.
  * A base suprime o agendador; esta classe não substitui persistência por mocks.
  * Consulta HTTP de composições tem data, mas não K: os cortes K são exercitados
  * no serviço temporal real, em transações novas, sem inventar parâmetro de API.
@@ -66,8 +66,8 @@ class ProvaHistoricaTransferenciaConvergenteRotulosHttpIT extends ContratosHttpB
     @BeforeEach
     void exigirMysqlRealSemSchemaManual() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -224,7 +224,8 @@ class ProvaHistoricaTransferenciaConvergenteRotulosHttpIT extends ContratosHttpB
         var m2 = mapa("lotacaoOrigemId", ordem.get(1).lotacao(), "jornadaOrigemId", ordem.get(1).jornada(),
                 "cargoOrigemId", ordem.get(1).cargo(), "lotacaoDestinoId", c.lotacaoB.getId(),
                 "jornadaDestinoId", c.jornadaB.getId(), "cargoDestinoId", c.cargoB.getId());
-        var req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        var req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Convergência sintética para prova dos rótulos de cada origem",
                 "referenciaSei", "SEI-SINTETICO-R01-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",

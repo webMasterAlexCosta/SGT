@@ -1,7 +1,7 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
-import { useDialogoAcessivel } from '../src/core/ui/acessibilidadeDialogo.js';
+import { useDialogoAcessivel } from '../src/core/ui/acessibilidadeDialogo.ts';
 
 function Dialogo({ aberto, nome, aoFechar }) {
   const ref = useDialogoAcessivel({ aberto, aoFechar });

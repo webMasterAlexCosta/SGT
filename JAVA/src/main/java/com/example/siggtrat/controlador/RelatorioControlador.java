@@ -34,7 +34,11 @@ import java.util.UUID;
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_PRESIDENTE, " +
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_ESTADUAL, " +
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_LOCAL)")
-public class RelatorioControlador {
+public class RelatorioControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final RelatorioConsultaServico servico;
     private final RelatorioExportacaoServico exportacaoServico;
     private final RelatorioExportacaoAssincronaServico exportacaoAssincronaServico;
@@ -243,6 +247,11 @@ public class RelatorioControlador {
     @GetMapping("/exportacoes/{id}")
     public ResponseEntity<ExportacaoRelatorioStatusDTO> consultarExportacao(@PathVariable UUID id) {
         return ResponseEntity.ok(exportacaoAssincronaServico.consultar(id));
+    }
+
+    @PostMapping("/exportacoes/{id}/cancelamento")
+    public ResponseEntity<ExportacaoRelatorioStatusDTO> cancelarExportacao(@PathVariable UUID id) {
+        return ResponseEntity.ok(exportacaoAssincronaServico.cancelar(id));
     }
 
     @GetMapping("/exportacoes/{id}/arquivo")

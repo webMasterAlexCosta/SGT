@@ -6,7 +6,11 @@ import java.security.SecureRandom;
 
 /** Gera credenciais temporárias fortes que são reveladas uma única vez. */
 @Service
-public class GeradorSenhaTemporariaServico {
+public class GeradorSenhaTemporariaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(GeradorSenhaTemporariaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final String MAIUSCULAS = "ABCDEFGHJKLMNPQRSTUVWXYZ";
     private static final String MINUSCULAS = "abcdefghijkmnopqrstuvwxyz";

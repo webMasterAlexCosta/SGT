@@ -60,7 +60,7 @@ class EmpregadoContextoCanonicoControlesHttpIT extends ContratosHttpBase {
     }
 
     @Test
-    void empregadoLegadoSemPessoaCanonicaPreservaEscopoEFiltrosAnteriores() throws Exception {
+    void empregadoSemPessoaCanonicaPreservaCadastroHistoricoSemSelecaoOperacional() throws Exception {
         Cenario c = criarCenario();
         Empregado legado = new Empregado(); legado.setNome("Legado sem identidade canônica " + c.gestaoA.getId());
         legado.setCpf(cpf(Math.toIntExact(970000000L + c.gestaoA.getId()))); legado.setGestaoLocal(c.gestaoA);
@@ -81,7 +81,7 @@ class EmpregadoContextoCanonicoControlesHttpIT extends ContratosHttpBase {
         assertThat(ids(consultar(c.operacionalA, "/api/empregados/filtrados-frequencia?dataRef=" + RelogioSistema.hoje()
                         + "&contratoId=" + c.contratoA.getId() + "&lotacaoId=" + c.lotacaoA.getId()
                         + "&turnoId=" + c.jornadaA.getId() + "&searchTerm=" + legado.getCpf(),
-                "Recorte operacional legado permanece válido na grade autorizada"))).containsExactly(legado.getId());
+                "Diretriz atual: ausência de identidade canônica exclui da frequência sem apagar cadastro"))).isEmpty();
         String filtro = "?contratoId=" + c.contratoA.getId() + "&lotacaoId=" + c.lotacaoA.getId() + "&search=" + legado.getCpf();
         assertThat(ids(consultar(c.localA, "/api/empregados" + filtro, "Filtros anteriores preservados para legado")))
                 .containsExactly(legado.getId());

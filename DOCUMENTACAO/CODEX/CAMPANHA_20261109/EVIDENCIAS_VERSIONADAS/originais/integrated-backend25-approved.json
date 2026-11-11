@@ -1,0 +1,26 @@
+{
+  "state": "NATIVE_INTEGRATED25_SOL_APPROVED_IN_DECLARED_SCOPE_GLOBAL_PENDING",
+  "review_directory": "review-integrated63-backend25",
+  "runtime_model": "gpt-6.1-sol",
+  "runtime_effort": "xhigh",
+  "thread_id": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+  "turn_id": "01a1c864-cbf4-7143-8615-e37597e47524",
+  "cursor": "35b56430-583c-4408-bcd5-7dcbecc6cd38:257",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "parecer_sha256": "146c5d6ea4eabf1db21b16911d4eb42c1a2f3968719586124a381a4b0fd7a452",
+  "freeze_sha256": "1b3abc4ff372bc4ef7bcdd56544e783f2b5557f776a6cfb3c959d392ed0a56cf",
+  "no_new_p0_p3_findings": true,
+  "approved_predicates": [
+    "AUD006005/006_pg_mockmvc",
+    "CON012/RST005_native_phased",
+    "RST003/004_full_restart",
+    "declared_aditamento_pendencia_ux_pagination",
+    "LAN_other_physical_PC"
+  ],
+  "remaining_demonstrations": [
+    "ROP042_documents_and_late_options_cargos",
+    "E2E10_N30_night_shift_historical_UI_DTO",
+    "E2E24_partial_real_API_failure_no_false_success"
+  ],
+  "no_global_acceptance": true
+}

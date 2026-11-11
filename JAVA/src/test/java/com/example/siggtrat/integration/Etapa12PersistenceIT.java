@@ -26,8 +26,8 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 
-@DisplayName("Integração MySQL: fechamento de persistência da Etapa 12")
-class Etapa12PersistenceIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: fechamento de persistência da Etapa 12")
+class Etapa12PersistenceIT extends PostgresIntegrationTestSupport {
 
     @Autowired private EmissaoRelatorioAdministrativoRepositorio emissoes;
     @Autowired private PlatformTransactionManager transactionManager;

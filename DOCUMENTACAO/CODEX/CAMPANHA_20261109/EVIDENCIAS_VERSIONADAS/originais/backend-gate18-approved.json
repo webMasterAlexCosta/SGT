@@ -1,0 +1,14 @@
+{
+  "state": "NATIVE18_SOL_BACKEND_APPROVED_DELIMITED_SYNTHETIC_SCOPE_MAIN36",
+  "thread_id": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+  "turn_id": "01a1c570-78dc-7bd3-9a6f-b7ec49b33fad",
+  "cursor": "35b56430-583c-4408-bcd5-7dcbecc6cd38:202",
+  "jar_sha256": "3c5cd0a6d616737efb3c85b8922294fadf53cfe231022edd1d9503242b7c87c9",
+  "compiled_receipt": "java-main36-package03",
+  "parecer_sha256": "d968d7107d2d27a8da55976f924bf835d1cb18d952cecef8281c7c3c2504a908",
+  "freeze_sha256": "fbdd72cd040d9f8d16db02ce3c830e28012cbd7cee50cd48521959b7439ff5f9",
+  "runtime_proof_sha256": "8cfb9c00574081d4848391e4976ee58888d71877326800eaaafd9a218934a3b6",
+  "no_p0_p3_findings": true,
+  "wrong_runtime17_excluded": true,
+  "no_global_acceptance": true
+}

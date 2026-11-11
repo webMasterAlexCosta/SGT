@@ -1,0 +1,29 @@
+{
+  "verified": true,
+  "scope": "FULL_OWN_NATIVE_LAB_RESTART_SAME_JAR_CHROME_DURABLE_DATA_HISTORY_ATTACHMENTS_AND_JOBS_NOT_LAN",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "tables": 72,
+  "rows": 7332,
+  "durable_files": 6,
+  "exact_db_schema_sequence_comparison_before_login": true,
+  "no_ignored_db_fields": true,
+  "chrome_assertions": 61,
+  "original_driver_assertions": 29,
+  "supplement_assertions": 32,
+  "receipts": {
+    "full-restart08-lab-comparison.json": "ee49e82848fd64d8a53747fb00120ff44623278ed94c2ee901653bc01a24aaaa",
+    "full-restart08-jar-comparison.json": "0fdb1a85b4f78ebc88e4ace7f7b2daa8b97b5c23d28418e8bcaeecbcf41a59d9",
+    "browser-jar08-persistencia02/result.json": "0d5c8b0a99a51ffaa51e2c6fd110702ca651528335e7495865db7b4ab7baecce",
+    "browser-jar08-persist-integridade01/result.json": "f0227139fb5b645fee3a9401c6f5930e182e2cb63a354f2ae0f7107380c21c0d"
+  },
+  "hash_diagnostic": {
+    "path": "diagnose-persistence-hash08-01/diagnostic.json",
+    "sha256": "df9ecdf99140aa7631b6e75c4aaf20d0ea16ec6ac9308a5a59c7a2d5111deb7f",
+    "difference": "Map.copyOf iteration order only; exact original SHA reproduced by key permutation; no fields or values excluded; three corruption countercontrols pass"
+  },
+  "limitations": [
+    "Original19 drivers remain bound to JAR06, this original twentieth and32check supplemental ran onJAR08; not20/20 on sameJAR.",
+    "Synthetic isolated PG18.6/Valkey9.0.7 corpus, cache cold afterrestart/noFLUSH, not production backup/restore.",
+    "No other physical computer/LAN proof or global approval."
+  ]
+}

@@ -13,7 +13,11 @@ import java.util.List;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/jornadas")
-public class JornadaControlador {
+public class JornadaControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(JornadaControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final JornadaServico servico;
     public JornadaControlador(JornadaServico servico) { this.servico = servico; }
 
@@ -23,7 +27,9 @@ public class JornadaControlador {
     @GetMapping("/{id}")
     public ResponseEntity<JornadaDTO> obter(@PathVariable Long id) {
         JornadaDTO dto = servico.obter(id);
-        return dto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dto);
+        if (dto == null) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Turno não encontrado no seu escopo.");
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping @ExigirSenha

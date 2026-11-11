@@ -3,11 +3,11 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import '@testing-library/jest-dom/vitest';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 const { listar, filtros, previa, notificar }=vi.hoisted(()=>({listar:vi.fn(),filtros:vi.fn(),previa:vi.fn(),notificar:vi.fn()}));
-vi.mock('../src/services/rh/ServicoFrequencia.js',()=>({ServicoFrequencia:{carregarFiltrosRelatorio:filtros}}));
-vi.mock('../src/services/rh/ServicoRelatorioAdministrativo.js',()=>({ServicoRelatorioAdministrativo:{listar,previa},criarChaveIdempotenciaRelatorio:()=> 'intencao-sintetica'}));
-vi.mock('../src/modules/auth/context.jsx',()=>({useAutenticacao:()=>({user:{id:1,perfil:'GESTOR_LOCAL',autoridade:'PERFIL_GESTOR_LOCAL'}})}));
-vi.mock('../src/core/events.js',()=>({notificar}));
-import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.jsx';
+vi.mock('../src/services/rh/ServicoFrequencia.ts',()=>({ServicoFrequencia:{carregarFiltrosRelatorio:filtros}}));
+vi.mock('../src/services/rh/ServicoRelatorioAdministrativo.ts',()=>({ServicoRelatorioAdministrativo:{listar,previa},criarChaveIdempotenciaRelatorio:()=> 'intencao-sintetica'}));
+vi.mock('../src/modules/auth/context.tsx',()=>({useAutenticacao:()=>({user:{id:1,perfil:'GESTOR_LOCAL',autoridade:'PERFIL_GESTOR_LOCAL'}})}));
+vi.mock('../src/core/events.ts',()=>({notificar}));
+import { PaginaRelatoriosAdministrativos } from '../src/modules/rh/pages/PaginaRelatoriosAdministrativos/index.tsx';
 const diferida=()=>{let resolve,reject;const promise=new Promise((a,b)=>{resolve=a;reject=b;});return {promise,resolve,reject};};
 const pagina=(id,tipo='FREQUENCIA_CONSOLIDADA',number=0)=>({content:[{id,tipo,versao:1,estado:'VIGENTE',natureza:'ORIGINAL'}],number,totalPages:2,totalElements:6,first:number===0,last:number===1});
 beforeEach(()=>{vi.resetAllMocks();filtros.mockResolvedValue({contratos:[],lotacoes:[],turnos:[]});});

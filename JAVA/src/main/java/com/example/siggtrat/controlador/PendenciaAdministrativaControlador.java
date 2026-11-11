@@ -21,7 +21,11 @@ import java.util.List;
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_NACIONAL, " +
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_ESTADUAL, " +
         "T(com.example.siggtrat.constante.ConstantesDominio).PERFIL_GESTOR_LOCAL)")
-public class PendenciaAdministrativaControlador {
+public class PendenciaAdministrativaControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PendenciaAdministrativaControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final PendenciaAdministrativaServico servico;
 
     public PendenciaAdministrativaControlador(PendenciaAdministrativaServico servico) {

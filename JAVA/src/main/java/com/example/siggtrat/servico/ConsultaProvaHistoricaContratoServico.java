@@ -14,7 +14,11 @@ import java.util.*;
 /** Leitura da cadeia documental e da proveniência das fotografias preservadas. */
 @Service
 @Transactional(readOnly=true)
-public class ConsultaProvaHistoricaContratoServico {
+public class ConsultaProvaHistoricaContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ConsultaProvaHistoricaContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ProvaHistoricaContratoRepositorio provas;
     private final ProvaHistoricaComposicaoRepositorio itens;
     private final ProvaHistoricaAditamentoComposicaoRepositorio itensAditamento;
@@ -177,17 +181,23 @@ public class ConsultaProvaHistoricaContratoServico {
 
     /**
      * HIS-006: o comando PUBLICACAO captura a fotografia integral pelo motor.
-     * O marcador legado de configuração só legitima ausências opcionais nesse
+     * O marcador de captura integral só legitima ausências opcionais nesse
      * snapshot original vinculado; valores copiados por outro ato não o herdam.
      */
     private Map<String,ProvaCampoHistoricoDTO> camposOriginais(VersaoContratoNegocialDTO foto) {
         Map<String,Object> valores=ProvasCamposHistoricos.valores(foto);
         Map<String,ProvaCampoHistoricoDTO> resultado=ProvasCamposHistoricos.desconhecidos(valores.keySet());
         var origem=ProvasCamposHistoricos.versao(foto);
+        boolean capturaIntegral=foto.matriculaVinculoObrigatoriaEfetiva()!=null;
+        boolean identidadeEmpresarialDocumentada=!ProvasCamposHistoricos.ausente(foto.cnpjEmpresa())
+                &&!ProvasCamposHistoricos.ausente(foto.razaoSocialEmpresa())
+                &&!ProvasCamposHistoricos.ausente(foto.nomeFantasiaEmpresa());
         valores.forEach((campo,valor)->{
-            boolean ausenciaConfiguracao=foto.matriculaVinculoObrigatoriaEfetiva()!=null
+            boolean ausenciaConfiguracao=capturaIntegral
                     &&Set.of("matriculaVinculoObrigatoria","diaSemanaReduzido","horasDiaReduzido").contains(campo);
-            if(!ProvasCamposHistoricos.ausente(valor)||ausenciaConfiguracao)
+            // registrarFotografia lê a associação opcional na mesma captura da publicação.
+            boolean ausenciaFornecedor=capturaIntegral&&identidadeEmpresarialDocumentada&&"fornecedorId".equals(campo);
+            if(!ProvasCamposHistoricos.ausente(valor)||ausenciaConfiguracao||ausenciaFornecedor)
                 resultado.put(campo,ProvasCamposHistoricos.comprovado(valor,origem));
         });
         return Map.copyOf(resultado);

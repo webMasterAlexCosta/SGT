@@ -106,7 +106,7 @@ class AuditoriaFinalPessoasLacunasEspecificasHttpIT extends ContratosHttpBase {
         long eventoOriginalId = eventosOriginais.get(0).path("id").asLong();
         Instant corte = tx(() -> em.find(EventoVinculoContratual.class, eventoOriginalId).getRegistradoEm());
         JsonNode conhecidaAntes = consultar(c.localA, posicaoPessoa(pessoaId, hoje, corte),
-                "VIN-007: corte usa o instante do evento original efetivamente gravado no MySQL");
+                "VIN-007: corte usa o instante do evento original efetivamente gravado no PostgreSQL");
         assertThat(conhecidaAntes.path("vinculos")).hasSize(1);
         JsonNode programada = conhecidaAntes.path("vinculos").get(0);
         assertThat(programada.path("vinculoId").asLong()).isEqualTo(vinculoId);

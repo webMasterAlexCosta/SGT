@@ -1,0 +1,10 @@
+{
+  "baseline_jar_sha256": "3c5cd0a6d616737efb3c85b8922294fadf53cfe231022edd1d9503242b7c87c9",
+  "allowed_updated_entries": {
+    "BOOT-INF/classes/com/example/siggtrat/servico/AditamentoContratualServico$1.class": "6032195890e557bfb9e0a20b3d6ce27e7d22a9fdf88884d7a9c2d569dc478a35",
+    "BOOT-INF/classes/com/example/siggtrat/servico/AditamentoContratualServico.class": "335683448977547ac91eba6fe21d99d7bbb0b92b1c9a47b1207c69ac62a2df76",
+    "BOOT-INF/classes/com/example/siggtrat/servico/ConsultaProvaHistoricaContratoServico.class": "4443c346ac0d68d686eb21c7c65ad6264f5c09a6f60ba8aa64fe37ac51634c9e"
+  },
+  "unchanged_classes": 820,
+  "class_count": 823
+}

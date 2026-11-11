@@ -22,7 +22,11 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 /** Repara projeções de pendências legadas fora das consultas HTTP de relatório. */
 @Service
-public class SincronizadorPendenciasFrequenciaServico {
+public class SincronizadorPendenciasFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(SincronizadorPendenciasFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int TAMANHO_LOTE = 500;
     private final FrequenciaRepositorio frequencias;
     private final ContratoRepositorio contratos;

@@ -48,6 +48,12 @@ class ContratosCompletudeHttpIT extends ContratosHttpBase {
         assertThat(fim.get(0).path("motivoDesligamentoId").asLong()).isEqualTo(motivo.getId());
         em.flush(); em.clear();
         var eventosAntes = consultar(c.localA, "/api/vinculos-contratuais/" + vinculoId + "/eventos", "VIN-012 trilha do fim natural");
+        var inativar = mapa("dataEfetiva",fimAntigo.minusDays(2),"motivo","Suspensão administrativa independente da vigência");
+        var previaInativar = enviar(c.localA,base(id)+"/previas/inativar",inativar,200,"CON012 prévia da inativação explícita");
+        inativar.put("tokenPrevia",previaInativar.path("tokenPrevia").asText()); inativar.put("confirmarImpacto",true);
+        enviar(c.localA,base(id)+"/inativar",inativar,200,"CON012 contrato inativo antes da prorrogação");
+        assertThat(consultar(c.localA,base(id)+"/posicao-temporal?data="+RelogioSistema.hoje(),
+                "CON012 controle anterior de habilitação").path("habilitacaoAdministrativa").asText()).isEqualTo("INATIVO");
         var extensao = aditamento("PRORROGACAO-TARDIA", fimAntigo.minusDays(1));
         var fimNovo = RelogioSistema.hoje().plusDays(30); extensao.put("novaDataFim", fimNovo);
         var previa = previaAditamento(c, id, extensao);
@@ -57,6 +63,18 @@ class ContratosCompletudeHttpIT extends ContratosHttpBase {
         var contrato = consultar(c.localA, base(id) + "/posicao-temporal?data=" + RelogioSistema.hoje(), "VIN-012 contrato prorrogado está vigente");
         assertThat(contrato.path("vigenciaFim").asText()).isEqualTo(fimNovo.toString());
         assertThat(contrato.path("situacaoTemporal").asText()).isEqualTo("VIGENTE");
+        assertThat(contrato.path("habilitacaoAdministrativa").asText()).as("CON012 prorrogação não reativa contrato").isEqualTo("INATIVO");
+        var reativar = mapa("dataEfetiva",RelogioSistema.hoje(),"motivo","Retomada administrativa explícita após prorrogação");
+        var previaReativar = enviar(c.localA,base(id)+"/previas/reativar",reativar,200,"CON012 prévia autônoma da retomada");
+        reativar.put("tokenPrevia",previaReativar.path("tokenPrevia").asText()); reativar.put("confirmarImpacto",true);
+        enviar(c.localA,base(id)+"/reativar",reativar,200,"CON012 somente evento explícito reativa");
+        em.flush(); em.clear();
+        var ativo = consultar(c.localA,base(id)+"/posicao-temporal?data="+RelogioSistema.hoje(),"CON012 posição após retomada");
+        assertThat(ativo.path("habilitacaoAdministrativa").asText()).isEqualTo("ATIVO");
+        assertThat(ativo.path("vigenciaFim").asText()).isEqualTo(fimNovo.toString());
+        assertThat(em.find(com.example.siggtrat.entidade.Contrato.class,id).getAtivo()).isTrue();
+        assertThat(consultar(c.localA,base(id)+"/posicao-temporal?data="+fimAntigo.minusDays(1),
+                "CON012 reativação não apaga o intervalo inativo").path("habilitacaoAdministrativa").asText()).isEqualTo("INATIVO");
         var depois = consultar(c.localA, "/api/vinculos-contratuais/" + vinculoId, "VIN-012 vínculo encerrado não é reaberto automaticamente");
         assertThat(depois.path("dataFim").asText()).isEqualTo(fimAntigo.toString());
         assertThat(depois.path("situacaoTemporal").asText()).isEqualTo("ENCERRADO");
@@ -108,6 +126,62 @@ class ContratosCompletudeHttpIT extends ContratosHttpBase {
         var versoes = consultar(c.localA, base(n.id()) + "/versoes", "CON-005 fotografia original e alterações preservadas");
         assertThat(versoes.size()).isGreaterThanOrEqualTo(2);
         assertThat(versoes.get(0).path("descricao").asText()).isEqualTo("Contrato de auditoria HTTP");
+        var outro=publicado(c,100,50,false);
+        var outroAdi=aditamento("CONTEUDO-OUTRO-B10",outro.inicio().plusDays(1));outroAdi.put("novaDescricao","Outro contrato com fatos concorrentes");
+        var instrumentoOutro=registrarAditamento(c,outro.id(),outroAdi);
+        var outroRem=remanejamento(outro,"DISTRIBUICAO-OUTRA-B10",outro.inicio().plusDays(2),10);previaRemanejamento(c,outro.id(),outroRem);
+        var redistribuicaoOutro=enviar(c.localA,base(outro.id())+"/remanejamentos",outroRem,201,"CON005 controle positivo dos fatos do outro contrato");
+        long pendenciaN=pendenciaIsolamentoB10(c,n.id(),instrumento.path("eventoId").asLong());
+        long pendenciaOutro=pendenciaIsolamentoB10(c,outro.id(),instrumentoOutro.path("eventoId").asLong());
+        em.flush();em.clear();
+        for(boolean selecionaN:List.of(true,false)) {
+            NovoContrato selecionado=selecionaN?n:outro,alheio=selecionaN?outro:n;
+            var a=selecionaN?instrumento:instrumentoOutro;var r=selecionaN?redistribuicao:redistribuicaoOutro;
+            long pendenciaId=selecionaN?pendenciaN:pendenciaOutro;
+            var comps=consultar(c.localA,base(selecionado.id())+"/composicoes","CON005 composições pertencem ao contrato selecionado");
+            assertThat(idsB10(comps)).containsExactlyInAnyOrder(selecionado.composicao1(),selecionado.composicao2())
+                    .doesNotContain(alheio.composicao1(),alheio.composicao2());
+            for(var comp:comps) assertThat(comp.path("contratoId").asLong()).isEqualTo(selecionado.id());
+            var adis=consultar(c.localA,base(selecionado.id())+"/aditamentos","CON005 ADI do contrato selecionado");
+            assertThat(idsB10(adis)).containsExactly(a.path("id").asLong());
+            assertThat(adis.get(0).path("contratoId").asLong()).isEqualTo(selecionado.id());
+            var rems=consultar(c.localA,base(selecionado.id())+"/remanejamentos","CON005 REM do contrato selecionado");
+            assertThat(idsB10(rems)).containsExactly(r.path("id").asLong());
+            assertThat(rems.get(0).path("contratoId").asLong()).isEqualTo(selecionado.id());
+            var ps=consultar(c.localA,"/api/pendencias?contratoIds="+selecionado.id(),"CON005 filtro discrimina pendências não vazias").path("registros");
+            assertThat(idsB10(ps)).containsExactly(pendenciaId);
+            assertThat(ps.get(0).path("contratoId").asLong()).isEqualTo(selecionado.id());
+            assertThat(ps.get(0).path("origemId").asLong()).isEqualTo(a.path("eventoId").asLong());
+            var es=consultar(c.localA,base(selecionado.id())+"/eventos","CON005 histórico expõe IDs associados ao mesmo contrato");
+            var idsPersistidos=em.createQuery("select e.id from EventoCicloVidaContrato e where e.contrato.id=:c order by e.id",Long.class)
+                    .setParameter("c",selecionado.id()).getResultList();
+            var idsAlheios=em.createQuery("select e.id from EventoCicloVidaContrato e where e.contrato.id=:c order by e.id",Long.class)
+                    .setParameter("c",alheio.id()).getResultList();
+            assertThat(idsPersistidos).hasSize(3);assertThat(idsAlheios).hasSize(3);
+            assertThat(idsB10(es)).containsExactlyInAnyOrderElementsOf(idsPersistidos).doesNotContainAnyElementsOf(idsAlheios);
+            var vs=consultar(c.localA,base(selecionado.id())+"/versoes","CON005 versões são do mesmo contrato");
+            assertThat(idsB10(vs)).containsExactlyInAnyOrderElementsOf(em.createQuery(
+                    "select v.id from VersaoContratoNegocial v where v.contrato.id=:c order by v.id",Long.class)
+                    .setParameter("c",selecionado.id()).getResultList());
+        }
+    }
+
+    private java.util.List<Long> idsB10(com.fasterxml.jackson.databind.JsonNode itens) {
+        java.util.List<Long> ids=new java.util.ArrayList<>();itens.forEach(i->ids.add(i.path("id").asLong()));return ids;
+    }
+
+    private long pendenciaIsolamentoB10(Cenario c,long contratoId,long eventoId) {
+        // Pendência sintética exclusiva do filtro; não declara conflito real do instrumento.
+        var p=new com.example.siggtrat.entidade.PendenciaAdministrativa();
+        p.setChaveOrigem("B10-FILTRO-SINTETICO:"+contratoId);
+        p.setTipo(com.example.siggtrat.dominio.pendencia.TipoPendencia.CONFLITO_REPLAY_TEMPORAL);
+        p.setEstado(com.example.siggtrat.dominio.pendencia.EstadoPendencia.ABERTA);
+        p.setMotivo("Pendência sintética explícita para isolamento de consultas por contrato");p.setDataEfetiva(RelogioSistema.hoje());
+        p.setOperacaoOrigem("ADITAMENTO");p.setOrigemEntidade("EventoCicloVidaContrato");p.setOrigemId(eventoId);
+        p.setPerfilResponsavel(com.example.siggtrat.dominio.acesso.PerfilAcesso.GESTOR_LOCAL);
+        p.setEscopoBloqueio(com.example.siggtrat.dominio.pendencia.EscopoBloqueioPendencia.CONTRATO_TEMPORAL);
+        p.setContratoId(contratoId);p.setGestaoLocalId(c.gestaoA.getId());p.setSuperintendenciaId(c.seA.getId());
+        em.persist(p);em.flush();return p.getId();
     }
 
     @Test

@@ -28,7 +28,11 @@ import java.util.stream.Collectors;
 /** Responsabilidade organizacional reconstruída sem depender da atualização da coluna materializada. */
 @Service
 @Transactional(readOnly = true)
-public class GestaoContratoTemporalServico {
+public class GestaoContratoTemporalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(GestaoContratoTemporalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final MotorTemporalContratoServico motor;
     private final TransferenciaGestaoContratoRepositorio transferencias;
     private final GestaoLocalRepositorio gestoes;

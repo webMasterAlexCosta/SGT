@@ -13,7 +13,11 @@ import org.springframework.web.bind.annotation.*;
 @InvalidaCacheNegocio
 @RestController
 @RequestMapping("/api/cargos")
-public class CargoControlador {
+public class CargoControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CargoControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final CargoServico servico;
     public CargoControlador(CargoServico servico) { this.servico = servico; }
 
@@ -23,7 +27,9 @@ public class CargoControlador {
     @GetMapping("/{id}")
     public ResponseEntity<CargoDTO> buscarPorId(@PathVariable Long id) {
         CargoDTO dto = servico.buscarPorId(id);
-        return dto == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(dto);
+        if (dto == null) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Cargo não encontrado no seu escopo.");
+        return ResponseEntity.ok(dto);
     }
 
     @PostMapping
@@ -34,12 +40,16 @@ public class CargoControlador {
     @ExigirSenha
     public ResponseEntity<CargoDTO> atualizar(@PathVariable Long id, @Valid @RequestBody CargoDTO dto) {
         CargoDTO updated = servico.atualizar(id, dto);
-        return updated == null ? ResponseEntity.notFound().build() : ResponseEntity.ok(updated);
+        if (updated == null) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Cargo não encontrado no seu escopo.");
+        return ResponseEntity.ok(updated);
     }
 
     @DeleteMapping("/{id}")
     @ExigirSenha
     public ResponseEntity<Void> excluir(@PathVariable Long id) {
-        return servico.excluir(id) ? ResponseEntity.noContent().build() : ResponseEntity.notFound().build();
+        if (!servico.excluir(id)) throw new org.springframework.web.server.ResponseStatusException(
+                org.springframework.http.HttpStatus.NOT_FOUND, "Cargo não encontrado no seu escopo.");
+        return ResponseEntity.noContent().build();
     }
 }

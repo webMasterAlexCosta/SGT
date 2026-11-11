@@ -39,9 +39,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Critério CON-009:001; norma de autorização corrente do executor.
  * Fonte C8 cdf471fbe344f4eb4e096a5e86b6f71226fe3ad3cde040baa6d6d4d4812e5545.
  * Coordenação derivada dos REDs C3→C4→C6: somente uma espera efetivamente
- * observada no performance_schema autoriza avançar para a revogação.
+ * observada em pg_stat_activity/pg_locks autoriza avançar para a revogação.
  * Sem alteração produtiva, sem fabricação de fato legado e sem execução
- * Maven/Java/MySQL por este revisor; execução exclusivamente pela raiz.
+ * Maven/Java/PostgreSQL por este revisor; execução exclusivamente pela raiz.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @TestPropertySource(properties = {"spring.cache.type=redis", "spring.sql.init.mode=never",
@@ -78,7 +78,7 @@ class Candidato8CriacaoContratoExecutorRevogadoRedIT extends ContratosHttpBase {
                 // Esta transação bloqueia somente o Tipo usado pela criação.
                 // Não toca Usuario, Contrato nem flags do catálogo.
                 em.find(TipoContratacao.class, c.tipoA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarTipo.await(30, TimeUnit.SECONDS))
@@ -137,12 +137,12 @@ class Candidato8CriacaoContratoExecutorRevogadoRedIT extends ContratosHttpBase {
         CompletableFuture<Void> esperaObservada = new CompletableFuture<>();
         var observador = Executors.newSingleThreadScheduledExecutor();
         // A cadência limita consultas. A evidência de espera é a linha real do
-        // MySQL ligada à conexão que mantém PWRITE do Tipo, não um sleep.
+        // PostgreSQL ligada à conexão que mantém PWRITE do Tipo, não um sleep.
         var consulta = observador.scheduleWithFixedDelay(() -> {
             try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
+                Long esperas = jdbc.queryForObject("""
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND ? = ANY(pg_blocking_pids(a.pid))
+""", Long.class, conexaoBloqueadora);
                 if (esperas != null && esperas >= 1) esperaObservada.complete(null);
                 else if (tentativa.isDone()) esperaObservada.completeExceptionally(
                         new AssertionError("Criação não alcançou a espera real no Tipo de Contratação"));

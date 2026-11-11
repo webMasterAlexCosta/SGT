@@ -1,6 +1,8 @@
 package com.example.siggtrat.entidade;
 
 import jakarta.persistence.*;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.hibernate.annotations.Immutable;
 import java.time.Instant;
 import java.time.LocalDate;
@@ -38,9 +40,9 @@ public class VersaoComplementoFrequencia {
     private String motivoTecnico;
     @Column(name = "versao_anterior_id", updatable = false)
     private Long versaoAnteriorId;
-    @Lob @Column(name = "fotografia_json", nullable = false, updatable = false, columnDefinition = "LONGTEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR) @Column(name = "fotografia_json", nullable = false, updatable = false, columnDefinition = "text")
     private String fotografiaJson;
-    @Lob @Column(name = "contextos_json", nullable = false, updatable = false, columnDefinition = "LONGTEXT")
+    @JdbcTypeCode(SqlTypes.LONGVARCHAR) @Column(name = "contextos_json", nullable = false, updatable = false, columnDefinition = "text")
     private String contextosJson;
     @Column(name = "hash_anterior", updatable = false, length = 64)
     private String hashAnterior;

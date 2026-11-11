@@ -22,5 +22,6 @@ public record TransferenciaGestaoContratoDTO(
         String responsavelUsername,
         List<MapeamentoTransferenciaGestaoDTO> mapeamentos,
         Long tipoContratacaoDestinoId,
-        String tipoContratacaoDestinoDescricao
+        String tipoContratacaoDestinoDescricao,
+        ConferenciaDocumentalAtoDTO conferenciaDocumental
 ) {}

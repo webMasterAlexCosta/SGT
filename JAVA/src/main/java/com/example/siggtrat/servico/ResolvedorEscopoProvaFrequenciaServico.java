@@ -22,7 +22,11 @@ import java.util.stream.Collectors;
  */
 @Service
 @Transactional(readOnly = true)
-public class ResolvedorEscopoProvaFrequenciaServico {
+public class ResolvedorEscopoProvaFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ResolvedorEscopoProvaFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ContratoRepositorio contratos;
     private final VinculoContratualRepositorio vinculos;
     private final AlocacaoVinculoRepositorio alocacoes;

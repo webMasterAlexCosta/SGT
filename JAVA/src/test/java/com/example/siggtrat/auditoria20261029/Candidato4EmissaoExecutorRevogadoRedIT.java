@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
@@ -33,7 +36,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /** Revisor transversal C4, hipótese C4-TR-H02. Proposta não executada pelo autor.
  * Manifesto: 13c84fd30b668335228704fd1028ddea11adad6f607458a7b7fa993dcbc64a89.
- * HTTP/MySQL reais, sem mocks de persistência ou autorização e sem DDL manual. */
+ * HTTP/PostgreSQL reais, sem mocks de persistência ou autorização e sem DDL manual. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class Candidato4EmissaoExecutorRevogadoRedIT extends ContratosHttpBase {
     @Autowired private DataSource dataSource;
@@ -55,7 +58,7 @@ class Candidato4EmissaoExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, c.contratoA.getId(), LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Limite da fixture: fonte não liberada");
@@ -63,8 +66,11 @@ class Candidato4EmissaoExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(requisicao).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("emissao-relatorio-administrativo");
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(requisicao).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    "Emissão administrativa: Contrato da fixture", tentativa);
             Map<String,Object> revogacao = rebaixarPerfil
                     ? mapa("perfil", "OPERACIONAL", "gestaoLocalId", c.gestaoA.getId(),
                             "lotacaoId", c.lotacaoA.getId(), "jornadaId", c.jornadaA.getId())
@@ -85,7 +91,7 @@ class Candidato4EmissaoExecutorRevogadoRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
                     "hipotese", "C4-TR-H02", "rebaixarPerfil", rebaixarPerfil,
-                    "esperaMySqlObservada", true, "revogacaoCommitadaAntesDaLiberacao", true,
+                    "esperaPostgresObservada", espera, "revogacaoCommitadaAntesDaLiberacao", true,
                     "status", resultado.getResponse().getStatus(), "antes", antes, "depois", depois)));
             assertAll("Autorização atual governa emissão mesmo após aguardar fontes",
                     () -> assertThat(resultado.getResponse().getStatus()).isIn(401, 403, 404, 409),
@@ -106,21 +112,5 @@ class Candidato4EmissaoExecutorRevogadoRedIT extends ContratosHttpBase {
                         .setParameter("u", usuarioId).getSingleResult()));
     }
 
-    private void aguardarBloqueioReal(long conexaoBloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<Void> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
-                if (esperas != null && esperas > 0) observada.complete(null);
-                else if (tentativa.isDone()) observada.completeExceptionally(new AssertionError("Emissão não aguardou a fonte"));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { observada.get(10, TimeUnit.SECONDS); }
-        finally { consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS); }
-    }
     private record Estado(long emissoes, long superadas) { }
 }

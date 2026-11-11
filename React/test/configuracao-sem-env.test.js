@@ -2,13 +2,13 @@
 import { readFileSync } from 'node:fs';
 import { parseEnv } from 'node:util';
 import { describe, expect, it } from 'vitest';
-import { criarConfiguracaoFrontend } from '../src/core/configuracaoFrontend.js';
+import { criarConfiguracaoFrontend } from '../src/core/configuracaoFrontend.ts';
 
 const exemplo = parseEnv(readFileSync(new URL('../.env.example', import.meta.url), 'utf8'));
 
 describe('Configuração reproduzível da suíte sem ambiente privado', () => {
   it('importa a configuração real do aplicativo usando o exemplo sanitizado nos testes', async () => {
-    const { CONFIG } = await import('../src/core/config.js');
+    const { CONFIG } = await import('../src/core/config.ts');
     expect(CONFIG.API_URL).toBe(exemplo.VITE_API_URL);
     expect(CONFIG.APP_NAME).toBe(exemplo.VITE_APP_NAME);
     expect(CONFIG.HTTP_TIMEOUT).toBe(Number(exemplo.VITE_HTTP_TIMEOUT));

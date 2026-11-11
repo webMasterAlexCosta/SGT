@@ -34,7 +34,7 @@ class AuditoriaFinalMetadadosEmissaoMinimizacaoHttpIT extends AuditoriaHttpSupor
         registrar(c, "PRESENCA", canario);
         em.flush(); em.clear();
         EmissaoRelatorioAdministrativo persistida = em.find(EmissaoRelatorioAdministrativo.class, emissaoId);
-        assertEquals(canario, persistida.getMotivoSuperacao(), "Pré-condição: motivo original preservado no MySQL");
+        assertEquals(canario, persistida.getMotivoSuperacao(), "Pré-condição: motivo original preservado no PostgreSQL");
         byte[] prova = persistida.getConteudoSnapshotGzip().clone();
         String hash = persistida.getHashConteudo();
         JsonNode leituraLocal = dados(executar(c.localA,

@@ -50,7 +50,7 @@ class CatalogoPublicacaoConcorrenteAuditoriaIndependenteHttpIT extends Contratos
                 conexao.complete(conexaoAtual()); aguardarLiberacao(liberar);
             }
             return resposta;
-        }).when(disponibilidade).ativoEm(eq(tipo), eq(f.item().id()), eq(f.inicio()), eq(Boolean.TRUE));
+        }).when(org.springframework.test.util.AopTestUtils.<DisponibilidadeCatalogoTemporalServico>getUltimateTargetObject(disponibilidade)).ativoEm(eq(tipo), eq(f.item().id()), eq(f.inicio()), eq(Boolean.TRUE));
         var reqPublicar = autenticar(post(base(f.contratoId()) + "/publicar")
                 .contentType(MediaType.APPLICATION_JSON).content(json(publicacao())), f.c().localA);
         var reqExcluir = autenticar(delete(f.item().rota()), f.c().localA);
@@ -80,7 +80,7 @@ class CatalogoPublicacaoConcorrenteAuditoriaIndependenteHttpIT extends Contratos
                 conexao.complete(conexaoAtual()); aguardarLiberacao(liberar);
             }
             return resposta;
-        }).when(programacao).exigirSemProgramacaoFutura(
+        }).when(org.springframework.test.util.AopTestUtils.<ProgramacaoFuturaCatalogoServico>getUltimateTargetObject(programacao)).exigirSemProgramacaoFutura(
                 eq(ProgramacaoFuturaCatalogoServico.TipoCatalogo.valueOf(tipo.name())), eq(f.item().id()));
         var reqExcluir = autenticar(delete(f.item().rota()), f.c().localA);
         var reqPublicar = autenticar(post(base(f.contratoId()) + "/publicar")
@@ -227,7 +227,7 @@ class CatalogoPublicacaoConcorrenteAuditoriaIndependenteHttpIT extends Contratos
         return mapa("dataPublicacao", RelogioSistema.hoje(), "referenciaSei", "SEI-CORRIDA-CATALOGO",
                 "justificativa", "Publicação concorrente documentada");
     }
-    private long conexaoAtual() { return ((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue(); }
+    private long conexaoAtual() { return ((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue(); }
     private void aguardarLiberacao(CountDownLatch barreira) {
         try {
             if (!barreira.await(25, TimeUnit.SECONDS)) throw new AssertionError("Barreira de teste expirou");
@@ -237,10 +237,8 @@ class CatalogoPublicacaoConcorrenteAuditoriaIndependenteHttpIT extends Contratos
         long fim = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
         while (System.nanoTime() < fim) {
             long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                    select count(*) from performance_schema.data_lock_waits espera
-                    join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                    where bloqueador.PROCESSLIST_ID=:conexao
-                    """).setParameter("conexao", conexao).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexao).getSingleResult()).longValue());
             if (esperas > 0) return;
             if (concorrente.isDone()) {
                 MvcResult r = concorrente.get();
@@ -249,9 +247,16 @@ class CatalogoPublicacaoConcorrenteAuditoriaIndependenteHttpIT extends Contratos
             }
             TimeUnit.MILLISECONDS.sleep(20);
         }
-        throw new AssertionError("MySQL não registrou espera na transação " + conexao);
+        throw new AssertionError("PostgreSQL não registrou espera na transação " + conexao);
     }
     private void conferirStatus(MvcResult resposta, int status) throws Exception {
+        if(resposta.getResponse().getStatus()!=status) {
+            Throwable causa=resposta.getResolvedException();
+            for(int i=0;causa!=null&&i<16;i++,causa=causa.getCause()) {
+                if(causa instanceof org.hibernate.StaleObjectStateException stale)
+                    System.out.println("CATALOGO_STALE_ENTIDADE tipo="+stale.getEntityName()+" idFixture="+stale.getIdentifier());
+            }
+        }
         assertThat(resposta.getResponse().getStatus()).as(resposta.getResponse().getContentAsString()).isEqualTo(status);
     }
     private Class<?> classe(TipoCatalogoTemporal tipo) {

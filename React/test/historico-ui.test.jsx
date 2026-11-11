@@ -6,10 +6,10 @@ import '@testing-library/jest-dom/vitest';
 const { requisitar, autenticacao } = vi.hoisted(() => ({
   requisitar: vi.fn(), autenticacao: { user: { perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' } },
 }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => autenticacao }));
-import { FormularioProvaHistorica } from '../src/modules/historico/FormularioProvaHistorica.jsx';
-import { ResultadoNome, TabelaHistorica, PublicacaoOriginal } from '../src/modules/historico/ResultadosHistoricos.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: (v) => Array.isArray(v) ? v : v?.content || [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => autenticacao }));
+import { FormularioProvaHistorica } from '../src/modules/historico/FormularioProvaHistorica.tsx';
+import { ResultadoNome, TabelaHistorica, PublicacaoOriginal } from '../src/modules/historico/ResultadosHistoricos.tsx';
 
 const previa = { tipoCatalogo: 'CARGO', catalogoId: 8, dataEfetiva: '2026-01-01', ativoAnterior: true,
   ativo: false, ativoAtualAposRegistro: false, versaoAtual: 0, tokenPrevia: 'token-java', impactos: ['Reavaliar dependências temporais.'] };

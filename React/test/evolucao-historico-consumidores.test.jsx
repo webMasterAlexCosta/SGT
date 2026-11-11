@@ -4,16 +4,16 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import '@testing-library/jest-dom/vitest';
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, requisitarDownload: vi.fn(),
+vi.mock('../src/core/http.ts', () => ({ requisitar, requisitarDownload: vi.fn(),
   extrairLista: value => Array.isArray(value) ? value : value?.content || [],
   extrairPagina: value => Array.isArray(value) ? { content: value, totalPages: 1 } : value,
 }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { id: 7, perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
-vi.mock('../src/core/security/useConfirmacaoSenha.jsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null, fechar: vi.fn() }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { ModalDetalhesContrato } from '../src/modules/admin/pages/PaginaContratos/components/ModalDetalhesContrato/index.jsx';
-import { PainelAlteracoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.jsx';
-import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.jsx';
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { id: 7, perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
+vi.mock('../src/core/security/useConfirmacaoSenha.tsx', () => ({ useConfirmacaoSenha: () => ({ confirmarComSenha: vi.fn(), ModalConfirmacao: () => null, fechar: vi.fn() }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { ModalDetalhesContrato } from '../src/modules/admin/pages/PaginaContratos/components/ModalDetalhesContrato/index.tsx';
+import { PainelAlteracoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx';
+import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.tsx';
 
 const origem = { tipo: 'PROVA_HISTORICA', provaId: 81, composicaoId: 31,
   dataEfetiva: '2026-01-01', registradoEm: '2026-02-01T12:00:00.123456Z' };

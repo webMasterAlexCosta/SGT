@@ -36,7 +36,8 @@ class RevisaoIndependenteProvaContratoIT extends ContratosHttpBase {
         var n = novo(c);
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
         LocalDate data = RelogioSistema.hoje().minusDays(2);
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência sintética da revisão independente",

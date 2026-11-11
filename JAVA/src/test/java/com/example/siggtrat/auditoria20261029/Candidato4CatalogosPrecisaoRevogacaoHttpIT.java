@@ -1,5 +1,7 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.example.siggtrat.dominio.acesso.PerfilAcesso;
 import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.entidade.Cargo;
@@ -47,7 +49,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Hipóteses C4-PES-H01 (recibo temporal do catálogo) e C4-PES-H02 (revogação
  * durante espera no catálogo). Não compilado nem executado pelo revisor.
  * Usa a fixture HTTP compartilhada, que suprime somente o agendador de fundo;
- * não simula autorização, MySQL, Redis, relógio, serviços ou transações.
+ * não simula autorização, PostgreSQL, Redis, relógio, serviços ou transações.
  * Todas as fontes abaixo são declaradamente sintéticas, não acervo recuperado.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -61,8 +63,8 @@ class Candidato4CatalogosPrecisaoRevogacaoHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigirInfraestruturaReal() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -101,10 +103,10 @@ class Candidato4CatalogosPrecisaoRevogacaoHttpIT extends ContratosHttpBase {
                 "reenvio", reenvio, "consulta_K_recibo", noRecibo,
                 "consulta_K_recibo_menos_1ns", antesRecibo, "consulta_K_persistido", noPersistido,
                 "consulta_K_persistido_menos_1ns", antesPersistido,
-                "transporte", "MockMvc/dispatcher real; MySQL8.0.45 e Redis reais; não TCP")));
+                "transporte", "MockMvc/dispatcher real; PostgreSQL18.6 e Redis reais; não TCP")));
         SoftAssertions.assertSoftly(soft -> {
             // Nenhuma tolerância/truncamento no oráculo: K é o instante anunciado.
-            soft.assertThat(recebido).as("Recibo canônico é o mesmo instante gravado no MySQL")
+            soft.assertThat(recebido).as("Recibo canônico é o mesmo instante gravado no PostgreSQL")
                     .isEqualTo(persistido);
             soft.assertThat(Instant.parse(reenvio.path("registradoEm").asText()))
                     .as("Reenvio não altera o instante do recibo original").isEqualTo(recebido);
@@ -137,7 +139,7 @@ class Candidato4CatalogosPrecisaoRevogacaoHttpIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Cargo.class, id, LockModeType.PESSIMISTIC_WRITE);
-                bloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                bloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(25, TimeUnit.SECONDS)) throw new AssertionError("Fixture não liberou o Cargo");
@@ -147,8 +149,11 @@ class Candidato4CatalogosPrecisaoRevogacaoHttpIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = bloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("transicao-cargo");
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("cargo", "id_cargo", id),
+                    "Cargo da transição de disponibilidade", tentativa);
             var revogacao = rebaixarPerfil
                     ? mapa("perfil", "OPERACIONAL", "gestaoLocalId", c.gestaoA.getId(),
                             "lotacaoId", c.lotacaoA.getId(), "jornadaId", c.jornadaA.getId())
@@ -171,7 +176,7 @@ class Candidato4CatalogosPrecisaoRevogacaoHttpIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, json(mapa("hipotese", "C4-PES-H02", "rebaixarPerfil", rebaixarPerfil,
                     "status", resposta.getResponse().getStatus(), "estadoAntes", antes, "estadoDepois", depois,
-                    "espera_mysql_observada", true, "revogacao_commitou_antes_da_liberacao", true)));
+                    "esperaPostgresObservada", espera, "revogacao_commitou_antes_da_liberacao", true)));
             SoftAssertions.assertSoftly(soft -> {
                 soft.assertThat(resposta.getResponse().getStatus()).as("Revogação exige recusa sem mutação")
                         .isIn(401, 403, 404, 409);
@@ -212,19 +217,6 @@ class Candidato4CatalogosPrecisaoRevogacaoHttpIT extends ContratosHttpBase {
                     .setParameter("tipo", TipoCatalogoTemporal.CARGO).setParameter("id", id).getSingleResult();
             return new Estado(cargo.getAtivo(), cargo.getVersion(), eventos);
         });
-    }
-    private void aguardarBloqueioReal(long bloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < limite) {
-            Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                    + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                    + "where t.PROCESSLIST_ID=?", Long.class, bloqueadora);
-            if (esperas != null && esperas >= 1) return;
-            if (tentativa.isDone()) throw new AssertionError("Comando não alcançou a espera real no Cargo");
-            Thread.sleep(25);
-        }
-        throw new AssertionError("Espera não observada no MySQL performance_schema");
     }
     private record Estado(Boolean ativo, long versao, long eventos) {}
 }

@@ -32,7 +32,9 @@ import static org.springframework.http.HttpStatus.BAD_REQUEST;
 import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 
 @Service
-public class RecuperacaoSenhaServico {
+public class RecuperacaoSenhaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return logger; }
+
 
     private static final Logger logger = LoggerFactory.getLogger(RecuperacaoSenhaServico.class);
     private static final SecureRandom SECURE_RANDOM = new SecureRandom();

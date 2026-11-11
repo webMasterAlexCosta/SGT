@@ -7,7 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 
 import java.time.Instant;
 import java.util.Map;
@@ -116,8 +116,8 @@ class FrequenciaConsultaMinimizacaoHttpIT extends AuditoriaHttpSuporte {
                 200, "Fonte real com observação pessoal e memória de quatro horas")).path("id").asLong();
     }
 
-    private MockHttpServletRequestBuilder consulta(String rota, Long contrato) {
-        MockHttpServletRequestBuilder request = switch (rota) {
+    private AbstractMockHttpServletRequestBuilder<?> consulta(String rota, Long contrato) {
+        AbstractMockHttpServletRequestBuilder<?> request = switch (rota) {
             case "dia" -> get("/api/frequencias").param("data", DATA.toString());
             case "mensal" -> get("/api/frequencias/mensal").param("mes", "6").param("ano", "2026");
             default -> get("/api/frequencias/intervalo").param("inicio", DATA.toString()).param("fim", DATA.toString());

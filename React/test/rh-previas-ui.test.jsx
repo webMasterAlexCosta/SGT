@@ -4,12 +4,12 @@ import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testi
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar, notificar } = vi.hoisted(() => ({ requisitar: vi.fn(), notificar: vi.fn() }));
-vi.mock('../src/core/http.js', async (original) => ({ ...(await original()), requisitar }));
-vi.mock('../src/core/events.js', async (original) => ({ ...(await original()), notificar }));
+vi.mock('../src/core/http.ts', async (original) => ({ ...(await original()), requisitar }));
+vi.mock('../src/core/events.ts', async (original) => ({ ...(await original()), notificar }));
 
-import { ModalAcaoVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalVinculo.jsx';
-import { ModalAlocacoesVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalAlocacoesVinculo.jsx';
-import { ModalCadastroVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalCadastroVinculo.jsx';
+import { ModalAcaoVinculo, ModalVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalVinculo.tsx';
+import { ModalAlocacoesVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalAlocacoesVinculo.tsx';
+import { ModalCadastroVinculo } from '../src/modules/rh/pages/PaginaPessoasVinculos/components/ModalCadastroVinculo.tsx';
 
 const pendente = () => {
   let resolve, reject;
@@ -140,6 +140,62 @@ const montarAlocacao = async (extras = {}) => {
   auditar();
   return props;
 };
+
+describe('Data civil administrativa nos modais de vínculo e alocação', () => {
+  // Relógio e offset controlados somente neste teste isolado; não é meia-noite física.
+  afterEach(() => { vi.useRealTimers(); vi.restoreAllMocks(); });
+  const relogio = instante => { vi.useFakeTimers({ toFake: ['Date'] }); vi.setSystemTime(new Date(instante)); };
+  const detalhe = extras => ({ aberto: true, vinculo: { ...vinculo, dataFim: '2026-11-10' }, podeGerenciar: true,
+    aoFechar: vi.fn(), aoConsultarTemporal: vi.fn(), aoAbrirAcao: vi.fn(), aoAbrirAlocacoes: vi.fn(), ...extras });
+  const alocacao = extras => ({ aberto: true, vinculo, podeGerenciar: true, processando: false,
+    aoFechar: vi.fn(), aoSalvarAlocacao: vi.fn(), aoCancelarAlocacao: vi.fn(), ...extras });
+
+  it.each([
+    ['2026-11-11T01:30:00Z', '2026-11-10', true],
+    ['2026-11-11T03:05:00Z', '2026-11-11', false],
+  ])('vínculo usa São Paulo no instante %s para consulta e cancelamento', (instante, data, cancelavel) => {
+    relogio(instante); render(<ModalVinculo {...detalhe()} />);
+    expect(screen.getByLabelText('Data de referência', { exact: true })).toHaveValue(data);
+    const cancelar = screen.queryByRole('button', { name: 'Cancelar desligamento programado', exact: true });
+    if (cancelavel) expect(cancelar).toBeInTheDocument(); else expect(cancelar).not.toBeInTheDocument();
+  });
+
+  it('reabrir o mesmo vínculo em outro dia atualiza a data administrativa', () => {
+    relogio('2026-11-10T18:00:00Z'); const props = detalhe({ aberto: false });
+    const view = render(<ModalVinculo {...props} />);
+    vi.setSystemTime(new Date('2026-11-11T12:00:00Z')); view.rerender(<ModalVinculo {...props} aberto />);
+    expect(screen.getByLabelText('Data de referência', { exact: true })).toHaveValue('2026-11-11');
+    expect(screen.queryByRole('button', { name: 'Cancelar desligamento programado', exact: true })).not.toBeInTheDocument();
+  });
+
+  it('mudança do dia atualiza ações sem apagar D/K escolhido num modal aberto', () => {
+    relogio('2026-11-10T18:00:00Z'); const props = detalhe(); const view = render(<ModalVinculo {...props} />);
+    fireEvent.change(screen.getByLabelText('Data de referência', { exact: true }), { target: { value: '2026-10-05' } });
+    fireEvent.change(screen.getByLabelText('Conhecido até (opcional)', { exact: true }), { target: { value: '2026-11-01T10:20' } });
+    vi.setSystemTime(new Date('2026-11-11T12:00:00Z')); view.rerender(<ModalVinculo {...props} />);
+    expect(screen.getByLabelText('Data de referência', { exact: true })).toHaveValue('2026-10-05');
+    expect(screen.getByLabelText('Conhecido até (opcional)', { exact: true })).toHaveValue('2026-11-01T10:20');
+    expect(screen.queryByRole('button', { name: 'Cancelar desligamento programado', exact: true })).not.toBeInTheDocument();
+  });
+
+  it('alocação não usa o dia do cliente UTC+14 na consulta e no novo movimento', async () => {
+    relogio('2026-11-10T12:00:00Z'); vi.spyOn(Date.prototype, 'getTimezoneOffset').mockReturnValue(-840);
+    await act(async () => render(<ModalAlocacoesVinculo {...alocacao()} />));
+    expect(screen.getByLabelText('Data de referência', { exact: true })).toHaveValue('2026-11-10');
+    fireEvent.click(screen.getByRole('button', { name: 'Programar / alterar alocação' }));
+    expect(screen.getByLabelText(/^Válido a partir de/)).toHaveValue('2026-11-10');
+  });
+
+  it('reabrir alocações em outro dia também renova a data do novo movimento', async () => {
+    relogio('2026-11-10T12:00:00Z'); const props = alocacao({ aberto: false });
+    const view = render(<ModalAlocacoesVinculo {...props} />);
+    vi.setSystemTime(new Date('2026-11-11T12:00:00Z'));
+    await act(async () => view.rerender(<ModalAlocacoesVinculo {...props} aberto />));
+    expect(screen.getByLabelText('Data de referência', { exact: true })).toHaveValue('2026-11-11');
+    fireEvent.click(screen.getByRole('button', { name: 'Programar / alterar alocação' }));
+    expect(screen.getByLabelText(/^Válido a partir de/)).toHaveValue('2026-11-11');
+  });
+});
 
 describe('Prévia de alocação vinculada ao editor atual', () => {
   it('ignora a prévia lenta depois de editar a justificativa', async () => {

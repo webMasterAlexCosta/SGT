@@ -22,7 +22,7 @@ import java.util.UUID;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Compatibilidade real MySQL: assinatura original, v2 com escopo e v3 com fonte coexistem. */
+/** Compatibilidade real PostgreSQL: assinatura original, v2 com escopo e v3 com fonte coexistem. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class HistoricoAssinaturaLegadaMistaHttpIT extends ContratosHttpBase {
     @Autowired HistoricoIntegridadeServico integridade;
@@ -47,9 +47,27 @@ class HistoricoAssinaturaLegadaMistaHttpIT extends ContratosHttpBase {
         });
         String hashOriginal = emTransacao(() -> em.find(HistoricoEmpregado.class, idLegado).getHashIntegridade());
         assertTrue(integridade.verificarEmpregado(c.empregadoA.getId()).integro());
-        long idV2 = emTransacao(() -> integridade.salvarAssinado(novo(
-                em.find(Empregado.class, c.empregadoA.getId()), em.find(UsuarioAplicacao.class, c.localA.getId()),
-                "Registro genérico novo com escopo autenticado")).getId());
+        long idV2 = emTransacao(() -> {
+            HistoricoEmpregado h = novo(em.find(Empregado.class, c.empregadoA.getId()),
+                    em.find(UsuarioAplicacao.class, c.localA.getId()), "Registro genérico novo com escopo autenticado");
+            h.setGestaoLocalSnapshotId(c.gestaoA.getId()); h.setSuperintendenciaSnapshotId(c.seA.getId());
+            h.setDataEfetiva(DATA);
+            HistoricoEmpregado salvo = integridade.salvarAssinado(h);
+            assertEquals(2, salvo.getVersaoAssinatura()); return salvo.getId();
+        });
+        adulteracaoV2Isolada(c, idV2, "Gestão", h -> h.setGestaoLocalSnapshotId(c.gestaoB.getId()),
+                h -> h.setGestaoLocalSnapshotId(c.gestaoA.getId()));
+        adulteracaoV2Isolada(c, idV2, "Estado", h -> h.setSuperintendenciaSnapshotId(c.seB.getId()),
+                h -> h.setSuperintendenciaSnapshotId(c.seA.getId()));
+        adulteracaoV2Isolada(c, idV2, "Data efetiva", h -> h.setDataEfetiva(DATA.plusDays(1)),
+                h -> h.setDataEfetiva(DATA));
+        adulteracaoV2Isolada(c, idV2, "Descrição", h -> h.setDescricao("Descrição sintética adulterada"),
+                h -> h.setDescricao("Registro genérico novo com escopo autenticado"));
+        adulteracaoV2Isolada(c, idV2, "Instante", h -> h.setDataEvento(LocalDateTime.of(2026, 6, 10, 9, 30, 1)),
+                h -> h.setDataEvento(LocalDateTime.of(2026, 6, 10, 9, 30)));
+        adulteracaoV2Isolada(c, idV2, "Autor", h -> h.setUsuario(em.find(UsuarioAplicacao.class, c.localB.getId())),
+                h -> h.setUsuario(em.find(UsuarioAplicacao.class, c.localA.getId())));
+        adulteracaoV2Isolada(c, idV2, "Marcador de versão", h -> h.setVersaoAssinatura(1), h -> h.setVersaoAssinatura(2));
         long ocorrencia = dados(executar(c.localA, multipart("/api/ocorrencias")
                 .param("empregadoId", c.empregadoA.getId().toString()).param("motivo", "ATESTADO")
                 .param("dataOcorrencia", DATA.toString()).param("dias", "1")
@@ -65,7 +83,7 @@ class HistoricoAssinaturaLegadaMistaHttpIT extends ContratosHttpBase {
             return h.getId();
         });
         JsonNode verificacao = consultar(c.localA, "/api/historicos-empregados/empregado/" + c.empregadoA.getId() + "/integridade",
-                "Verificação HTTP relê a cadeia mista confirmada no MySQL");
+                "Verificação HTTP relê a cadeia mista confirmada no PostgreSQL");
         assertTrue(verificacao.path("integro").asBoolean()); assertEquals(3, verificacao.path("registrosVerificados").asInt());
         assertTrue(verificacao.path("mensagem").asText().contains("legado"),
                 "Não se atribui proteção de escopo retroativa à assinatura original");
@@ -81,6 +99,23 @@ class HistoricoAssinaturaLegadaMistaHttpIT extends ContratosHttpBase {
     private HistoricoEmpregado novo(Empregado e, UsuarioAplicacao u, String descricao) {
         HistoricoEmpregado h = new HistoricoEmpregado(); h.setEmpregado(e); h.setUsuario(u);
         h.setDataEvento(LocalDateTime.of(2026, 6, 10, 9, 30)); h.setDescricao(descricao); return h;
+    }
+
+    private void adulteracaoV2Isolada(Cenario c, long historico, String campo,
+            java.util.function.Consumer<HistoricoEmpregado> alterar,
+            java.util.function.Consumer<HistoricoEmpregado> restaurar) {
+        assertTrue(integridade.verificarEmpregado(c.empregadoA.getId()).integro(), "Controle íntegro antes de " + campo);
+        String hash = emTransacao(() -> em.find(HistoricoEmpregado.class, historico).getHashIntegridade());
+        emTransacao(() -> { alterar.accept(em.find(HistoricoEmpregado.class, historico)); em.flush(); return null; });
+        var adulterada = integridade.verificarEmpregado(c.empregadoA.getId());
+        assertFalse(adulterada.integro(), "Cada campo v2 rompe isoladamente a prova: " + campo);
+        assertEquals(historico, adulterada.primeiroRegistroInvalido());
+        emTransacao(() -> {
+            HistoricoEmpregado h = em.find(HistoricoEmpregado.class, historico); restaurar.accept(h);
+            assertEquals(hash, h.getHashIntegridade(), "Restaurar o fato não recalcula nem troca sua assinatura");
+            em.flush(); return null;
+        });
+        assertTrue(integridade.verificarEmpregado(c.empregadoA.getId()).integro(), "Controle restaurado entre tentativas: " + campo);
     }
 
     private String assinar(String conteudo) {

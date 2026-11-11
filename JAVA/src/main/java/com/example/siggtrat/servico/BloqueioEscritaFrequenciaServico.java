@@ -29,7 +29,11 @@ import java.util.TreeSet;
  */
 @Service
 @Transactional(propagation = Propagation.MANDATORY)
-public class BloqueioEscritaFrequenciaServico {
+public class BloqueioEscritaFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(BloqueioEscritaFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EntityManager em;
 
     public BloqueioEscritaFrequenciaServico(EntityManager em) { this.em = em; }
@@ -45,6 +49,8 @@ public class BloqueioEscritaFrequenciaServico {
         identidades.stream().map(IdentidadeVinculo::id).sorted().forEach(id -> bloquear(VinculoContratual.class, id));
         // A mesma Pessoa pode ainda não ter projeção. O lock da raiz impede duas
         // criações concorrentes; projeções existentes são travadas antes do uso.
+        // CPF coincidente trava somente a colisão defensivamente: não associa
+        // identidades. A projeção continua recusando fusão sem associação explícita.
         em.createQuery("""
                 select distinct e.id from Empregado e, Pessoa p
                 where p.id in :ids and (e.pessoaCanonica = p or (e.pessoaCanonica is null and e.cpf = p.cpf))
@@ -58,18 +64,14 @@ public class BloqueioEscritaFrequenciaServico {
         if (ids.isEmpty()) return Map.of();
         Map<Long, Long> pessoasPorEmpregado = new LinkedHashMap<>();
         List<Object[]> entradas = em.createQuery("""
-                select e.id, p.id, e.cpf from Empregado e left join e.pessoaCanonica p
+                select e.id, p.id from Empregado e left join e.pessoaCanonica p
                 where e.id in :ids order by e.id
                 """, Object[].class).setParameter("ids", ids).getResultList();
         if (entradas.size() != ids.size()) throw entrada("Um ou mais colaboradores não foram encontrados.");
         for (Object[] entrada : entradas) {
             Long pessoaId = (Long) entrada[1];
-            if (pessoaId == null) {
-                String cpf = entrada[2] == null ? "" : entrada[2].toString().replaceAll("\\D", "");
-                pessoaId = em.createQuery("select p.id from Pessoa p where p.cpf = :cpf", Long.class)
-                        .setParameter("cpf", cpf).getResultStream().findFirst()
-                        .orElseThrow(() -> conflito("Pessoa canônica não encontrada para o colaborador."));
-            }
+            if (pessoaId == null) throw conflito(
+                    "O colaborador não possui associação explícita com Pessoa canônica. Regularize a identidade antes da operação.");
             pessoasPorEmpregado.put((Long) entrada[0], pessoaId);
         }
         Set<Long> pessoas = new TreeSet<>(pessoasPorEmpregado.values());
@@ -87,13 +89,9 @@ public class BloqueioEscritaFrequenciaServico {
         for (Long id : ids) {
             Empregado empregado = bloquear(Empregado.class, id);
             Long pessoaId = pessoasPorEmpregado.get(id);
-            if (empregado.getPessoaCanonica() != null
-                    && !Objects.equals(pessoaId, empregado.getPessoaCanonica().getId())) {
-                throw conflito("A identidade do colaborador mudou durante a operação. Refaça a solicitação.");
-            }
             if (empregado.getPessoaCanonica() == null
-                    && !Objects.equals(empregado.getCpf(), em.find(Pessoa.class, pessoaId).getCpf())) {
-                throw conflito("O CPF de compatibilidade mudou durante a operação. Refaça a solicitação.");
+                    || !Objects.equals(pessoaId, empregado.getPessoaCanonica().getId())) {
+                throw conflito("A associação canônica do colaborador mudou durante a operação. Refaça a solicitação.");
             }
             resultado.put(id, empregado);
         }

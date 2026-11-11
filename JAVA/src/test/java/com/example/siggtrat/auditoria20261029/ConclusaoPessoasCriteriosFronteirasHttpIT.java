@@ -30,7 +30,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 
-/** Fronteiras identificadas pela revisão dos critérios, com confirmação em novas transações MySQL. */
+/** Fronteiras identificadas pela revisão dos critérios, com confirmação em novas transações PostgreSQL. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ConclusaoPessoasCriteriosFronteirasHttpIT extends ContratosHttpBase {
     private static final String V = "/api/vinculos-contratuais";
@@ -165,7 +165,8 @@ class ConclusaoPessoasCriteriosFronteirasHttpIT extends ContratosHttpBase {
                 201, "COL011 recontratação com pessoaId omite e preserva todos os opcionais");
         assertThat(novo.path("pessoaId").asLong()).isEqualTo(pessoaId);
         assertThat(novo.path("id").asLong()).isNotEqualTo(primeiro.path("id").asLong());
-        conferirOpcionais(consultar(f.c().localA, "/api/pessoas/" + pessoaId, "COL011 omissão não apaga conteúdo conhecido"));
+        JsonNode antesLimpeza = consultar(f.c().localA, "/api/pessoas/" + pessoaId, "COL011 omissão não apaga conteúdo conhecido");
+        conferirOpcionais(antesLimpeza);
         JsonNode limpo = dados(executar(f.c().localA, put("/api/pessoas/" + pessoaId + "/dados-opcionais")
                 .contentType(MediaType.APPLICATION_JSON).content(json(mapa("limparNitPisPasep", true))), 200,
                 "COL011 limpeza explícita remove só o NIT/PIS escolhido"));
@@ -173,6 +174,13 @@ class ConclusaoPessoasCriteriosFronteirasHttpIT extends ContratosHttpBase {
         assertThat(limpo.path("dataNascimento").asText()).isEqualTo("1990-03-04");
         assertThat(limpo.path("ctpsSerie").asText()).isEqualTo("CTPS-EXATA");
         assertThat(emTransacao(() -> em.find(Pessoa.class, pessoaId).getNitPisPasep())).isNull();
+        for (String campo : List.of("rg", "ctpsSerie", "dataNascimento", "email", "endereco"))
+            assertThat(limpo.path(campo)).as("COL-011:002[1] limpar NIT preserva %s inteiro", campo)
+                    .isEqualTo(antesLimpeza.path(campo));
+        JsonNode relida = consultar(f.c().localA, "/api/pessoas/" + pessoaId,
+                "COL011 resposta confirmada por outra requisição após commit da limpeza");
+        for (String campo : List.of("rg", "ctpsSerie", "nitPisPasep", "dataNascimento", "email", "endereco"))
+            assertThat(relida.path(campo)).as("COL011 releitura do mesmo pessoaId: %s", campo).isEqualTo(limpo.path(campo));
     }
 
     private void conferirOpcionais(JsonNode pessoa) {

@@ -1,0 +1,38 @@
+{
+  "verified": true,
+  "scope": "NATIVE_TWO_PACKAGED_JAR_RECOVERY_IN_SEQUENTIAL_PHASES_NOT_FULL_JUNIT",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "checks": {
+    "identidadeRoleOwnershipPg180006": true,
+    "hashesJarTemplateEClasses": true,
+    "configuracaoEquivalente": true,
+    "handoffEEstadoInicial": true,
+    "semConexoesDoPreparadorAntesDosFilhos": true,
+    "doisExecutoresEmDisputaFisica": true,
+    "retomadaAutomaticaSemPost": true,
+    "mesmoIdTentativaEPrefixo": true,
+    "duzentasFrequenciasEEventosUnicos": true,
+    "contadoresPorTentativa": true,
+    "doisServidoresSaudaveisAteTerminalMaisTresSegundos": true,
+    "terminalCanonicoEstavel": true,
+    "mesmosBytesJar": true,
+    "filhosPropriosEncerrados": true
+  },
+  "population": 200,
+  "job_id": 1,
+  "attempt": 2,
+  "preparation_is_acceptance": false,
+  "full_junit_executed": false,
+  "handoff_sha256": "f4e4299c84c0d0c76ba917c7b229d94202bab06fba7bec76d1dc611725d80a57",
+  "receipts": {
+    "it-recovery-prep-final08-01/result.json": "e7fcc29ca1352462d05b9abef84b3cb0969f65007fe90955769d380bb4ff10e4",
+    "it-recovery-phase2-final08-01/result.json": "030a4155c02bf1bd03b06d7050c7bbe858640f1ddceec8dc680c9be4a8bcaa37",
+    "it-recovery-phase2-final08-01/proof/resultado-segunda-fase.json": "3e8c41f7b6cf3c5ea89b0f21d579b201f61837ce47a333244fb23bbfdd57bb86"
+  },
+  "limits": [
+    "Isolated synthetic corpus of 200 links, real PostgreSQL 18.6 and isolated Valkey cache3; no FLUSH.",
+    "Stale lease15s/recovery1000ms/chunk1 are test overrides; no default recovery-time SLA claim.",
+    "Preparation and two physical JARs ran in separate phases, same handoff/database/JAR; no preparer connections before child executors.",
+    "Main browser API stopped; this does not prove browser/LAN/full lab restart."
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "state": "NATIVE_INTEGRATED26_SOL_APPROVED_BACKEND_AND_DECLARED_INTEGRATED_PREDICATES_FRONTEND_FINAL_PENDING",
+  "review_directory": "review-integrated64-backend26",
+  "runtime_model": "gpt-6.1-sol",
+  "runtime_effort": "xhigh",
+  "thread_id": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+  "turn_id": "01a1c89d-9d0a-7a62-9289-75c18945ef0e",
+  "cursor": "35b56430-583c-4408-bcd5-7dcbecc6cd38:260",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "parecer_sha256": "938b0ef073211ebf4e88711edfbd24fe6971461adbd98ca750d57e6af21717e7",
+  "freeze_sha256": "39714a1b5947572faabbc9e861867635bdbba3c03532f239dc1578f1e4e227a9",
+  "no_new_p0_p3_findings": true,
+  "approved_predicates": [
+    "E2E24_partial_real_API_failure_Chrome",
+    "ROP042_documents_late_options_and_accepted_conjunction",
+    "E2E10_N30_night_historical_Chrome_and_real_HTTP_other_manager_denied",
+    "820_ID_LEDGER_TRACEABILITY_NOT_AUTOMATIC_ALL_CRITERIA_APPROVAL"
+  ],
+  "backend_can_close_for_functional_lab_homologation": true,
+  "frontend_final_pending": true,
+  "no_global_acceptance": true
+}

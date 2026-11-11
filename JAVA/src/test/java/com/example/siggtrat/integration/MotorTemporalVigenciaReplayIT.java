@@ -28,12 +28,12 @@ import java.util.function.Supplier;
 import static org.assertj.core.api.Assertions.*;
 
 /**
- * TMP-004/005/008/010/014: JPA/MySQL reais e releitura em novas transações.
+ * TMP-004/005/008/010/014: JPA/PostgreSQL reais e releitura em novas transações.
  * Datas de conhecimento sintéticas são declaradas antes de persistir a fonte;
  * nenhum objeto de repositório/motor é mockado e nenhuma consulta cria história.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
-class MotorTemporalVigenciaReplayIT extends MySqlIntegrationTestSupport {
+class MotorTemporalVigenciaReplayIT extends PostgresIntegrationTestSupport {
     private static final LocalDate INICIO = LocalDate.of(2026, 1, 1);
     private static final LocalDate FIM = LocalDate.of(2026, 1, 31);
     private static final Instant T0 = Instant.parse("2026-01-01T01:00:00Z");

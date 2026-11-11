@@ -33,7 +33,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * EMP-001/003 e AUD-001 no cadastro compartilhado: requisições Spring MVC reais,
- * filtros de segurança, serviços e transações confirmadas no MySQL 8.0.45.
+ * filtros de segurança, serviços e transações confirmadas no PostgreSQL 18.6.
  * MockMvc não prova transporte TCP nem navegador. A fila de auditoria real é
  * descarregada pelo mesmo método de produção; não há mock de serviço ou banco.
  * A comparação com o mestre limita-se à identidade CNPJ explicitamente usada
@@ -51,10 +51,10 @@ class FornecedorIntegridadeAuditoriaHttpIT extends ContratosHttpBase {
     void confirmarServidorReal(TestInfo info) throws Exception {
         caso = info.getTestMethod().orElseThrow().getName();
         try (var conexao = dataSource.getConnection(); var stmt = conexao.createStatement();
-             var rs = stmt.executeQuery("select version(), database(), current_user()")) {
+             var rs = stmt.executeQuery("select version(), current_database(), current_user")) {
             assertThat(rs.next()).isTrue();
-            assertThat(rs.getString(1)).isEqualTo("8.0.45");
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
+            assertThat(rs.getString(1)).startsWith("PostgreSQL 18.6 ");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
             evidencia("ambiente", mapa("servidor", rs.getString(1), "schema", rs.getString(2),
                     "identidadeEfetiva", rs.getString(3)));
         }

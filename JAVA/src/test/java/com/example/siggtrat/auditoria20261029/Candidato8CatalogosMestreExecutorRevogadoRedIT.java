@@ -1,5 +1,7 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.example.siggtrat.dominio.catalogo.TipoCatalogoTemporal;
 import com.example.siggtrat.entidade.*;
 import jakarta.persistence.LockModeType;
@@ -11,7 +13,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -67,8 +69,8 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
     void cadastroMestreRevalidaExecutorAposEsperaAntesDeAlterarOuInativar(
             String recurso, String operacao) throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         Cenario c = criarCenarioPersistido();
         Catalogo catalogo = catalogo(recurso);
@@ -109,7 +111,7 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(catalogo.entidade(), id, LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarCatalogo.await(30, TimeUnit.SECONDS))
@@ -120,8 +122,11 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long bloqueadora = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(request).andReturn());
-            aguardarBloqueioReal(bloqueadora, tentativa);
+            var ator = new Ator("catalogo-mestre-" + recurso + "-" + operacao);
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(request).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), bloqueadora, ator,
+                    sql -> sql.selecaoChave(catalogo.tabela(), catalogo.colunaPk(), id),
+                    "Catálogo mestre da operação corrente", tentativa);
             executar(c.admin, put("/api/usuarios/" + c.localA.getId()).contentType(MediaType.APPLICATION_JSON)
                             .content(json(mapa("active", false))), 200,
                     "Admin revoga o executor durante a espera real de " + recurso + " " + operacao);
@@ -138,7 +143,7 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, json(mapa("hipotese", "C8-PES-H02", "recurso", recurso,
                     "operacao", operacao, "status", resposta.getResponse().getStatus(),
-                    "estadoAntes", antes, "estadoDepois", depois, "espera_mysql_observada", true,
+                    "estadoAntes", antes, "estadoDepois", depois, "esperaPostgresObservada", espera,
                     "revogacao_commitou_antes_da_liberacao", true)));
             assertAll("Gestor revogado não confirma a administração do catálogo após a espera",
                     () -> assertThat(resposta.getResponse().getStatus()).isIn(401, 403, 404, 409),
@@ -149,7 +154,7 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
         }
     }
 
-    private MockHttpServletRequestBuilder pedido(String rota, String operacao, Map<String, Object> body)
+    private AbstractMockHttpServletRequestBuilder<?> pedido(String rota, String operacao, Map<String, Object> body)
             throws Exception {
         return operacao.equals("DELETE") ? delete(rota)
                 : put(rota).contentType(MediaType.APPLICATION_JSON).content(json(body));
@@ -181,11 +186,11 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
 
     private Catalogo catalogo(String recurso) {
         return switch (recurso) {
-            case "cargos" -> new Catalogo(Cargo.class, TipoCatalogoTemporal.CARGO);
-            case "lotacoes" -> new Catalogo(Lotacao.class, TipoCatalogoTemporal.LOTACAO);
-            case "jornadas" -> new Catalogo(Jornada.class, TipoCatalogoTemporal.JORNADA);
-            case "tipos-contratacao" -> new Catalogo(TipoContratacao.class, TipoCatalogoTemporal.TIPO_CONTRATACAO);
-            case "motivos-desligamento" -> new Catalogo(MotivoDesligamento.class, TipoCatalogoTemporal.MOTIVO_DESLIGAMENTO);
+            case "cargos" -> new Catalogo(Cargo.class, TipoCatalogoTemporal.CARGO, "cargo", "id_cargo");
+            case "lotacoes" -> new Catalogo(Lotacao.class, TipoCatalogoTemporal.LOTACAO, "lotacao", "id_lotacao");
+            case "jornadas" -> new Catalogo(Jornada.class, TipoCatalogoTemporal.JORNADA, "jornada", "id_jornada");
+            case "tipos-contratacao" -> new Catalogo(TipoContratacao.class, TipoCatalogoTemporal.TIPO_CONTRATACAO, "tipo_contratacao", "id_tipo_contratacao");
+            case "motivos-desligamento" -> new Catalogo(MotivoDesligamento.class, TipoCatalogoTemporal.MOTIVO_DESLIGAMENTO, "motivo_desligamento", "id_motivo_desligamento");
             default -> throw new IllegalArgumentException("Recurso fora do escopo literal: " + recurso);
         };
     }
@@ -217,25 +222,7 @@ class Candidato8CatalogosMestreExecutorRevogadoRedIT extends ContratosHttpBase {
         });
     }
 
-    private void aguardarBloqueioReal(long bloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<Void> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, bloqueadora);
-                if (esperas != null && esperas > 0) observada.complete(null);
-                else if (tentativa.isDone()) observada.completeExceptionally(
-                        new AssertionError("Comando não alcançou a espera real no catálogo"));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { observada.get(10, TimeUnit.SECONDS); }
-        finally { consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS); }
-    }
-
-    private record Catalogo(Class<?> entidade, TipoCatalogoTemporal tipo) {}
+    private record Catalogo(Class<?> entidade, TipoCatalogoTemporal tipo, String tabela, String colunaPk) {}
     private record Estado(long id, long versao, String rotulo, Boolean ativo, long gestaoLocalId, List<Evento> eventos) {}
     private record Evento(long id, LocalDate dataEfetiva, Boolean ativoAnterior, Boolean ativo, Instant registradoEm,
                           String motivo, String evidencia, String autorizacao, String chaveOrigem,

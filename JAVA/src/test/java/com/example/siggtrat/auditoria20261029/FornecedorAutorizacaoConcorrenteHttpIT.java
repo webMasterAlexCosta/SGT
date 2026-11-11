@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.TestPropertySource;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -39,7 +39,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * A entrada é Gestor Local, como exige FornecedorControlador;
  * Administrador aparece somente no ato HTTP de desativar esse executor.
  * Fonte C8 cdf471fbe344f4eb4e096a5e86b6f71226fe3ad3cde040baa6d6d4d4812e5545.
- * Técnica de observação real do MySQL deriva dos REDs C3→C4→C6.
+ * Técnica de observação real do PostgreSQL deriva dos REDs C3→C4→C6.
  * Propostas independentes: nenhuma execução ou correção produtiva pelo revisor.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -126,14 +126,14 @@ class FornecedorAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
     }
 
     private MvcResult tentarDepoisDeRevogacao(Cenario c, Class<?> raiz, long id,
-                                             MockHttpServletRequestBuilder pedido) throws Exception {
+                                             AbstractMockHttpServletRequestBuilder<?> pedido) throws Exception {
         var pool = Executors.newFixedThreadPool(2);
         CountDownLatch liberarRaiz = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBloqueadora = new CompletableFuture<>();
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(raiz, id, LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarRaiz.await(30, TimeUnit.SECONDS))
@@ -172,9 +172,9 @@ class FornecedorAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
         var observador = Executors.newSingleThreadScheduledExecutor();
         var consulta = observador.scheduleWithFixedDelay(() -> {
             try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
+                Long esperas = jdbc.queryForObject("""
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND ? = ANY(pg_blocking_pids(a.pid))
+""", Long.class, conexaoBloqueadora);
                 if (esperas != null && esperas >= 1) esperaObservada.complete(null);
                 else if (tentativa.isDone()) esperaObservada.completeExceptionally(
                         new AssertionError("Mutação de fornecedor não alcançou espera real na raiz controlada"));

@@ -2,12 +2,12 @@ import React from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import '@testing-library/jest-dom/vitest';
-import { IndicadorEfetivo } from '../src/modules/painel/components/IndicadorEfetivo/index.jsx';
-import { api } from '../src/core/http.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
-import * as xlsx from '../src/core/export/xlsx.js';
+import { IndicadorEfetivo } from '../src/modules/painel/components/IndicadorEfetivo/index.tsx';
+import { api } from '../src/core/http.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
+import * as xlsx from '../src/core/export/xlsx.ts';
 
 // Componente, serviço, serialização e interceptores reais; somente o transporte
 // Axios é controlado. As opções são fixtures explícitas dos contratos temporais
@@ -107,6 +107,23 @@ const pdf = () => screen.getByRole('button', { name: 'PDF', exact: true });
 const planilha = () => screen.getByRole('button', { name: 'XLSX', exact: true });
 const indicadorComValor = (params, valor) => ({
   ...indicador(params), resumoAtual: { ...resumo, efetivoPrevisto: valor },
+});
+
+it.each([
+  ['2024-03-01T01:30:00Z', '2024-02-28', '2024-02-29', '2024-03-01T03:30:00Z', '2024-03-01'],
+  ['2026-01-01T01:30:00Z', '2025-12-30', '2025-12-31', '2026-01-01T03:30:00Z', '2026-01-01'],
+])('usa ontem administrativo em %s e atualiza o limite sem substituir o recorte escolhido', async (instante, ontem, hoje, depois, novoHoje) => {
+  vi.useFakeTimers({ toFake: ['Date'] });
+  vi.setSystemTime(new Date(instante));
+  const view = render(<IndicadorEfetivo />);
+  const data = screen.getByLabelText('Data de referência do indicador');
+  expect(data).toHaveValue(ontem);
+  expect(data).toHaveAttribute('max', hoje);
+  await waitFor(() => expect(pedidos.some(p => p.url === '/painel/efetivo' && p.params.referencia === ontem)).toBe(true));
+  vi.setSystemTime(new Date(depois));
+  view.rerender(<IndicadorEfetivo />);
+  expect(data).toHaveValue(ontem);
+  expect(data).toHaveAttribute('max', novoHoje);
 });
 
 async function abrirComRelatorio(responderDados) {

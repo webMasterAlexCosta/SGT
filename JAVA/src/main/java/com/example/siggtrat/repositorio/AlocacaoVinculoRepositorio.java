@@ -34,7 +34,7 @@ public interface AlocacaoVinculoRepositorio extends JpaRepository<AlocacaoVincul
           and a.vinculo.contrato.estadoNegocial=com.example.siggtrat.entidade.EstadoNegocialContrato.PUBLICADO
           and (a.dataFim is null or a.dataFim>=:inicio)
           and (a.vinculo.dataFim is null or a.vinculo.dataFim>=:inicio)
-          and (:fim is null or (a.dataInicio<=:fim and a.vinculo.dataInicio<=:fim))
+          and (cast(:fim as date) is null or (a.dataInicio<=:fim and a.vinculo.dataInicio<=:fim))
         order by a.dataInicio, a.vinculo.id, a.id
         """)
     List<PeriodoOcupacao> buscarPeriodosOcupacao(@Param("contratoId") Long contratoId,

@@ -27,7 +27,8 @@ class PendenciaEscopoEfetivoHttpIT extends ContratosHttpBase {
                 "contratoId", contrato.id(), "composicaoId", contrato.composicao1(), "dataInicio", RelogioSistema.hoje()),
                 201, "Vínculo aberto antes da transferência").path("id").asLong();
         conceder(c, contrato.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(contrato.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", RelogioSistema.hoje().plusDays(5), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Reorganização administrativa documentada", "referenciaSei", "SEI-PENDENCIA-TRANSFERENCIA",

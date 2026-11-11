@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   prepararConsultaHistorica, prepararProvaContrato, prepararProvaNome,
   prepararProvaMotivo, prepararTransicaoCatalogo,
-} from '../src/services/historico/dominioHistorico.js';
+} from '../src/services/historico/dominioHistorico.ts';
 
 const fonte = {
   referenciaSei: ' SEI-SINTETICO ', documentoComprobatorioId: '',

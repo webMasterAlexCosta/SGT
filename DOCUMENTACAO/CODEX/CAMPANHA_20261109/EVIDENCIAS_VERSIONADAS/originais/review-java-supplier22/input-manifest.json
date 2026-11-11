@@ -1,0 +1,22 @@
+{
+  ".homologacao/20261109-sgt-final/backend-gate18-approved.json": "df6d4cb7e96b6164f2e23aa4b4f036681c64edc64442f9fe8b3d91d957482871",
+  ".homologacao/20261109-sgt-final/frontend-final07-jar-binding.json": "de548cec400a2edb4e65184fc1f6cfb9479edc5b2439d4e2101b6e791383f2fa",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/parecer.md": "c622ca121be1cc3e63f290087dece69048b9053f76164565b1e98a7cbd760178",
+  ".homologacao/20261109-sgt-final/review-frontend-current61-10/freeze-ended.json": "6dc5ac7d6bb563c4e10b69449fe61183f6adfa4a506dfd0c7ddcddd3a00c2913",
+  ".homologacao/20261109-sgt-final/it-supplier-red01/result.json": "58967fca97ea5a92e42c03808b8f1cd8031ce6cfbc14545df8d03505a0cf3a7f",
+  ".homologacao/20261109-sgt-final/it-supplier-red05/result.json": "7c8ca96a043bbd2868247bc6a7a763d65f219f71fba33a101a4a31da9f8ad685",
+  ".homologacao/20261109-sgt-final/it-supplier-red05/cache-isolation.json": "03e7c5ae21ffff32c8c3cf1d9ad44891ef6d9cc53bbe3416e8894430d332dbb5",
+  ".homologacao/20261109-sgt-final/it-supplier-red02/result.json": "b89fb63e18e7026f4c2f771ae19ba9994bcf38390f28685bdeeefedbf0f32000",
+  ".homologacao/20261109-sgt-final/it-supplier-green02/result.json": "c6caad67860a3497fd8268bd227ceb651a3267c4b7e12a12ae6de84b6246e5df",
+  ".homologacao/20261109-sgt-final/review-java-supplier21/parecer.md": "7ad2f21671ac3253187813e0fb52affcfc23d2f65e709d3fb7f9a949b0f5aa51",
+  ".homologacao/20261109-sgt-final/review-java-supplier21/freeze-ended.json": "10811aa328efe8f097fdd0320e718429df0f4ef392e60fb8afd9327b5f781ee8",
+  ".homologacao/20261109-sgt-final/it-supplier-green04/result.json": "c2489cb05f461bb7ed3e6e12dee626c6f83c7add2ed412335051868104e3880e",
+  ".homologacao/20261109-sgt-final/it-supplier-red04/result.json": "6719b7a43557f8505fd8bac0946ef8c1b9f67ebaf78c9961646c281ff9256753",
+  ".homologacao/20261109-sgt-final/it-supplier-green03/result.json": "de89d0f288bf3cd7f93f972eea4fd2b425cb6db32c1ae40942ef45111568abe3",
+  ".homologacao/20261109-sgt-final/it-supplier-red03/result.json": "4fb85694ab1e5c6b83b82f6f2590810177d438ea5ad10bcebf27b638a931875f",
+  ".homologacao/20261109-sgt-final/it-supplier-green05/result.json": "52c198f5480497070011aaf035e214235827a20b2f039aad32e043fe89f8c761",
+  ".homologacao/20261109-sgt-final/it-supplier-green05/cache-isolation.json": "03e7c5ae21ffff32c8c3cf1d9ad44891ef6d9cc53bbe3416e8894430d332dbb5",
+  ".homologacao/20261109-sgt-final/java-compile-supplier08/result.json": "adf1ea1fb2a8379dab13560d6094c410a45d88c6d00009b9b2f08616bb441a36",
+  ".homologacao/20261109-sgt-final/review-java-supplier22/brief.md": "455866c28712fccac034ce078a8a7744bd27fb32acee8aa8f1e02f1f4aa68a29",
+  ".homologacao/20261109-sgt-final/review-java-supplier22/increment.patch": "faef81da62908f9d505655acf4acc7c5a9cd08a628358a5740fd61f00546b9b7"
+}

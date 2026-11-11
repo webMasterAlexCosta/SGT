@@ -50,8 +50,8 @@ class Candidato8PessoaExecutorRevogadoRedIT extends ContratosHttpBase {
     @Timeout(value = 60, unit = TimeUnit.SECONDS)
     void pessoaRevalidaExecutorDepoisDaEsperaAntesDeCorrigirIdentidadeOuOpcionais(String operacao) throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         Cenario c = criarCenarioPersistido();
         long pessoaId = c.pessoaA.getId();
@@ -84,7 +84,7 @@ class Candidato8PessoaExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Pessoa.class, pessoaId, LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarPessoa.await(30, TimeUnit.SECONDS))
@@ -159,9 +159,9 @@ class Candidato8PessoaExecutorRevogadoRedIT extends ContratosHttpBase {
         var observador = Executors.newSingleThreadScheduledExecutor();
         var consulta = observador.scheduleWithFixedDelay(() -> {
             try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, bloqueadora);
+                Long esperas = jdbc.queryForObject("""
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND ? = ANY(pg_blocking_pids(a.pid))
+""", Long.class, bloqueadora);
                 if (esperas != null && esperas > 0) observada.complete(null);
                 else if (tentativa.isDone()) observada.completeExceptionally(
                         new AssertionError("Comando não alcançou a espera real na Pessoa"));

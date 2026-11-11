@@ -5,9 +5,9 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar }));
-import { GerenciadorSegundoFator } from '../src/modules/perfil/components/GerenciadorSegundoFator/index.jsx';
-import * as eventos from '../src/core/events.js';
+vi.mock('../src/core/http.ts', () => ({ requisitar }));
+import { GerenciadorSegundoFator } from '../src/modules/perfil/components/GerenciadorSegundoFator/index.tsx';
+import * as eventos from '../src/core/events.ts';
 
 afterEach(() => { cleanup(); vi.restoreAllMocks(); });
 

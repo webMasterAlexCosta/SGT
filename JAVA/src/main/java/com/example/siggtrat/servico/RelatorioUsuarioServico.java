@@ -14,7 +14,11 @@ import java.time.Instant;
  * Gera relatório de usuários (CSV) com streaming para suportar grandes volumes.
  */
 @Service
-public class RelatorioUsuarioServico {
+public class RelatorioUsuarioServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioUsuarioServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final JdbcTemplate jdbcTemplate;
 

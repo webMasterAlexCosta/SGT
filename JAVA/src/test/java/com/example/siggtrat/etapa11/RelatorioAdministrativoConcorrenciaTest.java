@@ -24,7 +24,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 
-/** Exercita os interceptadores reais de transação/retry, sem simular um banco MySQL. */
+/** Exercita os interceptadores reais de transação/retry, sem simular um banco PostgreSQL. */
 class RelatorioAdministrativoConcorrenciaTest {
     @Test
     void repeticaoConcorrenteSoRetornaDepoisDeNovaTransacaoValida() {
@@ -55,7 +55,7 @@ class RelatorioAdministrativoConcorrenciaTest {
 
     @Configuration(proxyBeanMethods = false)
     @EnableRetry
-    @EnableTransactionManagement
+    @EnableTransactionManagement(proxyTargetClass = true)
     static class Configuracao {
         @Bean Transacoes transactionManager() { return new Transacoes(); }
         @Bean EmissaoRelatorioAdministrativoRepositorio repositorio() {

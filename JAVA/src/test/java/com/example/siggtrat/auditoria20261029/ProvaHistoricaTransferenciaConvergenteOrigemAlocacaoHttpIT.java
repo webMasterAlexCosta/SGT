@@ -33,7 +33,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  *
  * Dados/SEI sintéticos; DML simula perda de duas propriedades de mapas somente
  * na fixture. Nenhuma coluna de origem/evento/alocação é fabricada ou alterada.
- * MySQL real 8.0.45; Hibernate update; nenhum esquema manual.
+ * PostgreSQL real 8.0.45; Hibernate update; nenhum esquema manual.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ProvaHistoricaTransferenciaConvergenteOrigemAlocacaoHttpIT extends ContratosHttpBase {
@@ -48,8 +48,8 @@ class ProvaHistoricaTransferenciaConvergenteOrigemAlocacaoHttpIT extends Contrat
     void exigirPersistenciaPermitida() throws Exception {
         try (var conexao = dataSource.getConnection()) {
             var meta = conexao.getMetaData();
-            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
-            assertThat(meta.getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
+            assertThat(meta.getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -171,7 +171,8 @@ class ProvaHistoricaTransferenciaConvergenteOrigemAlocacaoHttpIT extends Contrat
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
         LocalDate data = RelogioSistema.hoje().minusDays(20);
         LocalDate dia = RelogioSistema.hoje().minusDays(7);
-        var req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        var req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Convergência sintética de dois recortes independentes", "referenciaSei", "SEI-MAPAS-CONVERGENTES",
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(

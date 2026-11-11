@@ -26,13 +26,45 @@ import static org.junit.jupiter.api.Assertions.*;
         EscopoAcessoUsuarioServico.class, ConfiguracaoServico.class, CalculadoraJornadaNoturnaServico.class,
         ProjecaoOperacionalPessoaServico.class, MotorTemporalVinculoServico.class, MotorTemporalAlocacaoServico.class,
         MinimizadorDadosPessoaisServico.class, GestaoContratoTemporalServico.class})
-class RelatorioFrequenciaCanonicaIT extends MySqlIntegrationTestSupport {
+class RelatorioFrequenciaCanonicaIT extends PostgresIntegrationTestSupport {
     private static final LocalDate JUNHO = LocalDate.of(2026, 6, 30);
     private static final LocalDate JULHO = LocalDate.of(2026, 7, 1);
     private static final ZoneId ZONA = ZoneId.of("America/Sao_Paulo");
     @Autowired EntityManager em;
     @Autowired RelatorioFrequenciaConsolidadoServico relatorios;
     @Autowired ProjecaoOperacionalPessoaServico projecao;
+    @Autowired com.example.siggtrat.repositorio.RelatorioFrequenciaEscalaRepositorio escala;
+    @Autowired org.springframework.jdbc.core.JdbcTemplate jdbc;
+
+    @org.junit.jupiter.params.ParameterizedTest(name = "{0}: eventoK{1}ns, conhecidoK{2}ns, visivel={3}")
+    @org.junit.jupiter.params.provider.CsvSource({
+            "VINCULO,-1000,0,true", "VINCULO,0,0,true", "VINCULO,1000,0,false",
+            "ALOCACAO,-1000,0,true", "ALOCACAO,0,0,true", "ALOCACAO,1000,0,false",
+            "VINCULO,-1000,999,true", "VINCULO,0,999,true", "VINCULO,1000,999,false",
+            "ALOCACAO,-1000,999,true", "ALOCACAO,0,999,true", "ALOCACAO,1000,999,false"})
+    void fronteiraConhecimentoMicrosNaoDependeDoFusoDaSessao(String origem, long nanosEvento,
+                                                            long nanosLimite, boolean visivel) {
+        assertEquals("America/Sao_Paulo", jdbc.queryForObject("show TimeZone", String.class));
+        Instant k = Instant.parse("2026-06-30T12:00:00.123456Z");
+        Instant evento = k.plusNanos(nanosEvento), anterior = k.minusSeconds(3600);
+        Fixture f = fixture(false, origem.equals("VINCULO") ? evento : anterior,
+                origem.equals("ALOCACAO") ? evento : anterior);
+        em.flush(); em.clear();
+        var faixa = new com.example.siggtrat.repositorio.RelatorioFrequenciaEscalaRepositorio.FaixaResponsabilidade(
+                f.contrato.getId(), f.gestaoA.getId(), f.gestaoA.getSuperintendencia().getId(), JUNHO, JUNHO,
+                f.contrato.getNumeroContrato());
+        var escopo = new com.example.siggtrat.repositorio.RelatorioFrequenciaEscalaRepositorio.EscopoConsulta(
+                f.gestaoA.getId(), null, false, List.of(), List.of(faixa), k.plusNanos(nanosLimite));
+        var contratos = List.of(f.contrato.getId());
+        ZonedDateTime inicio = JUNHO.atStartOfDay(ZONA), fim = JUNHO.plusDays(1).atStartOfDay(ZONA);
+        assertEquals(visivel ? 1L : 0L, escala.contarColaboradores(contratos, inicio, fim, null, null, escopo));
+        List<Long> esperados = visivel ? List.of(f.empregado.getId()) : List.of();
+        assertEquals(esperados, escala.buscarIdsColaboradores(contratos, inicio, fim, null, null, escopo, 0, 5));
+        assertEquals(esperados, escala.buscarIdsColaboradoresAposId(contratos, inicio, fim, null, null, escopo, 0, 5));
+        assertEquals(visivel ? 1 : 0, escala.buscarFontesDoLote(List.of(f.empregado.getId()), contratos,
+                inicio, fim, null, null, escopo).size());
+    }
+
 
     @AfterEach void limparAutenticacao() { SecurityContextHolder.clearContext(); }
 
@@ -222,6 +254,10 @@ class RelatorioFrequenciaCanonicaIT extends MySqlIntegrationTestSupport {
     }
 
     private Fixture fixture(boolean transferido) {
+        return fixture(transferido, null, null);
+    }
+
+    private Fixture fixture(boolean transferido, Instant criadoVinculo, Instant criadaAlocacao) {
         GestaoLocal a = gestao("Origem", "RA"), b = transferido ? gestao("Destino", "RB") : a;
         if (transferido) assertNotEquals(a.getSuperintendencia().getId(), b.getSuperintendencia().getId(),
                 "Origem e destino precisam manter escopos estaduais distintos.");
@@ -232,12 +268,14 @@ class RelatorioFrequenciaCanonicaIT extends MySqlIntegrationTestSupport {
         if (transferido) versao(c, b, 2, JULHO);
         Pessoa p = new Pessoa(); p.setNome("Pessoa canônica de relatório"); p.setCpf("98765432100"); em.persist(p);
         VinculoContratual v = new VinculoContratual(); v.setPessoa(p); v.setContrato(c);
-        v.setDataInicio(LocalDate.of(2026, 6, 1)); v.setMatricula("M-CAN"); em.persist(v);
-        AlocacaoVinculo aa = alocacao(v, a, v.getDataInicio(), transferido ? JUNHO : null);
-        AlocacaoVinculo ab = transferido ? alocacao(v, b, JULHO, null) : aa;
+        v.setDataInicio(LocalDate.of(2026, 6, 1)); v.setMatricula("M-CAN");
+        if (criadoVinculo != null) org.springframework.test.util.ReflectionTestUtils.setField(v, "criadoEm", criadoVinculo);
+        em.persist(v);
+        AlocacaoVinculo aa = alocacao(v, a, v.getDataInicio(), transferido ? JUNHO : null, criadaAlocacao);
+        AlocacaoVinculo ab = transferido ? alocacao(v, b, JULHO, null, criadaAlocacao) : aa;
         // O contexto mínimo de persistência não executa InicializadorDados.
         // A fixture fornece o catálogo completo usado pela projeção, sem
-        // depender de outra classe ter carregado dados no mesmo MySQL.
+        // depender de outra classe ter carregado dados no mesmo PostgreSQL.
         for (String descricao : List.of("ATIVO", "INATIVO")) {
             if (em.createQuery("select count(s) from StatusEmpregado s where upper(s.descricao) = :descricao", Long.class)
                     .setParameter("descricao", descricao).getSingleResult() == 0)
@@ -263,7 +301,7 @@ class RelatorioFrequenciaCanonicaIT extends MySqlIntegrationTestSupport {
     private Lotacao lotacao(GestaoLocal g, String nome) {
         Lotacao l = new Lotacao(nome + " " + g.getNome()); l.setGestaoLocal(g); em.persist(l); return l;
     }
-    private AlocacaoVinculo alocacao(VinculoContratual v, GestaoLocal g, LocalDate inicio, LocalDate fim) {
+    private AlocacaoVinculo alocacao(VinculoContratual v, GestaoLocal g, LocalDate inicio, LocalDate fim, Instant criadaEm) {
         Jornada j = new Jornada(); j.setDescricao("Turno " + g.getNome()); j.setGestaoLocal(g);
         for (DayOfWeek dia : List.of(DayOfWeek.TUESDAY, DayOfWeek.WEDNESDAY)) {
             JornadaDiaSemana d = new JornadaDiaSemana(); d.setJornada(j); d.setDiaSemana(dia);
@@ -273,7 +311,9 @@ class RelatorioFrequenciaCanonicaIT extends MySqlIntegrationTestSupport {
         em.persist(j);
         Cargo cargo = new Cargo("Cargo " + g.getNome(), "1"); cargo.setGestaoLocal(g); em.persist(cargo);
         AlocacaoVinculo a = new AlocacaoVinculo(); a.setVinculo(v); a.setLotacao(lotacao(g, "Lotação"));
-        a.setJornada(j); a.setCargo(cargo); a.setDataInicio(inicio); a.setDataFim(fim); em.persist(a); return a;
+        a.setJornada(j); a.setCargo(cargo); a.setDataInicio(inicio); a.setDataFim(fim);
+        if (criadaEm != null) org.springframework.test.util.ReflectionTestUtils.setField(a, "criadoEm", criadaEm);
+        em.persist(a); return a;
     }
     private UsuarioAplicacao usuario(GestaoLocal g) {
         UsuarioAplicacao u = new UsuarioAplicacao(); u.setUsername("can-rel-" + UUID.randomUUID());

@@ -1,7 +1,7 @@
 // Respostas reais do JAR com entrega deliberadamente adiada pelo Playwright.
 // Não substitui a prova determinística de transporte não cancelável do Vitest.
 const { execute } = require('./ambiente-real.cjs');
-execute('pos-auditoria-sessao-fora-ordem', async ({ page, context, fixture, check, open, report }) => {
+execute('pos-auditoria-sessao-fora-ordem', async ({ page, context, fixture, check, open, report, screenshot }) => {
   const b = fixture.accounts.gestor_destino;
   const loginB = async () => {
     await page.getByRole('button', { name: /Entrar no Sistema/i }).waitFor({ timeout: 20000 });
@@ -43,8 +43,16 @@ execute('pos-auditoria-sessao-fora-ordem', async ({ page, context, fixture, chec
       } finally { finish(); }
     };
     await page.route(pattern, handler);
+    // Navegação canônica: o grupo pode estar recolhido após visitar contratos.
+    const group = page.getByRole('button', { name: 'Gestão de terceirizados', exact: true });
+    if (await group.getAttribute('aria-expanded') !== 'true') await group.click();
     await page.getByRole('button', { name: 'Frequência diária', exact: true }).click();
-    await captured;
+    let captureTimeout;
+    try {
+      await Promise.race([captured, new Promise((_, reject) => {
+        captureTimeout = setTimeout(() => reject(new Error('A navegação real não iniciou a consulta de perfil em 10 segundos.')), 10000);
+      })]);
+    } finally { clearTimeout(captureTimeout); }
     await logout();
     await loginB();
     release();
@@ -55,6 +63,7 @@ execute('pos-auditoria-sessao-fora-ordem', async ({ page, context, fixture, chec
     check(`${mode}: resposta antiga não substitui a identidade B`, (await page.locator('body').innerText()).includes(b.username)
       && !(await page.locator('body').innerText()).includes(fixture.accounts.gestor_local.username));
     check(`${mode}: sessão B continua autenticada`, await page.getByRole('button', { name: 'Sair', exact: true }).isVisible());
+    await screenshot(`${mode}-sessaoB-preservada`);
     await logout();
   }
   // O harness grava storageState da conta A; termine novamente nessa identidade.

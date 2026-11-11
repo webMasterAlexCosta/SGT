@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * Revisão independente do candidato 2. Hipótese C2-CTR-01; execução reservada à raiz.
  * Manifesto auditado: 54af0c36b2ca034453dd0ee79da9f390e0cc92f1446947c294681449263f3aac.
- * A perda das duas colunas agregadas é simulada somente em fixture MySQL descartável;
+ * A perda das duas colunas agregadas é simulada somente em fixture PostgreSQL descartável;
  * as quantidades das composições e o documento sintético original são preservados.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)

@@ -1,5 +1,7 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.example.siggtrat.entidade.AlocacaoVinculo;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
@@ -50,8 +52,8 @@ class Candidato4PessoasExecutorRevogadoRedIT extends ContratosHttpBase {
     @ValueSource(booleans = {false, true})
     void revogacaoDuranteEsperaNoContratoImpedeMatriculaEAlocacao(boolean alocacao) throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(conexao.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         Cenario c = criarCenarioPersistido();
         NovoContrato contrato = emTransacao(() -> {
@@ -89,7 +91,7 @@ class Candidato4PessoasExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, contrato.id(), LockModeType.PESSIMISTIC_WRITE);
-                bloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                bloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(25, TimeUnit.SECONDS)) throw new AssertionError("Contrato não foi liberado");
@@ -99,8 +101,11 @@ class Candidato4PessoasExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = bloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("vinculo-" + (alocacao ? "alocacao" : "matricula"));
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", contrato.id()),
+                    "Contrato do Vínculo em confirmação", tentativa);
             executar(c.admin, put("/api/usuarios/" + c.localA.getId()).contentType(MediaType.APPLICATION_JSON)
                             .content(json(mapa("active", false))), 200,
                     "Admin desativa executor e confirma antes de liberar a operação negocial");
@@ -113,7 +118,7 @@ class Candidato4PessoasExecutorRevogadoRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, json(mapa("hipotese", "C4-PES-H04", "alocacao", alocacao,
                     "status", resposta.getResponse().getStatus(), "estadoAntes", antes, "estadoDepois", depois,
-                    "espera_mysql_observada", true, "revogacao_commitou_antes_da_liberacao", true)));
+                    "esperaPostgresObservada", espera, "revogacao_commitou_antes_da_liberacao", true)));
             SoftAssertions.assertSoftly(soft -> {
                 soft.assertThat(resposta.getResponse().getStatus()).isIn(401, 403, 404, 409);
                 soft.assertThat(depois).as("Revogação impede Vínculo, reservas, faixas e eventos parciais").isEqualTo(antes);
@@ -139,19 +144,6 @@ class Candidato4PessoasExecutorRevogadoRedIT extends ContratosHttpBase {
     private long contar(String entidade, long vinculoId) {
         return em.createQuery("select count(e) from " + entidade + " e where e.vinculo.id=:v", Long.class)
                 .setParameter("v", vinculoId).getSingleResult();
-    }
-    private void aguardarBloqueioReal(long bloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < limite) {
-            Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                    + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                    + "where t.PROCESSLIST_ID=?", Long.class, bloqueadora);
-            if (esperas != null && esperas >= 1) return;
-            if (tentativa.isDone()) throw new AssertionError("Comando não alcançou a espera real no Contrato");
-            Thread.sleep(25);
-        }
-        throw new AssertionError("Espera não observada no MySQL performance_schema");
     }
     private record Estado(long versaoVinculo, String matricula, List<String> faixas,
                           long eventosVinculo, long eventosAlocacao, long reservas) {}

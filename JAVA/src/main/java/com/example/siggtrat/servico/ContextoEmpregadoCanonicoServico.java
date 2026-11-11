@@ -18,7 +18,11 @@ import java.util.stream.Collectors;
 /** Contexto corrente da API legada; as entidades operacionais nunca são regravadas pela consulta. */
 @Service
 @Transactional(readOnly = true)
-public class ContextoEmpregadoCanonicoServico {
+public class ContextoEmpregadoCanonicoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ContextoEmpregadoCanonicoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public record Contexto(Pessoa pessoa, VinculoContratual vinculo, AlocacaoVinculo alocacao,
                            GestaoLocal gestao, String matricula, LocalDate data) {
         public Lotacao lotacao() { return alocacao == null ? null : alocacao.getLotacao(); }

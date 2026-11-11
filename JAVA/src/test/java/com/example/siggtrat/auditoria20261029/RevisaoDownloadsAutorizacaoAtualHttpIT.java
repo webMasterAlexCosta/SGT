@@ -44,7 +44,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * DOC-010, PER-010/011 e REL-004: autorização presente em download real.
- * Segurança MVC, serviços, executor assíncrono, arquivos e MySQL são reais.
+ * Segurança MVC, serviços, executor assíncrono, arquivos e PostgreSQL são reais.
  * Fixtures e mudanças de permissão/escopo são confirmadas em transações próprias.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -97,6 +97,8 @@ class RevisaoDownloadsAutorizacaoAtualHttpIT extends ContratosHttpBase {
             assertThat(acessos.get(0).getAcessadoEm()).isNotNull();
             return null;
         });
+        JsonNode trilhaAutorizada = fotografiaDownloads(documentoId, c.nacional.getId());
+        assertThat(trilhaAutorizada.size()).isEqualTo(1);
 
         enviar(c.admin, rota + "/permissoes/" + permissaoId + "/revogar", mapa(
                 "motivo", "Auditoria encerrada; autorização retirada", "autorizacaoAdministrativa", "ATO-REVOGACAO"),
@@ -105,6 +107,7 @@ class RevisaoDownloadsAutorizacaoAtualHttpIT extends ContratosHttpBase {
                 "DOC010 mesma sessão e URL não reutilizam concessão revogada para bytes");
         assertThat(negado.getResponse().getContentType()).isNotEqualTo("application/pdf");
         assertThat(negado.getResponse().getContentAsByteArray()).isNotEqualTo(pdf);
+        assertThat(fotografiaDownloads(documentoId, c.nacional.getId())).isEqualTo(trilhaAutorizada);
         emTransacao(() -> {
             assertThat(em.find(DocumentoComprobatorio.class, documentoId).getSha256Arquivo()).isEqualTo(hash);
             assertThat(em.createQuery("select count(a) from AcessoDocumentoRestrito a "
@@ -208,6 +211,15 @@ class RevisaoDownloadsAutorizacaoAtualHttpIT extends ContratosHttpBase {
             Thread.sleep(100);
         } while (System.nanoTime() < limite);
         return fail("Exportação não concluiu em 30s: " + estado);
+    }
+
+    private JsonNode fotografiaDownloads(long documento, long usuario) {
+        return emTransacao(() -> mapper.valueToTree(em.createQuery(
+                        "select a.id,a.documento.id,a.tipoAcesso,a.finalidade,a.usuarioId,a.usuarioUsername,"
+                                + "a.perfisFotografia,a.permissaoId,a.acessadoEm from AcessoDocumentoRestrito a "
+                                + "where a.documento.id=:doc and a.usuarioId=:usuario and a.tipoAcesso=:tipo order by a.id", Object[].class)
+                .setParameter("doc", documento).setParameter("usuario", usuario).setParameter("tipo", TipoAcessoDocumento.DOWNLOAD)
+                .getResultList().stream().map(java.util.Arrays::asList).toList()));
     }
 
     private RelatorioExportacaoAssincronaServico.TransferenciaExportacao observarTransferenciaPreparada(

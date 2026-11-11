@@ -1,0 +1,9 @@
+{
+  "state": "ACTIVE",
+  "source_sha256": "fda6af14dc589bfdfd67e2060be376480e08fe6e5f86e83838fbbc79ce2d11b1",
+  "input_sha256": "102e379b405accb9bf617ad1945f04b6b42e5a0871f7283bd500027767201b26",
+  "bytecode_delta_sha256": "494afd703bff57b7b0aa262fafacb410831e178f030868fbfff645dd7d9e9e49",
+  "physical_jar_sha256": "7ae557a625ea9f35fd2db4644dc3f43d6ba568bdd6e1ed55caa2d4ccb701ac84",
+  "source_files": 1693,
+  "input_files": 13
+}

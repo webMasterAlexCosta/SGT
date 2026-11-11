@@ -22,6 +22,19 @@ class FrequenciaContratosHttpIT extends AuditoriaHttpSuporte {
                         .content(json(payload(c.vinculoA.getId(), DATA, "FALTA", "consulta-" + UUID.randomUUID()))),
                 200, "FRE-001 criação canônica"));
         long id = criada.path("id").longValue();
+        // TMP-001:002[0]: Pessoa/Vínculo/Contrato/Alocação de D continuam A;
+        // somente a projeção cadastral atual passa a apontar para B.
+        long empregadoId = c.empregadoA.getId();
+        c.empregadoA.getContratos().clear(); c.empregadoA.getContratos().add(c.contratoB);
+        c.empregadoA.setGestaoLocal(c.gestaoB); c.empregadoA.setLotacao(c.lotacaoB);
+        c.empregadoA.setJornada(c.jornadaB); c.empregadoA.setCargo(c.cargoB);
+        em.flush(); em.clear(); // leitura JPA após descarte do cache, não prova commit
+        var atual = em.find(com.example.siggtrat.entidade.Empregado.class, empregadoId);
+        assertEquals(c.pessoaA.getId(), atual.getPessoaCanonica().getId());
+        assertEquals(c.contratoB.getId(), atual.getContratos().get(0).getId());
+        assertEquals(c.lotacaoB.getId(), atual.getLotacao().getId());
+        assertNotEquals(c.contratoA.getId(), atual.getContratos().get(0).getId());
+        assertNotEquals(c.lotacaoA.getId(), atual.getLotacao().getId());
         for (String rota : List.of("?data=" + DATA, "/mensal?mes=6&ano=2026",
                 "/intervalo?inicio=" + DATA + "&fim=" + DATA + "&status=FALTA")) {
             JsonNode pagina = dados(executar(c.localA, get("/api/frequencias" + rota)
@@ -31,6 +44,7 @@ class FrequenciaContratosHttpIT extends AuditoriaHttpSuporte {
             JsonNode item = pagina.path("content").get(0);
             assertEquals(id, item.path("id").longValue());
             assertEquals(c.pessoaA.getId().longValue(), item.path("pessoaId").longValue());
+            assertEquals(c.contratoA.getId().longValue(), item.path("contratoId").longValue());
             assertEquals(c.vinculoA.getId().longValue(), item.path("vinculoContratualId").longValue());
             assertEquals(c.alocacaoA.getId().longValue(), item.path("alocacaoVinculoId").longValue());
             assertEquals(c.lotacaoA.getId().longValue(), item.path("lotacaoId").longValue());

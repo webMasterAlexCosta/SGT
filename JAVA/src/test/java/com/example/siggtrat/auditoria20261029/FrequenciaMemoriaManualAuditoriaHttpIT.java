@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * Memória manual deve permanecer coerente em todos os consumidores. A fixture e todas as escritas passam pelo
- * banco MySQL real. O modo manual inclui zero legítimo e redução noturna;
+ * banco PostgreSQL real. O modo manual inclui zero legítimo e redução noturna;
  * PRESENCA_PARCIAL é controle do caminho que já usa a memória gravada.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)

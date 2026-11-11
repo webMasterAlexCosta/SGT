@@ -54,7 +54,9 @@ import java.util.*;
 
 @org.springframework.stereotype.Service
 @Transactional
-public class AutenticacaoServico {
+public class AutenticacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(AutenticacaoServico.class);
 
@@ -75,6 +77,7 @@ public class AutenticacaoServico {
     private final EscopoAcessoUsuarioServico userAccessScopeServico;
     private final FiltroAutenticacaoJwt jwtAuthenticationFilter;
     private final TotpServico totpServico;
+    private final RevogacaoSessaoServico revogacaoSessaoServico;
 
     public AutenticacaoServico(
             AuthenticationManager authenticationManager,
@@ -90,8 +93,10 @@ public class AutenticacaoServico {
             EscopoAcessoUsuarioServico userAccessScopeServico,
             FiltroAutenticacaoJwt jwtAuthenticationFilter,
             TotpServico totpServico,
-            PropriedadesAutenticacao authProperties
+            PropriedadesAutenticacao authProperties,
+            RevogacaoSessaoServico revogacaoSessaoServico
     ) {
+        this.revogacaoSessaoServico = revogacaoSessaoServico;
         this.authenticationManager = authenticationManager;
         this.userRepositorio = userRepositorio;
         this.tokenAtivoRepositorio = tokenAtivoRepositorio;
@@ -263,15 +268,15 @@ public class AutenticacaoServico {
 
             if (lotacaoId == null && jornadaId == null) continue;
             if (lotacaoId == null || jornadaId == null) {
-                throw new IllegalArgumentException("Cada vínculo de gestão deve informar lotação e turno.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Cada vínculo de gestão deve informar lotação e turno.");
             }
 
             Lotacao lotacao = lotacaoRepositorio.findById(lotacaoId).orElse(null);
             Jornada jornada = jornadaRepositorio.findById(jornadaId).orElse(null);
-            if (lotacao == null) throw new IllegalArgumentException("Lotação inválida.");
-            if (jornada == null) throw new IllegalArgumentException("Turno/Jornada inválido.");
+            if (lotacao == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Lotação inválida.");
+            if (jornada == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Turno/Jornada inválido.");
             if (!jornadaPertenceLotacao(lotacao, jornada)) {
-                throw new IllegalArgumentException("O turno/jornada selecionado não está habilitado para a lotação informada.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O turno/jornada selecionado não está habilitado para a lotação informada.");
             }
 
             String key = lotacaoId + ":" + jornadaId;
@@ -839,7 +844,7 @@ public class AutenticacaoServico {
         } catch (DataIntegrityViolationException e) {
             return erro(HttpStatus.CONFLICT, "Já existe um usuário com o mesmo e-mail ou matrícula.");
         } catch (Exception e) {
-            log.error("Erro interno ao solicitar acesso.", e);
+            log.error("AutenticacaoServico: Erro interno ao solicitar acesso. falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
             return erro(HttpStatus.INTERNAL_SERVER_ERROR, "Erro interno ao solicitar o acesso.");
         }
     }
@@ -849,10 +854,11 @@ public class AutenticacaoServico {
         String texto = String.valueOf(valor).trim();
         return texto.isBlank() ? null : texto;
     }
+    @Transactional(propagation = org.springframework.transaction.annotation.Propagation.SUPPORTS)
     public ResponseEntity<?> encerrarSessao(HttpServletRequest request) {
         String token = extrairTokenAutenticacao(request);
         if (token != null && !token.isBlank()) {
-            tokenAtivoRepositorio.excluirPorTokenBruto(token);
+            revogacaoSessaoServico.revogarToken(token);
             jwtAuthenticationFilter.removerTokenDoCache(token);
         }
 

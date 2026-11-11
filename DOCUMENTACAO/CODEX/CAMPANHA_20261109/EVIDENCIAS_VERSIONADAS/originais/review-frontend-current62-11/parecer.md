@@ -1,0 +1,11 @@
+**APROVADO para integrar tecnicamente o `dist12` com o Java24 aprovado.** Os três P2 do parecer frontend10 estão fechados. Nenhum novo achado P0–P3 no incremento.
+
+- Desistir da troca na retificação restaura a fotografia empresarial original. O DTO preserva também tipo, política de matrícula e configuração de dia reduzido, incluindo valores `false`. [Restauração](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/React/src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx:313) · [Campos preservados](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/React/src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx:467)
+- A opção histórica fica restrita ao fornecedor do ato original. Uma nova seleção ausente do catálogo ativo bloqueia a prévia e a confirmação, inclusive no callback do modal. [Validação](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/React/src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx:185)
+- O seletor permite escolher a empresa exibida hoje. O Java avalia a transição na data efetiva. [Seletor](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/React/src/modules/admin/pages/PaginaContratos/components/PainelAlteracoesContrato/index.tsx:576)
+
+Conferi os recibos de **22 testes do painel e 15 dos consumidores aprovados**, build strict e dry-run. O congelamento solicitado confere, assim como CRC e SHA dos **102 assets**. Os hashes Java correspondem ao gate24, e o JAR07 permanece íntegro. [Freeze](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/.homologacao/20261109-sgt-final/review-frontend-current62-11/freeze.json)
+
+O roteiro Chrome cobre retificação, retorno da empresa atual em data futura e inativação entre prévia e confirmação, com restauração do cadastro na limpeza. Sua execução no novo JAR segue pendente. A preservação das políticas tem evidência de código e testes unitários nesta revisão. [Roteiro](/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/React/test/e2e/aditamento-regressao-empresa-real.cjs)
+
+A integração deverá preservar os 503 assets anteriores e conferir as três diferenças de bytecode aprovadas. Pendência, recuperação, reinício, LAN e homologação global continuam pendentes.

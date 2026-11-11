@@ -5,6 +5,8 @@ import com.example.siggtrat.entidade.DocumentoComprobatorio;
 import com.example.siggtrat.entidade.PermissaoDocumentoRestrito;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.lowagie.text.Document;
 import com.lowagie.text.Paragraph;
 import com.lowagie.text.pdf.PdfWriter;
@@ -16,7 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -92,13 +94,14 @@ class Candidato9PermissoesDocumentoExecutorRevogadoRedIT extends ContratosHttpBa
         var pool = Executors.newFixedThreadPool(2);
         CountDownLatch liberar = new CountDownLatch(1);
         CompletableFuture<Long> conexaoBloqueadora = new CompletableFuture<>();
+        var atorJdbc = new Ator("Candidato9PermissoesDocumentoExecutorRevogadoRedIT-" + fluxo);
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 Object alvo = fluxo.equals("CONCEDER")
                         ? em.find(UsuarioAplicacao.class, registroBloqueado, LockModeType.PESSIMISTIC_WRITE)
                         : em.find(PermissaoDocumentoRestrito.class, registroBloqueado, LockModeType.PESSIMISTIC_WRITE);
                 assertThat(alvo).isNotNull();
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberar.await(50, TimeUnit.SECONDS))
@@ -109,9 +112,11 @@ class Candidato9PermissoesDocumentoExecutorRevogadoRedIT extends ContratosHttpBa
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            List<Map<String, Object>> espera = aguardarBloqueioReal(
-                    conexao, tabelaEsperada, registroBloqueado, tentativa);
+            Future<MvcResult> tentativa = pool.submit(() -> atorJdbc.executar(() -> mvc.perform(pedido).andReturn()));
+            List<Map<String, Object>> espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource),conexao,atorJdbc,
+                    sql -> sql.selecaoChave(tabelaEsperada,
+                            fluxo.equals("CONCEDER") ? "id" : "id_documento_permissao",registroBloqueado),
+                    tabelaEsperada+"/"+registroBloqueado,tentativa);
             Instant esperaObservadaEm = Instant.now();
 
             executar(c.admin, put("/api/usuarios/" + ator.getId()).contentType(APPLICATION_JSON)
@@ -143,7 +148,7 @@ class Candidato9PermissoesDocumentoExecutorRevogadoRedIT extends ContratosHttpBa
                     "fluxo", fluxo, "metodo", "POST", "rota", rotaTentativa,
                     "executorId", ator.getId(), "revogadorId", c.admin.getId(), "beneficiarioId", c.nacional.getId(),
                     "tabelaEsperada", tabelaEsperada, "registroBloqueado", registroBloqueado,
-                    "esperaMySqlObservada", true, "esperaDataLockWaits", espera,
+                    "esperaPostgresObservada", true, "esperaDataLockWaits", espera,
                     "esperaObservadaEm", esperaObservadaEm, "revogacaoConferidaEm", revogacaoConferidaEm,
                     "liberacaoEm", liberacaoEm, "revogacaoCommitadaAntesDaLiberacao", true,
                     "executorAposRevogacao", executorDepoisDaRevogacao,
@@ -152,6 +157,19 @@ class Candidato9PermissoesDocumentoExecutorRevogadoRedIT extends ContratosHttpBa
                     () -> assertThat(resultado.getResponse().getStatus()).isIn(401, 403, 404, 409),
                     () -> assertThat(depois).as("Permissões, documento, eventos e trilha permanecem integralmente iguais")
                             .isEqualTo(antes));
+        } catch (AssertionError ex) {
+            var comando = atorJdbc.comandoAtual();
+            Path diagnostico = Path.of("target/auditoria-http/candidato9-permissao-espera-" + fluxo + ".json");
+            Files.createDirectories(diagnostico.getParent());
+            Files.writeString(diagnostico, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
+                    "erro", ex.getMessage(), "tabelaEsperada", tabelaEsperada,
+                    "registroBloqueado", registroBloqueado,
+                    "sqlPreparado", comando == null ? null : comando.sql(),
+                    "bindingsSha256", comando == null ? null : comando.conjuntos(),
+                    "atividade", comando == null ? List.of() : new JdbcTemplate(dataSource).queryForList(
+                            "select pid,state,wait_event_type,wait_event,pg_blocking_pids(pid)::text as bloqueadores "
+                                    + "from pg_stat_activity where datname=current_database() and pid=?", comando.pid()))));
+            throw ex;
         } finally {
             liberar.countDown();
             pool.shutdownNow();
@@ -199,7 +217,7 @@ class Candidato9PermissoesDocumentoExecutorRevogadoRedIT extends ContratosHttpBa
                 "autorizacaoAdministrativa", "ATO-SINTETICO-REVOGACAO-C9-" + marcador);
     }
 
-    private MockHttpServletRequestBuilder comando(String fluxo, long beneficiarioId, String rota) throws Exception {
+    private AbstractMockHttpServletRequestBuilder<?> comando(String fluxo, long beneficiarioId, String rota) throws Exception {
         Object body = fluxo.equals("CONCEDER") ? concessao(beneficiarioId, "tentativa-concorrente")
                 : motivoRevogacao("tentativa-concorrente");
         return post(rota).contentType(APPLICATION_JSON).content(json(body));
@@ -255,37 +273,7 @@ class Candidato9PermissoesDocumentoExecutorRevogadoRedIT extends ContratosHttpBa
         });
     }
 
-    private List<Map<String, Object>> aguardarBloqueioReal(long conexaoBloqueadora, String tabela,
-                                                          long id, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<List<Map<String, Object>>> observada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                List<Map<String, Object>> esperas = jdbc.queryForList(
-                        "select rt.PROCESSLIST_ID as requisitante,bt.PROCESSLIST_ID as bloqueador,"
-                                + "r.OBJECT_NAME as tabela,r.INDEX_NAME as indice,r.LOCK_TYPE as tipo,"
-                                + "r.LOCK_MODE as modo,r.LOCK_DATA as registro "
-                                + "from performance_schema.data_lock_waits w "
-                                + "join performance_schema.threads bt on bt.THREAD_ID=w.BLOCKING_THREAD_ID "
-                                + "join performance_schema.threads rt on rt.THREAD_ID=w.REQUESTING_THREAD_ID "
-                                + "join performance_schema.data_locks r on r.ENGINE=w.ENGINE "
-                                + "and r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID "
-                                + "join performance_schema.data_locks b on b.ENGINE=w.ENGINE "
-                                + "and b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID "
-                                + "where bt.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() and r.OBJECT_NAME=? "
-                                + "and b.INDEX_NAME='PRIMARY' and b.LOCK_TYPE='RECORD' and b.LOCK_DATA=?",
-                        conexaoBloqueadora, tabela, Long.toString(id));
-                if (!esperas.isEmpty()) observada.complete(esperas);
-                else if (tentativa.isDone()) observada.completeExceptionally(
-                        new AssertionError("A tentativa terminou sem esperar pelo registro documental esperado: " + tabela + "/" + id));
-            } catch (Throwable ex) { observada.completeExceptionally(ex); }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true); observador.shutdownNow(); observador.awaitTermination(5, TimeUnit.SECONDS);
-        }
-    }
+
 
     private byte[] pdfSintetico(String texto) throws Exception {
         ByteArrayOutputStream buffer = new ByteArrayOutputStream();

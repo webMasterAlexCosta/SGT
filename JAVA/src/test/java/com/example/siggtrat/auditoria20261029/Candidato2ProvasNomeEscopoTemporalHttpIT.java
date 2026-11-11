@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * Sem mocks de domínio/persistência; cada comando HTTP confirma sua transação.
  * Preparação JPA declara explicitamente duas faixas sintéticas, sem simular que
  * a projeção atual prova a existência passada. As provas nominais usam a API.
- * Não executado pelo revisor; a raiz executará MySQL 8.0.45 + Redis reais em série.
+ * Não executado pelo revisor; a raiz executará PostgreSQL 18.6 + Redis reais em série.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @TestPropertySource(properties = {"spring.cache.type=redis", "spring.sql.init.mode=never",
@@ -40,8 +40,8 @@ class Candidato2ProvasNomeEscopoTemporalHttpIT extends ContratosHttpBase {
     @BeforeEach
     void exigePersistenciaReal() throws Exception {
         try (var c = dataSource.getConnection()) {
-            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
-            assertThat(c.getMetaData().getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(c.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
+            assertThat(c.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");

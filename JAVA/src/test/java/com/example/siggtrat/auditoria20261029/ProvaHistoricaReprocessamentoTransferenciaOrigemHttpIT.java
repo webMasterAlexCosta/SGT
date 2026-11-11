@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  *
  * A única simulação de perda é DML em grade/município dos mapas de T2. Nenhuma
  * origem ou evento da alocação é fabricado/alterado na fixture. Demais atos são
- * realizados por HTTP MockMvc com serviços/autorização e MySQL reais.
+ * realizados por HTTP MockMvc com serviços/autorização e PostgreSQL reais.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ProvaHistoricaReprocessamentoTransferenciaOrigemHttpIT extends ContratosHttpBase {
@@ -50,8 +50,8 @@ class ProvaHistoricaReprocessamentoTransferenciaOrigemHttpIT extends ContratosHt
     void exigirPersistenciaPermitida() throws Exception {
         try (var conexao = dataSource.getConnection()) {
             var meta = conexao.getMetaData();
-            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
-            assertThat(meta.getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
+            assertThat(meta.getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -150,7 +150,8 @@ class ProvaHistoricaReprocessamentoTransferenciaOrigemHttpIT extends ContratosHt
         // normal. Sem corrigir o discriminador do motor, ela seria importada
         // como decisão humana independente, em vez de continuar derivada.
         Instant antesDaTerceira = Instant.now();
-        transferir(o.c().localA, o.n().id(), mapa("dataEfetiva", RelogioSistema.hoje().minusDays(1),
+        transferir(o.c().localA, o.n().id(), mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", RelogioSistema.hoje().minusDays(1),
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", o.c().gestaoB.getId(),
                 "tipoContratacaoDestinoId", o.c().tipoB.getId(), "motivo", "T3 posterior testa proveniência derivada após reprocessamento",
                 "referenciaSei", "SEI-T3-POSTERIOR", "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(
@@ -201,7 +202,8 @@ class ProvaHistoricaReprocessamentoTransferenciaOrigemHttpIT extends ContratosHt
         long eventoT1 = emTransacao(() -> em.createQuery("select t.evento.id from TransferenciaGestaoContrato t where t.contrato.id=:c",
                 Long.class).setParameter("c", n.id()).getSingleResult());
         concederPara(c, n.id(), c.localB, "TRANSFERENCIA_GESTAO_LOCAL", "ATO-HTTP");
-        transferir(c.localB, n.id(), mapa("dataEfetiva", dataT2, "dataAto", RelogioSistema.hoje(),
+        transferir(c.localB, n.id(), mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", dataT2, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoA.getId(), "tipoContratacaoDestinoId", c.tipoA.getId(),
                 "motivo", "Retorno convergente documentado por tríades", "referenciaSei", "SEI-T2-CONVERGENTE",
                 "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(
@@ -233,7 +235,8 @@ class ProvaHistoricaReprocessamentoTransferenciaOrigemHttpIT extends ContratosHt
     }
 
     private Map<String, Object> transferenciaT1(Cenario c, NovoContrato n, long cargoB2, LocalDate data) {
-        return mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
+        return mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "T1 preserva duas combinações de origem",
                 "referenciaSei", "SEI-T1-RETIFICAVEL", "autorizacaoAdministrativa", "ATO-HTTP", "mapeamentos", List.of(
                         mapa("composicaoOrigemId", n.composicao1(), "lotacaoDestinoId", c.lotacaoB.getId(),

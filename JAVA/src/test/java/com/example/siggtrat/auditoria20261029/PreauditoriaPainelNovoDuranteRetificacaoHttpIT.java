@@ -76,7 +76,9 @@ public class PreauditoriaPainelNovoDuranteRetificacaoHttpIT extends ContratosHtt
                     && Arrays.stream(Thread.currentThread().getStackTrace()).anyMatch(frame ->
                     frame.getClassName().equals("com.example.siggtrat.servico.PainelCalculoEstadoServico")
                             && frame.getMethodName().equals("concluir"));
-            if (finalizando && normal.contains(" from painel_calculo ") && normal.contains("for update")
+            // PESSIMISTIC_WRITE no PostgreSQL atual usa FOR NO KEY UPDATE.
+            if (finalizando && normal.contains(" from painel_calculo ")
+                    && (normal.contains("for update") || normal.contains("for no key update"))
                     && publicacao.usada().compareAndSet(false, true)) {
                 publicacao.aguardarLiberacao();
             }

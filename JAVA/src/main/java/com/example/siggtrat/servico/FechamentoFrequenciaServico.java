@@ -28,7 +28,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
-public class FechamentoFrequenciaServico {
+public class FechamentoFrequenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FechamentoFrequenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final FechamentoFrequenciaRepositorio repositorio;
     private final FechamentoFrequenciaItemRepositorio itemRepositorio;
@@ -427,7 +431,8 @@ public class FechamentoFrequenciaServico {
         boolean gestor = acessoOrganizacionalServico.ehGestaoLocal(user);
         if (!gestor && !politicaTemporal.abertaParaOperacional(data, null)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
-                    "A frequência está FECHADA desde o início do 8º dia; o Operacional não pode iniciar fechamento tardio.");
+                    "A frequência está FECHADA; a janela operacional de " + politicaTemporal.diasJanela()
+                            + " dias encerrou. O Operacional não pode iniciar fechamento tardio.");
         }
     }
 

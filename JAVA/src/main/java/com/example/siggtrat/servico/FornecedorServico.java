@@ -22,20 +22,27 @@ import java.util.Objects;
 /** Identidade cadastral compartilhada pelos contratos e seus fatos temporais. */
 @Service
 @Transactional
-public class FornecedorServico {
+public class FornecedorServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FornecedorServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final FornecedorRepositorio fornecedorRepositorio;
     private final ContratoRepositorio contratoRepositorio;
     private final AcessoOrganizacionalServico acessoOrganizacionalServico;
     private final RegistroAuditoriaServico auditoria;
+    private final jakarta.validation.Validator validador;
 
     public FornecedorServico(FornecedorRepositorio fornecedorRepositorio,
                              ContratoRepositorio contratoRepositorio,
                              AcessoOrganizacionalServico acessoOrganizacionalServico,
-                             RegistroAuditoriaServico auditoria) {
+                             RegistroAuditoriaServico auditoria,
+                             jakarta.validation.Validator validador) {
         this.fornecedorRepositorio = fornecedorRepositorio;
         this.contratoRepositorio = contratoRepositorio;
         this.acessoOrganizacionalServico = acessoOrganizacionalServico;
         this.auditoria = auditoria;
+        this.validador = validador;
     }
 
     @Transactional(readOnly = true)
@@ -50,7 +57,7 @@ public class FornecedorServico {
         Fornecedor fornecedor = new Fornecedor();
         fornecedor.setRazaoSocial(textoObrigatorio(dto == null ? null : dto.razaoSocial(), "razaoSocial"));
         fornecedor.setCnpj(cnpjObrigatorio(dto == null ? null : dto.cnpj()));
-        fornecedor.setEmail(texto(dto == null ? null : dto.email()));
+        fornecedor.setEmail(emailValido(dto == null ? null : dto.email()));
         Fornecedor salvo = fornecedorRepositorio.saveAndFlush(fornecedor);
         // A criação pode esperar na identidade única do CNPJ. A autoridade
         // precisa continuar válida depois dessa espera e até o commit.
@@ -70,7 +77,7 @@ public class FornecedorServico {
         FornecedorDTO antes = fornecedorDTO(fornecedor);
         fornecedor.setRazaoSocial(textoObrigatorio(dto == null ? null : dto.razaoSocial(), "razaoSocial"));
         fornecedor.setCnpj(cnpjObrigatorio(dto == null ? null : dto.cnpj()));
-        fornecedor.setEmail(texto(dto == null ? null : dto.email()));
+        fornecedor.setEmail(emailValido(dto == null ? null : dto.email()));
         if (dto != null && dto.ativo() != null) fornecedor.setAtivo(dto.ativo());
         Fornecedor salvo = fornecedorRepositorio.saveAndFlush(fornecedor);
         auditoria.registrarAcao("FORNECEDOR_ATUALIZADO", "Fornecedor", salvo.getId(), salvo.getRazaoSocial(),
@@ -119,6 +126,14 @@ public class FornecedorServico {
 
     private String texto(String valor) {
         return valor == null ? null : valor.trim();
+    }
+
+    private String emailValido(String dado) {
+        String valor = texto(dado);
+        if (!validador.validateValue(FornecedorEntradaDTO.class, "email", valor).isEmpty()) {
+            throw new IllegalArgumentException("Quando informado, o e-mail deve ser válido e conter até 180 caracteres.");
+        }
+        return valor;
     }
 
     private String textoObrigatorio(String dado, String campo) {

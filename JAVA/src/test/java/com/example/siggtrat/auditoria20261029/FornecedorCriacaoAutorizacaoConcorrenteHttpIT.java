@@ -3,6 +3,8 @@ package com.example.siggtrat.auditoria20261029;
 import com.example.siggtrat.entidade.Fornecedor;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import jakarta.persistence.LockModeType;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.Timeout;
@@ -66,7 +68,7 @@ class FornecedorCriacaoAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
     @Timeout(value = 75, unit = TimeUnit.SECONDS)
     void criacaoRevalidaExecutorAposEsperaNoCnpjDesfeitoPorRollback() throws Exception {
         try (var conexao = dataSource.getConnection()) {
-            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("MySQL");
+            assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
         }
         exigirIndiceUnico();
         Cenario c = criarCenarioPersistido();
@@ -93,6 +95,7 @@ class FornecedorCriacaoAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
         var pool = Executors.newFixedThreadPool(3);
         CountDownLatch liberar = new CountDownLatch(1);
         CompletableFuture<Barreira> preparada = new CompletableFuture<>();
+        var atorJdbc=new Ator("fornecedor-cnpj");
         try {
             Future<Barreira> bloqueador = pool.submit(() -> new TransactionTemplate(transactionManager).execute(status -> {
                 try {
@@ -102,17 +105,17 @@ class FornecedorCriacaoAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
                     int alteradas = em.createQuery(
                                     "update Fornecedor set cnpj=:cnpj where id=:id")
                             .setParameter("cnpj", cnpjTentativa).setParameter("id", controleId).executeUpdate();
-                    assertThat(alteradas).as("A barreira alterou exatamente sua linha sintética no MySQL").isEqualTo(1);
+                    assertThat(alteradas).as("A barreira alterou exatamente sua linha sintética no PostgreSQL").isEqualTo(1);
                     String chaveConfirmada = String.valueOf(em.createNativeQuery(
                                     "select cnpj from fornecedor where id_fornecedor=:id")
                             .setParameter("id", controleId).getSingleResult());
                     assertThat(chaveConfirmada).as("SELECT escalar confirma a chave efetivamente escrita").isEqualTo(cnpjTentativa);
                     long linhaNoIndice = ((Number) em.createNativeQuery(
-                                    "select id_fornecedor from fornecedor force index (uk_fornecedor_cnpj) "
+                                    "select id_fornecedor from fornecedor "
                                             + "where cnpj=:cnpj for update")
                             .setParameter("cnpj", cnpjTentativa).getSingleResult()).longValue();
                     assertThat(linhaNoIndice).as("A UNIQUE disputada aponta para a linha bloqueada").isEqualTo(controleId);
-                    Barreira b = new Barreira(((Number) em.createNativeQuery("select connection_id()")
+                    Barreira b = new Barreira(((Number) em.createNativeQuery("select pg_backend_pid()")
                             .getSingleResult()).longValue(), controleId, chaveConfirmada, linhaNoIndice);
                     Path preparo = Path.of("target/auditoria-http/fornecedor-criacao-barreira-confirmada.json");
                     Files.createDirectories(preparo.getParent());
@@ -133,8 +136,9 @@ class FornecedorCriacaoAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
                 }
             }));
             Barreira barreira = preparada.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            List<Map<String, Object>> espera = aguardarUniqueReal(barreira.conexao(), cnpjTentativa, tentativa);
+            Future<MvcResult> tentativa = pool.submit(() -> atorJdbc.executar(() -> mvc.perform(pedido).andReturn()));
+            List<Map<String, Object>> espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource),barreira.conexao(),atorJdbc,
+                    sql->sql.insercao("fornecedor","cnpj",cnpjTentativa),"fornecedor/cnpj sintético",tentativa);
 
             Future<?> revogacao = pool.submit(() -> {
                 executar(c.admin, put("/api/usuarios/" + c.localA.getId()).contentType(APPLICATION_JSON)
@@ -170,7 +174,7 @@ class FornecedorCriacaoAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
                     "recorded_at", Instant.now().toString(), "rota", ROTA, "controlePositivoStatus", 200,
                     "controleId", controleId, "executorId", c.localA.getId(), "revogadorId", c.admin.getId(),
                     "cnpjSinteticoTentativa", cnpjTentativa, "barreira", barreira,
-                    "esperaMySqlObservada", true, "esperaFisica", espera,
+                    "esperaPostgresObservada", true, "esperaFisica", espera,
                     "revogacaoCommitadaAntesDoRollback", true, "barreiraRestauradaAposRollback", barreiraRevertida,
                     "status", resultado.getResponse().getStatus(), "antes", antes, "depois", depois)));
 
@@ -218,107 +222,11 @@ class FornecedorCriacaoAutorizacaoConcorrenteHttpIT extends ContratosHttpBase {
     }
 
     private void exigirIndiceUnico() {
-        Long quantidade = new JdbcTemplate(dataSource).queryForObject(
-                "select count(*) from information_schema.statistics where table_schema=database() "
-                        + "and table_name='fornecedor' and index_name='uk_fornecedor_cnpj' "
-                        + "and non_unique=0 and column_name='cnpj' and seq_in_index=1", Long.class);
-        assertThat(quantidade).as("Premissa de schema Hibernate: UNIQUE física do CNPJ").isEqualTo(1L);
+        assertThat(EsperaJdbcPostgres.indiceUnico(new JdbcTemplate(dataSource),"fornecedor","uk_fornecedor_cnpj","cnpj"))
+                .as("UNIQUE física simples, válida e pronta de CNPJ gerada pelo Hibernate").isTrue();
     }
 
-    private List<Map<String, Object>> aguardarUniqueReal(long bloqueadora, String cnpj,
-                                                        Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<List<Map<String, Object>>> observada = new CompletableFuture<>();
-        List<Map<String, Object>> amostras = new CopyOnWriteArrayList<>();
-        AtomicReference<String> ultimaAssinatura = new AtomicReference<>();
-        AtomicReference<String> desfecho = new AtomicReference<>("OBSERVACAO_INICIADA");
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                // Diagnóstico deliberadamente amplo, mas limitado ao PID da barreira.
-                // Os ENGINE_LOCK_ID vêm da própria relação de espera, sem exigir
-                // previamente igualdade de LOCK_DATA ou sequer presença dos dois
-                // registros em data_locks nessa amostra. Não autoriza revogação.
-                List<Map<String, Object>> todasEsperas = jdbc.queryForList("select "
-                        + "w.ENGINE as engine_espera, w.REQUESTING_ENGINE_LOCK_ID as lock_solicitado_id, "
-                        + "w.BLOCKING_ENGINE_LOCK_ID as lock_bloqueador_id, "
-                        + "w.REQUESTING_THREAD_ID as thread_solicitante, w.BLOCKING_THREAD_ID as thread_bloqueador, "
-                        + "t.PROCESSLIST_ID as conexao_bloqueadora, rt.PROCESSLIST_ID as conexao_solicitante, "
-                        + "r.OBJECT_SCHEMA as esquema_solicitado, r.OBJECT_NAME as tabela_solicitada, "
-                        + "r.INDEX_NAME as indice_solicitado, r.LOCK_TYPE as tipo_solicitado, "
-                        + "r.LOCK_MODE as modo_solicitado, r.LOCK_STATUS as estado_solicitado, r.LOCK_DATA as dados_solicitados, "
-                        + "b.OBJECT_SCHEMA as esquema_bloqueador, b.OBJECT_NAME as tabela_bloqueadora, "
-                        + "b.INDEX_NAME as indice_bloqueador, b.LOCK_TYPE as tipo_bloqueador, "
-                        + "b.LOCK_MODE as modo_bloqueador, b.LOCK_STATUS as estado_bloqueador, b.LOCK_DATA as dados_bloqueadores "
-                        + "from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "left join performance_schema.threads rt on rt.THREAD_ID=w.REQUESTING_THREAD_ID "
-                        + "left join performance_schema.data_locks r on r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID and r.ENGINE=w.ENGINE "
-                        + "left join performance_schema.data_locks b on b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID and b.ENGINE=w.ENGINE "
-                        + "where t.PROCESSLIST_ID=? order by w.REQUESTING_ENGINE_LOCK_ID, w.BLOCKING_ENGINE_LOCK_ID", bloqueadora);
-                List<Map<String, Object>> locksDaBarreira = jdbc.queryForList("select "
-                        + "l.ENGINE as engine, l.ENGINE_LOCK_ID as lock_id, l.ENGINE_TRANSACTION_ID as transacao, "
-                        + "l.THREAD_ID as thread_id, t.PROCESSLIST_ID as conexao, l.OBJECT_SCHEMA as esquema, "
-                        + "l.OBJECT_NAME as tabela, l.INDEX_NAME as indice, l.LOCK_TYPE as tipo, "
-                        + "l.LOCK_MODE as modo, l.LOCK_STATUS as estado, l.LOCK_DATA as dados "
-                        + "from performance_schema.data_locks l "
-                        + "join performance_schema.threads t on t.THREAD_ID=l.THREAD_ID "
-                        + "where t.PROCESSLIST_ID=? order by l.ENGINE_LOCK_ID", bloqueadora);
 
-                // Predicado V1 preservado: apenas ele satisfaz a premissa e deixa
-                // o chamador prosseguir para a revogação HTTP e seus oráculos.
-                List<Map<String, Object>> linhas = jdbc.queryForList("select w.REQUESTING_THREAD_ID as solicitante, "
-                        + "w.BLOCKING_THREAD_ID as bloqueador, r.OBJECT_SCHEMA as esquema, r.OBJECT_NAME as tabela, "
-                        + "r.INDEX_NAME as indice, r.LOCK_DATA as registro, r.LOCK_MODE as modo_solicitado, "
-                        + "b.LOCK_MODE as modo_detido, r.LOCK_STATUS as estado "
-                        + "from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "join performance_schema.data_locks r on r.ENGINE_LOCK_ID=w.REQUESTING_ENGINE_LOCK_ID and r.ENGINE=w.ENGINE "
-                        + "join performance_schema.data_locks b on b.ENGINE_LOCK_ID=w.BLOCKING_ENGINE_LOCK_ID and b.ENGINE=w.ENGINE "
-                        + "where t.PROCESSLIST_ID=? and r.OBJECT_SCHEMA=database() and r.OBJECT_NAME='fornecedor' "
-                        + "and r.INDEX_NAME='uk_fornecedor_cnpj' and r.LOCK_TYPE='RECORD' "
-                        + "and r.LOCK_DATA like concat('%', ?, '%') "
-                        + "and r.LOCK_STATUS='WAITING' and b.LOCK_STATUS='GRANTED' "
-                        + "and b.OBJECT_SCHEMA=r.OBJECT_SCHEMA and b.OBJECT_NAME=r.OBJECT_NAME "
-                        + "and b.INDEX_NAME=r.INDEX_NAME and b.LOCK_DATA=r.LOCK_DATA", bloqueadora, cnpj);
-                Map<String, Object> estado = mapa("esperasDoPid", todasEsperas, "locksDoPid", locksDaBarreira,
-                        "linhasDoPredicadoV1", linhas, "tentativaTerminou", tentativa.isDone());
-                String assinatura = mapper.writeValueAsString(estado);
-                if (!assinatura.equals(ultimaAssinatura.getAndSet(assinatura))) {
-                    amostras.add(mapa("instante", Instant.now().toString(), "estado", estado));
-                }
-                if (!linhas.isEmpty()) {
-                    desfecho.set("PREMISSA_FISICA_V1_OBSERVADA");
-                    observada.complete(List.copyOf(linhas));
-                } else if (tentativa.isDone()) {
-                    desfecho.set("PEDIDO_TERMINOU_SEM_PREMISSA");
-                    observada.completeExceptionally(new AssertionError("POST não alcançou espera física na UNIQUE do CNPJ sintético"));
-                }
-            } catch (Throwable ex) {
-                desfecho.set("ERRO_DE_OBSERVACAO: " + ex.getClass().getName() + ": " + ex.getMessage());
-                observada.completeExceptionally(ex);
-            }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { return observada.get(10, TimeUnit.SECONDS); }
-        catch (java.util.concurrent.TimeoutException ex) {
-            desfecho.set("TIMEOUT_SEM_PREMISSA_V1; NAO_HOUVE_REVOGACAO_NEM_ORACULO_NEGOCIAL");
-            throw ex;
-        }
-        finally {
-            consulta.cancel(true);
-            observador.shutdownNow();
-            observador.awaitTermination(5, TimeUnit.SECONDS);
-            Path arquivo = Path.of("target/auditoria-http/candidato10-fornecedor-observacao-unique-v2.json");
-            Files.createDirectories(arquivo.getParent());
-            Files.writeString(arquivo, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
-                    "autor", "/root/revisao_final_pessoas", "audit_round", System.getenv("SGT_AUDITORIA_RODADA"),
-                    "recorded_at", Instant.now().toString(), "conexaoBloqueadora", bloqueadora,
-                    "cnpjSinteticoEsperado", cnpj, "predicadoV1Preservado", true,
-                    "premissaFisicaEncontrada", "PREMISSA_FISICA_V1_OBSERVADA".equals(desfecho.get()),
-                    "desfecho", desfecho.get(), "amostrasDistintas", amostras,
-                    "limite", "Diagnóstico da premissa, não comprovação de escrita após revogação.")));
-        }
-    }
 
     private record Barreira(long conexao, long fornecedorId, String chaveConfirmada, long linhaNoIndice) {}
 }

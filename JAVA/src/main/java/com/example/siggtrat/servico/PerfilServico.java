@@ -30,7 +30,11 @@ import java.util.Map;
 import java.util.Set;
 
 @org.springframework.stereotype.Service
-public class PerfilServico {
+public class PerfilServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PerfilServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private static final long MAX_AVATAR_BYTES = 5L * 1024L * 1024L;
     private static final Set<String> AVATAR_CONTENT_TYPES = Set.of("image/jpeg", "image/png", "image/webp");

@@ -5,8 +5,8 @@ import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-libra
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, extrairLista: (v) => v }));
-import { ModalAcaoContrato } from '../src/modules/admin/pages/PaginaContratos/components/ModalAcaoContrato/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, extrairLista: (v) => v }));
+import { ModalAcaoContrato } from '../src/modules/admin/pages/PaginaContratos/components/ModalAcaoContrato/index.tsx';
 
 const previa = {
   contratoId: 9, operacao: 'inativar', dataEfetiva: '2026-11-01', dataAto: '2026-11-01', motivo: 'Inativação documentada',

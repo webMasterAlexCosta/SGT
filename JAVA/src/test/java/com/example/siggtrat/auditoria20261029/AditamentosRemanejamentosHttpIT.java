@@ -107,10 +107,29 @@ class AditamentosRemanejamentosHttpIT extends ContratosHttpBase {
         var lista = consultar(c.localA, base(n.id()) + "/remanejamentos", "REM-004 cadeia preservada");
         assertThat(lista.size()).isEqualTo(2);
         assertThat(lista.get(1).path("situacao").asText()).isEqualTo("CANCELADO");
+        assertThat(lista.get(0).path("id")).isEqualTo(rem.path("id"));
+        assertThat(lista.get(1).path("id")).isEqualTo(nova.path("id"));
+        assertThat(lista.get(0).path("situacao").asText()).isEqualTo("RETIFICADO");
+        var esperados = List.of(
+                java.util.Map.of(n.composicao1(), List.of(25, -5, 20), n.composicao2(), List.of(75, 5, 80)),
+                java.util.Map.of(n.composicao1(), List.of(25, -10, 15), n.composicao2(), List.of(75, 10, 85)));
+        for (int i = 0; i < 2; i++) {
+            var itens = lista.get(i).path("itens");
+            assertThat(itens).hasSize(2);
+            var porId = java.util.stream.StreamSupport.stream(itens.spliterator(), false).collect(java.util.stream.Collectors.toMap(
+                    item -> item.path("composicaoId").asLong(), item -> List.of(item.path("quantidadeAnterior").asInt(),
+                            item.path("variacao").asInt(), item.path("quantidadeResultante").asInt())));
+            assertThat(porId).as("CMP003 pares históricos da versão %s mesmo após cancelamento", i + 1).isEqualTo(esperados.get(i));
+        }
         var comps = consultar(c.localA, base(n.id()) + "/composicoes?data=" + n.inicio().plusDays(2), "REM-007 distribuição cancelada não aplicada");
         int total = 0;
         for (JsonNode comp : comps) total += comp.path("efetivoPrevisto").asInt();
         assertThat(total).isEqualTo(100);
+        assertThat(comps).hasSize(2);
+        assertThat(java.util.stream.StreamSupport.stream(comps.spliterator(), false).collect(java.util.stream.Collectors.toMap(
+                item -> item.path("id").asLong(), item -> item.path("efetivoPrevisto").asInt())))
+                .as("CMP003 cancelamento restitui exatamente os IDs e quantidades originais, além do total")
+                .isEqualTo(java.util.Map.of(n.composicao1(), 25, n.composicao2(), 75));
     }
 
     @Test

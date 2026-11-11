@@ -27,7 +27,7 @@ public interface PessoaRepositorio extends JpaRepository<Pessoa, Long>, org.spri
             or (:gestaoLocalId is not null and v.contrato.gestaoLocal.id = :gestaoLocalId)
             or (:superintendenciaId is not null and v.contrato.gestaoLocal.superintendencia.id = :superintendenciaId))
           and (:contratoId is null or v.contrato.id = :contratoId)
-          and (:ativoEm is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
+          and (cast(:ativoEm as date) is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
                 and v.dataInicio <= :ativoEm and (v.dataFim is null or v.dataFim >= :ativoEm)))
           and (:busca is null or lower(p.nome) like concat('%', :busca, '%')
                or (:buscaCpf is not null and p.cpf like concat('%', :buscaCpf, '%')))
@@ -39,7 +39,7 @@ public interface PessoaRepositorio extends JpaRepository<Pessoa, Long>, org.spri
             or (:gestaoLocalId is not null and v.contrato.gestaoLocal.id = :gestaoLocalId)
             or (:superintendenciaId is not null and v.contrato.gestaoLocal.superintendencia.id = :superintendenciaId))
           and (:contratoId is null or v.contrato.id = :contratoId)
-          and (:ativoEm is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
+          and (cast(:ativoEm as date) is null or (v.estadoNegocial = com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo.REGISTRADO
                 and v.dataInicio <= :ativoEm and (v.dataFim is null or v.dataFim >= :ativoEm)))
           and (:busca is null or lower(p.nome) like concat('%', :busca, '%')
                or (:buscaCpf is not null and p.cpf like concat('%', :buscaCpf, '%')))

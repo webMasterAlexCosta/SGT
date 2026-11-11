@@ -24,7 +24,7 @@ class FrequenciaEtapa09Test {
 
     @Test
     void janelaContaDataComoDiaUmEFechaNoInicioDoOitavoDia() {
-        var p = new PoliticaTemporalFrequenciaServico();
+        var p = new PoliticaTemporalFrequenciaServico(7);
         LocalDate d = LocalDate.of(2026, 1, 1);
         ZoneId z = ZoneId.of("America/Sao_Paulo");
         assertTrue(p.abertaParaOperacional(d, ZonedDateTime.of(2026,1,7,23,59,59,0,z)));
@@ -34,7 +34,7 @@ class FrequenciaEtapa09Test {
 
     @Test
     void politicaConverteInstanteParaSaoPauloSemOffsetFixo() {
-        var p = new PoliticaTemporalFrequenciaServico();
+        var p = new PoliticaTemporalFrequenciaServico(7);
         LocalDate d = LocalDate.of(2026, 1, 1);
         assertFalse(p.fechada(d, ZonedDateTime.parse("2026-01-08T02:59:59Z")));
         assertTrue(p.fechada(d, ZonedDateTime.parse("2026-01-08T03:00:00Z")));
@@ -158,7 +158,7 @@ class FrequenciaEtapa09Test {
 
     @Test
     void fechamentoAutomaticoPersisteEstadoEEvento() {
-        FrequenciaRepositorio repo=mock(FrequenciaRepositorio.class); AuditoriaFrequenciaServico aud=mock(AuditoriaFrequenciaServico.class); PoliticaTemporalFrequenciaServico pol=new PoliticaTemporalFrequenciaServico();
+        FrequenciaRepositorio repo=mock(FrequenciaRepositorio.class); AuditoriaFrequenciaServico aud=mock(AuditoriaFrequenciaServico.class); PoliticaTemporalFrequenciaServico pol=new PoliticaTemporalFrequenciaServico(7);
         var tx=mock(org.springframework.transaction.PlatformTransactionManager.class);
         when(tx.getTransaction(any())).thenReturn(new org.springframework.transaction.support.SimpleTransactionStatus());
         var s=new FechamentoAutomaticoFrequenciaNegocialServico(repo,pol,aud,tx,mock(com.example.siggtrat.servico.InvalidacaoCacheServico.class),500); Frequencia f=frequenciaBase(); f.setId(100L); f.setDataReferencia(LocalDate.now(pol.zona()).minusDays(8)); f.setEstadoNegocial(EstadoNegocialFrequencia.ABERTA);

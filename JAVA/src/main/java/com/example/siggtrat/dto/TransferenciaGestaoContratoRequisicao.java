@@ -19,5 +19,7 @@ public record TransferenciaGestaoContratoRequisicao(
         Integer ordemDocumental,
         Long tipoContratacaoDestinoId,
         String tokenPrevia,
-        Boolean confirmarImpacto
+        Boolean confirmarImpacto,
+        Boolean conferenciaDocumentalConfirmada,
+        String versaoConferenciaDocumental
 ) {}

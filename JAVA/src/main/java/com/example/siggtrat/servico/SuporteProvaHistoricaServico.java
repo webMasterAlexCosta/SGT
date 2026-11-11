@@ -15,7 +15,11 @@ import java.util.*;
 
 /** Controles comuns de custódia, fonte e metadados; não resolve valores históricos. */
 @Service
-public class SuporteProvaHistoricaServico {
+public class SuporteProvaHistoricaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(SuporteProvaHistoricaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EntityManager em;
     private final AcessoOrganizacionalServico acesso;
     private final GestaoContratoTemporalServico gestao;
@@ -85,19 +89,19 @@ public class SuporteProvaHistoricaServico {
         return valor.trim();
     }
     public static String normalizar(String valor) { return valor == null ? null : valor.trim(); }
-    public static String hash(Object... valores) {
-        return AssinaturaPreviaNegocial.sha256(Arrays.stream(valores).map(AssinaturaPreviaNegocial::valor).toList());
+    public static String hash(String dominio, Object... valores) {
+        return AssinaturaPreviaNegocial.sha256(dominio, AssinaturaPreviaNegocial.partes(valores));
     }
     public void preencher(ProvaHistoricaBase p, Contrato c, LocalDate inicio, LocalDate fim, DocumentoComprobatorioDTO d,
             String referencia, String motivo, String autorizacao, String chave, String intencao, UsuarioAplicacao u) {
         p.setContrato(c); p.setDataInicioEfetiva(inicio); p.setDataFimEfetiva(fim);
         p.setDocumentoComprobatorio(d == null ? null : em.getReference(DocumentoComprobatorio.class, d.id()));
         p.setVersaoDocumento(d == null ? null : d.versaoDocumento());
-        p.setHashDocumento(d == null ? hash(referencia) : hash(d.id(),d.versaoDocumento(),d.sha256Arquivo(),d.referenciaSei()));
+        p.setHashDocumento(d == null ? hash("sgt.prova-historica.documento-sei.v1", referencia) : hash("sgt.prova-historica.documento.v1", d.id(),d.versaoDocumento(),d.sha256Arquivo(),d.referenciaSei()));
         p.setReferenciaSei(normalizar(referencia)); p.setMotivo(motivo.trim()); p.setAutorizacao(autorizacao.trim());
         p.setChaveIdempotencia(chave.trim()); p.setHashIntencao(intencao); p.setRegistradoEm(Instant.now());
         p.setResponsavelId(u.getId()); p.setResponsavelUsername(u.getUsername());
-        p.setHashConteudo(hash(intencao,p.getHashDocumento(),p.getRegistradoEm()));
+        p.setHashConteudo(hash("sgt.prova-historica.conteudo.v1", intencao,p.getHashDocumento(),p.getRegistradoEm()));
     }
     public static ResponseStatusException erro(HttpStatus status, String mensagem) { return new ResponseStatusException(status, mensagem); }
 }

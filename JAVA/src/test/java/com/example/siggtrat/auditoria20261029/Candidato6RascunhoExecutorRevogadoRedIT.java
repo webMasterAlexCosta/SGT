@@ -1,5 +1,7 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.UsuarioAplicacao;
 import com.example.siggtrat.utilitario.RelogioSistema;
@@ -36,7 +38,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  * de uma espera de escrita e não passam por revalidação após essa espera.
  * Norma/critério: CON-009:001, autorização corrente para escrita contratual.
  * Coordenação e observador derivados de Candidato4InativacaoExecutorRevogadoRedIT;
- * preserva a proveniência C3→C4 da técnica de observação real do MySQL.
+ * preserva a proveniência C3→C4 da técnica de observação real do PostgreSQL.
  * Fonte auditada: C6 b0796984cf93131ce89ba3634e479eb390dc7a9b3de5dc2fa1d7a944208a340e.
  * Somente proposta: não compilada/executada por este revisor, nem correção produtiva.
  */
@@ -75,7 +77,7 @@ class Candidato6RascunhoExecutorRevogadoRedIT extends ContratosHttpBase {
         try {
             Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
                 em.find(Contrato.class, contratoId, LockModeType.PESSIMISTIC_WRITE);
-                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select connection_id()")
+                conexaoBloqueadora.complete(((Number) em.createNativeQuery("select pg_backend_pid()")
                         .getSingleResult()).longValue());
                 try {
                     if (!liberarContrato.await(30, TimeUnit.SECONDS))
@@ -87,8 +89,11 @@ class Candidato6RascunhoExecutorRevogadoRedIT extends ContratosHttpBase {
                 return null;
             }));
             long conexao = conexaoBloqueadora.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> tentativa = pool.submit(() -> mvc.perform(pedido).andReturn());
-            aguardarBloqueioReal(conexao, tentativa);
+            var ator = new Ator("rascunho-" + operacao);
+            Future<MvcResult> tentativa = pool.submit(() -> ator.executar(() -> mvc.perform(pedido).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, ator,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", contratoId),
+                    "Contrato RASCUNHO em alteração/descarte", tentativa);
 
             executar(c.admin, put("/api/usuarios/" + c.localA.getId())
                             .contentType(MediaType.APPLICATION_JSON).content(json(mapa("active", false))), 200,
@@ -109,7 +114,7 @@ class Candidato6RascunhoExecutorRevogadoRedIT extends ContratosHttpBase {
             Files.createDirectories(evidencia.getParent());
             Files.writeString(evidencia, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(mapa(
                     "hipotese", "C6-CON-H01", "operacao", operacao,
-                    "esperaMySqlObservada", true, "revogacaoCommitadaAntesDaLiberacao", true,
+                    "esperaPostgresObservada", espera, "revogacaoCommitadaAntesDaLiberacao", true,
                     "status", resultado.getResponse().getStatus(), "antes", antes, "depois", depois)));
             assertAll("Rascunho exige executor ainda autorizado depois de aguardar a escrita",
                     () -> assertThat(resultado.getResponse().getStatus())
@@ -122,32 +127,6 @@ class Candidato6RascunhoExecutorRevogadoRedIT extends ContratosHttpBase {
             liberarContrato.countDown();
             pool.shutdownNow();
             pool.awaitTermination(10, TimeUnit.SECONDS);
-        }
-    }
-
-    private void aguardarBloqueioReal(long conexaoBloqueadora, Future<?> tentativa) throws Exception {
-        JdbcTemplate jdbc = new JdbcTemplate(dataSource);
-        CompletableFuture<Void> esperaObservada = new CompletableFuture<>();
-        var observador = Executors.newSingleThreadScheduledExecutor();
-        // Cadência limita consultas: o ordenamento depende do performance_schema,
-        // nunca de supor que um sleep implica espera ou revogação já confirmada.
-        var consulta = observador.scheduleWithFixedDelay(() -> {
-            try {
-                Long esperas = jdbc.queryForObject("select count(*) from performance_schema.data_lock_waits w "
-                        + "join performance_schema.threads t on t.THREAD_ID=w.BLOCKING_THREAD_ID "
-                        + "where t.PROCESSLIST_ID=?", Long.class, conexaoBloqueadora);
-                if (esperas != null && esperas >= 1) esperaObservada.complete(null);
-                else if (tentativa.isDone()) esperaObservada.completeExceptionally(
-                        new AssertionError("Mutação de rascunho não alcançou a espera real no Contrato"));
-            } catch (Throwable ex) {
-                esperaObservada.completeExceptionally(ex);
-            }
-        }, 0, 25, TimeUnit.MILLISECONDS);
-        try { esperaObservada.get(10, TimeUnit.SECONDS); }
-        finally {
-            consulta.cancel(true);
-            observador.shutdownNow();
-            observador.awaitTermination(5, TimeUnit.SECONDS);
         }
     }
 

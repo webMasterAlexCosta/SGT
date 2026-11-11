@@ -1,5 +1,9 @@
 # SGT C25-H04 — levantamento atualizado de requisitos e regras de negócio
 
+> **Estado atual: projeto não concluído e não homologado para produção.** O corpo original preserva o corte C25-H04/MySQL; a derivada local usa PostgreSQL e a toolchain registrada em [CODEX/TOOLCHAIN.md](CODEX/TOOLCHAIN.md). Contagens, commits e aceites históricos não aprovam os bytes atuais. Leia [ESTADO_ATUAL.md](ESTADO_ATUAL.md) e o [índice](README.md).
+
+> **Decisão vigente de09/11/2026:** a janela fixa de sete dias citada no corpo histórico abaixo foi substituída por N configurável, padrão30, limite exclusivo D+N. Consulte a [regra vigente](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md). Governança de Terceiros continua excluída; demais permissões e invariantes preservadas. Nenhum resultado histórico aprova a campanha atual.
+
 **Referência documental:** campanha C25-H04, corte C03/C04 de 04/11/2026. **Empacotado:** 05/11/2026, sem alteração do código-fonte.
 
 ## 1. O que esta documentação contém
@@ -76,3 +80,15 @@ Esta entrega não é apenas um resumo de arquitetura: inclui o levantamento vige
 6. Leia o `PROMPT_MESTRE_SGT_CORRECAO_E_HOMOLOGACAO_8045_20261103.md` como especificação de execução da campanha, distinguindo testes exigidos de testes efetivamente aprovados.
 
 **Precedência:** os documentos C04 são a leitura atualizada da candidata; o mestre orienta critérios da campanha e não pode ser convertido em aprovação por si só. Os IDs iguais entre a matriz histórica dos 198 requisitos e as matrizes transversais do mestre **podem ter significados diferentes**; preserve os namespaces (ex.: `CANONICAL198::CON-012` vs `MASTER::8.6::CON-012`).
+
+
+## Contrato de preservação da derivada atual — 07/11/2026
+
+Consolidação das obrigações do AGENTS anterior, preservado no checkpoint `d8c415f4`. Esta seção não inventa novos requisitos nem certifica que todos estejam implementados.
+
+- Preservar autorização atual, núcleo operacional, Fornecedor compartilhado, GOV-003, documentos, histórico/auditoria, perfis/escopos/senha/CSRF, locks/transações/rollback, fotografias e limites operacionais. A duração fixa anterior foi substituída pela decisão humana de09/11/2026: N dias civis configuráveis, padrão30.
+- Governança de Terceiros/financeira e risco manual/contínuo removidos na baseline não devem ser reintroduzidos. Cadastro operacional de Fornecedor e funções compartilhadas não são automaticamente áreas removidas. O escopo detalhado e suas exceções estão em [MAPA_REMOVIDOS_PRESERVADOS.md](MATRIZES_COMPLETAS/MAPA_REMOVIDOS_PRESERVADOS.md), inclusive o suplemento PostgreSQL.
+- A data de início da jornada D, e não a gravação/retificação, define o primeiro dia da janela N configurável/padrão30. O limite é início de D+N em America/Sao_Paulo, exclusivo; para01/01 e N=30,31/01 às00:00. Inclusão/retificação não reinicia a janela. Permissões e demais condições permanecem. Fonte vigente: [REGRA_JANELA_FREQUENCIA.md](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md); [investigação anterior](../JAVA/docs/REGRA_SETE_DIAS.md) preservada como histórico.
+- Preservar precisão JSON e temporalidade America/Sao_Paulo; contratos Jackson2 de serialização/JJWT/Redis, cookies/CSRF, geração de sessão/cancelamento, acessibilidade e validações decisivas do backend real.
+
+O catálogo de 198 enunciados é uma fonte de rastreabilidade com namespaces e cortes próprios; não reativa por si só a missão antiga de congelar 198/198 nem as áreas removidas. Cada alegação de conclusão exige prova atual e escopo identificado. Nenhuma migração de acervo ou implantação é autorizada por esta consolidação.

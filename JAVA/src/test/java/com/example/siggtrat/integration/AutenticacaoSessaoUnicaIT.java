@@ -26,7 +26,7 @@ import java.util.concurrent.*;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.mock;
 
-class AutenticacaoSessaoUnicaIT extends MySqlIntegrationTestSupport {
+class AutenticacaoSessaoUnicaIT extends PostgresIntegrationTestSupport {
     @Autowired UsuarioAplicacaoRepositorio usuarios;
     @Autowired TokenAtivoRepositorio tokens;
     @Autowired LotacaoRepositorio lotacoes;
@@ -62,7 +62,7 @@ class AutenticacaoSessaoUnicaIT extends MySqlIntegrationTestSupport {
                     new TentativaLoginServico(new PropriedadesSegurancaLogin(5, 60_000)),
                     lotacoes, jornadas, superintendencias, gestoes,
                     new EscopoAcessoUsuarioServico(), mock(FiltroAutenticacaoJwt.class), mock(TotpServico.class),
-                    new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."));
+                    new PropriedadesAutenticacao(6, 31_536_000, "Credenciais inválidas."), new com.example.siggtrat.servico.RevogacaoSessaoServico(tokens, new com.example.siggtrat.configuracao.transacao.ExecutorTransacaoIdempotente(gerenciador)));
             CountDownLatch preparadas = new CountDownLatch(2);
             CountDownLatch iniciar = new CountDownLatch(1);
             Callable<Integer> login = () -> {

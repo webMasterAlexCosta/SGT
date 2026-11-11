@@ -140,7 +140,8 @@ class PessoasProjecaoTransferenciaHttpIT extends ContratosHttpBase {
 
     private void transferir(Preparado f, LocalDate data) throws Exception {
         conceder(f.c(), f.contrato().id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa("dataEfetiva", data,
+        enviar(f.c().localA, base(f.contrato().id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data,
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", f.c().gestaoB.getId(),
                 "tipoContratacaoDestinoId", f.c().tipoB.getId(), "motivo", "Transferência com contexto operacional coerente",
                 "referenciaSei", "SEI-PROJECAO-TRANSFERENCIA", "autorizacaoAdministrativa", "ATO-HTTP",

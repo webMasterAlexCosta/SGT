@@ -14,7 +14,7 @@ import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
 /**
- * Complemento real do gate de arquitetura: aplicação, segurança e MySQL.
+ * Complemento real do gate de arquitetura: aplicação, segurança e PostgreSQL.
  * Uma recusa 401/403 não vale como prova de remoção; exige Gestor Local válido,
  * controle operacional 200 e ausência dos handlers registrados em runtime.
  */

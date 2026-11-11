@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /**
  * Provas propostas pela revisão independente do manifesto
  * 3e19c8d47eb566ca6edd6cb6cbda6ff228e4813b291f93af045715a33f5eb1d2.
- * Requer MySQL real. Não depende de descrição injetada diretamente no histórico:
+ * Requer PostgreSQL real. Não depende de descrição injetada diretamente no histórico:
  * todas as narrativas investigadas são produzidas por comandos HTTP reais.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -81,7 +81,8 @@ class PreauditoriaPainelAtividadesHttpIT extends ContratosHttpBase {
                 200, "Controle: painel contém a ocorrência original em A")), historico)).isTrue();
 
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.minusDays(1), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Responsabilidade histórica corrigida por documento na revisão independente",

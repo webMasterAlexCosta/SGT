@@ -1,0 +1,21 @@
+const fs=require('node:fs'),path=require('node:path');
+const {execute}=require('./ambiente-real.cjs');const {baseFrontend}=require('./contexto-fixture.cjs');
+const unwrap=x=>x&&Object.hasOwn(x,'data')?x.data:x;
+execute('fechamento-grade-leitura-real',async({page,context,fixture,check,report,open,screenshot})=>{
+ const b=JSON.parse(fs.readFileSync(path.join(process.env.SGT_TEST_RUNTIME,'private/e2e-business.json'))),base=baseFrontend();
+ check('Reprocessamento200 já confirmado, sem novo comando',b.jobs200CancelReprocessamentoConcluido===true&&b.jobs200CancelId>0);
+ await open('/frequencia');await page.getByLabel('Data de referência da frequência',{exact:true}).fill(b.jobs200CancelData);
+ await page.getByRole('combobox',{name:'Lotação',exact:true}).selectOption(String(fixture.ids.lotacao));await page.getByRole('combobox',{name:'Turno',exact:true}).selectOption(String(fixture.ids.jornada));
+ const contracts=unwrap(await(await context.request.get(base+'/api/contratos')).json()).filter(x=>x.ativo===true),index=contracts.findIndex(x=>x.id===b.jobs200ContratoId);
+ await page.getByRole('button',{name:'Selecionar contratos',exact:true}).click();const boxes=page.locator('[data-tour="freq-filters"]').getByRole('checkbox');await boxes.first().click();await boxes.nth(index+1).check();await page.getByRole('button',{name:'Selecionar contratos',exact:true}).click();
+ const params=new URLSearchParams({data:b.jobs200CancelData,lotacaoId:String(fixture.ids.lotacao),jornadaId:String(fixture.ids.jornada),contratoId:String(b.jobs200ContratoId),page:'0',size:'500'});
+ const r=await context.request.get(base+'/api/frequencias?'+params),body=unwrap(await r.json()),frequencies=Array.isArray(body)?body:body.content;
+ check('Consulta nova lê200 frequências reais com identidade canônica',r.status()===200&&Array.isArray(frequencies)&&frequencies.length===200&&frequencies.every(x=>x.id>0&&x.vinculoContratualId>0&&x.empregado?.id>0));
+ report.sample=frequencies.slice(0,5).map(x=>({id:x.id,empregadoId:x.empregado.id,vinculoContratualId:x.vinculoContratualId,status:x.status}));
+ const remaining=200-b.jobs200CancelPrefix;check('Leitura confere tentativa2 com o prefixo físico registrado',remaining>0&&remaining<200);
+ await page.getByRole('region',{name:'Fechamento do escopo',exact:true}).getByText(`${remaining} / ${remaining}`,{exact:true}).waitFor({timeout:15000});
+ await page.getByText('SINTETICO JOBS200 '+(b.jobs200CorpusMarker||'FINAL03')+' 001',{exact:true}).waitFor({timeout:15000});
+ report.gridText=await page.locator('body').innerText();report.scope='READ_ONLY_FRESH_PAGE_GRID_DIAGNOSIS_NOT_NEW_JOB';
+ check('Grade fresca reflete registros confirmados sem associação pendente',!report.gridText.includes('Associação será conferida ao salvar')&&!report.gridText.includes('Sem frequência salva'));
+ await screenshot('grade-fresca');
+},{accountName:'gestor_local',reuse:false});

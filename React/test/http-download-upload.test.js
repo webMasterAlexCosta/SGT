@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
-import { api } from '../src/core/http.js';
-import { criarConfiguracaoRequisicaoAxios } from '../src/core/http/configuracaoRequisicaoAxios.js';
+import { api } from '../src/core/http.ts';
+import { criarConfiguracaoRequisicaoAxios } from '../src/core/http/configuracaoRequisicaoAxios.ts';
 
 describe('erros JSON em download binário', () => {
   it('mantém código e mensagem de conflito para o formulário decidir refazer a prévia', async () => {

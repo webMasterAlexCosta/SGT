@@ -5,11 +5,11 @@ import { cleanup, fireEvent, render, screen, waitFor, within } from '@testing-li
 import '@testing-library/jest-dom/vitest';
 
 const { requisitar } = vi.hoisted(() => ({ requisitar: vi.fn() }));
-vi.mock('../src/core/http.js', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: (r) => Array.isArray(r) ? r : r?.content || [] }));
-vi.mock('../src/modules/auth/context.jsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
-vi.mock('../src/core/events.js', () => ({ notificar: vi.fn() }));
-import { CLASSIFICACOES_DOCUMENTO, TIPOS_FATO_DOCUMENTAL } from '../src/services/admin/ServicoDominioExcecoesContrato.js';
-import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.jsx';
+vi.mock('../src/core/http.ts', () => ({ requisitar, requisitarDownload: vi.fn(), extrairLista: (r) => Array.isArray(r) ? r : r?.content || [] }));
+vi.mock('../src/modules/auth/context.tsx', () => ({ useAutenticacao: () => ({ user: { perfil: 'GESTOR_LOCAL', gestaoLocalId: 1 } }) }));
+vi.mock('../src/core/events.ts', () => ({ notificar: vi.fn() }));
+import { CLASSIFICACOES_DOCUMENTO, TIPOS_FATO_DOCUMENTAL } from '../src/services/admin/ServicoDominioExcecoesContrato.ts';
+import { PainelExcecoesContrato } from '../src/modules/admin/pages/PaginaContratos/components/PainelExcecoesContrato/index.tsx';
 
 // Oráculo literal: backend congelado, dominio/documento/TipoFatoDocumental.java.
 const TIPOS_JAVA = [
@@ -28,6 +28,22 @@ const lerMetadados = (formData) => new Promise((resolve, reject) => {
 });
 
 describe('Fatos documentais conforme os enums Java completos', () => {
+  it.each([
+    ['RASCUNHO', false],
+    ['PUBLICADO', true],
+    ['SUBSTITUIDO', false],
+  ])('oferece versionamento somente na fonte publicada vigente: %s', async (estado, versionavel) => {
+    const documento = { id: 72, titulo: 'Fonte documental sintética', estado, classificacaoAcesso: 'NEGOCIAL', downloadDisponivel: true };
+    requisitar.mockImplementation(({ url }) => Promise.resolve(url === '/contratos/9/documentos' ? [documento] : []));
+    montar();
+    const titulo = await screen.findByText(documento.titulo, { exact: true });
+    const cartao = within(titulo.closest('article'));
+    expect(Boolean(cartao.queryByRole('button', { name: 'Retificar SEI', exact: true }))).toBe(versionavel);
+    expect(Boolean(cartao.queryByRole('button', { name: 'Nova versão/anexo', exact: true }))).toBe(versionavel);
+    expect(cartao.getByRole('button', { name: 'Detalhes', exact: true })).toBeEnabled();
+    expect(cartao.getByRole('button', { name: 'Baixar', exact: true })).toBeEnabled();
+  });
+
   it('mantém todos os onze tipos e as duas classificações de acesso do contrato congelado', () => {
     expect(TIPOS_FATO_DOCUMENTAL).toEqual(TIPOS_JAVA);
     expect(CLASSIFICACOES_DOCUMENTO).toEqual(['NEGOCIAL', 'PESSOAL_RESTRITO']);

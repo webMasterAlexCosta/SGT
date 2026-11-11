@@ -1,0 +1,10 @@
+{
+  "state": "VERIFIED_CURRENT_JAR08_IDENTICAL_SERVICE_BYTECODE_PG_HTTP_IN_PROCESS",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "tests": 2,
+  "receipt": "it-pendencia-replay-final08-01",
+  "receipt_sha256": "e1873249b31d66223cca888845d65ed76cba9349250e7f94684f9b828161ce02",
+  "all823_main_class_bytes_match_jar": true,
+  "scope": "AUD006002 discriminating operational write and AUD006004 responsible management after temporal replay; synthetic JPA fixtures, real PostgreSQL/services and MockMvc HTTP; not an additional packaged-browser driver",
+  "no_global_acceptance": true
+}

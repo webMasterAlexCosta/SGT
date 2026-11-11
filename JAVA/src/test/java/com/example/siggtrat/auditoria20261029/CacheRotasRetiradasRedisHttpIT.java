@@ -23,7 +23,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 
-/** Regressão com MySQL/Redis reais: uma chave herdada não reativa uma rota retirada. */
+/** Regressão com PostgreSQL/Redis reais: uma chave herdada não reativa uma rota retirada. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class CacheRotasRetiradasRedisHttpIT extends ContratosHttpBase {
     @Autowired CacheManager caches;
@@ -74,7 +74,9 @@ class CacheRotasRetiradasRedisHttpIT extends ContratosHttpBase {
             } finally {
                 SecurityContextHolder.setContext(anterior);
             }
-            cache.put(chave, new RespostaCacheConsultaHttp(200, "application/json", legado));
+            // A fixture deve estar publicada antes do HTTP; Cache.put pode ser diferido.
+            // Cache.putIfAbsent garante registro imediato e mantém intactas as verificações abaixo.
+            cache.putIfAbsent(chave, new RespostaCacheConsultaHttp(200, "application/json", legado));
             assertArrayEquals(legado, cache.get(chave, RespostaCacheConsultaHttp.class).body());
             var retirada = executar(cenario.localA, get(rota).accept(APPLICATION_JSON), 404,
                     "Rota retirada deve chegar ao MVC apesar dos bytes legados no Redis: " + rota);

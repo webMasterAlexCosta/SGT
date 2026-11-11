@@ -18,7 +18,11 @@ import com.example.siggtrat.utilitario.RelogioSistema;
 /** Fluxo exclusivo para corrigir número/ano sem reescrever a identidade histórica. */
 @Service
 @Transactional
-public class CorrecaoIdentificadorContratoServico {
+public class CorrecaoIdentificadorContratoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(CorrecaoIdentificadorContratoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final ContratoRepositorio contratoRepositorio;
     private final CorrecaoIdentificadorContratoRepositorio correcaoRepositorio;
     private final AcessoOrganizacionalServico acesso;
@@ -55,7 +59,7 @@ public class CorrecaoIdentificadorContratoServico {
 
     public CorrecaoIdentificadorContratoDTO corrigir(Long contratoId,
                                                       CorrecaoIdentificadorContratoRequisicao requisicao) {
-        if (requisicao == null) throw new IllegalArgumentException("Informe a correção do identificador.");
+        if (requisicao == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe a correção do identificador.");
         UsuarioAplicacao usuario = acesso.usuarioAtual();
         acesso.exigirGestaoContrato(usuario);
 
@@ -163,7 +167,7 @@ public class CorrecaoIdentificadorContratoServico {
 
     @Transactional(readOnly = true)
     public List<CorrecaoIdentificadorContratoDTO> pesquisarHistorico(String numero, Integer ano) {
-        if (ano == null || ano < 1900 || ano > 9999) throw new IllegalArgumentException("Informe um ano válido.");
+        if (ano == null || ano < 1900 || ano > 9999) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe um ano válido.");
         String numeroNormalizado = texto(numero, "Informe o número do contrato.");
         UsuarioAplicacao usuario = acesso.usuarioAtual();
         return correcaoRepositorio.pesquisarHistorico(numeroNormalizado, ano).stream()
@@ -244,7 +248,7 @@ public class CorrecaoIdentificadorContratoServico {
     private String identificador(String numero, Integer ano) { return numero + "/" + ano; }
     private boolean vazio(String valor) { return valor == null || valor.isBlank(); }
     private String texto(String valor, String mensagem) {
-        if (vazio(valor)) throw new IllegalArgumentException(mensagem);
+        if (vazio(valor)) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio(mensagem);
         return valor.trim().replaceAll("\\s+", " ");
     }
 

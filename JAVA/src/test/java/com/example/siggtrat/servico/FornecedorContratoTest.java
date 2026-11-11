@@ -24,6 +24,7 @@ class FornecedorContratoTest {
     @Mock private ContratoRepositorio contratoRepositorio;
     @Mock private AcessoOrganizacionalServico acessoOrganizacionalServico;
     @Mock private RegistroAuditoriaServico auditoria;
+    @Mock private jakarta.validation.Validator validador;
     @Mock private UsuarioAplicacao usuario;
 
     @InjectMocks private FornecedorServico servico;

@@ -22,7 +22,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
     private record Prova(Long gestao, Long lotacao, Long turno, String nome, Long autor, String status) {}
     private record Tarefa(Long id, String chave, String motivo, java.time.Instant surgida,
-                          Long iniciadaPor, String estado, Long gestao, Long lotacao, Long turno) {}
+                          Long iniciadaPor, java.time.Instant iniciadaEm, String estado, Long gestao, Long lotacao, Long turno) {}
 
     @Test
     void transferenciaRealinhaTodasAsRevisoesAbertasDeVersoesAnterioresSemAlterarSuaHistoria() throws Exception {
@@ -48,10 +48,13 @@ class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
         assertEquals(2, antes.size(), "Duas versões pendentes são mantidas pelo contrato da central");
         assertEquals("EM_TRATAMENTO", antes.get(0).estado());
         assertEquals("ABERTA", antes.get(1).estado());
+        assertNotNull(antes.get(0).iniciadaEm(), "Controle deve ter início de tratamento persistido");
+        assertNull(antes.get(1).iniciadaEm(), "Tarefa ainda aberta não ganhou início artificial");
         assertEquals(2, antes.stream().map(Tarefa::chave).distinct().count());
         assertTrue(antes.stream().allMatch(t -> t.gestao().equals(c.gestaoA.getId())));
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.minusDays(2), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Responsabilidade documental sobre todas as revisões ainda abertas",
@@ -67,6 +70,7 @@ class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
             assertEquals(a.chave(), d.chave()); assertEquals(a.motivo(), d.motivo());
             assertEquals(a.surgida(), d.surgida()); assertEquals(a.estado(), d.estado());
             assertEquals(a.iniciadaPor(), d.iniciadaPor());
+            assertEquals(a.iniciadaEm(), d.iniciadaEm(), "Transferência preserva o instante original de início");
         }
         assertEquals(fotoOriginal, prova(frequenciaId));
         JsonNode origem = pendencias(c.localA, c), destino = pendencias(c.localB, c);
@@ -91,6 +95,7 @@ class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
         List<Tarefa> resolvidas = tarefas(frequenciaId);
         assertTrue(resolvidas.stream().allMatch(t -> t.estado().equals("RESOLVIDA")));
         assertEquals(c.localA.getId(), resolvidas.get(0).iniciadaPor());
+        assertEquals(antes.get(0).iniciadaEm(), resolvidas.get(0).iniciadaEm(), "Resolução conserva o início documentado");
         JsonNode eventos = consultar(c.localB, "/api/frequencias/" + frequenciaId + "/eventos",
                 "Fonte e eventos originais conservados após resolução das duas versões");
         assertEquals(eventoOriginal, eventos.get(0));
@@ -115,7 +120,7 @@ class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
         return emTransacao(() -> em.createQuery("select p from PendenciaAdministrativa p where p.frequenciaId=:id order by p.id",
                         PendenciaAdministrativa.class).setParameter("id", frequenciaId).getResultList().stream()
                 .map(p -> new Tarefa(p.getId(), p.getChaveOrigem(), p.getMotivo(), p.getSurgidaEm(),
-                        p.getIniciadaPorId(), p.getEstado().name(), p.getGestaoLocalId(), p.getLotacaoId(), p.getJornadaId()))
+                        p.getIniciadaPorId(), p.getIniciadaEm(), p.getEstado().name(), p.getGestaoLocalId(), p.getLotacaoId(), p.getJornadaId()))
                 .toList());
     }
 
@@ -128,7 +133,8 @@ class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
         JsonNode eventosAntes = consultar(c.localA, "/api/frequencias/" + frequenciaId + "/eventos",
                 "Fotografia do lançamento antes da transferência");
         conceder(c, c.contratoA.getId(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", DATA.minusDays(2), "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Retificação documental da responsabilidade pelo período", "referenciaSei", "SEI-PENDENCIA-DESTINO",
@@ -148,7 +154,8 @@ class PendenciaFrequenciaResponsabilidadeAtualHttpIT extends ContratosHttpBase {
                     "finalidade", "Novo ato documental sobre revisão ainda aberta", "justificativa", "Conferência do ato de retorno",
                     "autorizacaoAdministrativa", "ATO-RETORNO", "validoAte", java.time.Instant.now().plusSeconds(3600)),
                     201, "Concessão própria do responsável por nova transferência");
-            enviar(c.localB, base(c.contratoA.getId()) + "/transferir-gestao", mapa(
+            enviar(c.localB, base(c.contratoA.getId()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                     "dataEfetiva", DATA.minusDays(1), "dataAto", RelogioSistema.hoje(),
                     "gestaoLocalDestinoId", c.gestaoA.getId(), "tipoContratacaoDestinoId", c.tipoA.getId(),
                     "motivo", "Segundo ato documentado durante revisão não concluída", "referenciaSei", "SEI-PENDENCIA-RETORNO",

@@ -1,5 +1,9 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import org.springframework.jdbc.core.JdbcTemplate;
+
 import com.example.siggtrat.entidade.EventoFrequencia;
 import com.example.siggtrat.entidade.Frequencia;
 import com.fasterxml.jackson.databind.JsonNode;
@@ -24,6 +28,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /** AUD005: o clique repetido não cria outra versão negocial na escrita operacional. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ConclusaoFrequenciaIdempotenciaOperacionalHttpIT extends AuditoriaHttpSuporte {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSource;
     @ParameterizedTest
     @ValueSource(booleans = {true, false})
     void reenvioOperacionalPreservaVersaoCadeiaEAutorComOuSemChave(boolean comChave) throws Exception {
@@ -73,11 +78,31 @@ class ConclusaoFrequenciaIdempotenciaOperacionalHttpIT extends AuditoriaHttpSupo
         var a = autenticar(post("/api/frequencias").contentType(APPLICATION_JSON).content(corpo), c.operacionalA);
         var b = autenticar(post("/api/frequencias").contentType(APPLICATION_JSON).content(corpo), c.operacionalA);
         CountDownLatch largada = new CountDownLatch(1);
-        ExecutorService pool = Executors.newFixedThreadPool(2);
+        ExecutorService pool = Executors.newFixedThreadPool(3);
+        CountDownLatch liberarContrato = new CountDownLatch(1);
+        CompletableFuture<Long> bloqueadorPronto = new CompletableFuture<>();
+        var atorA = new Ator("reenvio-operacional-A-" + comChave);
+        var atorB = new Ator("reenvio-operacional-B-" + comChave);
         try {
-            Future<MvcResult> fa = pool.submit(() -> { largada.await(); return mvc.perform(a).andReturn(); });
-            Future<MvcResult> fb = pool.submit(() -> { largada.await(); return mvc.perform(b).andReturn(); });
+            Future<?> bloqueador = pool.submit(() -> emTransacao(() -> {
+                em.find(com.example.siggtrat.entidade.Contrato.class, c.contratoA.getId(), jakarta.persistence.LockModeType.PESSIMISTIC_WRITE);
+                bloqueadorPronto.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
+                try {
+                    if (!liberarContrato.await(25, TimeUnit.SECONDS)) throw new AssertionError("AUD005 fixture não liberou o Contrato");
+                } catch (InterruptedException e) { Thread.currentThread().interrupt(); throw new IllegalStateException(e); }
+                return null;
+            }));
+            long raiz = bloqueadorPronto.get(10, TimeUnit.SECONDS);
+            Future<MvcResult> fa = pool.submit(() -> atorA.executar(() -> { largada.await(); return mvc.perform(a).andReturn(); }));
+            Future<MvcResult> fb = pool.submit(() -> atorB.executar(() -> { largada.await(); return mvc.perform(b).andReturn(); }));
             largada.countDown();
+            var esperas = EsperaJdbcPostgres.aguardarAmbos(new JdbcTemplate(dataSource), raiz,
+                    atorA, sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    atorB, sql -> sql.selecaoChave("contrato", "id_contrato", c.contratoA.getId()),
+                    "AUD005 reenvios do mesmo Vínculo/Contrato", fa, fb);
+            assertThat(esperas).isNotEmpty();
+            assertThat(fa.isDone()).isFalse(); assertThat(fb.isDone()).isFalse();
+            liberarContrato.countDown(); bloqueador.get(10, TimeUnit.SECONDS);
             MvcResult ra = fa.get(35, TimeUnit.SECONDS), rb = fb.get(35, TimeUnit.SECONDS);
             assertThat(ra.getResponse().getStatus()).as(ra.getResponse().getContentAsString()).isEqualTo(200);
             assertThat(rb.getResponse().getStatus()).as(rb.getResponse().getContentAsString()).isEqualTo(200);
@@ -86,7 +111,7 @@ class ConclusaoFrequenciaIdempotenciaOperacionalHttpIT extends AuditoriaHttpSupo
             assertThat(segundo.path("versaoNegocial")).isEqualTo(primeiro.path("versaoNegocial"));
             assertThat(cadeia(primeiro.path("id").asLong())).hasSize(1);
             assertThat(emTransacao(() -> contar(c))).isEqualTo(1L);
-        } finally { largada.countDown(); pool.shutdownNow(); }
+        } finally { largada.countDown(); liberarContrato.countDown(); pool.shutdownNow(); }
     }
 
     @Test

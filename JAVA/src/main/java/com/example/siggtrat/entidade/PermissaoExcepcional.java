@@ -10,6 +10,7 @@ import java.time.Instant;
 @Table(name = "permissao_excepcional", indexes = {
         @Index(name = "idx_permissao_excepcional_beneficiario", columnList = "id_usuario_beneficiario, tipo, ativo"),
         @Index(name = "idx_permissao_excepcional_contrato", columnList = "id_contrato, tipo, ativo"),
+        @Index(name = "idx_permissao_excepcional_ocorrencia", columnList = "id_ocorrencia, tipo, ativo"),
         @Index(name = "idx_permissao_excepcional_validade", columnList = "valido_ate, ativo")
 })
 public class PermissaoExcepcional {
@@ -33,6 +34,11 @@ public class PermissaoExcepcional {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "id_gestao_local", updatable = false)
     private GestaoLocal gestaoLocal;
+
+    /** Alvo exclusivo de leitura; não representa autorização genérica no contrato. */
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_ocorrencia", updatable = false)
+    private Ocorrencia ocorrencia;
 
     @Column(name = "finalidade", nullable = false, length = 500, updatable = false)
     private String finalidade;
@@ -79,6 +85,10 @@ public class PermissaoExcepcional {
 
     @PrePersist
     protected void validar() {
+        if (ocorrencia != null && (tipo != TipoPermissaoExcepcional.ACESSO_DADOS_PESSOAIS_RESTRITOS
+                || contrato != null || gestaoLocal != null)) {
+            throw new IllegalStateException("Concessão de ocorrência exige alvo exclusivo e tipo de leitura restrita.");
+        }
         if (tipo == null || usuarioBeneficiario == null || vazio(finalidade) || vazio(justificativa)
                 || vazio(autorizacaoAdministrativa) || concedidoPorId == null
                 || vazio(concedidoPorUsername) || validoAte == null) {
@@ -107,6 +117,8 @@ public class PermissaoExcepcional {
     public void setContrato(Contrato contrato) { this.contrato = contrato; }
     public GestaoLocal getGestaoLocal() { return gestaoLocal; }
     public void setGestaoLocal(GestaoLocal gestaoLocal) { this.gestaoLocal = gestaoLocal; }
+    public Ocorrencia getOcorrencia() { return ocorrencia; }
+    public void setOcorrencia(Ocorrencia ocorrencia) { this.ocorrencia = ocorrencia; }
     public String getFinalidade() { return finalidade; }
     public void setFinalidade(String finalidade) { this.finalidade = finalidade; }
     public String getJustificativa() { return justificativa; }

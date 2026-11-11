@@ -1,0 +1,59 @@
+{
+  "verified": true,
+  "state": "THREE_EXACT_DEMONSTRATIONS_PASS_PENDING_INDEPENDENT_RECHECK",
+  "jar_sha256": "f9d0a761f139094ce1db585a1cc818843482f003c247c6ba03b66ebf3af9f4c6",
+  "total_checks": 83,
+  "production_java_and_react_sources_identical_to_approved_24_11": true,
+  "cases": [
+    {
+      "predicate": "E2E24_PARTIAL_REAL_API_FAILURE",
+      "receipt": "browser-jar08-carga-parcial01/result.json",
+      "receipt_sha256": "fa35b8e658920d19f8bd4a14ee2edd7a54204477aa796df8504b184fc057fcf5",
+      "checks": 13,
+      "scope": "jar-REAL_CHROME_NOT_LAN",
+      "artifacts": {
+        "browser/carga-parcial-api-real-erro-parcial-dados-e-formulario-preservados.png": "50ab9edac863ea47523627015da1dd56a72704c103c1c1bd5865a45739f490b9",
+        "browser/carga-parcial-api-real.json": "3fb9bcd636382e47b6043878367ca592e1e1e4aa1b5aa5c03298f383ba942bfd"
+      },
+      "peak_aggregate_bytes": 9949655040,
+      "own_peak_bytes": 490414080
+    },
+    {
+      "predicate": "ROP042_DOCUMENTS_AND_LATE_CARGOS",
+      "receipt": "browser-jar08-docs-cargos-cauda02/result.json",
+      "receipt_sha256": "966285c9ffe4f88c7fdb3f3e0ba0356a9c7045cb27c461dc9661c107ff9ae0bd",
+      "checks": 46,
+      "scope": "jar-REAL_CHROME_NOT_LAN",
+      "artifacts": {
+        "browser/documentos-cargos-cauda-real-documentos-ultima-pagina-com-cadeia.png": "d95d3c1e5e4868d52160740b53c5a6ae55cdcf30f0f44500a00ec7f08d48f077",
+        "browser/documentos-cargos-cauda-real-cargo-cauda-paginada-e-filtrada.png": "4c65b912dc561ba30f7a3d86c87f48ca6388f17179e8fb1f1c18d6ed209060cc",
+        "browser/documentos-cargos-cauda-real-cargo-tardio-disponivel-no-formulario.png": "d46c5faea39672779c8d9fd841cc3edde418f82dfde337b9efe9769406d41877",
+        "browser/documentos-cargos-cauda-real.json": "91b211775ec2f4a99dca74db7f0a303cc58d9a53c97915175b9fc4dae9ff7898"
+      },
+      "peak_aggregate_bytes": 10024275968,
+      "own_peak_bytes": 546279424
+    },
+    {
+      "predicate": "E2E10_N30_NIGHT_HISTORICAL_UI_AUTHORIZATION",
+      "receipt": "browser-jar08-plantao-ui02/result.json",
+      "receipt_sha256": "c1c4278a0b1fcd77726a2e8555a0375dc7f70006dcc8d1105fcfa23dcf3e9e79",
+      "checks": 24,
+      "scope": "jar-REAL_CHROME_NOT_LAN",
+      "artifacts": {
+        "browser/plantao-historico-ui-real-plantao-na-data-de-inicio-e-prazo-n30.png": "47f497208ebc8e3a68e779269364fe692244e04429a60a3ad415afb6ef8f5ae4",
+        "browser/plantao-historico-ui-real-dia-seguinte-nova-alocacao-sem-duplicacao.png": "1f90fd7d9159e05a2dc1ebab6de3e2704394e4d8461c9e9769d611b1565c63cf",
+        "browser/plantao-historico-ui-real.json": "2abc0ae29a35480a7825703de05448741a4cba67038dba8ca28653074b5ecc12"
+      },
+      "peak_aggregate_bytes": 9986142208,
+      "own_peak_bytes": 469831680
+    }
+  ],
+  "limits": [
+    "The13check partial-load case redirects only one GET to an actually nonexistent contract ID; real authenticated JAR returns404, no mocked response/server. Other resource data and unsaved form remain; no POST/PUT.",
+    "ROP042:12documents/3pages with each actual detailID/chain, sixcargos5+1 with explicit local-page filter and late option in composition form; selecting without commit leaves contract intact. PDF41 proof reused only within independently accepted compatibility.",
+    "E2E10:ChromeA night22–06, physical480min from audited source (not a DTO field), historical allocationD06 and D+1 new allocation, actual UI counter hours/minutes from backend deadlineD+30. Other manager authenticated in independent APIRequestContext gets403; original facts/events and chain intact. No physical midnight or Operational grant claimed.",
+    "Preparation-only inventory/cargos/night are not extra acceptance tests. Night first preparer persisted facts before failing an incorrect DTO-field assertion; resumed without replaying committed POSTs and checked physical minutes in original immutable event.",
+    "Failed selector/native-option visibility/counter-format attempts preserved separately and excluded fromPASS; no production source/JAR change.",
+    "No global acceptance inferred before final independent review and per-ID reconciliation."
+  ]
+}

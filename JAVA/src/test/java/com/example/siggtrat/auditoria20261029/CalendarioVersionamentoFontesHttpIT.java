@@ -123,17 +123,20 @@ class CalendarioVersionamentoFontesHttpIT extends AuditoriaHttpSuporte {
         Instant primeiroCorte = Instant.now();
         Map<String, Object> primeira = evento(DATA.plusDays(1), c.lotacaoA.getId(), "Primeira correção");
         primeira.put("justificativa", "Data correta segundo o primeiro ato retificador");
-        executar(c.localA, put("/api/calendario-eventos/{id}", id).contentType(APPLICATION_JSON)
-                .content(json(primeira)), 200, "Primeira retificação do calendário");
+        JsonNode retificacao1=dados(executar(c.localA, put("/api/calendario-eventos/{id}", id).contentType(APPLICATION_JSON)
+                .content(json(primeira)), 200, "Primeira retificação do calendário"));
         Instant segundoCorte = Instant.now();
         Map<String, Object> segunda = evento(DATA.plusDays(2), c.lotacaoA.getId(), "Segunda correção");
         segunda.put("tipo", "DIA_DESCANSO");
         segunda.put("justificativa", "Segundo ato corrigiu novamente a data e a natureza");
-        executar(c.localA, put("/api/calendario-eventos/{id}", id).contentType(APPLICATION_JSON)
-                .content(json(segunda)), 200, "Retificação da retificação preserva ambas as anteriores");
+        JsonNode retificacao2=dados(executar(c.localA, put("/api/calendario-eventos/{id}", id).contentType(APPLICATION_JSON)
+                .content(json(segunda)), 200, "Retificação da retificação preserva ambas as anteriores"));
         em.flush(); em.clear();
         JsonNode cadeia = historico(c.localA, id);
         assertEquals(3, cadeia.size());
+        assertEquals(criada,cadeia.get(0).path("fotografia"),"TMP-003:002 fotografia integral da publicação");
+        assertEquals(retificacao1,cadeia.get(1).path("fotografia"),"Fotografia integral da primeira correção");
+        assertEquals(retificacao2,cadeia.get(2).path("fotografia"),"Fotografia integral da segunda correção");
         for (int i = 0; i < cadeia.size(); i++) {
             JsonNode versao = cadeia.get(i);
             assertEquals(i + 1, versao.path("numeroVersao").asInt());

@@ -2,9 +2,9 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
-import { ProvedorAutenticacao, useAutenticacao, normalizarUsuarioAutenticado } from '../src/modules/auth/context.jsx';
-import { obterGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import { ProvedorAutenticacao, useAutenticacao, normalizarUsuarioAutenticado } from '../src/modules/auth/context.tsx';
+import { obterGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 import { iniciarContextoSessaoIsolado } from './fixtures/contextoSessaoIsolado.js';
 
 const { servico } = vi.hoisted(() => ({ servico: {
@@ -36,6 +36,54 @@ beforeEach(() => {
   servico.buscarMeuPerfil.mockReset().mockResolvedValue(A);
   servico.encerrarSessao.mockReset().mockResolvedValue(true);
   servico.autenticar.mockReset().mockResolvedValue(A);
+});
+
+describe('Escopo legado confirmado na resposta atual do Java', () => {
+  const identidade = { id: 31, perfil: 'OPERACIONAL', autoridade: 'PERFIL_OPERACIONAL', username: 'operacional-sintetico' };
+  const legado = { ...identidade, gestaoLocalId: 3, lotacaoId: 7, jornadaId: 8, lotacaoNome: 'Lotação 7', turno: 'Turno 8', vinculosGestao: [] };
+
+  it('expõe exatamente o par legado que a resposta atual reconhece, sem alterar dados cadastrais', () => {
+    const usuario = normalizarUsuarioAutenticado({}, legado);
+    expect(usuario.vinculosGestao).toEqual([expect.objectContaining({ lotacaoId: 7, jornadaId: 8, lotacaoNome: 'Lotação 7', jornadaNome: 'Turno 8' })]);
+    expect(usuario.gestaoLocalId).toBe(3);
+    expect(legado.vinculosGestao).toEqual([]);
+  });
+
+  it('lista vazia atual não recupera o par de uma resposta antiga', () => {
+    const antiga = { ...legado, vinculosGestao: [{ lotacaoId: 7, jornadaId: 8 }] };
+    expect(normalizarUsuarioAutenticado(antiga, { ...identidade, vinculosGestao: [] }).vinculosGestao).toEqual([]);
+  });
+
+  it('também usa o par completo de uma resposta de sessão recebida como base atual', () => {
+    expect(normalizarUsuarioAutenticado(legado).vinculosGestao)
+      .toEqual([expect.objectContaining({ lotacaoId: 7, jornadaId: 8 })]);
+  });
+
+  it.each([{ jornadaId: null }, { lotacao: null }, { gestaoLocal: null }])('uma atualização parcial explícita não restaura escopo da base antiga: %j', (atualizacao) => {
+    expect(normalizarUsuarioAutenticado(legado, { ...identidade, ...atualizacao }).vinculosGestao).toEqual([]);
+  });
+
+  it('um par incompleto atual não é completado com o turno antigo', () => {
+    expect(normalizarUsuarioAutenticado(legado, { ...identidade, gestaoLocalId: 3, lotacaoId: 7, vinculosGestao: [] }).vinculosGestao).toEqual([]);
+  });
+
+  it('escopos explícitos atuais prevalecem sobre o par legado', () => {
+    expect(normalizarUsuarioAutenticado({}, { ...legado, vinculosGestao: [{ lotacaoId: 9, jornadaId: 10 }] }).vinculosGestao)
+      .toEqual([expect.objectContaining({ lotacaoId: 9, jornadaId: 10 })]);
+  });
+
+  it.each([
+    ['lista explicitamente nula', { vinculosGestao: null }],
+    ['gestão revogada', { gestaoLocalId: null }],
+    ['lotação revogada', { lotacaoId: null }],
+    ['turno revogado', { jornadaId: null }],
+    ['ID textual inesperado', { jornadaId: '8' }],
+    ['ID fracionário', { jornadaId: 8.5 }],
+    ['ID sem precisão segura', { lotacaoId: Number.MAX_SAFE_INTEGER + 1 }],
+    ['perfil gerencial', { perfil: 'GESTOR_LOCAL', autoridade: 'PERFIL_GESTOR_LOCAL' }],
+  ])('não cria escopo com %s', (_nome, alteracoes) => {
+    expect(normalizarUsuarioAutenticado({}, { ...legado, ...alteracoes }).vinculosGestao).toEqual([]);
+  });
 });
 afterEach(() => cleanup());
 

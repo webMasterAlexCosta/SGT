@@ -79,7 +79,7 @@ class OcorrenciaProvaPreservadaHttpIT extends ContratosHttpBase {
         long emissaoId = emissao.path("metadados").path("id").asLong();
         assertEquals(1, emissao.path("conteudo").path("totais").path("atestados").asInt());
         // A comparação de rollback usa a fotografia já relida após commit:
-        // MySQL armazena microssegundos, enquanto a resposta de criação ainda
+        // PostgreSQL armazena microssegundos, enquanto a resposta de criação ainda
         // pode conter os nanossegundos do Instant gerado na memória da JVM.
         JsonNode emissaoPersistidaAntes = consultar(c.localA,
                 "/api/relatorios/administrativos/emissoes/" + emissaoId,

@@ -16,7 +16,11 @@ import java.util.Objects;
 
 @Service
 @Transactional(readOnly = true)
-public class MotivoDesligamentoServico {
+public class MotivoDesligamentoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(MotivoDesligamentoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final MotivoDesligamentoRepositorio repositorio;
     private final AcessoOrganizacionalServico acesso;

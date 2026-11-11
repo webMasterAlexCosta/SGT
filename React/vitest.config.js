@@ -19,6 +19,8 @@ export default defineConfig({
   // Permite executar os testes adversariais independentes sem reescrevê-los.
   resolve: { alias: { '@sgt': new URL('./src', import.meta.url).pathname, '@review': new URL('./src', import.meta.url).pathname } },
   test: {
+    // Mantém o Web Storage do jsdom; Node26 oferece globais nativas conflitantes.
+    execArgv: ['--no-experimental-webstorage'],
     env: ambienteTeste,
     environment: 'jsdom',
     globals: false,

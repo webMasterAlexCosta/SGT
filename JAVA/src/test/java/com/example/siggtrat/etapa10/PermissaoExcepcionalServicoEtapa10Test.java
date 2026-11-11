@@ -182,7 +182,7 @@ class PermissaoExcepcionalServicoEtapa10Test {
         return new ConcessaoPermissaoExcepcionalRequisicao(tipo, beneficiarioId,
                 contrato.getId(), gestao.getId(), "Execução do ato autorizado",
                 "Necessidade excepcional comprovada", "ATO-ADM-2026-001",
-                Instant.now().plusSeconds(3600));
+                Instant.now().plusSeconds(3600), null);
     }
 
     private PermissaoExcepcional permissaoAtiva(TipoPermissaoExcepcional tipo,

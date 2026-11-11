@@ -17,7 +17,11 @@ import java.util.*;
 
 /** Uma política para consulta, filtros, anexos e comandos; nunca autoriza pela projeção Empregado. */
 @Service
-public class AutorizacaoTemporalOcorrenciaServico {
+public class AutorizacaoTemporalOcorrenciaServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AutorizacaoTemporalOcorrenciaServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public record Contexto(LocalDate data, Long contratoId, Long vinculoId, Long alocacaoId,
                            Long gestaoId, Long estadoId, Long lotacaoId, Long jornadaId) {}
 
@@ -169,17 +173,19 @@ public class AutorizacaoTemporalOcorrenciaServico {
             String finalidade, String recurso, Long id) {
         var padrao = minimizador.nivelPadrao(usuario);
         if (padrao == NivelExposicaoDadosPessoais.COMPLETO || finalidade == null || finalidade.isBlank()) return padrao;
-        autorizarConteudoPessoal(usuario, contextos, finalidade, recurso, id);
+        autorizarConteudoPessoal(usuario, contextos, finalidade, recurso, id,
+                "Ocorrencia".equals(recurso) ? id : null);
         return NivelExposicaoDadosPessoais.COMPLETO;
     }
 
     public void autorizarAnexo(UsuarioAplicacao usuario, AnexoOcorrencia anexo, List<Contexto> contextos, String finalidade) {
         if (anexo.getClassificacaoAcesso() == ClassificacaoAcessoDocumento.PESSOAL_RESTRITO)
-            autorizarConteudoPessoal(usuario, contextos, finalidade, "AnexoOcorrencia", anexo.getId());
+            autorizarConteudoPessoal(usuario, contextos, finalidade, "AnexoOcorrencia", anexo.getId(),
+                    anexo.getOcorrencia().getId());
     }
 
     private void autorizarConteudoPessoal(UsuarioAplicacao usuario, List<Contexto> contextos,
-            String finalidade, String recurso, Long id) {
+            String finalidade, String recurso, Long id, Long ocorrenciaId) {
         if (!podeConsultar(usuario, contextos)) negar();
         if (usuario.getPerfil() == PerfilAcesso.GESTOR_LOCAL) return;
         if (usuario.getPerfil() == PerfilAcesso.OPERACIONAL) negar();
@@ -189,10 +195,18 @@ public class AutorizacaoTemporalOcorrenciaServico {
                 ? TipoPermissaoExcepcional.INTERVENCAO_NEGOCIAL_TECNICA
                 : TipoPermissaoExcepcional.ACESSO_DADOS_PESSOAIS_RESTRITOS;
         Set<String> verificados = new HashSet<>();
-        for (Contexto c : contextos) if (verificados.add(c.contratoId() + ":" + c.gestaoId()))
-            permissoes.exigirERegistrarUsoNoEscopoHistorico(usuario, tipo,
+        for (Contexto c : contextos) if (verificados.add(c.contratoId() + ":" + c.gestaoId())) {
+            if (ocorrenciaId != null) {
+                var utilizada = permissoes.exigirERegistrarUsoDaOcorrencia(usuario, tipo,
+                        em.getReference(Contrato.class, c.contratoId()), em.getReference(GestaoLocal.class, c.gestaoId()),
+                        finalidade, recurso, id, ocorrenciaId);
+                // Todos os dias já foram autorizados acima. Uma concessão da
+                // própria ocorrência cobre o fato inteiro e tem um único uso.
+                if (utilizada.getOcorrencia() != null) return;
+            } else permissoes.exigirERegistrarUsoNoEscopoHistorico(usuario, tipo,
                     em.getReference(Contrato.class, c.contratoId()), em.getReference(GestaoLocal.class, c.gestaoId()),
                     finalidade, recurso, id);
+        }
     }
 
     private void negar() {

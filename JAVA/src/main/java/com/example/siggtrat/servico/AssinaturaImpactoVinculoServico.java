@@ -19,7 +19,11 @@ import java.util.List;
 /** Dependências escalares em páginas limitadas, resumidas sem perder a última linha. */
 @Service
 @Transactional(readOnly = true)
-public class AssinaturaImpactoVinculoServico {
+public class AssinaturaImpactoVinculoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(AssinaturaImpactoVinculoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final int TAMANHO_PAGINA = 200;
     private static final String VERSAO_ASSINATURA = "dependencias-v2";
     private final EntityManager em;

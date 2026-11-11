@@ -6,7 +6,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -105,7 +105,7 @@ class RelatoriosExportacoesHttpIT extends AuditoriaHttpSuporte {
         executar(c.localA, get("/api/relatorios/exportacoes/invalido"), 400, "Identificador deve ser UUID");
     }
 
-    private MockHttpServletRequestBuilder parametros(MockHttpServletRequestBuilder r, String tipo, Cenario c) {
+    private AbstractMockHttpServletRequestBuilder<?> parametros(AbstractMockHttpServletRequestBuilder<?> r, String tipo, Cenario c) {
         if (tipo.equals("frequencia-consolidada")) return r.param("inicio", DATA.toString())
                 .param("fim", DATA.toString()).param("contratoIds", c.contratoA.getId().toString());
         if (tipo.equals("absenteismo")) r.param("mes", "6").param("ano", "2026");

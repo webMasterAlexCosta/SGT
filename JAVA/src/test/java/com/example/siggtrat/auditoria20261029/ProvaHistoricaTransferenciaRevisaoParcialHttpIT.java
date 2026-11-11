@@ -35,7 +35,7 @@ import static org.junit.jupiter.api.Assertions.assertAll;
  *
  * Fontes e dados expressamente sintéticos. A perda simulada usa DML apenas nos
  * dados da fixture. O schema deve ser gerido exclusivamente pelo Hibernate.
- * MockMvc cobre controladores/autorização/serviços e MySQL reais, não TCP/JAR.
+ * MockMvc cobre controladores/autorização/serviços e PostgreSQL reais, não TCP/JAR.
  * A referência SEI é fonte permitida: o teste não impõe PDF obrigatório.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -51,8 +51,8 @@ class ProvaHistoricaTransferenciaRevisaoParcialHttpIT extends ContratosHttpBase 
     void exigirPersistenciaPermitida() throws Exception {
         try (var conexao = dataSource.getConnection()) {
             var meta = conexao.getMetaData();
-            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("MySQL");
-            assertThat(meta.getDatabaseProductVersion()).isEqualTo("8.0.45");
+            assertThat(meta.getDatabaseProductName()).isEqualToIgnoringCase("PostgreSQL");
+            assertThat(meta.getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
         }
         assertThat(ambiente.getProperty("spring.jpa.hibernate.ddl-auto")).isEqualTo("update");
         assertThat(ambiente.getProperty("spring.sql.init.mode")).isEqualTo("never");
@@ -257,7 +257,8 @@ class ProvaHistoricaTransferenciaRevisaoParcialHttpIT extends ContratosHttpBase 
             item.put("jornadaOrigemId", c.jornadaA.getId());
             item.put("cargoOrigemId", c.cargoA.getId());
         }
-        Map<String, Object> req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        Map<String, Object> req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Transferência sintética de recorte identificado explicitamente",
                 "referenciaSei", "SEI-SINTETICO-MAPA", "autorizacaoAdministrativa", "ATO-HTTP",

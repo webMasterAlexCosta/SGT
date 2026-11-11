@@ -72,7 +72,7 @@ class DocumentosRascunhoCommitRollbackHttpIT extends ContratosHttpBase {
         if (referenciaExterna) corpo.put("referenciaSei", "SEI-PROVA-EXTERNA");
         long documento = dados(executar(c.localA, multipart(base(contrato) + "/documentos").file(metadados(corpo))
                 .file(new MockMultipartFile("arquivo", "prova.pdf", "application/pdf", PDF)), 201,
-                "Arquivo e metadados confirmados no MySQL antes do ensaio")).path("id").asLong();
+                "Arquivo e metadados confirmados no PostgreSQL antes do ensaio")).path("id").asLong();
         String nome = emTransacao(() -> em.find(DocumentoComprobatorio.class, documento).getNomeArmazenado());
         return new Fonte(c, contrato, documento, armazenamento.uploadDir().resolve(nome));
     }

@@ -1,5 +1,9 @@
 package com.example.siggtrat.servico;
 
+import com.example.siggtrat.regra.MaterialHashEventos;
+import static com.example.siggtrat.regra.MaterialHashEventos.*;
+
+
 import com.example.siggtrat.dominio.vinculo.*;
 import com.example.siggtrat.dominio.acesso.NivelExposicaoDadosPessoais;
 import com.example.siggtrat.dto.*;
@@ -7,7 +11,6 @@ import com.example.siggtrat.entidade.*;
 import com.example.siggtrat.regra.AssinaturaPreviaNegocial;
 import com.example.siggtrat.repositorio.*;
 import com.example.siggtrat.utilitario.RelogioSistema;
-import com.example.siggtrat.utilitario.UtilitarioHashSeguranca;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.dao.DataIntegrityViolationException;
@@ -27,7 +30,11 @@ import com.example.siggtrat.utilitario.UtilitarioPaginacao;
 
 @Service
 @Transactional(readOnly = true)
-public class VinculoContratualServico {
+public class VinculoContratualServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(VinculoContratualServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final VinculoContratualRepositorio vinculoRepositorio;
     private final PessoaServico pessoaServico;
     private final ContratoRepositorio contratoRepositorio;
@@ -52,6 +59,12 @@ public class VinculoContratualServico {
     private AditamentoContratualServico aditamentoContratualServico;
     private IdentidadeHistoricaServico identidadeHistorica;
     private MotivoDesligamentoHistoricoServico motivoHistorico;
+    private GradeFrequenciaCanonicaServico selecaoFrequencia;
+
+    @Autowired
+    public void configurarSelecaoFrequencia(GradeFrequenciaCanonicaServico servico) {
+        this.selecaoFrequencia = servico;
+    }
 
     @Autowired
     public void configurarProvasHistoricas(IdentidadeHistoricaServico identidade,
@@ -158,6 +171,50 @@ public class VinculoContratualServico {
                         a -> a.getVinculo().getId(), a -> a, (primeira, ignorada) -> primeira,
                         LinkedHashMap::new));
         return pagina.map(v -> paraDTO(v, user, iniciais.get(v.getId())));
+    }
+
+    /** Consulta operacional própria; a listagem cadastral/histórica permanece independente. */
+    public Page<VinculoElegivelFrequenciaDTO> listarElegiveisParaFrequencia(LocalDate data,
+            Long lotacaoId, Long jornadaId, Long contratoId, List<Long> contratoIds, String busca, Pageable pageable) {
+        UsuarioAplicacao usuario = acesso.usuarioAtual();
+        acesso.exigirConsultaFrequencia(usuario);
+        Set<Long> solicitados = new LinkedHashSet<>();
+        if (contratoId != null) solicitados.add(contratoId);
+        if (contratoIds != null) contratoIds.stream().filter(Objects::nonNull).forEach(solicitados::add);
+        var consulta = selecaoFrequencia.preparar(usuario, data, lotacaoId, jornadaId, solicitados, busca);
+        Pageable limitado = UtilitarioPaginacao.limitarComOrdenacaoFixa(pageable,
+                Sort.by(Sort.Direction.DESC, "dataInicio").and(Sort.by(Sort.Direction.DESC, "id")));
+        Page<VinculoContratual> pagina = vinculoRepositorio.findAll(consulta.vinculos(), limitado);
+        List<Long> ids = pagina.getContent().stream().map(VinculoContratual::getId).toList();
+        Map<Long, AlocacaoVinculo> porVinculo = new HashMap<>();
+        if (!ids.isEmpty()) {
+            for (AlocacaoVinculo a : alocacaoRepositorio.buscarPorVinculos(ids)) {
+                if (a.getEstadoNegocial() != com.example.siggtrat.dominio.alocacao.EstadoNegocialAlocacao.REGISTRADA
+                        || a.getDataInicio().isAfter(data) || a.getDataFim() != null && a.getDataFim().isBefore(data)
+                        || !Objects.equals(a.getLotacao().getId(), lotacaoId)
+                        || !Objects.equals(a.getJornada().getId(), jornadaId)) continue;
+                if (porVinculo.put(a.getVinculo().getId(), a) != null) {
+                    throw new ResponseStatusException(HttpStatus.CONFLICT,
+                            "Mais de uma Alocação foi encontrada no recorte da frequência.");
+                }
+            }
+        }
+        NivelExposicaoDadosPessoais nivel = minimizador.nivelPadrao(usuario);
+        return pagina.map(v -> {
+            AlocacaoVinculo a = porVinculo.get(v.getId());
+            var posicao = motor.reconstruir(v, data, consulta.conhecidoAte());
+            GestaoLocal historica = gestaoTemporal.gestaoEm(v.getContrato(), data, consulta.conhecidoAte());
+            if (a == null || historica == null || !Objects.equals(historica.getId(), consulta.gestaoId())
+                    || posicao.situacaoTemporal() != SituacaoTemporalVinculo.VIGENTE) {
+                throw new ResponseStatusException(HttpStatus.CONFLICT,
+                        "O contexto da frequência mudou durante a consulta. Refaça a seleção.");
+            }
+            return new VinculoElegivelFrequenciaDTO(v.getId(), v.getPessoa().getId(),
+                    minimizador.nome(v.getPessoa().getNome(), nivel), minimizador.cpf(v.getPessoa().getCpf(), nivel),
+                    v.getContrato().getId(), v.getContrato().getNumeroContrato(), v.getContrato().getAnoContrato(),
+                    minimizador.matricula(posicao.matricula(), nivel), data, consulta.conhecidoAte(),
+                    historica.getId(), a.getId(), a.getLotacao().getId(), a.getJornada().getId(), a.getCargo().getId());
+        });
     }
 
     public VinculoContratualDTO buscar(Long id) {
@@ -1062,16 +1119,14 @@ public class VinculoContratualServico {
     }
     private String tokenPrevia(VinculoContratual v, LocalDate inicio, LocalDate fim, List<Long> conflitos, Object... intencao) {
         String hash = eventoRepositorio.findTopByVinculoIdOrderByRegistradoEmDescIdDesc(v.getId()).map(EventoVinculoContratual::getHashEvento).orElse("SEM_EVENTO");
-        List<String> partes = new ArrayList<>(List.of(String.valueOf(v.getId()), String.valueOf(v.getVersion()),
-                AssinaturaPreviaNegocial.valor(v.getDataInicio()), AssinaturaPreviaNegocial.valor(v.getDataFim()),
-                AssinaturaPreviaNegocial.valor(inicio), AssinaturaPreviaNegocial.valor(fim), hash));
-        conflitos.stream().sorted().forEach(x -> partes.add(String.valueOf(x)));
-        for (Object valor : intencao) partes.add(AssinaturaPreviaNegocial.valor(valor));
+        List<Object> partes = new ArrayList<>(AssinaturaPreviaNegocial.partes(v.getId(), v.getVersion(), v.getDataInicio(), v.getDataFim(), inicio, fim, hash));
+        partes.add(conflitos.stream().sorted().toList());
+        partes.add(AssinaturaPreviaNegocial.partes(intencao));
         if (assinaturaImpacto != null) {
             LocalDate desde = inicio.isBefore(v.getDataInicio()) ? inicio : v.getDataInicio();
             partes.addAll(assinaturaImpacto.partesPorVinculo(v, desde, null));
         }
-        return AssinaturaPreviaNegocial.sha256(partes);
+        return AssinaturaPreviaNegocial.sha256("sgt.previa.vinculo.v1", partes);
     }
 
     private EventoVinculoContratual registrarEvento(VinculoContratual v, TipoEventoVinculoContratual tipo,
@@ -1132,16 +1187,12 @@ public class VinculoContratualServico {
         e.setGestaoLocalIdFotografia(gestao == null ? null : gestao.getId());
         e.setGestaoLocalNomeFotografia(nomeGestaoFotografadoParaEvento(v, dataEfetiva, gestao));
         String hashAnterior = precedente == null ? null : precedente.getHashEvento(); e.setHashAnterior(hashAnterior);
-        e.setHashEvento(UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|",
-                AssinaturaPreviaNegocial.valor(hashAnterior), tipo.name(), AssinaturaPreviaNegocial.valor(dataEfetiva),
-                AssinaturaPreviaNegocial.valor(inicioAnterior), AssinaturaPreviaNegocial.valor(inicioNovo),
-                AssinaturaPreviaNegocial.valor(fimAnterior), AssinaturaPreviaNegocial.valor(fimNovo),
-                AssinaturaPreviaNegocial.valor(matriculaAnterior), AssinaturaPreviaNegocial.valor(matriculaNova),
-                v.getPessoa().getCpf(), AssinaturaPreviaNegocial.valor(v.getContrato().getId()),
-                AssinaturaPreviaNegocial.valor(user == null ? null : user.getId()), AssinaturaPreviaNegocial.valor(justificativa),
-                AssinaturaPreviaNegocial.valor(e.getMotivoDesligamentoIdFotografia()),
-                AssinaturaPreviaNegocial.valor(e.getMotivoDesligamentoDescricaoFotografia()),
-                AssinaturaPreviaNegocial.valor(e.getMotivoDesligamentoCategoriaFotografia()))));
+        e.setHashEvento(MaterialHashEventos.sha256("sgt.evento-vinculo.base",
+                texto(hashAnterior), enumeracao(tipo), data(dataEfetiva), data(inicioAnterior), data(inicioNovo),
+                data(fimAnterior), data(fimNovo), texto(matriculaAnterior), texto(matriculaNova),
+                texto(v.getPessoa().getCpf()), longo(v.getContrato().getId()), longo(user == null ? null : user.getId()),
+                texto(justificativa), longo(e.getMotivoDesligamentoIdFotografia()),
+                texto(e.getMotivoDesligamentoDescricaoFotografia()), enumeracao(e.getMotivoDesligamentoCategoriaFotografia())));
         return e;
     }
 
@@ -1189,11 +1240,11 @@ public class VinculoContratualServico {
         evento.setJustificativa(justificativa);
         evento.setEvidencia(evidencia);
         evento.setAutorizacao(autorizacao);
-        evento.setHashEvento(UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|", evento.getHashEvento(),
-                String.valueOf(baseId), String.valueOf(composicao.lotacao().getId()),
-                String.valueOf(composicao.jornada().getId()), String.valueOf(composicao.cargo().getId()),
-                String.valueOf(capacidade.efetivoPrevisto()), String.valueOf(capacidade.ocupacaoAposInclusao()),
-                justificativa, evidencia, autorizacao)));
+        evento.setHashEvento(MaterialHashEventos.sha256("sgt.evento-vinculo.excedente",
+                texto(evento.getHashEvento()), longo(baseId), longo(composicao.lotacao().getId()),
+                longo(composicao.jornada().getId()), longo(composicao.cargo().getId()),
+                inteiro(capacidade.efetivoPrevisto()), longo(capacidade.ocupacaoAposInclusao()),
+                texto(justificativa), texto(evidencia), texto(autorizacao)));
     }
 
     private VinculoContratualDTO paraDTO(VinculoContratual v, UsuarioAplicacao usuario) {

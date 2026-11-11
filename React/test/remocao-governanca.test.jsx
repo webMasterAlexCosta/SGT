@@ -13,27 +13,27 @@ const { auth } = vi.hoisted(() => ({ auth: {
 } }));
 vi.mock('../src/modules/auth/context', () => ({ ProvedorAutenticacao: ({ children }) => children, useAutenticacao: () => auth }));
 // As consultas de latência e o pulso periódico não fazem parte do cadastro.
-vi.mock('../src/services/system/ServicoSistema.js', () => ({ ServicoSistema: {
+vi.mock('../src/services/system/ServicoSistema.ts', () => ({ ServicoSistema: {
   carregarRuntimeConfig: () => Promise.resolve({}), medirLatencia: () => Promise.resolve(0),
 } }));
 vi.mock('../src/hooks/usePulsoAtividade', () => ({ usePulsoAtividade: () => {} }));
-vi.mock('../src/Leiaute/Cabecalho/index.jsx', () => ({ default: () => null }));
-vi.mock('../src/core/ui/HomologacaoModal.jsx', () => ({ default: () => null }));
+vi.mock('../src/Leiaute/Cabecalho/index.tsx', () => ({ default: () => null }));
+vi.mock('../src/core/ui/HomologacaoModal.tsx', () => ({ default: () => null }));
 vi.mock('../src/core/ui/LembreteSegundoFator', () => ({ LembreteSegundoFator: () => null }));
-vi.mock('../src/modules/AtualizacaoModulo/index.jsx', () => ({ default: () => null }));
+vi.mock('../src/modules/AtualizacaoModulo/index.tsx', () => ({ default: () => null }));
 vi.mock('../src/core/ModalConexao', () => ({ ModalConexao: () => null }));
 vi.mock('../src/core/ui/Aviso', () => ({ ConteinerAvisos: () => null }));
 // Destinos preservados têm suites próprias; mantemos aqui sua fronteira de rota.
-vi.mock('../src/modules/painel/pages/index.jsx', () => ({ Painel: () => <section aria-label="Destino painel" /> }));
-vi.mock('../src/modules/rh/pages/PaginaFrequencia/index.jsx', () => ({ PaginaFrequencia: () => <section aria-label="Destino frequência" /> }));
-vi.mock('../src/modules/auth/pages/Login/index.jsx', () => ({ Login: () => <h1>Acesso à aplicação</h1> }));
+vi.mock('../src/modules/painel/pages/index.tsx', () => ({ Painel: () => <section aria-label="Destino painel" /> }));
+vi.mock('../src/modules/rh/pages/PaginaFrequencia/index.tsx', () => ({ PaginaFrequencia: () => <section aria-label="Destino frequência" /> }));
+vi.mock('../src/modules/auth/pages/Login/index.tsx', () => ({ Login: () => <h1>Acesso à aplicação</h1> }));
 
-import Aplicacao from '../src/Aplicacao.jsx';
-import { api } from '../src/core/http.js';
-import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.js';
-import { resetarSolicitadorConfirmacaoSenhaParaTestes } from '../src/core/http/coordenadorConfirmacaoSenha.js';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
-import { EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.js';
+import Aplicacao from '../src/Aplicacao.tsx';
+import { api } from '../src/core/http.ts';
+import { configurarBuscadorTokenCsrf, resetarCoordenadorCsrfParaTestes } from '../src/core/http/coordenadorCsrf.ts';
+import { resetarSolicitadorConfirmacaoSenhaParaTestes } from '../src/core/http/coordenadorConfirmacaoSenha.ts';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
+import { EVENT_SHOW_TOAST, redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 import { diferida } from './fixtures/promessaDiferida.js';
 
 let adapterOriginal;

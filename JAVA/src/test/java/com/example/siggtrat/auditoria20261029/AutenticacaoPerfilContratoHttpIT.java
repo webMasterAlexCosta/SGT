@@ -15,7 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.*;
@@ -147,9 +147,9 @@ class AutenticacaoPerfilContratoHttpIT extends AuditoriaHttpSuporte {
     }
 
     private MvcResult login(UsuarioAplicacao user,String senha)throws Exception{return executar(null,publico(post("/api/autenticacao/autenticar")).contentType(MediaType.APPLICATION_JSON).content(json(Map.of("matricula",user.getMatricula(),"password",senha))),200,"Autenticação login real com matrícula e senha");}
-    private MockHttpServletRequestBuilder publico(MockHttpServletRequestBuilder r){return r.cookie(new Cookie("XSRF-TOKEN","csrf-publico-auditoria")).header("X-XSRF-TOKEN","csrf-publico-auditoria");}
+    private AbstractMockHttpServletRequestBuilder<?> publico(AbstractMockHttpServletRequestBuilder<?> r){return r.cookie(new Cookie("XSRF-TOKEN","csrf-publico-auditoria")).header("X-XSRF-TOKEN","csrf-publico-auditoria");}
     private Map<String,Cookie> cookies(MvcResult r){Map<String,Cookie> jar=new LinkedHashMap<>();for(String h:r.getResponse().getHeaders("Set-Cookie")){String[] pair=h.split(";",2)[0].split("=",2);if(pair.length==2&&!pair[1].isBlank())jar.put(pair[0],new Cookie(pair[0],pair[1]));}return jar;}
-    private MockHttpServletRequestBuilder comCookies(MockHttpServletRequestBuilder r,Map<String,Cookie> jar){r.cookie(jar.values().toArray(Cookie[]::new));if(jar.containsKey("XSRF-TOKEN"))r.header("X-XSRF-TOKEN",jar.get("XSRF-TOKEN").getValue());return r;}
+    private AbstractMockHttpServletRequestBuilder<?> comCookies(AbstractMockHttpServletRequestBuilder<?> r,Map<String,Cookie> jar){r.cookie(jar.values().toArray(Cookie[]::new));if(jar.containsKey("XSRF-TOKEN"))r.header("X-XSRF-TOKEN",jar.get("XSRF-TOKEN").getValue());return r;}
     private void renovarCsrf(Map<String,Cookie> jar)throws Exception{jar.remove("XSRF-TOKEN");var result=executar(null,comCookies(get("/api/autenticacao/csrf"),jar),200,"Autenticação renova CSRF após mudança de sessão");jar.put("XSRF-TOKEN",new Cookie("XSRF-TOKEN",dados(result).path("token").asText()));}
     private String codigo(String secret){return String.format(java.util.Locale.ROOT,"%06d",totp.obterCodigoAtual(secret));}
     private boolean containsId(JsonNode n,long id){for(var d:n)if(d.path("id").asLong()==id)return true;return false;}

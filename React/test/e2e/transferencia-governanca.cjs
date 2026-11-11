@@ -8,6 +8,8 @@ execute('transferencia-governanca', async ({ page, context, fixture, check, scre
   const business = JSON.parse(fs.readFileSync(path.join(runtime, 'private/e2e-business.json')));
   check('Concessão real anterior existe na fixture de navegador', !!business.permissaoTransferenciaId);
   const base = baseFrontend();
+  const esperar = predicate => page.waitForResponse(predicate).then(response => ({ response }), error => ({ error }));
+  const receber = async pending => { const result = await pending; if (result.error) throw result.error; return result.response; };
   const admin = await context.browser().newContext({ storageState: path.join(runtime, 'private/e2e-fixture_admin-browser-state.json') });
   const apiGet = async route => (await (await context.request.get(base + '/api' + route)).json()).data;
   const adminPost = async (route, data) => {
@@ -37,19 +39,21 @@ execute('transferencia-governanca', async ({ page, context, fixture, check, scre
   const mapping = { 'Composição origem': fixture.ids.composicao_contrato_rascunho, 'Lotação origem': fixture.ids.lotacao, 'Turno origem': fixture.ids.jornada, 'Cargo origem': fixture.ids.cargo, 'Lotação destino': fixture.ids.destino_lotacao, 'Turno destino': fixture.ids.destino_jornada, 'Cargo destino': fixture.ids.destino_cargo };
   for (const [label, id] of Object.entries(mapping)) await form.getByLabel(`${label} do mapa 1`, { exact: true }).fill(String(id));
   const gerar = async () => {
-    const preview = page.waitForResponse(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferencias-gestao/previa` && r.request().method() === 'POST');
+    await form.getByRole('checkbox', { name: 'Conferência documental deste ato', exact: true }).check();
+    check('Conferência documental explícita habilita a prévia da intenção atual', await form.getByRole('button', { name: 'Gerar prévia da transferência', exact: true }).isEnabled());
+    const preview = esperar(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferencias-gestao/previa` && r.request().method() === 'POST');
     await form.getByRole('button', { name: 'Gerar prévia da transferência', exact: true }).click();
-    const response = await preview;
+    const response = await receber(preview);
     check('Prévia real da transferência aprovada', response.status() === 200, { status: response.status() });
     await form.getByLabel('Confirmo os impactos e os mapas desta transferência.', { exact: true }).check();
   };
   await gerar();
   await screenshot('previa-antes-revogacao');
   await adminPost(`/permissoes-excepcionais/${grant.id}/revogar`, { motivo: 'SINTETICO E2E — revogação entre prévia e confirmação.' });
-  const rejected = page.waitForResponse(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferir-gestao` && r.request().method() === 'POST');
+  const rejected = esperar(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferir-gestao` && r.request().method() === 'POST');
   await form.getByRole('button', { name: 'Confirmar transferência', exact: true }).click();
   await confirmPassword();
-  check('Revogação posterior à prévia bloqueia a confirmação no Java', (await rejected).status() === 403);
+  check('Revogação posterior à prévia bloqueia a confirmação no Java', (await receber(rejected)).status() === 403);
   await detail.getByRole('alert').filter({ hasText: /concessão|autoriz|permiss/i }).waitFor();
   check('Falha de autorização preserva o formulário e exige nova prévia', await form.getByLabel(/Motivo da transferência/).inputValue() === motivo && await form.getByRole('button', { name: 'Confirmar transferência', exact: true }).isDisabled());
   check('Tentativa revogada não persistiu transferência', (await apiGet(`${contratoAlvo.caminho}/transferencias-gestao`)).length === 0);
@@ -62,10 +66,10 @@ execute('transferencia-governanca', async ({ page, context, fixture, check, scre
   recordBusiness({ permissaoTransferenciaId: renewed.id, permissaoTransferenciaRevogadaId: grant.id });
   await form.getByLabel(/Autorização administrativa/).fill(renewed.autorizacaoAdministrativa);
   const confirmar = async () => {
-    const result = page.waitForResponse(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferir-gestao` && r.request().method() === 'POST');
+    const result = esperar(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferir-gestao` && r.request().method() === 'POST');
     await form.getByRole('button', { name: 'Confirmar transferência', exact: true }).click();
     await confirmPassword();
-    check('Transferência confirmada pelo Java após nova prévia', (await result).status() === 200);
+    check('Transferência confirmada pelo Java após nova prévia', (await receber(result)).status() === 200);
     await form.getByRole('button', { name: 'Gerar prévia da transferência', exact: true }).waitFor();
   };
   await gerar();
@@ -99,10 +103,11 @@ execute('transferencia-governanca', async ({ page, context, fixture, check, scre
   await cancellation.getByLabel(/SEI do cancelamento/).fill('SINTETICO-E2E-CANCELAMENTO-FUTURO');
   await cancellation.getByLabel(/Autorização do cancelamento/).fill('SINTETICO-E2E-RECONCESSAO');
   await cancellation.getByLabel(/Motivo do cancelamento/).fill('SINTETICO E2E — cancelar efeito futuro e manter a cadeia íntegra.');
-  const cancelResponse = page.waitForResponse(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferencias-gestao/${revised.id}/cancelar` && r.request().method() === 'POST');
+  await cancellation.getByRole('checkbox', { name: 'Conferência documental deste ato', exact: true }).check();
+  const cancelResponse = esperar(r => new URL(r.url()).pathname === `${contratoAlvo.api}/transferencias-gestao/${revised.id}/cancelar` && r.request().method() === 'POST');
   await cancellation.getByRole('button', { name: 'Confirmar cancelamento', exact: true }).click();
   await confirmPassword();
-  check('Cancelamento futuro confirmado no Java', (await cancelResponse).status() === 200);
+  check('Cancelamento futuro confirmado no Java', (await receber(cancelResponse)).status() === 200);
   const futureAfter = await apiGet(`${contratoAlvo.caminho}/posicao-temporal?data=${fixture.dates.future}`);
   check('Cancelamento retira o efeito futuro sem apagar o histórico', futureAfter.versaoContratual.gestaoLocalId === fixture.ids.gestao_origem && (await apiGet(`${contratoAlvo.caminho}/transferencias-gestao`)).length === transfers.length);
   recordBusiness({ transferenciaFuturaCancelada: true });

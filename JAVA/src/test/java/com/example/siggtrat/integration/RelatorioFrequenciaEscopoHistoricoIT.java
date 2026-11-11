@@ -28,7 +28,7 @@ import static org.mockito.Mockito.mockStatic;
         GestaoContratoTemporalServico.class,
         EscopoAcessoUsuarioServico.class, ConfiguracaoServico.class, CalculadoraJornadaNoturnaServico.class,
         RelatorioConsultaServico.class, RelatorioTerceirizadosServico.class, MinimizadorDadosPessoaisServico.class})
-class RelatorioFrequenciaEscopoHistoricoIT extends MySqlIntegrationTestSupport {
+class RelatorioFrequenciaEscopoHistoricoIT extends PostgresIntegrationTestSupport {
     private static final LocalDate JUNHO = LocalDate.of(2026, 6, 30);
     private static final LocalDate JULHO = LocalDate.of(2026, 7, 1);
     private static final ZoneId ZONA = ZoneId.of("America/Sao_Paulo");

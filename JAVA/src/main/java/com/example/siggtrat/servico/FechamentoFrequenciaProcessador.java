@@ -24,7 +24,9 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Service
-public class FechamentoFrequenciaProcessador {
+public class FechamentoFrequenciaProcessador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(FechamentoFrequenciaProcessador.class);
 
@@ -157,7 +159,9 @@ public class FechamentoFrequenciaProcessador {
             try {
                 stateServico.falhar(fechamentoId, erro);
             } catch (Throwable erroAoRegistrar) {
-                log.error("Falha ao registrar o erro do fechamento id={}", fechamentoId, erroAoRegistrar);
+                log.error("Falha ao registrar erro: referencia=FECHAMENTO-{} falhaOriginal={} falhaRegistro={}", fechamentoId,
+                        com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erro),
+                        com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erroAoRegistrar));
             }
         } finally {
             emExecucao.remove(fechamentoId);

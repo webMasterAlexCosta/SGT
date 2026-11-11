@@ -81,7 +81,8 @@ class Candidato4PrecisaoRecibosInstrumentosRedIT extends ContratosHttpBase {
         NovoContrato n = publicar(c, null);
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
         String rota = base(n.id()) + "/transferir-gestao";
-        Map<String, Object> req = mapa("dataEfetiva", n.inicio().plusDays(1),
+        Map<String, Object> req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", n.inicio().plusDays(1),
                 "dataAto", RelogioSistema.hoje(), "gestaoLocalDestinoId", c.gestaoB.getId(),
                 "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Fonte sintética para verificar a precisão da nova transferência",

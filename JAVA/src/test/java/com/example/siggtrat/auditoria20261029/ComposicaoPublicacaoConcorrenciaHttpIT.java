@@ -1,5 +1,8 @@
 package com.example.siggtrat.auditoria20261029;
 
+import com.example.siggtrat.infra.EsperaJdbcPostgres;
+import com.example.siggtrat.infra.ObservadorAtorPostgres.Ator;
+import org.springframework.jdbc.core.JdbcTemplate;
 import com.example.siggtrat.entidade.ComposicaoContratual;
 import com.example.siggtrat.entidade.Contrato;
 import com.example.siggtrat.entidade.EstadoNegocialContrato;
@@ -24,6 +27,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 /** A barreira observa o SQL real antes do DELETE; não há mock de repositório nem de serviço. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 public class ComposicaoPublicacaoConcorrenciaHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired
+    private javax.sql.DataSource dataSource;
     @DynamicPropertySource
     static void barreiraSql(DynamicPropertyRegistry props) {
         props.add("spring.jpa.properties.hibernate.session_factory.statement_inspector", BarreiraDelete.class::getName);
@@ -52,7 +57,7 @@ public class ComposicaoPublicacaoConcorrenciaHttpIT extends ContratosHttpBase {
         CountDownLatch liberarDelete = new CountDownLatch(1);
         Runnable barreira = () -> {
             long conexao = em.unwrap(Session.class).doReturningWork(conexaoJdbc -> {
-                try (var consulta = conexaoJdbc.createStatement(); var resultado = consulta.executeQuery("select connection_id()")) {
+                try (var consulta = conexaoJdbc.createStatement(); var resultado = consulta.executeQuery("select pg_backend_pid()")) {
                     resultado.next(); return resultado.getLong(1);
                 }
             });
@@ -73,13 +78,17 @@ public class ComposicaoPublicacaoConcorrenciaHttpIT extends ContratosHttpBase {
                 } finally { BarreiraDelete.antesDoDelete.remove(); }
             });
             long conexao = entrouNoDelete.get(10, TimeUnit.SECONDS);
-            Future<MvcResult> publicacao = pool.submit(() -> mvc.perform(publicar).andReturn());
-            boolean aguardouContrato = esperarPublicacaoOuLock(conexao, publicacao);
+            var atorPublicacao = new Ator("publicacao-apos-exclusao-composicao");
+            Future<MvcResult> publicacao = pool.submit(() -> atorPublicacao.executar(() -> mvc.perform(publicar).andReturn()));
+            var espera = EsperaJdbcPostgres.aguardar(new JdbcTemplate(dataSource), conexao, atorPublicacao,
+                    sql -> sql.selecaoChave("contrato", "id_contrato", contratoId),
+                    "Contrato/" + contratoId + " antes da publicação", publicacao);
+            boolean aguardouContrato = !espera.isEmpty();
             liberarDelete.countDown();
             exclusao.get(15, TimeUnit.SECONDS);
             MvcResult resposta = publicacao.get(15, TimeUnit.SECONDS);
             assertAll(
-                    () -> assertThat(aguardouContrato).as("MySQL deve serializar a publicação após a transação de composição").isTrue(),
+                    () -> assertThat(aguardouContrato).as("PostgreSQL deve serializar a publicação após a transação de composição").isTrue(),
                     () -> assertThat(resposta.getResponse().getStatus()).as(resposta.getResponse().getContentAsString()).isEqualTo(400),
                     () -> emTransacao(() -> {
                         assertThat(em.find(Contrato.class, contratoId).getEstadoNegocial()).isEqualTo(EstadoNegocialContrato.RASCUNHO);
@@ -92,18 +101,4 @@ public class ComposicaoPublicacaoConcorrenciaHttpIT extends ContratosHttpBase {
         } finally { liberarDelete.countDown(); pool.shutdownNow(); }
     }
 
-    private boolean esperarPublicacaoOuLock(long conexao, Future<MvcResult> publicacao) throws Exception {
-        long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-        while (System.nanoTime() < limite) {
-            if (publicacao.isDone()) return false;
-            long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                    select count(*) from performance_schema.data_lock_waits espera
-                    join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                    where bloqueador.PROCESSLIST_ID=:conexao
-                    """).setParameter("conexao", conexao).getSingleResult()).longValue());
-            if (esperas > 0) return true;
-            TimeUnit.MILLISECONDS.sleep(20);
-        }
-        throw new AssertionError("Publicação não concluiu nem esperou pelo bloqueio do Contrato.");
-    }
 }

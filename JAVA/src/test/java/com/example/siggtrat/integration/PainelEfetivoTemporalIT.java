@@ -22,9 +22,9 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 
-/** Regressões com MySQL real: nenhuma linha de histórico legado é fabricada. */
+/** Regressões com PostgreSQL real: nenhuma linha de histórico legado é fabricada. */
 @Transactional
-class PainelEfetivoTemporalIT extends MySqlIntegrationTestSupport {
+class PainelEfetivoTemporalIT extends PostgresIntegrationTestSupport {
     @Autowired EntityManager em;
     @Autowired PainelEfetivoRepositorio painel;
     @Autowired PainelRepositorio painelGestao;
@@ -229,7 +229,7 @@ class PainelEfetivoTemporalIT extends MySqlIntegrationTestSupport {
                 "select s.uf from SuperintendenciaEstadual s", String.class).getResultList());
         usadas.add("YY");
         usadas.addAll(com.example.siggtrat.constante.ConstantesDominio.UFS_BRASIL);
-        // Mesmo namespace sintético validado no MySQL por AuditoriaHttpSuporte.
+        // Mesmo namespace sintético validado no PostgreSQL por AuditoriaHttpSuporte.
         // Cada cenário conserva sua própria SE/Gestão, mesmo com fixtures de
         // rodadas anteriores persistidas; a transação deste teste é revertida.
         String alfabeto = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!#$%&()+,-.;=@[]^_{}~";

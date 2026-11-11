@@ -49,11 +49,20 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         assertThat(mantida.path("rg").asText()).isEqualTo("RG-123");
         assertThat(mantida.path("email").asText()).isEqualTo("cadastro@example.test");
         assertThat(mantida.path("endereco")).isEqualTo(completa.path("endereco"));
+        for (String campo : List.of("rg", "ctpsSerie", "nitPisPasep", "dataNascimento", "email", "endereco"))
+            assertThat(mantida.path(campo)).as("COL-011:002[1] omissão preserva %s", campo).isEqualTo(completa.path(campo));
         JsonNode limpa = dados(executar(c.localA, put(P+"/"+pessoaId+"/dados-opcionais")
                 .contentType(MediaType.APPLICATION_JSON).content(json(Map.of("limparRg",true,"limparEmail",true,"limparEndereco",true))),
                 200,"COL003 COL011 limpeza expressa"));
         assertThat(limpa.path("rg").isNull()).isTrue(); assertThat(limpa.path("email").isNull()).isTrue();
         assertThat(limpa.path("endereco").isNull()).isTrue(); assertThat(limpa.path("ctpsSerie").asText()).isEqualTo("CTPS-9");
+        for (String campo : List.of("ctpsSerie", "nitPisPasep", "dataNascimento"))
+            assertThat(limpa.path(campo)).as("COL-011:002[1] limpar RG/email/endereço preserva %s", campo)
+                    .isEqualTo(completa.path(campo));
+        em.flush(); em.clear();
+        JsonNode relida = dados(executar(c.localA, get(P+"/"+pessoaId), 200, "COL011 releitura pelo pessoaId explícito"));
+        for (String campo : List.of("rg", "ctpsSerie", "nitPisPasep", "dataNascimento", "email", "endereco"))
+            assertThat(relida.path(campo)).as("COL011 persistência após limpeza: %s", campo).isEqualTo(limpa.path(campo));
         JsonNode alocacoes = dados(executar(c.localA,get(V+"/"+vinculoId+"/alocacoes"),200,"VIN001 primeira alocação persistida"));
         assertThat(alocacoes).hasSize(1); assertThat(alocacoes.get(0).path("dataInicio").asText()).isEqualTo(DATA.toString());
         assertThat(em.createQuery("select count(e) from Empregado e where e.pessoaCanonica.id=:p",Long.class)
@@ -148,6 +157,14 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         assertThat(em.createQuery("select count(p) from Pessoa p where p.cpf=:cpf",Long.class).setParameter("cpf",c.pessoaA.getCpf()).getSingleResult()).isEqualTo(1);
         JsonNode pos=dados(executar(c.nacional,get(V+"/pessoas/"+c.pessoaA.getId()+"/posicao").param("data",DATA.plusDays(1).toString()),200,"HIS002 história dos dois contratos"));
         assertThat(pos.path("vinculos")).hasSize(2);
+        List<List<Long>> identidadesHistoricas = new ArrayList<>();
+        for (JsonNode historico : pos.path("vinculos")) {
+            assertThat(historico.path("pessoaId").asLong()).isEqualTo(c.pessoaA.getId());
+            identidadesHistoricas.add(List.of(historico.path("vinculoId").asLong(), historico.path("contratoId").asLong()));
+        }
+        assertThat(identidadesHistoricas).as("HIS002 mesma Pessoa conserva ambos os Vínculos e Contratos")
+                .containsExactlyInAnyOrder(List.of(c.vinculoA.getId(), c.contratoA.getId()),
+                        List.of(novo.path("id").asLong(), c.contratoB.getId()));
         Map<String,Object> duplicada=cadastro(c,DATA,null,null); duplicada.put("pessoa",Map.of("nome","Outra identidade","cpf",c.pessoaA.getCpf()));
         executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(duplicada)),409,"COL005 CPF global duplicado");
         Map<String,Object> invalida=cadastro(c,DATA,null,null); invalida.put("pessoa",Map.of("nome","Nome","cpf","11111111111"));
@@ -173,6 +190,13 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         Map<String,Object> segunda=cadastro(c,DATA.plusDays(2),null,"MAT-ORIGINAL"); segunda.put("pessoaId",novo.path("pessoaId").asLong());
         executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(segunda)),409,"MAT003 MAT004 nem a própria Pessoa reutiliza matrícula antiga");
         segunda.put("matricula","MAT-NOVA"); executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(segunda)),409,"Matrícula alterada também fica reservada");
+        em.flush(); em.clear();
+        List<List<Object>> reservas = em.createQuery("select r.contrato.id, r.vinculo.id, r.matricula from ReservaMatriculaContrato r "
+                        + "where r.vinculo.id=:v order by r.matricula", Object[].class)
+                .setParameter("v", id).getResultList().stream().map(Arrays::asList).toList();
+        assertThat(reservas).as("MAT-001:001[1] reservas persistidas vinculadas ao contrato e vínculo explícitos")
+                .containsExactlyInAnyOrder(List.<Object>of(c.contratoA.getId(), id, "MAT-ORIGINAL"),
+                        List.<Object>of(c.contratoA.getId(), id, "MAT-NOVA"));
         executar(c.localB,post(V+"/"+id+"/alterar-matricula").contentType(MediaType.APPLICATION_JSON).content(json(req)),404,"Matrícula fora da Gestão");
         executar(c.operacionalA,post(V+"/"+id+"/alterar-matricula").contentType(MediaType.APPLICATION_JSON).content(json(req)),403,"Operacional não altera matrícula");
         req.put("dataEfetiva",RelogioSistema.hoje().plusDays(1)); req.put("novaMatricula","MAT-FUTURA");
@@ -216,6 +240,29 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         assertThat(previa.path("token").asText()).hasSize(64); assertThat(previa.path("valorAtual").asText()).isEqualTo(INICIO.toString());
         assertThat(previa.path("impactos").size()).isGreaterThanOrEqualTo(5);
         req.put("confirmarImpacto",true); req.put("tokenPrevia",previa.path("token").asText());
+        List<String> estadoAntes = estadoRetificacaoB07(c.vinculoA.getId());
+        JsonNode eventosAntes = dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/eventos"),
+                200,"VIN014 fotografia antes das recusas isoladas"));
+        for (String campo : List.of("justificativa", "evidencia", "autorizacao")) {
+            for (boolean omitir : List.of(true, false)) {
+                Map<String,Object> incompleta = new LinkedHashMap<>(req);
+                if (omitir) incompleta.remove(campo); else incompleta.put(campo, "   ");
+                // Novo início e token da prévia válida continuam exatamente os mesmos.
+                assertThat(incompleta.get("novoInicio")).isEqualTo(req.get("novoInicio"));
+                assertThat(incompleta.get("tokenPrevia")).isEqualTo(req.get("tokenPrevia"));
+                for (String outro : List.of("justificativa", "evidencia", "autorizacao"))
+                    if (!outro.equals(campo)) assertThat(incompleta.get(outro)).isEqualTo(req.get(outro));
+                var negada = executar(c.localA,post(V+"/"+c.vinculoA.getId()+"/retificar-inicio")
+                        .contentType(MediaType.APPLICATION_JSON).content(json(incompleta)),400,
+                        "VIN014 metadado isolado " + campo + (omitir ? " omitido" : " vazio"));
+                assertThat(mapper.readTree(negada.getResponse().getContentAsString()).path("message").asText())
+                        .containsIgnoringCase("justificativa").containsIgnoringCase("evidência").containsIgnoringCase("autorização");
+                assertThat(estadoRetificacaoB07(c.vinculoA.getId())).as("Recusa de " + campo + " não grava limites, versões ou eventos")
+                        .isEqualTo(estadoAntes);
+                assertThat(dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/eventos"),200,
+                        "VIN014 trilha preservada após recusa de " + campo))).isEqualTo(eventosAntes);
+            }
+        }
         JsonNode retificado=dados(executar(c.localA,post(V+"/"+c.vinculoA.getId()+"/retificar-inicio").contentType(MediaType.APPLICATION_JSON).content(json(req)),200,"VIN014 retificação auditada"));
         assertThat(retificado.path("id").asLong()).isEqualTo(c.vinculoA.getId()); assertThat(retificado.path("dataInicio").asText()).isEqualTo(INICIO.plusDays(1).toString());
         JsonNode alocacoes=dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/alocacoes"),200,"Cobertura acompanha início retificado"));
@@ -281,6 +328,15 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
     @Test
     void alocacaoRetroativaERetificacaoNoMesmoDiaPreservamMudancaPosterior() throws Exception {
         Cenario c=criarCenario(); ComposicaoContratual b=destino(c,"B"), d=destino(c,"C");
+        declararFonteNominalSintetica(c, "B04-ALOCACAO-NAO-CRIA-CONTRATACAO");
+        long pessoaId = c.pessoaA.getId(), vinculoId = c.vinculoA.getId();
+        long pessoasAntes = em.createQuery("select count(p) from Pessoa p", Long.class).getSingleResult();
+        List<List<Object>> vinculosAntes = fotografiaVinculosB04();
+        List<List<Object>> eventosAntes = fotografiaEventosVinculoB04();
+        assertThat(em.createQuery("select e.id from EventoVinculoContratual e where e.vinculo.id=:v "
+                        + "and e.tipoEvento=:tipo", Long.class).setParameter("v", vinculoId)
+                .setParameter("tipo", com.example.siggtrat.dominio.vinculo.TipoEventoVinculoContratual.CRIACAO).getResultList())
+                .as("Controle positivo: origem sintética declarada antes das mudanças internas").hasSize(1);
         JsonNode posterior=alterar(c,c.vinculoA.getId(),DATA.plusDays(10),d.getId(),false,null);
         JsonNode retro=alterar(c,c.vinculoA.getId(),DATA,b.getId(),false,null);
         assertThat(retro.path("dataFim").asText()).isEqualTo(DATA.plusDays(9).toString());
@@ -291,11 +347,43 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         assertThat(meio.path("lotacaoId").asLong()).isEqualTo(c.lotacaoA.getId()); assertThat(apos.path("lotacaoId").asLong()).isEqualTo(d.getLotacao().getId());
         JsonNode faixas=dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/alocacoes").param("mes","2026-06"),200,"HIS002 todas as faixas do mês"));
         assertThat(faixas.size()).isGreaterThanOrEqualTo(4);
+        List<List<Object>> faixasExatas = new ArrayList<>();
+        for (JsonNode faixa : faixas) faixasExatas.add(List.<Object>of(faixa.path("id").asLong(),
+                faixa.path("vinculoId").asLong(), faixa.path("composicaoBaseId").asLong(),
+                faixa.path("estadoNegocial").asText(), faixa.path("dataInicio").asText(), faixa.path("dataFim").asText()));
+        assertThat(faixasExatas).as("HIS-002:001[1] conjunto mensal exato por IDs, estados e limites")
+                .containsExactlyInAnyOrder(
+                        List.<Object>of(c.alocacaoA.getId(), vinculoId, c.composicaoA.getId(), "REGISTRADA", INICIO.toString(), DATA.minusDays(1).toString()),
+                        List.<Object>of(retro.path("id").asLong(), vinculoId, b.getId(), "SUBSTITUIDA", DATA.toString(), DATA.plusDays(9).toString()),
+                        List.<Object>of(retificada.path("id").asLong(), vinculoId, c.composicaoA.getId(), "REGISTRADA", DATA.toString(), DATA.plusDays(9).toString()),
+                        List.<Object>of(posterior.path("id").asLong(), vinculoId, d.getId(), "REGISTRADA", DATA.plusDays(10).toString(), FIM.toString()));
         long efetivas=0; for(JsonNode f:faixas) if(f.path("estadoNegocial").asText().equals("REGISTRADA")
                 && !LocalDate.parse(f.path("dataInicio").asText()).isAfter(DATA)
                 && (f.path("dataFim").isNull() || !LocalDate.parse(f.path("dataFim").asText()).isBefore(DATA))) efetivas++;
         assertThat(efetivas).isEqualTo(1);
-        assertThat(c.vinculoA.getDataInicio()).isEqualTo(INICIO); assertThat(c.vinculoA.getDataFim()).isNull();
+        em.flush();em.clear();
+        var anterior=em.find(AlocacaoVinculo.class,c.alocacaoA.getId());
+        assertThat(anterior.getDataFim()).as("TMP-013:002 alocação anterior termina em D-1").isEqualTo(DATA.minusDays(1));
+        var vinculoAtual=em.find(VinculoContratual.class,c.vinculoA.getId());
+        assertThat(vinculoAtual.getDataInicio()).isEqualTo(INICIO);assertThat(vinculoAtual.getDataFim()).isNull();
+        assertThat(vinculoAtual.getPessoa().getId()).as("ALO-002:002[0] mesma Pessoa canônica pelo ID").isEqualTo(pessoaId);
+        assertThat(em.find(Pessoa.class, pessoaId).getId()).isEqualTo(pessoaId);
+        assertThat(em.createQuery("select count(p) from Pessoa p", Long.class).getSingleResult())
+                .as("ALO-002:002[0] alteração interna não cria outra Pessoa").isEqualTo(pessoasAntes);
+        assertThat(fotografiaVinculosB04()).as("ALO-002:002[2] conjunto global de IDs e limites de vínculos permanece exato")
+                .isEqualTo(vinculosAntes);
+        assertThat(fotografiaEventosVinculoB04()).as("ALO-002:002[2] nenhum evento extra de contratação/desligamento")
+                .isEqualTo(eventosAntes);
+        JsonNode inicioReal = pesquisarVinculosB04(c, pessoaId, "inicio", INICIO);
+        assertThat(ids(inicioReal.path("content"))).containsExactly(vinculoId);
+        assertThat(inicioReal.path("totalElements").asLong()).isEqualTo(1);
+        for (LocalDate diaMudanca : List.of(DATA, DATA.plusDays(10))) {
+            for (String limite : List.of("inicio", "fim")) {
+                JsonNode artificial = pesquisarVinculosB04(c, pessoaId, limite, diaMudanca);
+                assertThat(artificial.path("content")).as("VIN-002:002[0]/HIS-003:002[1] %s da alocação não cria evento de vínculo em %s", limite, diaMudanca).isEmpty();
+                assertThat(artificial.path("totalElements").asLong()).isZero();
+            }
+        }
         JsonNode eventos=dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/alocacoes/eventos"),200,"ALO003 ALO004 trilha encadeada"));
         assertThat(eventos.size()).isGreaterThanOrEqualTo(3); assertThat(eventos.get(eventos.size()-1).path("hashEvento").asText()).hasSize(64);
         Map<String,Object> req=alocacao(DATA,b.getId());
@@ -303,6 +391,30 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         executar(c.localB,post(V+"/"+c.vinculoA.getId()+"/alocacoes").contentType(MediaType.APPLICATION_JSON).content(json(req)),404,"Alteração de Alocação fora da Gestão");
         executar(c.localB,post(V+"/"+c.vinculoA.getId()+"/alocacoes/"+retificada.path("id").asLong()+"/retificar").contentType(MediaType.APPLICATION_JSON).content(json(req)),404,"Retificação de Alocação fora da Gestão");
         executar(c.localA,post(V+"/"+c.vinculoA.getId()+"/previas/alocacoes").contentType(MediaType.APPLICATION_JSON).content("{}"),400,"Alocação exige data e combinação");
+
+        // Controle positivo posterior: somente este comando encerra o vínculo.
+        LocalDate fimReal = DATA.plusDays(15);
+        MotivoDesligamento motivo = motivo(c.gestaoA, CategoriaTerminoVinculo.DESLIGAMENTO_INDIVIDUAL);
+        FonteMotivoSintetica.declarar(em, gestaoDaFonte, c.contratoA.getId(), motivo.getId(), c.gestaoA.getId(), c.localA,
+                "Fonte sintética do término usado como controle B04", CategoriaTerminoVinculo.DESLIGAMENTO_INDIVIDUAL,
+                fimReal, fimReal, java.time.Instant.now(), "SEI-SINTETICO-B04-TERMINO");
+        JsonNode encerrado = desligar(c, vinculoId, fimReal, motivo.getId());
+        LocalDate diaRegistro = java.time.Instant.parse(encerrado.path("desligamentoRegistradoEm").asText())
+                .atZone(RelogioSistema.ZONA).toLocalDate();
+        assertThat(diaRegistro).as("HIS-003:001[2] registro distinto do término efetivo e das mudanças")
+                .isNotIn(fimReal, DATA, DATA.plusDays(10));
+        em.flush(); em.clear();
+        assertThat(em.find(VinculoContratual.class, vinculoId).getDataFim()).isEqualTo(fimReal);
+        JsonNode porFimReal = pesquisarVinculosB04(c, pessoaId, "fim", fimReal);
+        assertThat(ids(porFimReal.path("content"))).as("HIS-003:001[2] limite inclusivo exato do término efetivo").containsExactly(vinculoId);
+        assertThat(porFimReal.path("totalElements").asLong()).isEqualTo(1);
+        assertThat(porFimReal.path("content").get(0).path("dataFim").asText()).isEqualTo(fimReal.toString());
+        for (LocalDate outroDia : List.of(DATA, DATA.plusDays(10), diaRegistro)) {
+            JsonNode porOutroDia = pesquisarVinculosB04(c, pessoaId, "fim", outroDia);
+            assertThat(porOutroDia.path("content")).as("HIS003 término não é mudança de alocação nem registro em %s", outroDia).isEmpty();
+            assertThat(porOutroDia.path("totalElements").asLong()).isZero();
+        }
+        assertThat(ids(pesquisarVinculosB04(c, pessoaId, "inicio", INICIO).path("content"))).containsExactly(vinculoId);
     }
 
     @Test
@@ -345,21 +457,52 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         declararFonteNominalSintetica(c, "PESSOAS-FIM-NATURAL");
         MotivoDesligamento natural=motivo(c.gestaoA,CategoriaTerminoVinculo.FIM_VIGENCIA_CONTRATO);
         c.contratoA.setDataFim(DATA); c.composicaoA.setDataFimVigencia(DATA); c.alocacaoA.setDataFim(DATA);
-        em.createQuery("select v from VersaoContratoNegocial v where v.contrato.id=:id",VersaoContratoNegocial.class)
-                .setParameter("id",c.contratoA.getId()).getResultList().forEach(v->v.setDataFim(DATA));
+        // A fotografia tem updatable=false: preparar a fixture por DML JPA,
+        // nunca tomar setter no cache como prova de alteração persistida.
+        em.flush();
+        assertThat(em.createQuery("update VersaoContratoNegocial v set v.dataFim=:fim where v.contrato.id=:id")
+                .setParameter("fim",DATA).setParameter("id",c.contratoA.getId()).executeUpdate()).isEqualTo(1);
+        em.clear();
+        assertThat(em.createQuery("select v.dataFim from VersaoContratoNegocial v where v.contrato.id=:id",LocalDate.class)
+                .setParameter("id",c.contratoA.getId()).getResultList()).containsExactly(DATA);
         // Fonte contextual sintética opt-in deste cenário; disponibilidade permanece fonte separada.
         FonteMotivoSintetica.declarar(em, gestaoDaFonte, c.contratoA.getId(), natural.getId(), c.gestaoA.getId(), c.localA,
                 "Fim natural documentado da vigência contratual", CategoriaTerminoVinculo.FIM_VIGENCIA_CONTRATO,
                 DATA, DATA, java.time.Instant.now(), "SEI-SINTETICO-C5-PES-FIM-NATURAL");
+        JsonNode criacaoAntes = dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/eventos"),200,
+                "VIN011 evento anterior é fotografado antes do registro posterior")).get(0).deepCopy();
+        java.time.Instant antesRegistro = java.time.Instant.now().truncatedTo(java.time.temporal.ChronoUnit.MICROS);
+        assertThat(antesRegistro.atZone(java.time.ZoneOffset.UTC).toLocalDate()).isAfter(DATA);
         JsonNode encerrados=dados(executar(c.localA,post(V+"/contratos/"+c.contratoA.getId()+"/tratar-fim-natural"),200,"VIN009-011 tratamento posterior conserva fim da vigência"));
+        java.time.Instant depoisRegistro = java.time.Instant.now();
         assertThat(encerrados).hasSize(1); assertThat(encerrados.get(0).path("dataFim").asText()).isEqualTo(DATA.toString());
         assertThat(encerrados.get(0).path("motivoDesligamentoId").asLong()).isEqualTo(natural.getId());
         JsonNode eventos=dados(executar(c.localA,get(V+"/"+c.vinculoA.getId()+"/eventos"),200,"Causa própria do fim natural"));
         assertThat(eventos).hasSize(2);
         assertThat(eventos.get(0).path("tipo").asText()).isEqualTo("CRIACAO");
         assertThat(eventos.get(0).path("dataEfetiva").asText()).isEqualTo(INICIO.toString());
+        assertThat(eventos.get(0)).as("VIN011 registro posterior não reescreve criação").isEqualTo(criacaoAntes);
         assertThat(eventos.get(1).path("tipo").asText()).isEqualTo("FIM_NATURAL_CONTRATO");
         assertThat(eventos.get(1).path("dataEfetiva").asText()).isEqualTo(DATA.toString());
+        java.time.Instant registroEvento = java.time.Instant.parse(eventos.get(1).path("registradoEm").asText());
+        assertThat(registroEvento).as("VIN011 Instant administrativo próprio, limitado pelo comando")
+                .isBetween(antesRegistro, depoisRegistro);
+        assertThat(registroEvento.atZone(java.time.ZoneOffset.UTC).toLocalDate()).isAfter(DATA);
+        assertThat(eventos.get(1).path("responsavelId").asLong()).isEqualTo(c.localA.getId());
+        assertThat(eventos.get(1).path("responsavelUsername").asText()).isEqualTo(c.localA.getUsername());
+        em.flush(); em.clear(); // persistência recarregada na transação ambiente; não commit independente
+        VinculoContratual gravado = em.find(VinculoContratual.class,c.vinculoA.getId());
+        assertThat(gravado.getPessoa().getId()).isEqualTo(c.pessoaA.getId());
+        assertThat(gravado.getContrato().getId()).isEqualTo(c.contratoA.getId());
+        assertThat(gravado.getDataFim()).isEqualTo(DATA);
+        assertThat(gravado.getDesligamentoRegistradoEm()).isBetween(antesRegistro, depoisRegistro);
+        assertThat(gravado.getDesligamentoRegistradoPorId()).isEqualTo(c.localA.getId());
+        assertThat(gravado.getDesligamentoRegistradoPorUsername()).isEqualTo(c.localA.getUsername());
+        EventoVinculoContratual eventoGravado = em.find(EventoVinculoContratual.class,eventos.get(1).path("id").asLong());
+        assertThat(eventoGravado.getVinculo().getId()).isEqualTo(gravado.getId());
+        assertThat(eventoGravado.getRegistradoEm()).isEqualTo(registroEvento);
+        assertThat(eventoGravado.getResponsavelId()).isEqualTo(c.localA.getId());
+        assertThat(eventoGravado.getResponsavelUsername()).isEqualTo(c.localA.getUsername());
         assertThat(eventos.get(1).path("eventoPrecedenteId").asLong()).isEqualTo(eventos.get(0).path("id").asLong());
         executar(c.localB,post(V+"/contratos/"+c.contratoA.getId()+"/tratar-fim-natural"),404,"Fim natural fora da Gestão");
         executar(c.localB,post(V+"/contratos/"+c.contratoB.getId()+"/tratar-fim-natural"),409,"Contrato com vigência futura não encerra por fim natural");
@@ -410,7 +553,9 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
     void inclusaoExcedenteExigeConsentimentoERegistraAutorizacaoSemTetoArtificial() throws Exception {
         Cenario c=criarCenario(); c.composicaoA.setEfetivoPrevisto(1);
         Map<String,Object> req=cadastro(c,DATA,null,null); req.put("pessoa",Map.of("nome","Pessoa excedente 1","cpf",cpf(790000000+c.pessoaA.getId().intValue())));
-        executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(req)),409,"CMP008 excedente exige confirmação específica");
+        JsonNode negativa = dados(executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(req)),409,"CMP008 excedente exige confirmação específica"));
+        assertThat(negativa.path("message").asText()).as("CMP008 resposta informa todas as condições do consentimento")
+                .contains("confirmação", "justificativa", "evidência", "autorização");
         req.put("confirmarInclusaoExcedente",true); req.put("justificativaExcedente","Necessidade formal documentada");
         req.put("evidenciaExcedente","SEI-EXCEDENTE"); req.put("autorizacaoExcedente","Ato do Gestor Local");
         JsonNode primeiro=dados(executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(req)),201,"CMP009 primeira inclusão excedente autorizada"));
@@ -420,9 +565,80 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         assertThat(eventos.get(0).path("ocupacaoAposInclusaoExcedente").asInt()).isEqualTo(2);
         assertThat(eventos.get(0).path("evidencia").asText()).contains("SEI-EXCEDENTE");
         assertThat(eventos.get(0).path("autorizacao").asText()).contains("Ato do Gestor Local");
+        long primeiroId = primeiro.path("id").asLong();
+        em.flush();
+        em.clear();
+        Map<String, List<List<Object>>> primeiraFonteAntes = fonteDaInclusaoExcedente(primeiroId);
+        assertThat(primeiraFonteAntes.get("vinculo")).hasSize(1);
+        assertThat(primeiraFonteAntes.get("alocacoes")).hasSize(1);
+        assertThat(primeiraFonteAntes.get("eventosVinculo")).hasSize(1);
+        assertThat(primeiraFonteAntes.get("eventosAlocacao")).hasSize(1);
         req.put("pessoa",Map.of("nome","Pessoa excedente 2","cpf",cpf(795000000+c.pessoaA.getId().intValue())));
         JsonNode segundo=dados(executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(req)),201,"CMP010 segunda inclusão excedente sem teto artificial"));
-        assertThat(segundo.path("id").asLong()).isNotEqualTo(primeiro.path("id").asLong());
+        assertThat(segundo.path("id").asLong()).isNotEqualTo(primeiroId);
+        em.flush();
+        em.clear();
+        assertThat(fonteDaInclusaoExcedente(primeiroId))
+                .as("CMP008 a segunda inclusão não reescreve o primeiro vínculo, alocação ou eventos")
+                .isEqualTo(primeiraFonteAntes);
+        VinculoContratual preservado = em.find(VinculoContratual.class, primeiroId);
+        assertThat(preservado).isNotNull();
+        assertThat(preservado.getPessoa().getId()).isEqualTo(primeiro.path("pessoaId").asLong());
+        assertThat(preservado.getPessoa().getNome()).isEqualTo("Pessoa excedente 1");
+        assertThat(preservado.getContrato().getId()).isEqualTo(c.contratoA.getId());
+        assertThat(preservado.getDataInicio()).isEqualTo(DATA);
+        assertThat(preservado.getDataFim()).isNull();
+        assertThat(preservado.getMatricula()).isNull();
+        assertThat(preservado.getEstadoNegocial().name()).isEqualTo("REGISTRADO");
+        assertThat(dados(executar(c.localA, get(V+"/"+primeiroId+"/eventos"), 200,
+                "CMP008 primeira autorização relida após a segunda inclusão"))).isEqualTo(eventos);
+    }
+
+    private List<List<Object>> fotografiaVinculosB04() {
+        return em.createQuery("select v.id, v.pessoa.id, v.contrato.id, v.dataInicio, v.dataFim, v.estadoNegocial, "
+                        + "v.matricula, v.desligamentoRegistradoEm from VinculoContratual v order by v.id", Object[].class)
+                .getResultList().stream().map(Arrays::asList).toList();
+    }
+    private List<List<Object>> fotografiaEventosVinculoB04() {
+        return em.createQuery("select e.id, e.vinculo.id, e.tipoEvento, e.dataEfetiva, e.inicioAnterior, e.inicioNovo, "
+                        + "e.fimAnterior, e.fimNovo, e.hashAnterior, e.hashEvento from EventoVinculoContratual e order by e.id", Object[].class)
+                .getResultList().stream().map(Arrays::asList).toList();
+    }
+    private JsonNode pesquisarVinculosB04(Cenario c, long pessoaId, String limite, LocalDate dia) throws Exception {
+        return dados(executar(c.localA, get(V).param("pessoaId", Long.toString(pessoaId))
+                .param(limite+"De", dia.toString()).param(limite+"Ate", dia.toString()), 200,
+                "B04 busca inclusiva por data canônica de " + limite + ": " + dia));
+    }
+
+    private Map<String, List<List<Object>>> fonteDaInclusaoExcedente(long vinculoId) {
+        // Esta classe mantém a transação ambiente herdada. flush/clear força
+        // releitura JPA; não equivale a comprovar commit em outra transação.
+        return Map.of(
+                "vinculo", linhasDaInclusao("select v.id,v.pessoa.id,v.pessoa.nome,v.pessoa.cpf,v.contrato.id,"
+                        + "v.dataInicio,v.dataFim,v.matricula,v.estadoNegocial,v.criadoEm,v.criadoPorId,"
+                        + "v.criadoPorUsername,v.version from VinculoContratual v where v.id=:v", vinculoId),
+                "alocacoes", linhasDaInclusao("select a.id,a.vinculo.id,c.id,a.lotacao.id,a.jornada.id,a.cargo.id,"
+                        + "a.dataInicio,a.dataFim,a.estadoNegocial,a.criadoEm,a.criadoPorId,a.version,"
+                        + "a.lotacaoNomeFotografia,a.jornadaDescricaoFotografia,a.cargoNomeFotografia,"
+                        + "a.lotacaoMunicipioFotografia,a.jornadaSemanalFotografia,a.municipioAusenciaComprovada "
+                        + "from AlocacaoVinculo a left join a.composicao c where a.vinculo.id=:v order by a.id", vinculoId),
+                "eventosVinculo", linhasDaInclusao("select e.id,e.vinculo.id,e.tipoEvento,e.dataEfetiva,e.registradoEm,"
+                        + "e.responsavelId,e.responsavelUsername,e.justificativa,e.evidencia,e.autorizacao,"
+                        + "e.inclusaoExcedente,e.composicaoExcedenteId,e.lotacaoExcedenteId,e.jornadaExcedenteId,"
+                        + "e.cargoExcedenteId,e.efetivoPrevistoExcedente,e.ocupacaoAposInclusaoExcedente,"
+                        + "e.hashAnterior,e.hashEvento,e.inicioNovo,e.fimNovo,e.matriculaNova,e.pessoaCpfFotografia "
+                        + "from EventoVinculoContratual e where e.vinculo.id=:v order by e.id", vinculoId),
+                "eventosAlocacao", linhasDaInclusao("select e.id,e.vinculo.id,e.tipoEvento,e.dataEfetiva,e.registradoEm,"
+                        + "e.responsavelId,e.responsavelUsername,e.justificativa,e.evidencia,e.autorizacao,"
+                        + "e.inclusaoExcedente,e.efetivoPrevistoExcedente,e.ocupacaoAposInclusaoExcedente,"
+                        + "e.composicaoNovaId,e.lotacaoNovaId,e.jornadaNovaId,e.cargoNovoId,e.inicioNovo,e.fimNovo,"
+                        + "e.hashAnterior,e.hashEvento from EventoAlocacaoVinculo e "
+                        + "where e.vinculo.id=:v order by e.id", vinculoId));
+    }
+
+    private List<List<Object>> linhasDaInclusao(String jpql, long vinculoId) {
+        return em.createQuery(jpql, Object[].class).setParameter("v", vinculoId).getResultList().stream()
+                .map(Arrays::asList).toList();
     }
 
     private JsonNode cadastrar(Cenario c,LocalDate inicio,LocalDate fim,String matricula) throws Exception {
@@ -430,6 +646,19 @@ class PessoasVinculosContratoHttpIT extends AuditoriaHttpSuporte {
         req.put("pessoa",Map.of("nome","Pessoa HTTP "+UUID.randomUUID(),"cpf",cpf(740000000+c.pessoaA.getId().intValue())));
         return dados(executar(c.localA,post(V).contentType(MediaType.APPLICATION_JSON).content(json(req)),201,"Cadastro integrado de vínculo"));
     }
+    private List<String> estadoRetificacaoB07(long vinculoId) {
+        em.flush(); em.clear();
+        List<String> estado = new ArrayList<>();
+        for (String jpql : List.of(
+                "select v.id,v.pessoa.id,v.contrato.id,v.dataInicio,v.dataFim,v.estadoNegocial,v.version from VinculoContratual v where v.id=:v",
+                "select a.id,a.vinculo.id,a.dataInicio,a.dataFim,a.estadoNegocial,a.version from AlocacaoVinculo a where a.vinculo.id=:v order by a.id",
+                "select e.id,e.hashEvento from EventoVinculoContratual e where e.vinculo.id=:v order by e.id",
+                "select e.id,e.hashEvento from EventoAlocacaoVinculo e where e.vinculo.id=:v order by e.id"))
+            em.createQuery(jpql,Object[].class).setParameter("v",vinculoId).getResultList().stream()
+                    .map(Arrays::toString).forEach(estado::add);
+        return estado;
+    }
+
     private Map<String,Object> cadastro(Cenario c,LocalDate inicio,LocalDate fim,String matricula) {
         Map<String,Object> req=new LinkedHashMap<>(); req.put("contratoId",c.contratoA.getId()); req.put("dataInicio",inicio);
         req.put("dataFim",fim); req.put("matricula",matricula); req.put("composicaoId",c.composicaoA.getId()); return req;

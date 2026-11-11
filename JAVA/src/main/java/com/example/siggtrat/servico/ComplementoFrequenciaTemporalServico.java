@@ -25,7 +25,11 @@ import java.util.*;
 
 /** Política única de autorização temporal e prova das fontes manuais de frequência. */
 @Service
-public class ComplementoFrequenciaTemporalServico {
+public class ComplementoFrequenciaTemporalServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(ComplementoFrequenciaTemporalServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     public static final String EXCECAO = "EXCECAO";
     public static final String ADICIONAL = "ADICIONAL";
     private final ResolvedorContextoTemporalFrequenciaServico operacional;

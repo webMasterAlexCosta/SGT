@@ -9,7 +9,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.http.MediaType;
 import org.springframework.test.web.servlet.MvcResult;
-import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.AbstractMockHttpServletRequestBuilder;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,7 +27,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** AUD-04/CON001-004: cada requisição confirma sua própria transação MySQL. */
+/** AUD-04/CON001-004: cada requisição confirma sua própria transação PostgreSQL. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ConclusaoAud04IdentidadeContratualHttpIT extends ContratosHttpBase {
     @Test
@@ -242,7 +242,7 @@ class ConclusaoAud04IdentidadeContratualHttpIT extends ContratosHttpBase {
                 .setParameter("id", contrato).getSingleResult());
     }
 
-    private List<MvcResult> simultaneos(MockHttpServletRequestBuilder a, MockHttpServletRequestBuilder b) throws Exception {
+    private List<MvcResult> simultaneos(AbstractMockHttpServletRequestBuilder<?> a, AbstractMockHttpServletRequestBuilder<?> b) throws Exception {
         CountDownLatch largada = new CountDownLatch(1);
         ExecutorService pool = Executors.newFixedThreadPool(2);
         try {

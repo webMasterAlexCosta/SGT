@@ -18,7 +18,11 @@ import java.util.Locale;
 import java.util.function.Consumer;
 
 @Service
-public class RelatorioTerceirizadosServico {
+public class RelatorioTerceirizadosServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RelatorioTerceirizadosServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     static final int TAMANHO_PADRAO = 100;
     static final int TAMANHO_MAXIMO = 5000;

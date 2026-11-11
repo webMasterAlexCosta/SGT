@@ -20,7 +20,11 @@ import java.util.stream.Collectors;
 
 @Service
 @Transactional
-public class UsuarioAplicacaoServico {
+public class UsuarioAplicacaoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(UsuarioAplicacaoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final UsuarioAplicacaoRepositorio userRepositorio;
     private final LotacaoRepositorio lotacaoRepositorio;
@@ -94,14 +98,14 @@ public class UsuarioAplicacaoServico {
     }
 
     public ResumoUsuarioAplicacaoDTO criar(CriacaoUsuarioAplicacaoDTO dto) {
-        if (dto == null) throw new IllegalArgumentException("Informe os dados do usuário.");
+        if (dto == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe os dados do usuário.");
         UsuarioAplicacao gestor = acessoOrganizacionalServico.usuarioAtual();
         String username = dto.username().trim().toLowerCase(Locale.ROOT);
         String email = dto.email().trim().toLowerCase(Locale.ROOT);
         validarEmailInstitucional(email);
         String matricula = UtilitarioMatricula.normalizar(dto.matricula());
-        if (matricula == null) throw new IllegalArgumentException("Informe a matrícula com 8 dígitos.");
-        if (userRepositorio.findByUsername(username).isPresent()) throw new IllegalArgumentException("Nome de usuário já cadastrado.");
+        if (matricula == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe a matrícula com 8 dígitos.");
+        if (userRepositorio.findByUsername(username).isPresent()) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Nome de usuário já cadastrado.");
         if (userRepositorio.existsByEmailIgnoreCase(email)) throw new com.example.siggtrat.excecao.ExcecaoConflitoDados("E-mail já cadastrado.");
         if (userRepositorio.existsByMatricula(matricula)) {
             throw new com.example.siggtrat.excecao.ExcecaoConflitoDados("Matrícula já cadastrada.");
@@ -129,7 +133,7 @@ public class UsuarioAplicacaoServico {
                     dto.lotacaoId(), dto.jornadaId(), dto.vinculosGestao(),
                     dto.superintendenciaId(), dto.gestaoLocalId());
             List<VinculoGestaoUsuarioAplicacao> vinculos = resolverEscoposGestao(temporario, user.getGestaoLocal());
-            if (vinculos.isEmpty()) throw new IllegalArgumentException("Informe ao menos uma lotação/turno para o usuário operacional.");
+            if (vinculos.isEmpty()) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe ao menos uma lotação/turno para o usuário operacional.");
             aplicarEscoposGestao(user, vinculos);
         } else {
             aplicarEscoposGestao(user, List.of());
@@ -146,11 +150,12 @@ public class UsuarioAplicacaoServico {
         UsuarioAplicacao gestor = acessoOrganizacionalServico.usuarioAtual();
         UsuarioAplicacao user = obterUsuarioOuFalhar(id);
         exigirPodeGerenciar(gestor, user);
-        if (!acessoOrganizacionalServico.ehOperacional(user)) throw new IllegalArgumentException("O acesso retroativo é exclusivo de usuários operacionais.");
+        if (!acessoOrganizacionalServico.ehOperacional(user)) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O acesso retroativo é exclusivo de usuários operacionais.");
         user.setRetroactiveUnlockExpireAt(com.example.siggtrat.utilitario.RelogioSistema.agora().plusHours(retroactiveUnlockHours));
         userRepositorio.save(user);
-        return "Usuário liberado! Poderá lançar até " + retroactiveUnlockDays
-                + " dias retroativos pelas próximas " + retroactiveUnlockHours + " horas.";
+        return "Marcador legado de acesso retroativo registrado por " + retroactiveUnlockHours
+                + " horas. A janela operacional e os bloqueios de frequência não foram alterados; "
+                + "este marcador não libera lançamentos.";
     }
 
     public void revogarAcessoRetroativo(Long id) {
@@ -168,7 +173,7 @@ public class UsuarioAplicacaoServico {
         acessoOrganizacionalServico.revalidarAposEspera(gestor);
         exigirPodeGerenciar(gestor, user);
 
-        if (dto == null) throw new IllegalArgumentException("Informe os dados do usuário.");
+        if (dto == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe os dados do usuário.");
 
         boolean propriaConta = Objects.equals(gestor.getId(), user.getId());
         PerfilAcesso perfilAnterior = user.getPerfil();
@@ -177,7 +182,7 @@ public class UsuarioAplicacaoServico {
         Boolean ativoAnterior = user.getActive();
 
         if (propriaConta && Boolean.FALSE.equals(dto.active())) {
-            throw new IllegalArgumentException("Não é permitido desativar a própria conta por esta tela.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Não é permitido desativar a própria conta por esta tela.");
         }
         if (Boolean.FALSE.equals(ativoAnterior) && Boolean.TRUE.equals(dto.active())) {
             throw new ResponseStatusException(HttpStatus.CONFLICT,
@@ -186,7 +191,7 @@ public class UsuarioAplicacaoServico {
 
         if (dto.email() != null) {
             String email = dto.email().trim().toLowerCase(Locale.ROOT);
-            if (email.isBlank()) throw new IllegalArgumentException("Informe o e-mail do usuário.");
+            if (email.isBlank()) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe o e-mail do usuário.");
             validarEmailInstitucional(email);
             if (userRepositorio.existsByEmailIgnoreCaseAndIdNot(email, user.getId())) {
                 throw new com.example.siggtrat.excecao.ExcecaoConflitoDados("E-mail já cadastrado.");
@@ -196,7 +201,7 @@ public class UsuarioAplicacaoServico {
         if (dto.active() != null) user.setActive(dto.active());
         if (dto.matricula() != null) {
             String matricula = UtilitarioMatricula.normalizar(dto.matricula());
-            if (matricula == null) throw new IllegalArgumentException("Informe a matrícula com 8 dígitos.");
+            if (matricula == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe a matrícula com 8 dígitos.");
             if (userRepositorio.existsByMatriculaAndIdNot(matricula, user.getId())) {
                 throw new com.example.siggtrat.excecao.ExcecaoConflitoDados("Matrícula já cadastrada.");
             }
@@ -206,7 +211,7 @@ public class UsuarioAplicacaoServico {
         PerfilAcesso perfilFinal = dto.perfil() != null ? dto.perfil() : user.getPerfil();
         validarPerfilQueGestorPodeCriar(gestor, perfilFinal);
         if (propriaConta && perfilAnterior != perfilFinal) {
-            throw new IllegalArgumentException("Não é permitido alterar o próprio perfil de acesso.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Não é permitido alterar o próprio perfil de acesso.");
         }
         user.setPerfil(perfilFinal);
 
@@ -223,10 +228,10 @@ public class UsuarioAplicacaoServico {
             aplicarEscoposGestao(user, List.of());
         } else if (shouldUpdateScopes) {
             List<VinculoGestaoUsuarioAplicacao> vinculos = resolverEscoposGestao(dto, user.getGestaoLocal());
-            if (vinculos.isEmpty()) throw new IllegalArgumentException("Informe ao menos uma lotação/turno para este usuário operacional.");
+            if (vinculos.isEmpty()) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe ao menos uma lotação/turno para este usuário operacional.");
             aplicarEscoposGestao(user, vinculos);
         } else if (userAccessScopeServico.obterEscopos(user).isEmpty()) {
-            throw new IllegalArgumentException("Informe ao menos uma lotação/turno para este usuário operacional.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe ao menos uma lotação/turno para este usuário operacional.");
         }
         userRepositorio.save(user);
         boolean acabouDeSerInativado = Boolean.TRUE.equals(ativoAnterior)
@@ -248,12 +253,12 @@ public class UsuarioAplicacaoServico {
     }
 
     public void redefinirSenha(Long id, RedefinicaoSenhaUsuarioAplicacaoDTO dto) {
-        if (dto == null) throw new IllegalArgumentException("Informe os dados da redefinição de senha.");
+        if (dto == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe os dados da redefinição de senha.");
         UsuarioAplicacao gestor = acessoOrganizacionalServico.usuarioAtual();
         UsuarioAplicacao user = obterUsuarioOuFalhar(id);
         exigirPodeGerenciar(gestor, user);
         if (Objects.equals(gestor.getId(), user.getId())) {
-            throw new IllegalArgumentException("Para alterar a própria senha, utilize a opção Meu perfil.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Para alterar a própria senha, utilize a opção Meu perfil.");
         }
 
         aplicarNovaSenhaAdministrativa(user, dto.newPassword(), true);
@@ -265,7 +270,7 @@ public class UsuarioAplicacaoServico {
         UsuarioAplicacao gestor = acessoOrganizacionalServico.usuarioAtual();
         UsuarioAplicacao user = obterUsuarioOuFalhar(id);
         if (Boolean.TRUE.equals(user.getActive())) {
-            throw new IllegalArgumentException("O usuário já está ativo.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O usuário já está ativo.");
         }
 
         // Solicitações públicas nascem com perfil OPERACIONAL e vinculadas à Gestão Local da
@@ -284,7 +289,7 @@ public class UsuarioAplicacaoServico {
             exigirPodeGerenciar(gestor, user);
         }
         if (Objects.equals(gestor.getId(), user.getId())) {
-            throw new IllegalArgumentException("A própria conta já está autenticada e não pode ser reativada por esta tela.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A própria conta já está autenticada e não pode ser reativada por esta tela.");
         }
         if (acessoOrganizacionalServico.ehGestorEstadual(user)
                 && user.getSuperintendencia() != null) {
@@ -322,7 +327,7 @@ public class UsuarioAplicacaoServico {
         UsuarioAplicacao user = obterUsuarioOuFalhar(id);
         exigirPodeGerenciar(gestor, user);
         if (Objects.equals(gestor.getId(), user.getId())) {
-            throw new IllegalArgumentException("Não é permitido desativar a própria conta.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Não é permitido desativar a própria conta.");
         }
         inativarUsuarioEHierarquia(user);
     }
@@ -426,23 +431,23 @@ public class UsuarioAplicacaoServico {
         if (perfil == PerfilAcesso.GESTOR_ESTADUAL) {
             Long targetId = superintendenciaId != null ? superintendenciaId
                     : user.getSuperintendencia() != null ? user.getSuperintendencia().getId() : null;
-            if (targetId == null) throw new IllegalArgumentException("Selecione a superintendência estadual deste usuário.");
+            if (targetId == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Selecione a superintendência estadual deste usuário.");
             SuperintendenciaEstadual se = superintendenciaRepositorio.findById(targetId)
-                    .orElseThrow(() -> new IllegalArgumentException("Gestor estadual inválido."));
+                    .orElseThrow(() -> new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Gestor estadual inválido."));
             user.setSuperintendencia(se); user.setGestaoLocal(null); return;
         }
 
         if (perfil == PerfilAcesso.GESTOR_LOCAL || perfil == PerfilAcesso.OPERACIONAL) {
             Long targetId = gestaoLocalId != null ? gestaoLocalId : user.getGestaoLocal() != null ? user.getGestaoLocal().getId() : null;
-            if (targetId == null) throw new IllegalArgumentException("Selecione a Gestão Local deste usuário.");
+            if (targetId == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Selecione a Gestão Local deste usuário.");
             GestaoLocal gestaoLocal = gestaoLocalRepositorio.findById(targetId)
-                    .orElseThrow(() -> new IllegalArgumentException("Gestão Local inválida."));
+                    .orElseThrow(() -> new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Gestão Local inválida."));
             if (!Boolean.TRUE.equals(gestaoLocal.getAtivo())) {
-                throw new IllegalArgumentException("A Gestão Local selecionada está inativa.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A Gestão Local selecionada está inativa.");
             }
             if (superintendenciaId != null && gestaoLocal.getSuperintendencia() != null
                     && !Objects.equals(superintendenciaId, gestaoLocal.getSuperintendencia().getId())) {
-                throw new IllegalArgumentException("A Gestão Local selecionada não pertence à Gestão Estadual informada.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A Gestão Local selecionada não pertence à Gestão Estadual informada.");
             }
             user.setGestaoLocal(gestaoLocal);
             user.setSuperintendencia(gestaoLocal.getSuperintendencia());
@@ -457,23 +462,23 @@ public class UsuarioAplicacaoServico {
             items = List.of(new AtualizacaoUsuarioAplicacaoDTO.VinculoGestaoDTO(dto.lotacaoId(), dto.jornadaId()));
         }
         if (items == null || items.isEmpty()) return List.of();
-        if (gestaoLocalUsuario == null) throw new IllegalArgumentException("O usuário operacional precisa estar vinculado a uma Gestão Local.");
+        if (gestaoLocalUsuario == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O usuário operacional precisa estar vinculado a uma Gestão Local.");
 
         List<VinculoGestaoUsuarioAplicacao> vinculos = new ArrayList<>();
         Set<String> unique = new LinkedHashSet<>();
         for (AtualizacaoUsuarioAplicacaoDTO.VinculoGestaoDTO item : items) {
             if (item == null || item.lotacaoId() == null || item.jornadaId() == null) {
-                throw new IllegalArgumentException("Cada vínculo operacional deve informar lotação e turno.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Cada vínculo operacional deve informar lotação e turno.");
             }
             Lotacao lotacao = lotacaoRepositorio.findById(item.lotacaoId())
-                    .orElseThrow(() -> new IllegalArgumentException("Lotação inválida."));
+                    .orElseThrow(() -> new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Lotação inválida."));
             if (lotacao.getGestaoLocal() == null || !Objects.equals(gestaoLocalUsuario.getId(), lotacao.getGestaoLocal().getId())) {
-                throw new IllegalArgumentException("A lotação selecionada não pertence à Gestão Local do usuário.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A lotação selecionada não pertence à Gestão Local do usuário.");
             }
             Jornada jornada = jornadaRepositorio.findById(item.jornadaId())
-                    .orElseThrow(() -> new IllegalArgumentException("Turno/Jornada inválido."));
+                    .orElseThrow(() -> new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Turno/Jornada inválido."));
             if (!jornadaPertenceLotacao(lotacao, jornada)) {
-                throw new IllegalArgumentException("O turno selecionado não está habilitado para a lotação informada.");
+                throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("O turno selecionado não está habilitado para a lotação informada.");
             }
             String key = item.lotacaoId() + ":" + item.jornadaId();
             if (unique.add(key)) vinculos.add(new VinculoGestaoUsuarioAplicacao(null, lotacao, jornada));
@@ -554,7 +559,7 @@ public class UsuarioAplicacaoServico {
     private void aplicarNovaSenhaAdministrativa(UsuarioAplicacao user, String novaSenha, boolean exigirTrocaNoProximoLogin) {
         validarNovaSenha(novaSenha);
         if (senhaCorresponde(novaSenha, user.getPassword())) {
-            throw new IllegalArgumentException("A nova senha deve ser diferente da senha atual do usuário.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A nova senha deve ser diferente da senha atual do usuário.");
         }
         user.setPassword(passwordEncoder.encode(novaSenha));
         user.setForceChangePassword(exigirTrocaNoProximoLogin);
@@ -564,10 +569,10 @@ public class UsuarioAplicacaoServico {
 
     private void validarNovaSenha(String novaSenha) {
         if (novaSenha == null || novaSenha.length() < passwordMinLength) {
-            throw new IllegalArgumentException("A nova senha deve ter no mínimo " + passwordMinLength + " caracteres.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A nova senha deve ter no mínimo " + passwordMinLength + " caracteres.");
         }
         if (novaSenha.length() > 72) {
-            throw new IllegalArgumentException("A nova senha deve ter no máximo 72 caracteres.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("A nova senha deve ter no máximo 72 caracteres.");
         }
     }
 
@@ -594,7 +599,7 @@ public class UsuarioAplicacaoServico {
 
     private void validarEmailInstitucional(String email) {
         if (email == null || !email.matches("^[a-z0-9._%+\\-]+@correios\\.com\\.br$")) {
-            throw new IllegalArgumentException("Informe um e-mail institucional @correios.com.br.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Informe um e-mail institucional @correios.com.br.");
         }
     }
 }

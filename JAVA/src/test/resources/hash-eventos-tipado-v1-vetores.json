@@ -1,0 +1,1100 @@
+{
+  "scope": "Fixture offline Python/struct/hashlib; produto e suíte não executados",
+  "formato": "SGT-EVENTOS-UTF8-TIPADO-V1",
+  "vectors": [
+    {
+      "id": "V_ORIGEM",
+      "dominio": "sgt.evento-vinculo.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "CRIACAO"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": null
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": null
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-30"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-001"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "52998224725"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Cadastro integrado de Pessoa, Vínculo e Alocação inicial"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "ENUM",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000177367742e6576656e746f2d76696e63756c6f2e62617365000000100100000000000501000000074352494143414f04010000000a323032362d30362d303104000000000004010000000a323032362d30362d303104000000000004010000000a323032362d30362d33300100000000000101000000074d41542d30303101010000000b353239393832323437323502010000000132020100000002343201010000003b436164617374726f20696e7465677261646f20646520506573736f612c2056c3ad6e63756c6f206520416c6f6361c3a7c3a36f20696e696369616c020000000000010000000000050000000000",
+      "sha256": "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158"
+    },
+    {
+      "id": "V_MATRICULA",
+      "dominio": "sgt.evento-vinculo.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158"
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "ALTERACAO_MATRICULA"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-15"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-30"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-30"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-001"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-002"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "52998224725"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Matrícula retificada"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "ENUM",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000177367742e6576656e746f2d76696e63756c6f2e626173650000001001010000004033313833323831346561623535643939653938626566656666633830383163343534613465666532346230313338626237303761666265643039396330313538050100000013414c5445524143414f5f4d4154524943554c4104010000000a323032362d30362d313504010000000a323032362d30362d303104010000000a323032362d30362d303104010000000a323032362d30362d333004010000000a323032362d30362d33300101000000074d41542d3030310101000000074d41542d30303201010000000b35323939383232343732350201000000013202010000000234320101000000154d617472c3ad63756c612072657469666963616461020000000000010000000000050000000000",
+      "sha256": "5d46cb8af0393e951ed8206c2ff4bc27bd9ee18656487fcb09cbd6445057a0d9"
+    },
+    {
+      "id": "V_EXCEDENTE",
+      "dominio": "sgt.evento-vinculo.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "INT64",
+          "valor": 10
+        },
+        {
+          "tipo": "INT64",
+          "valor": 11
+        },
+        {
+          "tipo": "INT64",
+          "valor": 12
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Excedente autorizado"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-TESTE"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-TESTE"
+        }
+      ],
+      "materialHex": "53475448000101010000001c7367742e6576656e746f2d76696e63756c6f2e6578636564656e74650000000a0101000000403331383332383134656162353564393965393862656665666663383038316334353461346566653234623031333862623730376166626564303939633031353802000000000002010000000231300201000000023131020100000002313203010000000131020100000001320101000000144578636564656e7465206175746f72697a61646f0101000000095345492d544553544501010000000941544f2d5445535445",
+      "sha256": "531972581e0b28a4a0209a07b5daa48afa62f44e53a9acb25090caca12266a81"
+    },
+    {
+      "id": "V_RETIFICACAO",
+      "dominio": "sgt.evento-vinculo.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "da592271d8bda4b296a16bf3ea870dbb4f1cb2429aa929119fd53651caa579a5"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 9
+        },
+        {
+          "tipo": "INT64",
+          "valor": 10
+        },
+        {
+          "tipo": "INT64",
+          "valor": 11
+        },
+        {
+          "tipo": "INT64",
+          "valor": 12
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Antecipação autorizada"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-TESTE"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-TESTE"
+        }
+      ],
+      "materialHex": "53475448000101010000001c7367742e6576656e746f2d76696e63756c6f2e6578636564656e74650000000a01010000004064613539323237316438626461346232393661313662663365613837306462623466316362323432396161393239313139666435333635316361613537396135020100000001390201000000023130020100000002313102010000000231320301000000013102010000000132010100000018416e746563697061c3a7c3a36f206175746f72697a6164610101000000095345492d544553544501010000000941544f2d5445535445",
+      "sha256": "9b57e83374e1565a74175fc2c98df0a526c480fa52b9c3f70b4043aaaee5eca6"
+    },
+    {
+      "id": "V_PRECEDENTE_ROMPIDO",
+      "dominio": "sgt.evento-vinculo.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "ALTERACAO_MATRICULA"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-15"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-30"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-30"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-001"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-002"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "52998224725"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Matrícula retificada"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "ENUM",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000177367742e6576656e746f2d76696e63756c6f2e626173650000001001010000004062626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262050100000013414c5445524143414f5f4d4154524943554c4104010000000a323032362d30362d313504010000000a323032362d30362d303104010000000a323032362d30362d303104010000000a323032362d30362d333004010000000a323032362d30362d33300101000000074d41542d3030310101000000074d41542d30303201010000000b35323939383232343732350201000000013202010000000234320101000000154d617472c3ad63756c612072657469666963616461020000000000010000000000050000000000",
+      "sha256": "7a900defc990a30ec1ff834f6ee08e68aad99cf06929968ce7f56d0cecafea83"
+    },
+    {
+      "id": "V_DESLIGAMENTO",
+      "dominio": "sgt.evento-vinculo.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158"
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "DESLIGAMENTO"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-20"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-30"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-20"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-001"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "MAT-001"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "52998224725"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Término documentado"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 71
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Desligamento sintético"
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "DESLIGAMENTO_INDIVIDUAL"
+        }
+      ],
+      "materialHex": "5347544800010101000000177367742e6576656e746f2d76696e63756c6f2e62617365000000100101000000403331383332383134656162353564393965393862656665666663383038316334353461346566653234623031333862623730376166626564303939633031353805010000000c4445534c4947414d454e544f04010000000a323032362d30362d323004010000000a323032362d30362d303104010000000a323032362d30362d303104010000000a323032362d30362d333004010000000a323032362d30362d32300101000000074d41542d3030310101000000074d41542d30303101010000000b353239393832323437323502010000000132020100000002343201010000001454c3a9726d696e6f20646f63756d656e7461646f02010000000237310101000000174465736c6967616d656e746f2073696e74c3a97469636f0501000000174445534c4947414d454e544f5f494e444956494455414c",
+      "sha256": "c3b627feaec1870bf721af7a9342b5f6a8c40050ad8c51126a13dee132b8633a"
+    },
+    {
+      "id": "A_ORIGEM",
+      "dominio": "sgt.evento-alocacao.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "CRIACAO"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": null
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": [
+            {
+              "tipo": "INT64",
+              "valor": 21
+            },
+            {
+              "tipo": "INT64",
+              "valor": 9
+            },
+            {
+              "tipo": "INT64",
+              "valor": 10
+            },
+            {
+              "tipo": "INT64",
+              "valor": 11
+            },
+            {
+              "tipo": "INT64",
+              "valor": 12
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-01"
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-30"
+            },
+            {
+              "tipo": "ENUM",
+              "valor": "REGISTRADA"
+            }
+          ]
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Cadastro integrado de Pessoa, Vínculo e Alocação inicial"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000187367742e6576656e746f2d616c6f636163616f2e62617365000000080100000000000501000000074352494143414f04010000000a323032362d30362d303106000000000006010000005b0000000802010000000232310201000000013902010000000231300201000000023131020100000002313204010000000a323032362d30362d303104010000000a323032362d30362d333005010000000a52454749535452414441020100000002343201010000003b436164617374726f20696e7465677261646f20646520506573736f612c2056c3ad6e63756c6f206520416c6f6361c3a7c3a36f20696e696369616c020000000000",
+      "sha256": "9da662f6783ad11cb3c34db55bd36f399b587f6b66bf441d2a724280c0bc1061"
+    },
+    {
+      "id": "A_TRANSFERENCIA",
+      "dominio": "sgt.evento-alocacao.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "9da662f6783ad11cb3c34db55bd36f399b587f6b66bf441d2a724280c0bc1061"
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "TRANSFERENCIA_GESTAO"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-15"
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": [
+            {
+              "tipo": "INT64",
+              "valor": 21
+            },
+            {
+              "tipo": "INT64",
+              "valor": 9
+            },
+            {
+              "tipo": "INT64",
+              "valor": 10
+            },
+            {
+              "tipo": "INT64",
+              "valor": 11
+            },
+            {
+              "tipo": "INT64",
+              "valor": 12
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-01"
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-30"
+            },
+            {
+              "tipo": "ENUM",
+              "valor": "REGISTRADA"
+            }
+          ]
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": [
+            {
+              "tipo": "INT64",
+              "valor": 22
+            },
+            {
+              "tipo": "INT64",
+              "valor": null
+            },
+            {
+              "tipo": "INT64",
+              "valor": 110
+            },
+            {
+              "tipo": "INT64",
+              "valor": 111
+            },
+            {
+              "tipo": "INT64",
+              "valor": 112
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-15"
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-30"
+            },
+            {
+              "tipo": "ENUM",
+              "valor": "REGISTRADA"
+            }
+          ]
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Transferência documentada"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 77
+        }
+      ],
+      "materialHex": "5347544800010101000000187367742e6576656e746f2d616c6f636163616f2e6261736500000008010100000040396461363632663637383361643131636233633334646235356264333666333939623538376636623636626634343164326137323432383063306263313036310501000000145452414e53464552454e4349415f47455354414f04010000000a323032362d30362d313506010000005b0000000802010000000232310201000000013902010000000231300201000000023131020100000002313204010000000a323032362d30362d303104010000000a323032362d30362d333005010000000a5245474953545241444106010000005d00000008020100000002323202000000000002010000000331313002010000000331313102010000000331313204010000000a323032362d30362d313504010000000a323032362d30362d333005010000000a52454749535452414441020100000002343201010000001a5472616e73666572c3aa6e63696120646f63756d656e746164610201000000023737",
+      "sha256": "99d66ffae8ece9c0a88ec87ebc31c09a63e3cedaa2c70436ab77f5cc66ce644f"
+    },
+    {
+      "id": "A_PRECEDENTE_ROMPIDO",
+      "dominio": "sgt.evento-alocacao.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "TRANSFERENCIA_GESTAO"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-15"
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": [
+            {
+              "tipo": "INT64",
+              "valor": 21
+            },
+            {
+              "tipo": "INT64",
+              "valor": 9
+            },
+            {
+              "tipo": "INT64",
+              "valor": 10
+            },
+            {
+              "tipo": "INT64",
+              "valor": 11
+            },
+            {
+              "tipo": "INT64",
+              "valor": 12
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-01"
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-30"
+            },
+            {
+              "tipo": "ENUM",
+              "valor": "REGISTRADA"
+            }
+          ]
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": [
+            {
+              "tipo": "INT64",
+              "valor": 22
+            },
+            {
+              "tipo": "INT64",
+              "valor": null
+            },
+            {
+              "tipo": "INT64",
+              "valor": 110
+            },
+            {
+              "tipo": "INT64",
+              "valor": 111
+            },
+            {
+              "tipo": "INT64",
+              "valor": 112
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-15"
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-30"
+            },
+            {
+              "tipo": "ENUM",
+              "valor": "REGISTRADA"
+            }
+          ]
+        },
+        {
+          "tipo": "INT64",
+          "valor": 42
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Transferência documentada"
+        },
+        {
+          "tipo": "INT64",
+          "valor": 77
+        }
+      ],
+      "materialHex": "5347544800010101000000187367742e6576656e746f2d616c6f636163616f2e6261736500000008010100000040626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262626262620501000000145452414e53464552454e4349415f47455354414f04010000000a323032362d30362d313506010000005b0000000802010000000232310201000000013902010000000231300201000000023131020100000002313204010000000a323032362d30362d303104010000000a323032362d30362d333005010000000a5245474953545241444106010000005d00000008020100000002323202000000000002010000000331313002010000000331313102010000000331313204010000000a323032362d30362d313504010000000a323032362d30362d333005010000000a52454749535452414441020100000002343201010000001a5472616e73666572c3aa6e63696120646f63756d656e746164610201000000023737",
+      "sha256": "089195cbc0a5fbc02bca9bda866ab3b69cf268bd669169b0565b995ea1e8c35f"
+    },
+    {
+      "id": "A_EXCEDENTE",
+      "dominio": "sgt.evento-alocacao.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "e3d45920a433acdd757e524252d1625eb39acdc7a21b6a095fb2dadad0333ea8"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "EXCEDENTE"
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-TESTE"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-TESTE"
+        }
+      ],
+      "materialHex": "53475448000101010000001d7367742e6576656e746f2d616c6f636163616f2e6578636564656e746500000006010100000040653364343539323061343333616364643735376535323432353264313632356562333961636463376132316236613039356662326461646164303333336561380101000000094558434544454e544503010000000131020100000001320101000000095345492d544553544501010000000941544f2d5445535445",
+      "sha256": "0afbadb8415cb0b90f798046fc2d330c35ac1a1a3e6ac7319b7a525382b5f289"
+    },
+    {
+      "id": "A_ETAPA07",
+      "dominio": "sgt.evento-alocacao.base",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "ENUM",
+          "valor": "CRIACAO"
+        },
+        {
+          "tipo": "DATA",
+          "valor": "2026-06-01"
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": null
+        },
+        {
+          "tipo": "GRUPO",
+          "valor": [
+            {
+              "tipo": "INT64",
+              "valor": 21
+            },
+            {
+              "tipo": "INT64",
+              "valor": 9
+            },
+            {
+              "tipo": "INT64",
+              "valor": 10
+            },
+            {
+              "tipo": "INT64",
+              "valor": 11
+            },
+            {
+              "tipo": "INT64",
+              "valor": 12
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-01"
+            },
+            {
+              "tipo": "DATA",
+              "valor": "2026-06-30"
+            },
+            {
+              "tipo": "ENUM",
+              "valor": "REGISTRADA"
+            }
+          ]
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000187367742e6576656e746f2d616c6f636163616f2e62617365000000080100000000000501000000074352494143414f04010000000a323032362d30362d303106000000000006010000005b0000000802010000000232310201000000013902010000000231300201000000023131020100000002313204010000000a323032362d30362d303104010000000a323032362d30362d333005010000000a52454749535452414441020000000000010000000000020000000000",
+      "sha256": "bf1af6114caa42eafbfbbb5a6b54219b469ae2b5790f906c12cd8468bd39a1d6"
+    },
+    {
+      "id": "V_COMPENSATORIO_A",
+      "dominio": "sgt.evento-vinculo.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "INT64",
+          "valor": 10
+        },
+        {
+          "tipo": "INT64",
+          "valor": 11
+        },
+        {
+          "tipo": "INT64",
+          "valor": 12
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Excedente autorizado"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-X|ATO-Y"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-Z"
+        }
+      ],
+      "materialHex": "53475448000101010000001c7367742e6576656e746f2d76696e63756c6f2e6578636564656e74650000000a0101000000403331383332383134656162353564393965393862656665666663383038316334353461346566653234623031333862623730376166626564303939633031353802000000000002010000000231300201000000023131020100000002313203010000000131020100000001320101000000144578636564656e7465206175746f72697a61646f01010000000b5345492d587c41544f2d5901010000000541544f2d5a",
+      "sha256": "0c53a52ed430baaf17937923286709b2a22833b3b360807441d8ee2068c64b84"
+    },
+    {
+      "id": "V_COMPENSATORIO_B",
+      "dominio": "sgt.evento-vinculo.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "31832814eab55d99e98befeffc8081c454a4efe24b0138bb707afbed099c0158"
+        },
+        {
+          "tipo": "INT64",
+          "valor": null
+        },
+        {
+          "tipo": "INT64",
+          "valor": 10
+        },
+        {
+          "tipo": "INT64",
+          "valor": 11
+        },
+        {
+          "tipo": "INT64",
+          "valor": 12
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "Excedente autorizado"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-X"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-Y|ATO-Z"
+        }
+      ],
+      "materialHex": "53475448000101010000001c7367742e6576656e746f2d76696e63756c6f2e6578636564656e74650000000a0101000000403331383332383134656162353564393965393862656665666663383038316334353461346566653234623031333862623730376166626564303939633031353802000000000002010000000231300201000000023131020100000002313203010000000131020100000001320101000000144578636564656e7465206175746f72697a61646f0101000000055345492d5801010000000b41544f2d597c41544f2d5a",
+      "sha256": "b1c60dfe36cc5078a99e417b62ffa9b8b0a1891806e5ca21bd1087d398dcec82"
+    },
+    {
+      "id": "A_COMPENSATORIO_A",
+      "dominio": "sgt.evento-alocacao.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "e3d45920a433acdd757e524252d1625eb39acdc7a21b6a095fb2dadad0333ea8"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "EXCEDENTE"
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-X|ATO-Y"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-Z"
+        }
+      ],
+      "materialHex": "53475448000101010000001d7367742e6576656e746f2d616c6f636163616f2e6578636564656e746500000006010100000040653364343539323061343333616364643735376535323432353264313632356562333961636463376132316236613039356662326461646164303333336561380101000000094558434544454e5445030100000001310201000000013201010000000b5345492d587c41544f2d5901010000000541544f2d5a",
+      "sha256": "1b535f3c7e31de5686a486d1908b865a5d5ec92607e2f92f7e64481f979c3020"
+    },
+    {
+      "id": "A_COMPENSATORIO_B",
+      "dominio": "sgt.evento-alocacao.excedente",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "e3d45920a433acdd757e524252d1625eb39acdc7a21b6a095fb2dadad0333ea8"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "EXCEDENTE"
+        },
+        {
+          "tipo": "INT32",
+          "valor": 1
+        },
+        {
+          "tipo": "INT64",
+          "valor": 2
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "SEI-X"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "ATO-Y|ATO-Z"
+        }
+      ],
+      "materialHex": "53475448000101010000001d7367742e6576656e746f2d616c6f636163616f2e6578636564656e746500000006010100000040653364343539323061343333616364643735376535323432353264313632356562333961636463376132316236613039356662326461646164303333336561380101000000094558434544454e544503010000000131020100000001320101000000055345492d5801010000000b41544f2d597c41544f2d5a",
+      "sha256": "5f9973e80a8263e5d544846543a242ff6c8ea7f26370412c4f53c91a12f1df4b"
+    },
+    {
+      "id": "UNICODE",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "é🙂|A"
+        },
+        {
+          "tipo": "TEXTO",
+          "valor": "é"
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e74656972617300000002010100000008c3a9f09f99827c4101010000000365cc81",
+      "sha256": "a18947dde05edb799f64a3c9f0a1ba61341627800d1914ccfd6cb3e710f497ec"
+    },
+    {
+      "id": "NULO_TEXTO",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e74656972617300000001010000000000",
+      "sha256": "bb6119c62f1eaa61fe3dce4618d096083668651ff384c9314779e2903d1ff404"
+    },
+    {
+      "id": "VAZIO",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": ""
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e74656972617300000001010100000000",
+      "sha256": "cab8ec749e38c321be38169a36bfaeda0d7a4629e71a0296a0ec998736e764c5"
+    },
+    {
+      "id": "LITERAL_NULL",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "null"
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e746569726173000000010101000000046e756c6c",
+      "sha256": "dcca04cf1c6a91898330ec631a67413f6a75dd6eff7d0fa61ed6d3be0cef88ab"
+    },
+    {
+      "id": "LITERAL_ANGULOS",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "<null>"
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e746569726173000000010101000000063c6e756c6c3e",
+      "sha256": "52868d428a508e3b74fd08412074eed55c53127c4ad0da1a23932acae442bae1"
+    },
+    {
+      "id": "NULO_INT64",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "INT64",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e74656972617300000001020000000000",
+      "sha256": "6adba767babf2aa99b101ac2749734f3c30cfd92b3685be17a90f5f5ab8b7bc3"
+    },
+    {
+      "id": "TEXTO_1",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "1"
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e7465697261730000000101010000000131",
+      "sha256": "0168dbaddb5247f0b1c35cc8bc15b17ba6b17b3891775b14d5411573f61377b4"
+    },
+    {
+      "id": "INT32_1",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "INT32",
+          "valor": 1
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e7465697261730000000103010000000131",
+      "sha256": "ba8937fd8dae5dcd4ac7367cc2fd009c6a21e06b875c6318e4c334bcc29cbf2b"
+    },
+    {
+      "id": "PIPE_E_US",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "A|B\u001fC:0"
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e74656972617300000001010100000007417c421f433a30",
+      "sha256": "e8a9d8405c5ac21d4961a6769947b8b7f51fa34a0209399f2420fed006af59bd"
+    },
+    {
+      "id": "GRUPO_NULO",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "GRUPO",
+          "valor": null
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e74656972617300000001060000000000",
+      "sha256": "d13e87d547f3911fd5b25fea9992a045285812ab60905f5d2190b875d1513ea4"
+    },
+    {
+      "id": "GRUPO_VAZIO",
+      "dominio": "sgt.fixture.fronteiras",
+      "campos": [
+        {
+          "tipo": "GRUPO",
+          "valor": []
+        }
+      ],
+      "materialHex": "5347544800010101000000167367742e666978747572652e66726f6e7465697261730000000106010000000400000000",
+      "sha256": "8f4f347219b264f578403716c39c642b76fc3e00590192af7e63f03543556f9a"
+    },
+    {
+      "id": "DOMINIO_A",
+      "dominio": "sgt.fixture.a",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "mesmo"
+        }
+      ],
+      "materialHex": "53475448000101010000000d7367742e666978747572652e61000000010101000000056d65736d6f",
+      "sha256": "65b3b7ee8f0440cfb19c96fde6ecaa1848fac63e5241949ae02df486b7dfc0db"
+    },
+    {
+      "id": "DOMINIO_B",
+      "dominio": "sgt.fixture.b",
+      "campos": [
+        {
+          "tipo": "TEXTO",
+          "valor": "mesmo"
+        }
+      ],
+      "materialHex": "53475448000101010000000d7367742e666978747572652e62000000010101000000056d65736d6f",
+      "sha256": "dada4d40b5a265237a4926b43668b31300b94288e5496bb07d495710be78c557"
+    }
+  ]
+}

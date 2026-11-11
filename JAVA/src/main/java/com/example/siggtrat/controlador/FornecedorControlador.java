@@ -16,7 +16,11 @@ import java.util.List;
 @RestController
 @RequestMapping("/api")
 @PreAuthorize("hasAuthority('PERFIL_GESTOR_LOCAL')")
-public class FornecedorControlador {
+public class FornecedorControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(FornecedorControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final FornecedorServico servico;
 
     public FornecedorControlador(FornecedorServico servico) {

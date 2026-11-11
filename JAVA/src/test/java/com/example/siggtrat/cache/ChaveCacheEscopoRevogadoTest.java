@@ -17,7 +17,7 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
 
-/** A chave é uma regra pura; MySQL/Redis e a revogação real são verificados nos ITs. */
+/** A chave é uma regra pura; PostgreSQL/Redis e a revogação real são verificados nos ITs. */
 class ChaveCacheEscopoRevogadoTest {
     @AfterEach void limpar() { SecurityContextHolder.clearContext(); }
 

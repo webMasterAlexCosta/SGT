@@ -26,7 +26,11 @@ import java.util.*;
  */
 @Service
 @Transactional(readOnly = true)
-public class DocumentoComprobatorioServico {
+public class DocumentoComprobatorioServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(DocumentoComprobatorioServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private static final Set<String> EXTENSOES = Set.of("pdf", "png", "jpg", "jpeg", "doc", "docx", "xls", "xlsx");
     private static final Map<String, String> MIME_POR_EXTENSAO = Map.ofEntries(
             Map.entry("pdf", "application/pdf"),
@@ -651,11 +655,12 @@ public class DocumentoComprobatorioServico {
             throw new ResponseStatusException(HttpStatus.UNSUPPORTED_MEDIA_TYPE,
                     "Tipo MIME não corresponde à extensão do arquivo.");
         }
+        Path temporario = null;
         try {
             Files.createDirectories(armazenamento);
             Files.createDirectories(temporarios);
             String nomeArmazenado = UUID.randomUUID() + "." + extensao;
-            Path temporario = temporarios.resolve(UUID.randomUUID() + ".upload").normalize();
+            temporario = temporarios.resolve(UUID.randomUUID() + ".upload").normalize();
             Path definitivo = resolverArquivo(nomeArmazenado);
             MessageDigest digest = MessageDigest.getInstance("SHA-256");
             try (InputStream in = new DigestInputStream(arquivo.getInputStream(), digest)) {
@@ -675,6 +680,9 @@ public class DocumentoComprobatorioServico {
         } catch (Exception ex) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR,
                     "Não foi possível armazenar o documento com segurança.", ex);
+        } finally {
+            // Falhas de leitura, fechamento ou movimentação também deixam de publicar bytes.
+            if (temporario != null) excluirArquivoComDiagnostico(temporario);
         }
     }
 
@@ -707,7 +715,7 @@ public class DocumentoComprobatorioServico {
         try {
             return documentoRepositorio.save(documento);
         } catch (RuntimeException ex) {
-            if (preparado != null) excluirSilenciosamente(preparado.caminho());
+            if (preparado != null) excluirArquivoComDiagnostico(preparado.caminho());
             throw ex;
         }
     }
@@ -1035,23 +1043,28 @@ public class DocumentoComprobatorioServico {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) return;
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
             @Override public void afterCompletion(int status) {
-                if (status != STATUS_COMMITTED) excluirSilenciosamente(arquivo);
+                if (status != STATUS_COMMITTED) excluirArquivoComDiagnostico(arquivo);
             }
         });
     }
 
     private void registrarExclusaoAposCommit(Path arquivo) {
         if (!TransactionSynchronizationManager.isSynchronizationActive()) {
-            excluirSilenciosamente(arquivo);
+            excluirArquivoComDiagnostico(arquivo);
             return;
         }
         TransactionSynchronizationManager.registerSynchronization(new TransactionSynchronization() {
-            @Override public void afterCommit() { excluirSilenciosamente(arquivo); }
+            @Override public void afterCommit() { excluirArquivoComDiagnostico(arquivo); }
         });
     }
 
-    private void excluirSilenciosamente(Path arquivo) {
-        try { Files.deleteIfExists(arquivo); } catch (IOException ignored) { }
+    private void excluirArquivoComDiagnostico(Path arquivo) {
+        try {
+            Files.deleteIfExists(arquivo);
+        } catch (IOException erro) {
+            com.example.siggtrat.diagnostico.DiagnosticoFalha.registrar(
+                    LOG_DIAGNOSTICO, "DocumentoComprobatorioServico.excluirArquivo", erro);
+        }
     }
 
     private Path resolverArquivo(String nome) {

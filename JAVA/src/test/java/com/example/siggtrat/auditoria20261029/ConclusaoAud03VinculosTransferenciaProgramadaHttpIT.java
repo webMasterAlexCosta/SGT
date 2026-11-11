@@ -23,7 +23,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * AUD-03: reprodução dos recortes de vínculos cadastrados após a transferência documentada.
- * Reutilizam o contexto MySQL real do projeto. Não possuem DDL nem mocks de dados.
+ * Reutilizam o contexto PostgreSQL real do projeto. Não possuem DDL nem mocks de dados.
  * Cada consulta emTransacao é posterior ao commit do comando HTTP, porque a
  * classe não abre transação de teste envolvendo as requisições.
  */
@@ -211,7 +211,8 @@ class ConclusaoAud03VinculosTransferenciaProgramadaHttpIT extends ContratosHttpB
         });
         LocalDate data = RelogioSistema.hoje().plusDays(futura ? 5 : -5);
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(
+        enviar(c.localA, base(n.id()) + "/transferir-gestao", mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", 
                 "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(),
                 "motivo", "Ato de transferência anterior ao cadastro ou correção do vínculo",

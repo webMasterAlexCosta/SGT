@@ -15,8 +15,8 @@ import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 
-@DisplayName("Integração MySQL: contrato do schema Hibernate")
-class DatabaseSchemaContractIT extends MySqlIntegrationTestSupport {
+@DisplayName("Integração PostgreSQL: contrato do schema Hibernate")
+class DatabaseSchemaContractIT extends PostgresIntegrationTestSupport {
 
     @Autowired
     private EntityManager entityManager;
@@ -120,7 +120,7 @@ class DatabaseSchemaContractIT extends MySqlIntegrationTestSupport {
             }
         }
 
-        assertTrue(falhas.isEmpty(), () -> "Divergências entre JPA e MySQL:\n" + String.join("\n", falhas));
+        assertTrue(falhas.isEmpty(), () -> "Divergências entre JPA e PostgreSQL:\n" + String.join("\n", falhas));
     }
 
     private static void validarJoinTable(DatabaseMetaData md, String catalog, JoinTable joinTable,

@@ -1,8 +1,8 @@
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { act, cleanup, render } from '@testing-library/react';
-import { ProvedorExportacaoRelatorio, useExportacaoRelatorio } from '../src/core/exportacao/context.jsx';
-import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.js';
+import { ProvedorExportacaoRelatorio, useExportacaoRelatorio } from '../src/core/exportacao/context.tsx';
+import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao.ts';
 const { servico } = vi.hoisted(() => ({ servico: { solicitarFrequencia: vi.fn(), solicitarAbsenteismo: vi.fn(), solicitarTerceirizados: vi.fn(), consultar: vi.fn(), obterUrlDownload: id => `/arquivo-sintetico/${id}` } }));
 vi.mock('../src/core/exportacao/ServicoExportacaoRelatorio', () => ({ ServicoExportacaoRelatorio: servico }));
 vi.mock('../src/core/exportacao/PainelExportacoes', () => ({ PainelExportacoes: () => null }));

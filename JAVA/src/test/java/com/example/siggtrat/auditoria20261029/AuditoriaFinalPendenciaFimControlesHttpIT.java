@@ -43,6 +43,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class AuditoriaFinalPendenciaFimControlesHttpIT extends ContratosHttpBase {
+    @org.springframework.beans.factory.annotation.Autowired private javax.sql.DataSource dataSourceObservador;
     @Autowired FilaRegistroAuditoria fila;
     @Autowired MotorTemporalContratoServico motor;
     @Autowired GestaoContratoTemporalServico gestaoTemporal;
@@ -226,73 +227,55 @@ class AuditoriaFinalPendenciaFimControlesHttpIT extends ContratosHttpBase {
         // Preparar a sessão no thread chamador evita disputa no cache da fixture.
         var primeira = autenticar(get(rota), c.localA);
         var segunda = autenticar(get(rota), c.localA);
-        var executor = Executors.newFixedThreadPool(2);
-        var prontas = new CountDownLatch(2);
-        var iniciar = new CountDownLatch(1);
+        var executor = Executors.newFixedThreadPool(3);
+        var prontas = new CountDownLatch(2);var iniciar = new CountDownLatch(1);
+        var liberarRaiz = new CountDownLatch(1);var raizPid = new java.util.concurrent.CompletableFuture<Long>();
+        var atorA=new com.example.siggtrat.infra.ObservadorAtorPostgres.Ator("recorrencia-A");
+        var atorB=new com.example.siggtrat.infra.ObservadorAtorPostgres.Ator("recorrencia-B");
         try {
-            List<Future<MvcResult>> respostas = tx(() -> {
-                em.find(Contrato.class, contratoId, LockModeType.PESSIMISTIC_WRITE);
-                long conexao = ((Number) em.createNativeQuery("select connection_id()")
-                        .getSingleResult()).longValue();
-                var a = executor.submit(() -> {
-                    try (var relogio = Mockito.mockStatic(RelogioSistema.class, Mockito.CALLS_REAL_METHODS)) {
-                        relogio.when(RelogioSistema::hoje).thenReturn(hoje);
-                        prontas.countDown();
-                        assertThat(iniciar.await(10, TimeUnit.SECONDS)).as("Barreira do primeiro HTTP").isTrue();
-                        return mvc.perform(primeira).andReturn();
-                    }
-                });
-                var b = executor.submit(() -> {
-                    try (var relogio = Mockito.mockStatic(RelogioSistema.class, Mockito.CALLS_REAL_METHODS)) {
-                        relogio.when(RelogioSistema::hoje).thenReturn(hoje);
-                        prontas.countDown();
-                        assertThat(iniciar.await(10, TimeUnit.SECONDS)).as("Barreira do segundo HTTP").isTrue();
-                        return mvc.perform(segunda).andReturn();
-                    }
-                });
-                assertThat(prontas.await(10, TimeUnit.SECONDS)).as("Ambos os workers prontos").isTrue();
-                iniciar.countDown();
-                // A sincronização percorre todos os candidatos em ordem. Um
-                // worker pode aguardar o outro num contrato anterior ao alvo.
-                // A cadeia de espera enraizada neste lock comprova ambos os
-                // pedidos bloqueados, sem exigir duas esperas diretas no alvo.
-                long limite = System.nanoTime() + TimeUnit.SECONDS.toNanos(10);
-                long esperas = 0;
-                do {
-                    esperas = ((Number) em.createNativeQuery("""
-                            with recursive esperas (thread_id) as (
-                                select e.REQUESTING_THREAD_ID
-                                from performance_schema.data_lock_waits e
-                                join performance_schema.threads b on b.THREAD_ID=e.BLOCKING_THREAD_ID
-                                where b.PROCESSLIST_ID=:conexao
-                                union distinct
-                                select e.REQUESTING_THREAD_ID
-                                from performance_schema.data_lock_waits e
-                                join esperas anterior on e.BLOCKING_THREAD_ID=anterior.thread_id
-                            )
-                            select count(distinct thread_id) from esperas
-                            """).setParameter("conexao", conexao).getSingleResult()).longValue();
-                    assertThat(a.isDone()).as("Primeiro HTTP não ultrapassa o lock antes da liberação").isFalse();
-                    assertThat(b.isDone()).as("Segundo HTTP não ultrapassa o lock antes da liberação").isFalse();
-                    if (esperas >= 2) break;
-                    TimeUnit.MILLISECONDS.sleep(20);
-                } while (System.nanoTime() < limite);
-                assertThat(esperas).as("Duas conexões aguardam na cadeia do contrato bloqueado no MySQL")
-                        .isGreaterThanOrEqualTo(2);
-                return List.of(a, b);
-            }); // O commit solta o lock; as duas rotas confirmam transações próprias.
-            var primeiraResposta = respostas.get(0).get(20, TimeUnit.SECONDS);
-            var segundaResposta = respostas.get(1).get(20, TimeUnit.SECONDS);
+            var raiz=executor.submit(()->tx(()->{
+                em.find(Contrato.class,contratoId,LockModeType.PESSIMISTIC_WRITE);
+                raizPid.complete(((Number)em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
+                try { if(!liberarRaiz.await(30,TimeUnit.SECONDS))throw new AssertionError("Contrato da recorrência não liberado"); }
+                catch(InterruptedException e){Thread.currentThread().interrupt();throw new IllegalStateException(e);}
+                return null;
+            }));
+            long conexao=raizPid.get(10,TimeUnit.SECONDS);
+            var a=executor.submit(()->atorA.executar(()->{
+                try(var relogio=Mockito.mockStatic(RelogioSistema.class,Mockito.CALLS_REAL_METHODS)) {
+                    relogio.when(RelogioSistema::hoje).thenReturn(hoje);prontas.countDown();
+                    assertThat(iniciar.await(10,TimeUnit.SECONDS)).as("Barreira do primeiro HTTP").isTrue();
+                    return mvc.perform(primeira).andReturn();
+                }
+            }));
+            var b=executor.submit(()->atorB.executar(()->{
+                try(var relogio=Mockito.mockStatic(RelogioSistema.class,Mockito.CALLS_REAL_METHODS)) {
+                    relogio.when(RelogioSistema::hoje).thenReturn(hoje);prontas.countDown();
+                    assertThat(iniciar.await(10,TimeUnit.SECONDS)).as("Barreira do segundo HTTP").isTrue();
+                    return mvc.perform(segunda).andReturn();
+                }
+            }));
+            assertThat(prontas.await(10,TimeUnit.SECONDS)).as("Ambos os workers prontos").isTrue();iniciar.countDown();
+            // Observação fora da transação bloqueadora: cada sondagem lê os estados atuais.
+            // A rota já filtra este contrato antes da seleção/paginação dos candidatos.
+            com.example.siggtrat.infra.EsperaJdbcPostgres.aguardarAmbos(
+                    new org.springframework.jdbc.core.JdbcTemplate(dataSourceObservador),conexao,
+                    atorA,sql->sql.selecaoChave("contrato","id_contrato",contratoId),
+                    atorB,sql->sql.selecaoChave("contrato","id_contrato",contratoId),
+                    "contrato/"+contratoId,a,b);
+            assertThat(a.isDone()).as("Primeiro HTTP ainda bloqueado").isFalse();
+            assertThat(b.isDone()).as("Segundo HTTP ainda bloqueado").isFalse();
+            liberarRaiz.countDown();raiz.get(10,TimeUnit.SECONDS);
+            var primeiraResposta=a.get(20,TimeUnit.SECONDS);var segundaResposta=b.get(20,TimeUnit.SECONDS);
             assertAll(
                     () -> assertThat(primeiraResposta.getResponse().getStatus())
-                            .as("Primeiro HTTP: %s", primeiraResposta.getResponse().getContentAsString()).isEqualTo(200),
+                            .as("Primeiro HTTP: %s",primeiraResposta.getResponse().getContentAsString()).isEqualTo(200),
                     () -> assertThat(segundaResposta.getResponse().getStatus())
-                            .as("Segundo HTTP: %s", segundaResposta.getResponse().getContentAsString()).isEqualTo(200));
-            return List.of(dados(primeiraResposta), dados(segundaResposta));
+                            .as("Segundo HTTP: %s",segundaResposta.getResponse().getContentAsString()).isEqualTo(200));
+            return List.of(dados(primeiraResposta),dados(segundaResposta));
         } finally {
-            iniciar.countDown();
-            executor.shutdownNow();
-            assertThat(executor.awaitTermination(5, TimeUnit.SECONDS)).as("Workers encerrados").isTrue();
+            iniciar.countDown();liberarRaiz.countDown();executor.shutdown();
+            assertThat(executor.awaitTermination(20,TimeUnit.SECONDS)).as("Workers encerrados").isTrue();
         }
     }
 

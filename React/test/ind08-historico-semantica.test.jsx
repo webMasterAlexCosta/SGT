@@ -6,7 +6,7 @@ import { cleanup, fireEvent, render, screen, within } from '@testing-library/rea
 import '@testing-library/jest-dom/vitest';
 import {
   PublicacaoOriginal, ResultadoCatalogo, ResultadoContrato, ResultadoNome,
-} from '../src/modules/historico/ResultadosHistoricos.jsx';
+} from '../src/modules/historico/ResultadosHistoricos.tsx';
 
 afterEach(cleanup);
 

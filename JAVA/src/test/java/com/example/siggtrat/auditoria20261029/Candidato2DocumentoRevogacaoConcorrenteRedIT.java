@@ -28,7 +28,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Revisor independente; duas transações MySQL reais, sem mock de banco/autorização. */
+/** Revisor independente; duas transações PostgreSQL reais, sem mock de banco/autorização. */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 @Import(Candidato2DocumentoRevogacaoConcorrenteRedIT.Configuracao.class)
 class Candidato2DocumentoRevogacaoConcorrenteRedIT extends ContratosHttpBase {
@@ -69,14 +69,12 @@ class Candidato2DocumentoRevogacaoConcorrenteRedIT extends ContratosHttpBase {
             while (System.nanoTime() < limite) {
                 if (revogacao.isDone()) { concluidaAntes = true; break; }
                 long esperas = emTransacao(() -> ((Number) em.createNativeQuery("""
-                        select count(*) from performance_schema.data_lock_waits espera
-                        join performance_schema.threads bloqueador on bloqueador.THREAD_ID=espera.BLOCKING_THREAD_ID
-                        where bloqueador.PROCESSLIST_ID=:conexao
-                        """).setParameter("conexao", conexao).getSingleResult()).longValue());
+SELECT count(*) FROM pg_stat_activity a WHERE a.datname=current_database() AND :conexao = ANY(pg_blocking_pids(a.pid))
+""").setParameter("conexao", conexao).getSingleResult()).longValue());
                 if (esperas > 0) { esperaReal = true; break; }
                 TimeUnit.MILLISECONDS.sleep(30);
             }
-            assertTrue(concluidaAntes || esperaReal, "Deve haver commit ou espera real observada no MySQL.");
+            assertTrue(concluidaAntes || esperaReal, "Deve haver commit ou espera real observada no PostgreSQL.");
             if (concluidaAntes) {
                 assertEquals(200, revogacao.get(1, TimeUnit.SECONDS).getResponse().getStatus());
                 emTransacao(() -> {
@@ -136,7 +134,7 @@ class Candidato2DocumentoRevogacaoConcorrenteRedIT extends ContratosHttpBase {
             if (usuarioId != null && usuarioId.equals(chamada.getArgs()[1]) && ativa.compareAndSet(true, false)) {
                 assertTrue(resultado instanceof List<?> lista && lista.stream().anyMatch(
                         p -> p instanceof PermissaoDocumentoRestrito x && permissaoId.equals(x.getId())));
-                consulta.complete(((Number) em.createNativeQuery("select connection_id()").getSingleResult()).longValue());
+                consulta.complete(((Number) em.createNativeQuery("select pg_backend_pid()").getSingleResult()).longValue());
                 if (!liberar.await(30, TimeUnit.SECONDS)) throw new AssertionError("Barreira documental não liberada.");
             }
             return resultado;

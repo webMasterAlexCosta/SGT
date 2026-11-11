@@ -1,0 +1,118 @@
+{
+  "date_local": "2026-11-06",
+  "timezone": "America/Sao_Paulo",
+  "project": "SGT",
+  "base_commit": "0b03c5c8228ae5e4ac88e4c7e50cb2f9d15438a0",
+  "toolchain": {
+    "node": "26.13.0",
+    "npm": "12.2.2",
+    "java_release": 25,
+    "verified_jdk": "25.0.4.1",
+    "spring_boot": "4.1.2",
+    "maven_wrapper": "3.9.16"
+  },
+  "frontend_versions_preserved": {
+    "react": "19.2.5",
+    "react-dom": "19.2.5",
+    "vite": "8.2.4",
+    "react-router-dom": "7.18.3",
+    "typescript": "5.9.3",
+    "eslint": null,
+    "vitest": "4.1.12"
+  },
+  "all_locked_frontend_dependency_versions_origins_and_integrity_preserved": true,
+  "lockfile_version": 3,
+  "application_classes_release25_without_preview": 821,
+  "jar_sha256": "89f5e013ba683c0f0d49430b5b4435d6d954668010fef86733e2c4ef664f5ead",
+  "current_dist_files_verified_inside_jar": 100,
+  "http_smoke": {
+    "project": "SGT",
+    "root": 200,
+    "deep_route": {
+      "path": "/contratos",
+      "status": 200
+    },
+    "assets_verified": 10,
+    "api_unauthenticated_status": 401,
+    "jar_sha256": "89f5e013ba683c0f0d49430b5b4435d6d954668010fef86733e2c4ef664f5ead",
+    "java_release": 25,
+    "database_scope": "fresh isolated PostgreSQL18.6 only"
+  },
+  "preservation": {
+    "existing_databases_not_accessed_or_modified": true,
+    "private_dotenv_not_read_or_modified": true,
+    "historical_artifacts_not_replaced": true,
+    "existing_production_java_and_frontend_source_unchanged": true,
+    "no_commit_push_deploy_branch_or_worktree": true
+  },
+  "limitations": [
+    "Validação de persistência somente em recursos novos/isolados; não migra acervos existentes.",
+    "Smoke HTTP não substitui homologação institucional nem jornadas completas no navegador.",
+    "Skills pessoais validadas estruturalmente; nenhuma tarefa/agente de revisão independente foi criado."
+  ],
+  "java_unit_tests": {
+    "tests": 716,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "gate": {
+      "command": [
+        "bash",
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-T1",
+        "-Dmaven.repo.local=/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/maven-repository",
+        "package"
+      ],
+      "exit_code": 0,
+      "log_sha256": "fbbdf8adc35cbf238e95c960011327ec6cf13b34665b6535d18617154b6d7ca0"
+    }
+  },
+  "selected_integration_tests": {
+    "tests": 31,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0,
+    "gate": {
+      "command": [
+        "python3",
+        "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/isolated_sgt_it.py",
+        "--classes",
+        "PostgresMappingRoundTripIT,PostgresMembershipGraphIT,Postgres186AmbienteHttpIT,AutenticacaoSessaoUnicaIT,TokenRevogacaoReadCommittedPostgresIT,ConclusaoCacheRedisRealHttpIT,ObservacaoAtoresLocksPostgresIT,AutenticacaoPerfilContratoHttpIT,IdentidadeCanonicaAposEsperaPostgresIT,CacheRotasRetiradasRedisHttpIT",
+        "--redis"
+      ],
+      "exit_code": 0,
+      "log_sha256": "36139cc323898b35765e0032cd6686d04c70c04cd644f9d916bd012bd8203c34"
+    }
+  },
+  "frontend": {
+    "preparation_tests": 6,
+    "vitest_tests": 767,
+    "vitest_files": 101,
+    "typecheck": true,
+    "coverage_measured": true,
+    "build": true,
+    "lint": "Não existe script lint na baseline; nenhuma aprovação inventada.",
+    "gate": {
+      "command": [
+        "python3",
+        "/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/public_frontend_env.py",
+        "npm",
+        "run",
+        "test:completo"
+      ],
+      "exit_code": 0,
+      "log_sha256": "f51978dfda231c55cfd3fd02ec30c65547c488d70821daea3650414d1d4e1818"
+    }
+  },
+  "mandatory_compatibility_changes": [
+    "BOM Boot4.1.2: Framework7.0.10/Security7.1.2/Hibernate7.4.13.Final/Tomcat11.0.27.",
+    "Netty4.2.19.Final do BOM substitui override4.1.137.Final incompatível com Lettuce7.5.2.RELEASE.",
+    "Jackson2.21.7 preservado via módulo compatível e prefixos spring.jackson2.*.",
+    "Spring Retry2.0.13 preservado com versão explícita.",
+    "Helpers MockMvc e fixture de publicação imediata adaptados à API/contrato atual, mantendo asserções."
+  ],
+  "older_static_resources_preserved": 47,
+  "redis_validation_server": "Valkey9.0.7 local compatível com Redis; não houve alteração de serviços existentes."
+}

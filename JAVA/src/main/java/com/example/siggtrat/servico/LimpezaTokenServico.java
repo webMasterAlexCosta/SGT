@@ -10,7 +10,9 @@ import org.slf4j.LoggerFactory;
 import java.time.LocalDateTime;
 
 @Service
-public class LimpezaTokenServico {
+public class LimpezaTokenServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return logger; }
+
 
     private static final Logger logger = LoggerFactory.getLogger(LimpezaTokenServico.class);
     private final TokenAtivoRepositorio repositorio;
@@ -50,7 +52,7 @@ public class LimpezaTokenServico {
 
             logger.info("Limpeza concluída. Total de tokens removidos: {}", totalDeleted);
         } catch (Exception e) {
-            logger.error("Erro ao limpar tokens em batch", e);
+            logger.error("LimpezaTokenServico: Erro ao limpar tokens em batch falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(e));
         }
     }
 }

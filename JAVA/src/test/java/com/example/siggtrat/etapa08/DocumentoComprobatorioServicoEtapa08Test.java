@@ -16,6 +16,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.web.server.ResponseStatusException;
 
+import java.io.FilterInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.*;
 import java.security.MessageDigest;
 import java.time.*;
@@ -115,6 +118,89 @@ class DocumentoComprobatorioServicoEtapa08Test {
         servico = new DocumentoComprobatorioServico(documentos, eventos, permissoes, acessosRegistrados,
                 contratos, usuarios, acesso, new PropriedadesArmazenamentoArquivo(diretorio),
                 new PropriedadesEnvioArquivo(5_000_000, 10_000_000, 3));
+    }
+
+    @Test
+    void falhaAoFecharStreamDoUploadRemoveTemporarioSemPublicarDocumento() throws Exception {
+        MockMultipartFile arquivo = new MockMultipartFile("arquivo", "documento.pdf", "application/pdf",
+                "%PDF-1.4\nconteudo".getBytes()) {
+            private int leituras;
+
+            @Override
+            public InputStream getInputStream() throws IOException {
+                InputStream entrada = super.getInputStream();
+                // A primeira leitura calcula a intenção; a segunda prepara o armazenamento.
+                if (++leituras == 1) return entrada;
+                return new FilterInputStream(entrada) {
+                    @Override
+                    public void close() throws IOException {
+                        super.close();
+                        throw new IOException("Falha sintética no fechamento do upload");
+                    }
+                };
+            }
+        };
+
+        ResponseStatusException erro = assertThrows(ResponseStatusException.class,
+                () -> servico.criar(21L, requisicaoAnexo("io-upload"), arquivo));
+
+        assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, erro.getStatusCode());
+        assertInstanceOf(IOException.class, erro.getCause());
+        assertTrue(bancoDocumentos.isEmpty());
+        assertTrue(bancoEventos.isEmpty());
+        try (var arquivos = Files.walk(diretorio)) {
+            assertEquals(0, arquivos.filter(Files::isRegularFile).count(),
+                    "A falha de upload não pode deixar bytes sem documento, inclusive no staging");
+        }
+    }
+
+    @Test
+    void falhaDeExclusaoRegistraDiagnosticoSeguroSemPerderErroOriginal() throws Exception {
+        var logger = (ch.qos.logback.classic.Logger) org.slf4j.LoggerFactory
+                .getLogger(DocumentoComprobatorioServico.class);
+        var capturador = new ch.qos.logback.core.read.ListAppender<ch.qos.logback.classic.spi.ILoggingEvent>();
+        capturador.start();
+        logger.addAppender(capturador);
+        try {
+            MockMultipartFile arquivo = new MockMultipartFile("arquivo", "documento.pdf", "application/pdf",
+                    "%PDF-1.4\nconteudo".getBytes()) {
+                private int leituras;
+
+                @Override
+                public InputStream getInputStream() throws IOException {
+                    InputStream entrada = super.getInputStream();
+                    if (++leituras == 1) return entrada;
+                    return new FilterInputStream(entrada) {
+                        @Override
+                        public void close() throws IOException {
+                            super.close();
+                            // Simula falha de FS na compensação, sem alterar permissões do host.
+                            try (var staging = Files.list(diretorio.resolve(".staging"))) {
+                                Path temporario = staging.findFirst().orElseThrow();
+                                Files.delete(temporario);
+                                Files.createDirectory(temporario);
+                                Files.writeString(temporario.resolve("conteudo-privado"), "nao-expor");
+                            }
+                            throw new IOException("Falha original com detalhe privado nao-expor");
+                        }
+                    };
+                }
+            };
+            ResponseStatusException erro = assertThrows(ResponseStatusException.class,
+                    () -> servico.criar(21L, requisicaoAnexo("io-cleanup"), arquivo));
+            assertEquals(HttpStatus.INTERNAL_SERVER_ERROR, erro.getStatusCode());
+            assertEquals("Falha original com detalhe privado nao-expor", erro.getCause().getMessage());
+            assertTrue(bancoDocumentos.isEmpty());
+            assertTrue(bancoEventos.isEmpty());
+            assertEquals(1, capturador.list.size(), "Falha de compensação exige diagnóstico próprio");
+            String diagnostico = capturador.list.getFirst().getFormattedMessage();
+            assertTrue(diagnostico.contains("DirectoryNotEmptyException"));
+            assertFalse(diagnostico.contains(diretorio.toString()));
+            assertFalse(diagnostico.contains("nao-expor"));
+        } finally {
+            logger.detachAppender(capturador);
+            capturador.stop();
+        }
     }
 
     @Test

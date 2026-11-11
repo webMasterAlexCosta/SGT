@@ -1,12 +1,14 @@
 package com.example.siggtrat.servico;
 
+import com.example.siggtrat.regra.MaterialHashEventos;
+import static com.example.siggtrat.regra.MaterialHashEventos.*;
+
+
 import com.example.siggtrat.dominio.vinculo.*;
 import com.example.siggtrat.dto.PosicaoVinculoTemporalDTO;
 import com.example.siggtrat.entidade.*;
-import com.example.siggtrat.regra.AssinaturaPreviaNegocial;
 import com.example.siggtrat.repositorio.EventoVinculoContratualRepositorio;
 import com.example.siggtrat.utilitario.RelogioSistema;
-import com.example.siggtrat.utilitario.UtilitarioHashSeguranca;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.transaction.annotation.Transactional;
@@ -19,7 +21,11 @@ import java.util.*;
 /** Reconstrói o vínculo por data efetiva e pelo instante em que o sistema conhecia os fatos. */
 @Service
 @Transactional(readOnly = true)
-public class MotorTemporalVinculoServico {
+public class MotorTemporalVinculoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(MotorTemporalVinculoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final EventoVinculoContratualRepositorio eventoRepositorio;
     private MotorTemporalContratoServico motorContrato;
 
@@ -129,24 +135,19 @@ public class MotorTemporalVinculoServico {
         // O cadastro excedente substitui a justificativa depois de gerar o digest base.
         String justificativaBase = e.isInclusaoExcedente() && e.getTipoEvento() == TipoEventoVinculoContratual.CRIACAO
                 ? "Cadastro integrado de Pessoa, Vínculo e Alocação inicial" : e.getJustificativa();
-        String hash = UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|",
-                AssinaturaPreviaNegocial.valor(e.getHashAnterior()), e.getTipoEvento().name(),
-                AssinaturaPreviaNegocial.valor(e.getDataEfetiva()),
-                AssinaturaPreviaNegocial.valor(e.getInicioAnterior()), AssinaturaPreviaNegocial.valor(e.getInicioNovo()),
-                AssinaturaPreviaNegocial.valor(e.getFimAnterior()), AssinaturaPreviaNegocial.valor(e.getFimNovo()),
-                AssinaturaPreviaNegocial.valor(e.getMatriculaAnterior()), AssinaturaPreviaNegocial.valor(e.getMatriculaNova()),
-                e.getPessoaCpfFotografia(), AssinaturaPreviaNegocial.valor(e.getVinculo().getContrato().getId()),
-                AssinaturaPreviaNegocial.valor(e.getResponsavelId()), AssinaturaPreviaNegocial.valor(justificativaBase),
-                AssinaturaPreviaNegocial.valor(e.getMotivoDesligamentoIdFotografia()),
-                AssinaturaPreviaNegocial.valor(e.getMotivoDesligamentoDescricaoFotografia()),
-                AssinaturaPreviaNegocial.valor(e.getMotivoDesligamentoCategoriaFotografia())));
+        String hash = MaterialHashEventos.sha256("sgt.evento-vinculo.base",
+                texto(e.getHashAnterior()), enumeracao(e.getTipoEvento()), data(e.getDataEfetiva()),
+                data(e.getInicioAnterior()), data(e.getInicioNovo()), data(e.getFimAnterior()), data(e.getFimNovo()),
+                texto(e.getMatriculaAnterior()), texto(e.getMatriculaNova()), texto(e.getPessoaCpfFotografia()),
+                longo(e.getVinculo().getContrato().getId()), longo(e.getResponsavelId()), texto(justificativaBase),
+                longo(e.getMotivoDesligamentoIdFotografia()), texto(e.getMotivoDesligamentoDescricaoFotografia()),
+                enumeracao(e.getMotivoDesligamentoCategoriaFotografia()));
         if (e.isInclusaoExcedente()) {
-            // Preserva inclusive a representação histórica "null" nesta camada.
-            hash = UtilitarioHashSeguranca.sha256Hexadecimal(String.join("|", hash,
-                    String.valueOf(e.getComposicaoExcedenteId()), String.valueOf(e.getLotacaoExcedenteId()),
-                    String.valueOf(e.getJornadaExcedenteId()), String.valueOf(e.getCargoExcedenteId()),
-                    String.valueOf(e.getEfetivoPrevistoExcedente()), String.valueOf(e.getOcupacaoAposInclusaoExcedente()),
-                    e.getJustificativa(), e.getEvidencia(), e.getAutorizacao()));
+            hash = MaterialHashEventos.sha256("sgt.evento-vinculo.excedente", texto(hash),
+                    longo(e.getComposicaoExcedenteId()), longo(e.getLotacaoExcedenteId()),
+                    longo(e.getJornadaExcedenteId()), longo(e.getCargoExcedenteId()),
+                    inteiro(e.getEfetivoPrevistoExcedente()), longo(e.getOcupacaoAposInclusaoExcedente()),
+                    texto(e.getJustificativa()), texto(e.getEvidencia()), texto(e.getAutorizacao()));
         }
         return hash;
     }

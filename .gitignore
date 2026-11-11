@@ -1,0 +1,41 @@
+
+# Homologação local: artefatos e credenciais privados
+/.homologacao/
+**/.env
+**/.env.*
+!**/.env.example
+!**/.env*.example
+
+# Gerados reproduzíveis; evidências anteriores preservadas no checkpoint e acervo privado.
+/JAVA/target/
+/React/node_modules/
+/React/dist/
+/React/coverage/
+/React/.vite/
+**/__pycache__/
+**/*.pyc
+
+# Estado local das ferramentas; instruções do projeto continuam versionadas.
+/.serena/
+/.idea/
+*.iml
+.DS_Store
+Thumbs.db
+
+# Diagnósticos de JVM podem conter dados de memória e atingir vários GB.
+**/hs_err_pid*.log
+**/replay_pid*.log
+**/*.hprof
+**/jacoco*.exec
+
+# Saídas locais de execução, uploads e relatórios de teste.
+/JAVA/logs/
+/JAVA/uploads/
+/JAVA/relatorio-temp/
+/React/test-results/
+/React/playwright-report/
+/React/blob-report/
+/React/.cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*

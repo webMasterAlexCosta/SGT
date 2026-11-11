@@ -12,7 +12,9 @@ import org.springframework.transaction.support.TransactionSynchronizationManager
 import java.util.Arrays;
 
 @Service
-public class InvalidacaoCacheServico {
+public class InvalidacaoCacheServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    @Override public org.slf4j.Logger loggerDiagnostico() { return log; }
+
 
     private static final Logger log = LoggerFactory.getLogger(InvalidacaoCacheServico.class);
 
@@ -74,8 +76,7 @@ public class InvalidacaoCacheServico {
                         try {
                             cache.clear();
                         } catch (RuntimeException exception) {
-                            log.warn("Falha ao invalidar o cache '{}'; a operação principal foi preservada: {}",
-                                    name, exception.getMessage());
+                            log.warn("InvalidacaoCacheServico: Falha ao invalidar o cache falha={}", com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(exception));
                         }
                     }
                 });

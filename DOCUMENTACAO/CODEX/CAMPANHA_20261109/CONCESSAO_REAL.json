@@ -1,0 +1,62 @@
+{
+  "state": "VERIFICACAO_FOCAL_ATUAL_SEM_HOMOLOGACAO_GLOBAL",
+  "business_decision": "Uma ocorrência, somente leitura restrita; Administrador atual, beneficiário ativo, finalidade/validade/auditoria e prova histórica de todos os dias; sem escrita.",
+  "source": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/ConcessaoContextualOcorrenciaHttpIT.java",
+  "test_source_sha256": "9879b1f649703fb0f34d285d574932e3f3194d85c1b424666fadaef25bd65dd5",
+  "main_source_manifest_sha256": "ca076478a5174c32114865bd1bafac736f7eaaa936ba726777a7e744b7f43627",
+  "batch": "it-backend-safety41-02",
+  "receipt_sha256": "ff09860a15be1d3a33154cfbe420fcaf2b4a725b9f3d9ee45e2eaf3ac49fb83e",
+  "reports": [
+    {
+      "name": "com.example.siggtrat.auditoria20261029.ConcessaoContextualOcorrenciaHttpIT",
+      "tests": "28",
+      "errors": "0",
+      "failures": "0",
+      "skipped": "0",
+      "time": "112.71",
+      "effective_test_context_cache_max_size": "1",
+      "xml_sha256": "00a0d78f1bacd8cc0d503bf44e669cb54b0b7556ed7582b59264b17a1ec4df5f"
+    }
+  ],
+  "peak_aggregate_bytes": 7290355712,
+  "peak_validation_cgroup_bytes": 684646400,
+  "memory_events_delta": {
+    "low": 0,
+    "high": 0,
+    "max": 0,
+    "oom": 0,
+    "oom_kill": 0,
+    "oom_group_kill": 0,
+    "sock_throttled": 0
+  },
+  "test_context_cache_max_size": [
+    "1"
+  ],
+  "scenario_manifest_sha256": "d80bc0ed8a2764417e00d2d9918937183256560f45cc5ea76fd8657393b02067",
+  "proofs": [
+    "Alvo/anexo corretos; recusa de outro fato, frequência e escrita, com estado/arquivos preservados.",
+    "Origem ausente em um de dois dias: recusa; fonte posterior legítima libera somente controle comprovado.",
+    "Estadual sem cobertura integral recusado; Nacional, Estadual no escopo e Presidente com concessão leem o alvo.",
+    "Finalidade divergente, validade, revogação, conta/perfil/escopo e payload inválidos não deixam efeitos parciais.",
+    "Expiração real após concessão/uso positivo, sem alterar validade persistida, depender do scheduler ou revogar a conta.",
+    "Um recibo por concessão contextual/leitura; coexistência/prioridade e fallback genérico preservados.",
+    "Dois grants em espera física na mesma PK: um201/um409, uma concessão/auditoria.",
+    "Revogação HTTP do Administrador ou beneficiário commitada durante espera física: nenhuma concessão/uso/auditoria parcial."
+  ],
+  "limits": [
+    "MockMvc/filtros/serviços/JPA/PostgreSQL reais; não comprova transporte TCP/JAR, navegador ou LAN.",
+    "JAR/TCP atual conferido separadamente em JAR_HTTP_REAL.json; regressão IT ampla, carga/cobertura final e gatebackend pendentes.",
+    "Preparações, execuções falhas e quantidade de arquivos de cenário não são contadas como testes aprovados.",
+    "Dados sintéticos não comprovam autenticidade administrativa de acervo real."
+  ],
+  "prior_review_scope": {
+    "thread": "01a1c060-0523-74b1-8c83-caaba280f2a0",
+    "production_code": "SEM_ACHADOS_P0_P3_NO_INCREMENTO",
+    "four_additional_cases_and_final_28_test_source": "SEM_ACHADOS_P0_P3_NO_INCREMENTO",
+    "test_extension_turn": "01a1c106-acdf-7fe0-8cd9-ce0761f4a580"
+  },
+  "review": {
+    "current_main35": "PENDING_NATIVE15",
+    "previous_review_not_new_execution": true
+  }
+}

@@ -6,6 +6,8 @@
 **Escopo:** Contrato, composição contratual, aditamento, remanejamento, pessoa/colaborador, vínculo, alocação, desligamento, frequência, documentos, permissões, relatórios, histórico e auditoria.
 **Código nesta etapa:** **não**.
 
+**Emenda vigente de09/11/2026:** decisão humana altera a janela de frequência de sete dias fixos para N configurável, padrão30, preservando os IDs FRE e as demais permissões. Detalhamento e reconciliação histórica: [REGRA_JANELA_FREQUENCIA.md](REGRA_JANELA_FREQUENCIA.md). A versão8.0 acima identifica a origem; esta emenda não é um recibo de implementação/homologação.
+
 > Este documento deve ser compreendido sem acesso a conversas, versões anteriores, imagens ou outros arquivos. Todas as regras já fechadas estão descritas aqui por conteúdo.
 
 ---
@@ -863,10 +865,10 @@ A frequência diária deve resolver o Vínculo e a Alocação válidos na data d
 
 ### Janela normal do Usuário Operacional
 
-- edição por 7 dias corridos, considerando o fuso `America/Sao_Paulo`;
+- edição por N dias civis configuráveis, padrão30, considerando o fuso `America/Sao_Paulo`;
 - a própria data da frequência é o dia 1;
-- exemplo: frequência de 01/01 pode ser editada até 07/01 23:59:59;
-- em 08/01 00:00 passa automaticamente para condição negocial `FECHADA`.
+- edição enquanto agora for estritamente anterior ao início de D+N; inclusão/retificação não reinicia a janela;
+- exemplo padrão N=30: frequência de01/01 fecha em31/01 às00:00, limite exclusivo, passando à condição negocial `FECHADA`.
 
 O fechamento é regra negocial e não depende de lote, exportação, relatório ou processamento técnico.
 
@@ -877,7 +879,7 @@ Depois do fechamento:
 
 O Gestor Local:
 
-- não fecha antecipadamente uma frequência antes dos 7 dias;
+- não fecha antecipadamente uma frequência antes do fim da janela configurada;
 - pode corrigir dentro ou fora da janela normal;
 - toda alteração do Gestor gera versão/retificação formal;
 - se o Gestor corrigir determinado registro durante a janela, aquele registro deixa de ser editável pelo Operacional;
@@ -915,6 +917,14 @@ Regras:
 - verificar se o usuário possui hoje autorização sobre aquela Lotação/escopo;
 - permissão antiga do usuário não concede acesso depois de removida;
 - se nenhum Operacional atual possuir acesso ao escopo histórico, o tratamento passa ao Gestor Local.
+
+### Concessão contextual de leitura de ocorrência
+
+Decisão humana da campanha de 09/11/2026 para PER-010:004: o Administrador atual pode conceder acesso pessoal restrito para **uma ocorrência identificada**, a beneficiário ativo com perfil de consulta institucional e escopo válido sobre todos os dias. Finalidade, justificativa, autorização administrativa, validade e auditoria são obrigatórias. Antes de conceder, o backend exige prova histórica completa do período; permissão genérica ou cadastro atual não preenchem uma origem ausente.
+
+A concessão é somente de leitura do fato e de seus anexos protegidos. Não abrange outra ocorrência, frequência ou documento contratual, nem concede cancelamento, edição ou escrita negocial. Cada uso exige novamente autorização atual, contexto histórico comprovado, finalidade compatível e concessão vigente; revogação ou perda de escopo impede novo uso. O registro da concessão e dos usos conserva autoria e auditoria. Essa modalidade não equivale às concessões genéricas por contrato/Gestão ou às permissões documentais próprias.
+
+A decisão define a regra; implementação, contraprovas e aceite técnico estão registrados em `DOCUMENTACAO/CODEX/CAMPANHA_20261109`, sem aprovação por herança dos resultados históricos.
 
 ### Três dimensões da frequência
 
@@ -1390,18 +1400,18 @@ A inativação deve preservar o uso histórico.
 | ID | Requisito fechado para implementação |
 |---|---|
 | **FRE-001** | Frequência resolve vínculo e alocação válidos na data negocial. |
-| **FRE-002** | Usuário Operacional pode editar por 7 dias corridos, contando a data da frequência como dia 1, em America/Sao_Paulo. |
-| **FRE-003** | Exemplo: frequência de 01/01 editável até 07/01 23:59:59 e bloqueada para o Operacional a partir de 08/01 00:00. |
+| **FRE-002** | Usuário Operacional pode editar por N dias civis configuráveis, padrão30, contando a data da frequência como dia1, em America/Sao_Paulo; inclusão/retificação não reinicia a janela. |
+| **FRE-003** | Edição enquanto agora < início de D+N, limite exclusivo. Exemplo padrão N=30: frequência de01/01 bloqueada para Operacional a partir de31/01 00:00. |
 | **FRE-004** | Alterações do Operacional dentro da janela permanecem auditadas, com antes/depois, usuário e data/hora. |
 | **FRE-005** | Depois da janela, Gestor Local corrige por retificação versionada; não sobrescreve silenciosamente. |
-| **FRE-006** | Gestor Local pode corrigir antes do fim dos 7 dias, com identificação e justificativa. |
+| **FRE-006** | Gestor Local pode corrigir antes do fim da janela configurada, com identificação e justificativa. |
 | **FRE-007** | Gestor Local não possui prazo máximo rígido para retificação tardia; toda retificação tardia exige justificativa/auditoria. |
 | **FRE-008** | Retificação recalcula visão oficial atual de relatórios mensais, absenteísmo e indicadores; versões anteriores permanecem auditáveis. |
 | **FRE-009** | Alteração retroativa deve identificar frequências abertas e fechadas atingidas; fechada não é alterada silenciosamente, exige retificação autorizada. |
 | **FRE-010** | Frequências lançadas depois da data real de um desligamento retroativo permanecem visíveis/auditáveis e sinalizadas, mas não devem ser misturadas ao efetivo operacional válido/indicadores. |
 | **FRE-011** | Enquanto retificações pendem, relatórios podem ser consultados/exportados com aviso 'sujeito a revisão' e quantidade de pendências. |
 | **FRE-012** | Quando retificação é concluída, a visão oficial atual usa a verdade corrigida e a emissão anterior permanece versionada. |
-| **FRE-013** | No 8º dia, a frequência passa automaticamente a FECHADA negocialmente; qualquer mudança posterior é retificação. |
+| **FRE-013** | No início de D+N, a frequência passa automaticamente a FECHADA negocialmente; qualquer mudança posterior é retificação. O atraso do processamento técnico não amplia a janela. |
 | **FRE-014** | Alteração do Gestor Local gera versão formal e bloqueia nova edição daquele registro pelo Operacional. |
 | **FRE-015** | A frequência diária pertence ao escopo da alocação histórica do colaborador na data da frequência, e não à alocação atual do colaborador. |
 | **FRE-016** | Se retificação retroativa muda a alocação histórica, outro Operacional não assume silenciosamente o registro; eventual correção passa ao Gestor Local e preserva o autor original. |
@@ -1609,7 +1619,7 @@ Ao inserir ou retificar um fato retroativo:
 | Dois eventos conflitantes têm a mesma data e nenhuma precedência. | Bloquear conclusão até registrar relação negocial explícita. |
 | Inativação retroativa atinge frequência já lançada. | Preservar registro, sinalizar impacto e retificar quando aplicável. |
 | Contrato é reativado dentro da mesma vigência. | Vínculos e Alocações ainda válidos retomam operação sem criação artificial de novos registros. |
-| Frequência chega ao 8º dia no fuso America/Sao_Paulo. | Passa automaticamente a `FECHADA`. |
+| Frequência alcança o início de D+N no fuso America/Sao_Paulo, N configurado/padrão30. | Passa automaticamente a `FECHADA`, limite exclusivo. |
 | Gestor Local corrige frequência no 3º dia. | Aquele registro não volta ao controle de edição do Operacional. |
 | Jornada 22:00–06:00 atravessa meia-noite. | Pertence à data de início e utiliza Vínculo/Alocação daquela data. |
 | CPF incorreto é corrigido. | CPF antigo permanece na auditoria e deixa de ser identificador ativo. |

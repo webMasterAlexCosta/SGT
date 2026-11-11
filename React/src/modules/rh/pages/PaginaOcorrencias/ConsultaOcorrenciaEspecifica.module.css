@@ -1,0 +1,17 @@
+.consulta { padding: 1rem 0; border-bottom: 1px solid var(--cor-borda-sutil); }
+.consulta h2 { margin: 0 0 .4rem; color: var(--cor-texto-primario); font-size: 1.1rem; }
+.consulta > p { margin: 0 0 .9rem; color: var(--cor-texto-secundario); font-size: .875rem; }
+.formulario { display: grid; grid-template-columns: minmax(9rem, 12rem) minmax(12rem, 1fr) max-content; gap: .8rem; align-items: end; }
+.formulario label { display: flex; flex-direction: column; gap: .35rem; color: var(--cor-texto-primario); font-size: .875rem; font-weight: 600; }
+.formulario input { width: 100%; min-height: 40px; border: 1px solid var(--cor-borda-forte); border-radius: .5rem; padding: .5rem .7rem; background: var(--cor-neutra-0); color: var(--cor-texto-primario); font: inherit; }
+.formulario input:focus-visible { outline: 2px solid var(--cor-correios-azul-700); outline-offset: 2px; }
+.formulario input[aria-invalid="true"] { border-color: var(--cor-erro-700, #991b1b); }
+.erro { grid-column: 1 / -1; margin: 0; color: var(--cor-erro-700, #991b1b); }
+.resultado { margin-top: 1.2rem; }
+.resultado h3 { margin: 0 0 .7rem; font-size: 1rem; color: var(--cor-texto-primario); }
+.resultado dl { display: flex; flex-wrap: wrap; gap: .8rem 2rem; }
+.resultado dt { color: var(--cor-texto-secundario); font-size: .8rem; }
+.resultado dd { margin: .2rem 0 0; color: var(--cor-texto-primario); }
+.narrativa { white-space: pre-wrap; overflow-wrap: anywhere; max-width: 75ch; }
+@media (max-width: 1000px) { .formulario { grid-template-columns: minmax(8rem, 1fr) minmax(12rem, 2fr); } .formulario > button { justify-self: start; } }
+@media (max-width: 650px) { .formulario { grid-template-columns: 1fr; } }

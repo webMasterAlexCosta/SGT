@@ -22,7 +22,11 @@ import java.util.UUID;
  */
 @Service
 @Order(Ordered.HIGHEST_PRECEDENCE)
-public class RevisaoFontesPainelServico implements ApplicationRunner {
+public class RevisaoFontesPainelServico implements ApplicationRunner, com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(RevisaoFontesPainelServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final RevisaoFontesPainelRepositorio repositorio;
     private final TransactionTemplate inicializacao;
 

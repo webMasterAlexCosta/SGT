@@ -1,0 +1,115 @@
+{
+  "state": "NATIVE18_SOL_BACKEND_APPROVED_DELIMITED_SYNTHETIC_SCOPE_MAIN36",
+  "head": "3ed3843e954040a330957c8cd715daefc9760b72",
+  "compile": "java-main36-package03",
+  "java_source_resource_files": 1380,
+  "class_files": 1765,
+  "main_class_files": 823,
+  "jar_sha256": "3c5cd0a6d616737efb3c85b8922294fadf53cfe231022edd1d9503242b7c87c9",
+  "main_changed_since_review13": [
+    "JAVA/src/main/java/com/example/siggtrat/controlador/RelatorioControlador.java",
+    "JAVA/src/main/java/com/example/siggtrat/servico/RelatorioExportacaoAssincronaServico.java"
+  ],
+  "previous_test_source_changes_since13": [],
+  "new_test_sources_since13": [
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/FrequenciaCoberturaTemporalRecusasHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/FrequenciaMaterializacaoTrintaDiasHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/FrequenciaMatrizEntradasHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/FrequenciaTimerTrintaDiasJarIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/MestreAlocacaoFrequenciaConcorrenciaHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/MestreContratosFornecedorConcorrenciaHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/MestreDocumentoRetificacaoConcorrenteHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/OcorrenciaFalhaFisicaGravacaoHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/RelatorioExportacaoCancelamentoHttpIT.java",
+    "JAVA/src/test/java/com/example/siggtrat/servico/RelatorioExportacaoCancelamentoTest.java"
+  ],
+  "checks_summary": {
+    "unit": {
+      "classes": 149,
+      "tests": 739,
+      "classes_exact_main35": 1
+    },
+    "integration": {
+      "classes": 378,
+      "tests": 1569,
+      "classes_exact_main35": 18
+    },
+    "load": {
+      "classes": 1,
+      "tests": 1,
+      "classes_exact_main35": 1
+    }
+  },
+  "proofs_sha256": {
+    "standard350-complete-proof29.json": "1dd738cd0945f660f815a7383c2502d3f1b6638ef6f54c3b2007392625ab072c",
+    "execution-catalog-current41.json": "79d0fd6160ed23ab8c47ca2a9b289919d5ca0984e192064cc5a1e70c2a768307",
+    "jar-current40-package-01/jar-binding.json": "1fa8baac07bb935374ae0f2326a12681c261b0f3523364c164faaf5b56e8a6e3",
+    "cancel-export-main35-delta-current39.json": "caf0a9021cb507a99eeab8a6dca18359c277939099ac4182e5c5dbfe2d9802e6",
+    "export-cancel35-green-proof.json": "a22538b909a89a07cd23e7727c6e9a5bf7b0c31a98ab94aa218f0b5885f20851",
+    "mestre-concorrencia30-complete.json": "60c0b0b975f8ea6cf5e24998f68a6aea86ab4252eeac812b361bf33d90da83a6",
+    "mestre-arquivos31-complete.json": "aebc6e50c64603586f99facb9a2b963857e84c6e08f1e3a2a2823a5a0e62ec3b",
+    "it-frequencia-entradas37-01/input-matrix-proof.json": "2d167b773c4e4f7af3e0d0423486a0cb1ec909994ca1254afaa9639e359144bf",
+    "it-frequencia-temporal40-01/temporal-proof.json": "9a79b6c03f3f610bb1d74d9c40492f9bd26b16d2e1717badbb83581aa6d00c38",
+    "n30-materializacao41-proof.json": "13968e522553dec30704fb3274626891de46061a77f859cd824071c072deb402",
+    "jobs-current40-four-proof.json": "ad667932d8fd7b59c4ece0a642d2d5c9684967deecaba2d93629362e84df8d28",
+    "recovery-current41-proof.json": "bdd80dcc8ef4a2567c14146bdbe1dbbf2db21ed641b830bb6893d212b68678bf",
+    "jar-http-current40-02/http-resources-proof.json": "73d10ca964596dbd36cc3da4c1b84adf4aed856d461133cc625bd5782dbc16de",
+    "it-relatorio-contextual-03/scenario-index.json": "9d3df15ede933002f5c7165527892ff1c205c5366a28b89a09b2d71ade0745f6",
+    "pdf-visual-contextual-03/render-result.json": "b18f5229c5d46fa7f6963187c7570f4aefc1650be5bdb5ecb1e6e3a2a2d3a63e",
+    "pdf-visual-contextual-03/visual-inspection-root.json": "ff0cb99e6811181e0df5447059c25e8e8a9cac01cf5e340d544e817d028269b3",
+    "it-load-current41-01/load-metrics-proof.json": "c3f71ba787b4025ea0f364a3b1443f676967cb755d5f35142adca9be5a13e9d6",
+    "coverage-current41-04/coverage-proof.json": "548e9f38547e7ea66542cd857343bebc822835bf5b1c77e2b0e249e87bd7b644",
+    "inventory-current41-03/inventory.json": "faa842cca596183a84995049da2da7549e4b24e9e43dad11b981bd49ff7d1800",
+    "runtime-identity-current41.json": "174d08554653f94d9c57ac6b535602c18fad5b51d3f9156e2f6ce41577ecff61",
+    "scripts-stack-alignment41/before.json": "3f91dfda20f6d44a2dc04e24cc6e8c7aa619304e9a7df447a0681832091797eb",
+    "scripts-stack-alignment41/after.json": "2082b8ea28d453e63b909cd590e25ef62d93f2967373a91125ff77cfc658efce",
+    "jar-http-current40-02/current-jar-http-proof.json": "97f853a434ffcf46a8574b06cc7eb823c2a38e8f1b58065f3d445a5e79f0c8c5",
+    "coverage-current41-05/coverage-proof.json": "98097c0773a2bdef6d27965b42a6bdaf126d44a4ce54fe98f83ed54f5c8115db"
+  },
+  "native_prior_turns": [
+    "01a1c357-f0f8-7d52-9a71-6988a378e7ee",
+    "01a1c37e-9cd3-7b11-9841-08ae4bdec461"
+  ],
+  "limits": [
+    "Earlierstagesretainownappbytes;strictcompatibilitywithMain35twofiledeltapendingnative15.",
+    "Onlyactualtechnicalsyntheticlabscope;UI/Chrome/LANandexternalconditionsseparate.",
+    "NoSonar/commit/push/deploy/operationaldata.",
+    "Historical Main35 coverage90.42/65.53 is not automatically current for the two changed classIDs; no full backend rerun asserted."
+  ],
+  "coverage_current": {
+    "batch": "coverage-current44-02",
+    "proof_sha256": "6d94c9cd5d9b5fa4a3d8967f5037fc227e3613dd01138e3ff2a39f8e8c94160e"
+  },
+  "review15_parecer_sha256": "576af3ad20407bfbb13741af28c9e580dd97905e63527bfb13d67e39f0dcfe0c",
+  "prior_coverage04_scope": "Review15countersaccepted;manifestvolatilecontrolP3superseded05",
+  "new_sources_since15": {
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/AnexoTraversalTcpJarIT.java": "d7cf712d0bc851c6a60e3462ae7691f21a9b87622f8fe23880dc616dc2584889",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/GapsBackend15JarSuporte.java": "3b2d1afa96623cb015a58f151905aaa565698d67c656ffb9226f7f0d40d02ff0",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/ReinicioIntegralCorpusJarIT.java": "dc20d19e1a6c361b43735b375f644ade6bc894ef42313dc8a67ac5a6dbf0a75a",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/RelatorioCancelamentoAutoridadeAtualHttpIT.java": "54bba8d75aced69f80e0618e4ed879b53f605ad0e24754b33bde1853e2c25f43",
+    "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/SessaoLogoutIdleConcorrenteJarIT.java": "0f9e60d4289a66a255d0c18b0959ab1dbd2f840a71dc19d856df10f6c7da1052"
+  },
+  "four_gaps_proof": {
+    "path": "four-gaps-current44-proof.json",
+    "sha256": "c6433203a0dfafb4cb0c1ee6327297d9ef7d81dec3b65cdaf47676f86617004d"
+  },
+  "review16_parecer_sha256": "cc893b18080eb2be0c80289bd6418f4509353faea60fa9e0804bb7bdc191bc2c",
+  "review16_turn": "01a1c48d-b218-7bc0-8d0e-a8c210bc9394",
+  "previous_approved_state": "NATIVE16_BACKEND_APPROVED_DELIMITED_SYNTHETIC_SCOPE_MAIN35",
+  "current_change": {
+    "sources": [
+      "JAVA/src/main/java/com/example/siggtrat/servico/UsuarioAplicacaoServico.java",
+      "JAVA/src/main/java/com/example/siggtrat/controlador/UsuarioAplicacaoControlador.java",
+      "JAVA/pom.xml"
+    ],
+    "scope": "Only legacy marker response messages: no promise of individual frequency permission; status/routes/storage/authorization unchanged",
+    "jar_sha256_field_scope": "Current Main36 candidate, clean archive; backend17 review pending",
+    "native_frontend_review": "46/01 rejected1P1+2P2, three frontend fixes verified788tests/105files and PresidenteChrome21, awaiting backendmessagefollowup",
+    "test_relocation": "FechamentoFrequenciaProcessadorTest: path aligned to its existing servico package; all source bytes unchanged",
+    "package": "java-main36-package03:22/3; earlier bad-resource candidate and wrong-FQN attempt preserved/excluded",
+    "http": "api-legacy-marker-main36-02:6checks/8realHTTP, exact marker state restored; first wrong-endpoint attempt preserved/excluded",
+    "backend_gate": "backend-gate18-approved.json; wrong-runtime17 excluded, same delta verified under actualSol/xhigh"
+  },
+  "review18_parecer_sha256": "d968d7107d2d27a8da55976f924bf835d1cb18d952cecef8281c7c3c2504a908",
+  "review18_turn": "01a1c570-78dc-7bd3-9a6f-b7ec49b33fad"
+}

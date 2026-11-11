@@ -18,7 +18,11 @@ import com.example.siggtrat.dominio.vinculo.EstadoNegocialVinculo;
 @RestController
 @RequestMapping("/api/vinculos-contratuais")
 @InvalidaCacheNegocio
-public class VinculoContratualControlador {
+public class VinculoContratualControlador implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(VinculoContratualControlador.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
     private final VinculoContratualServico servico;
     private AlocacaoVinculoServico alocacaoServico;
     public VinculoContratualControlador(VinculoContratualServico servico) { this.servico = servico; }
@@ -37,6 +41,17 @@ public class VinculoContratualControlador {
             @RequestParam(required = false) String busca, Pageable pageable) {
         return servico.listar(contratoId, pessoaId, estado, inicioDe, inicioAte, fimDe, fimAte, ativoEm, busca, pageable);
     }
+    @GetMapping("/elegiveis-frequencia")
+    public Page<VinculoElegivelFrequenciaDTO> elegiveisFrequencia(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate dataRef,
+            @RequestParam Long lotacaoId, @RequestParam Long jornadaId,
+            @RequestParam(required = false) Long contratoId,
+            @RequestParam(required = false) List<Long> contratoIds,
+            @RequestParam(required = false) String busca, Pageable pageable) {
+        return servico.listarElegiveisParaFrequencia(dataRef, lotacaoId, jornadaId,
+                contratoId, contratoIds, busca, pageable);
+    }
+
     @GetMapping("/{id}") public VinculoContratualDTO buscar(@PathVariable Long id) { return servico.buscar(id); }
     @GetMapping("/{id}/eventos") public List<EventoVinculoContratualDTO> eventos(@PathVariable Long id) { return servico.listarEventos(id); }
     @GetMapping("/{id}/alocacoes")

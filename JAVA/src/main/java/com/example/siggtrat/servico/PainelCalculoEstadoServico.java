@@ -11,14 +11,16 @@ import org.springframework.transaction.annotation.Isolation;
 import java.util.Objects;
 import java.util.UUID;
 
-import java.io.PrintWriter;
-import java.io.StringWriter;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.util.Optional;
 
 @Service
-public class PainelCalculoEstadoServico {
+public class PainelCalculoEstadoServico implements com.example.siggtrat.diagnostico.DiagnosticoOperacao {
+    private static final org.slf4j.Logger LOG_DIAGNOSTICO = org.slf4j.LoggerFactory.getLogger(PainelCalculoEstadoServico.class);
+
+    @Override public org.slf4j.Logger loggerDiagnostico() { return LOG_DIAGNOSTICO; }
+
 
     private final PainelCalculoRepositorio repositorio;
     private final RevisaoFontesPainelServico revisaoFontes;
@@ -53,7 +55,7 @@ public class PainelCalculoEstadoServico {
     @Transactional(propagation = Propagation.REQUIRES_NEW, isolation = Isolation.READ_COMMITTED)
     public void concluir(Descritor execucao, String payloadJson) {
         if (payloadJson == null || payloadJson.isBlank() || "null".equalsIgnoreCase(payloadJson.trim())) {
-            throw new IllegalArgumentException("Não é permitido concluir o painel sem payload válido.");
+            throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Não é permitido concluir o painel sem payload válido.");
         }
         PainelCalculo calculo = repositorio.buscarPorIdParaAtualizacao(execucao.id()).orElseThrow();
         // Um worker anterior não pode concluir ou sobrescrever outra execução.
@@ -86,8 +88,8 @@ public class PainelCalculoEstadoServico {
             calculo.setStatus(PainelCalculoStatus.ERRO);
             calculo.setProgresso(0);
             calculo.setHeartbeatEm(agora());
-            calculo.setMensagem(mensagem(erro));
-            calculo.setDetalheErro(rastroPilha(erro));
+            calculo.setMensagem(com.example.siggtrat.diagnostico.MensagemFalhaAssincrona.criar("o cálculo do painel", "PAINEL-" + calculo.getId(), erro));
+            calculo.setDetalheErro(com.example.siggtrat.diagnostico.DiagnosticoFalha.resumir(erro));
             repositorio.save(calculo);
         });
     }
@@ -122,20 +124,6 @@ public class PainelCalculoEstadoServico {
     }
 
     private LocalDateTime agora() { return LocalDateTime.now(zoneId); }
-
-    private String mensagem(Throwable erro) {
-        String valor = erro == null ? null : erro.getMessage();
-        if (valor == null || valor.isBlank()) valor = "Falha ao consolidar o painel gerencial.";
-        return valor.length() > 500 ? valor.substring(0, 500) : valor;
-    }
-
-    private String rastroPilha(Throwable erro) {
-        if (erro == null) return null;
-        StringWriter sw = new StringWriter();
-        erro.printStackTrace(new PrintWriter(sw));
-        String valor = sw.toString();
-        return valor.length() > 12000 ? valor.substring(0, 12000) : valor;
-    }
 
     public record Descritor(
             Long id,

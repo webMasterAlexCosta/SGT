@@ -58,7 +58,7 @@ class FechamentoFrequenciaServicoTest {
     @BeforeEach
     void setUp() {
         var propriedades = new PropriedadesFechamentoFrequencia(500, 2, 1, 1, 10, 10_000, 120);
-        var politicaTemporal = new PoliticaTemporalFrequenciaServico();
+        var politicaTemporal = new PoliticaTemporalFrequenciaServico(7);
         servico = new FechamentoFrequenciaServico(
                 repositorio, itemRepositorio, empregadoRepositorio, lotacaoRepositorio, jornadaRepositorio,
                 contratoRepositorio, acessoOrganizacionalServico, eventPublisher, propriedades, politicaTemporal, elegibilidade,

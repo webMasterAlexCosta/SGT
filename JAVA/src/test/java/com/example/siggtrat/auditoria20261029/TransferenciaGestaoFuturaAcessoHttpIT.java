@@ -131,7 +131,8 @@ class TransferenciaGestaoFuturaAcessoHttpIT extends ContratosHttpBase {
 
     private void programar(Cenario c, NovoContrato n, LocalDate data) throws Exception {
         conceder(c, n.id(), "TRANSFERENCIA_GESTAO_LOCAL");
-        var req = mapa("dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
+        var req = mapa(/* Conferência SINTÉTICA explícita desta fixture; não é padrão do produto. */
+                "conferenciaDocumentalConfirmada", true, "versaoConferenciaDocumental", "transferencia-gestao-conferencia-v1", "dataEfetiva", data, "dataAto", RelogioSistema.hoje(),
                 "gestaoLocalDestinoId", c.gestaoB.getId(), "tipoContratacaoDestinoId", c.tipoB.getId(), "motivo", "Responsabilidade administrativa futura documentada",
                 "referenciaSei", "SEI-TRANSFERENCIA-FUTURA", "autorizacaoAdministrativa", "ATO-HTTP",
                 "mapeamentos", List.of(mapa("composicaoOrigemId", n.composicao1(),
