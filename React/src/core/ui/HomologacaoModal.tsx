@@ -6,10 +6,12 @@ import estilos from "./HomologacaoModal.module.css";
 const HomologacaoModal = () => {
   const [aberto, setAberto] = useState(false);
   const [naoMostrarNovamente, setNaoMostrarNovamente] = useState(false);
+  const buildProducao = CONFIG.BUILD_PRODUCAO;
 
   const CHAVE_ARMAZENAMENTO = `ocultarHomologacao_${CONFIG.APP_NAME}_Expiracao`;
 
   useEffect(() => {
+    if (buildProducao) return;
     const dadosExpiracao = localStorage.getItem(CHAVE_ARMAZENAMENTO);
 
     if (dadosExpiracao) {
@@ -25,7 +27,7 @@ const HomologacaoModal = () => {
     } else {
       setAberto(true);
     }
-  }, [CHAVE_ARMAZENAMENTO]);
+  }, [CHAVE_ARMAZENAMENTO, buildProducao]);
 
   const lidarComFechamento = () => {
     if (naoMostrarNovamente) {
@@ -36,7 +38,7 @@ const HomologacaoModal = () => {
     setAberto(false);
   };
 
-  if (!aberto) return null;
+  if (buildProducao || !aberto) return null;
 
   return (
     <div className={estilos.sobreposicaoModal}>

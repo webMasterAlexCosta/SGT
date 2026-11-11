@@ -146,6 +146,8 @@ export const criarConfiguracaoFrontend = (ambiente: FrontendEnvironment, { produ
   const mostrarCredenciais = !producao && mostrarCredenciaisSolicitado;
 
   const configuracao = {
+    // Identifica o artefato compilado; não é um aceite de implantação.
+    BUILD_PRODUCAO: producao,
     // Infraestrutura e resiliência.
     API_URL: apiUrl,
     HTTP_TIMEOUT: numero(ambiente, "VITE_HTTP_TIMEOUT", { minimo: 1_000, maximo: 300_000, inteiro: true }),

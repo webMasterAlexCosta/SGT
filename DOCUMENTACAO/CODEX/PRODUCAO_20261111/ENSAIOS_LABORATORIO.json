@@ -1,0 +1,161 @@
+{
+  "scope": "Operational preparation and synthetic laboratory rehearsals; production release pending external conditions and current independent reviews",
+  "current_jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+  "binding": {
+    "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+    "new_jar02_differences_only_static": true,
+    "changed_entries": 49,
+    "integrated_static_files": 595,
+    "business_classes_from_Jar08_unchanged": 823,
+    "total_classes": 827,
+    "libraries_unchanged": 116,
+    "backup02_jar_sha256": "3e3fb8eaef130149dc9fcccee80ce032befb29318316d10ceaf88eec113d488f",
+    "backup02_classes_identical_subset": 825,
+    "backup02_prod_config_identical": true,
+    "package_tests": 21,
+    "package_test_classes": 1,
+    "ram_plus_swap_peak_bytes": 5244686336
+  },
+  "checks": [
+    {
+      "batch": "prod67-jar02",
+      "kind": "Java regression,5classes",
+      "private_receipt_sha256": "acbbdc05f6bd3adc6e7bdb9b167effb437ccca9eacac6251c27c8519e665b50a",
+      "exit_code": 0,
+      "stopped": null,
+      "tests_executed": 43,
+      "test_classes": 5
+    },
+    {
+      "batch": "prod68-package01",
+      "kind": "Package,1class",
+      "private_receipt_sha256": "35bde8252ba29b2c205c6872c4f0e01042ca1bd79194a465d781ab34a5eebcff",
+      "exit_code": 0,
+      "stopped": null,
+      "tests_executed": 21,
+      "test_classes": 1
+    },
+    {
+      "batch": "prod67-ops-layout-green01",
+      "kind": "Python isolated units",
+      "private_receipt_sha256": "42721bdf68b1b07df5b5c1563b7345bd143a309c516ef877c87d941e478d7cef",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 8019238912,
+      "own_peak_bytes": 56233984,
+      "stopped": null
+    },
+    {
+      "batch": "fe-prod67-banner-green01",
+      "kind": "React isolated units",
+      "private_receipt_sha256": "815c2c596dcd6f0b59133fa70d7500536e3e02a07db100f0c09d706dfd6aec0f",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 10131091456,
+      "own_peak_bytes": 307847168,
+      "stopped": null
+    },
+    {
+      "batch": "fe-prod67-build13",
+      "kind": "Typecheck and frontend build",
+      "private_receipt_sha256": "e5bc799908cbe808d873ecb92fa8ac920d98c6ca4964768a9a7aa61608db52c4",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 10706767872,
+      "own_peak_bytes": 639483904,
+      "stopped": null
+    },
+    {
+      "batch": "prod67-backup-real02",
+      "kind": "Actual PostgreSQL backup/restore",
+      "private_receipt_sha256": "6793da44cab660dd0d833a53d44403c2a72f340ea4e8c5e2d78ec7188c67e6e1",
+      "passed": true,
+      "jar_sha256": "3e3fb8eaef130149dc9fcccee80ce032befb29318316d10ceaf88eec113d488f"
+    },
+    {
+      "batch": "prod67-tls-real02",
+      "kind": "Actual production TLS",
+      "private_receipt_sha256": "3ba1e711c81629ffd3590ab02cee2ccf1b95a1aa96690f7d8575cb8de446f5b3",
+      "passed": true,
+      "total_checks": 44,
+      "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+      "java_stopped_after_checks": true,
+      "Windows_native_execution": false
+    },
+    {
+      "batch": "prod69-admin-native01",
+      "kind": "Actual new schema and initial Administrator",
+      "private_receipt_sha256": "5402fc693ac47776f02a3897955a16ffc704ec525d9afe14d7d9122f8e97c80b",
+      "passed": true,
+      "checks_count": 9,
+      "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944"
+    },
+    {
+      "batch": "prod69-first-access02",
+      "kind": "Actual first access TLS API plus separate Chrome HTTP",
+      "private_receipt_sha256": "ced89e777b616abd6e06205745c4d768e8bdb93c75ac06ca34e78760cebdc2b5",
+      "passed": true,
+      "checks_count": 7,
+      "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+      "Windows_native_execution": false
+    },
+    {
+      "batch": "prod69-tls-resources03",
+      "kind": "TLS memory wrapper",
+      "private_receipt_sha256": "e0d8caeffa5ee906254209056b3a0a24514205c8fb6239f4803841115383452b",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 9233989632,
+      "own_peak_bytes": 553230336,
+      "stopped": null
+    },
+    {
+      "batch": "prod69-admin-resources01",
+      "kind": "Admin memory wrapper",
+      "private_receipt_sha256": "9c2908f65d1478bd884b3c53958fdc469d78b7e9de6238eed0720473d7739e01",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 9099763712,
+      "own_peak_bytes": 286789632,
+      "stopped": null
+    },
+    {
+      "batch": "prod69-first-resources03",
+      "kind": "First access memory wrapper",
+      "private_receipt_sha256": "bb21f3fa1ac018b1a5e1ae1417100df19fe181aff7d115a694b7581f47bcf66e",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 10380120064,
+      "own_peak_bytes": 918065152,
+      "stopped": null
+    }
+  ],
+  "browser": {
+    "version": "157.0.8103.50",
+    "sandbox": true,
+    "transport": "HTTP loopback only; actual prod TLS API tested separately",
+    "private_result_sha256": "1f1cdc3c1d4a793c4e603727f41b41d16b39e12b3466ea8ab0e0d8a0e57dd706"
+  },
+  "resources": {
+    "heavy_batches_parallel": false,
+    "batch_size": "2-4 related classes/files when useful; finite native phases sequential",
+    "human_cap_bytes": 15000000000,
+    "preventive_ram_plus_swap_bytes": 12000000000,
+    "max_recent_observed_ram_plus_swap_bytes": 10380120064,
+    "checkpoint_before_each_heavy_batch": true,
+    "global_cooperative_queue": true,
+    "own_test_cgroups_oom_zero": true,
+    "host_or_GUI_survival_not_inferred_from_own_oom_counters": true
+  },
+  "external_conditions": [
+    "Native Windows10 runtime/PowerShell/ACL/service and target compatibility",
+    "Real target DNS and institutional TLS certificate, Chrome HTTPS journey",
+    "Defined off-computer protected backup destination plus restore from that copy",
+    "Named accountable production acceptance owner",
+    "Real outbound mail proof if mail is enabled"
+  ],
+  "not_performed": [
+    "production access/deploy",
+    "off-machine backup copy",
+    "native Windows execution",
+    "new institutional acceptance"
+  ],
+  "independent_reviews": "PENDING_CURRENT_DIFF",
+  "no_sonar": true,
+  "frontend_lint": "NO_SCRIPT_AVAILABLE",
+  "protected_existing_test_sha256": "eb2e5a34c9f47efb8151e52470b438d24f1e22215bc694e945fa813bf52e679b"
+}

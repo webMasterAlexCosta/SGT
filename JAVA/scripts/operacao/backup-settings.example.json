@@ -1,0 +1,13 @@
+{
+  "database": {
+    "host": "127.0.0.1",
+    "port": 5432,
+    "name": "sgt_novo",
+    "user": "sgt_app_limitada",
+    "password": "",
+    "sslmode": "disable"
+  },
+  "uploads": "C:/SGT/data/uploads",
+  "audit_fallback": "C:/SGT/private-audit/fallback.jsonl",
+  "recovery_material": "C:/SGT/private-recovery"
+}

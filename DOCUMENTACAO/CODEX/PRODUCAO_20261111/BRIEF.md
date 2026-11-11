@@ -1,0 +1,21 @@
+# Preparação operacional e ensaios de produção
+
+O usuário autorizou concluir a preparação e realizar os ensaios no laboratório existente. Alvo informado: Windows 10, banco novo, sem migração de acervo. Não existe destino externo de backup nem responsável pelo aceite. Mantêm-se Sol/xhigh, Chrome/Chromium desktop, ausência de Sonar, checkpoints e fila única, teto agregado15GB e proteção preventiva12GB de RAM+swap (ajustada após o pedido humano de lotes intermediários). Não há autorização para implantar em produção, alterar o sistema operacional ou instalar componentes globais.
+
+Reutilizar o JAR08, fontes e pareceres funcionais26/12 no alcance que efetivamente conservar seus bytes. As mudanças operacionais serão delimitadas por diff, compilação, JAR e novos ensaios; não promover os recibos anteriores a aprovação da configuração modificada.
+
+## Solução adotada no escopo autorizado
+
+1. Endurecer o perfil `prod` existente para a modalidade inicial de JAR com TLS direto. Recusar configuração insegura antes da criação dos beans de persistência, com mensagens que identifiquem as propriedades e nunca seus valores. Conservar schema `validate`, SQL init `never`, logs SQL desligados e cargas opcionais desativadas. Desenvolvimento mantém seus contratos.
+2. Disponibilizar preparação explícita de schema novo exclusivamente por Hibernate/JPA, sem servidor HTTP, sementes ou scripts DDL. A ferramenta deve comprovar PostgreSQL18.6, role limitada, ownership e ausência de tabelas antes da preparação. Não serve para atualizar acervo existente.
+3. Criar suporte operacional de backup/restauração de dados e arquivos, com aplicação parada, fingerprints e hashes; restauração somente em banco próprio vazio cujo schema tenha sido produzido por JPA. Nunca apagar conteúdo existente, desabilitar constraints/triggers, recorrer a superusuário ou restaurar DDL de dump. Segredos de recuperação permanecem privados. Operação de cache não inclui FLUSH nem importação de cache antigo.
+4. Preparar comandos Windows/PowerShell para o JAR e documentação de primeira instalação, verificação, cópia externa, restauração e reversão. Não instalar serviço, modificar firewall, importar certificado no host ou contornar ExecutionPolicy. Ferramentas auxiliares e pré-requisitos devem ser explícitos.
+5. Ensaiar em recursos isolados autorizados: rejeições de configuração, perfilprod/TLS, autenticação/CSRF/cookies, rotas/assets, backup íntegro, restauração em banco novo e uso real após reinício. Rodar lotes pequenos, um por vez, com checkpoint durável.
+
+Primeiro acesso: a inspeção comprovou que o seed atual é de desenvolvimento e cria Administrador/GestorNacional/Presidente com identidades de exemplo. Ele não será utilizado para comissionar produção. Disponibilizar comando local separado para criar exatamente um Administrador nominal, com matrícula/e-mail/username e senha explícitos em configuração privada; BCrypt e troca obrigatória no primeiro acesso. Exigir schema já validado, banco próprio sem quaisquer dados de aplicação, confirmação explícita e transação serializada para não criar dois administradores simultaneamente. Registrar recibo técnico sem senha. O comando não integra o ComponentScan, não abre HTTP, não redefine contas existentes e não cria um poder novo no fluxo de concessões. A identidade institucional do responsável permanece informação externa a preencher.
+
+## Limites que não podem virar aprovação presumida
+
+O host de execução é Linux. Preparar comandos para Windows não comprova execução nativa no Windows10; esse teste será distinguido dos ensaios reais feitos aqui. A edição/cobertura de atualizações do Windows deverá ser comprovada no destino. Redis/Valkey deve ter endpoint e serviço compatível definidos, sem instalação de substituto por conveniência. Certificado de laboratório não atesta certificado institucional. Ausência de backup externo e de responsável pelo aceite permanece condição externa, não defeito a esconder nem autorização para criar um destino.
+
+O encerramento possível desta etapa é um pacote e ensaios operacionais comprovados no laboratório, com pendências externas explícitas. Só declarar pronto para a entrada em produção quando as condições aplicáveis do destino também estiverem comprovadas e o aceite humano tiver sido registrado.

@@ -7,6 +7,10 @@ import { criarConfiguracaoFrontend } from '../src/core/configuracaoFrontend.ts';
 const exemplo = parseEnv(readFileSync(new URL('../.env.example', import.meta.url), 'utf8'));
 
 describe('Configuração reproduzível da suíte sem ambiente privado', () => {
+  it('expõe o modo real de build sem confundi-lo com aceite de produção', () => {
+    expect(criarConfiguracaoFrontend(exemplo, { producao: true }).BUILD_PRODUCAO).toBe(true);
+    expect(criarConfiguracaoFrontend(exemplo, { producao: false }).BUILD_PRODUCAO).toBe(false);
+  });
   it('importa a configuração real do aplicativo usando o exemplo sanitizado nos testes', async () => {
     const { CONFIG } = await import('../src/core/config.ts');
     expect(CONFIG.API_URL).toBe(exemplo.VITE_API_URL);
