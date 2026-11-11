@@ -15,4 +15,3 @@ $arguments = @('-Xmx512m', '-XX:MaxMetaspaceSize=256m', '-Duser.timezone=America
     "--env-file=$($checked.ConfigPath)", "--spring.config.import=$($checked.ConfigUri)", '--sgt.admin.autorizado=true')
 & $checked.Java @arguments
 if ($LASTEXITCODE -ne 0) { throw 'SGT_WINDOWS_ADMIN_COMMISSIONING_FAILED: nao repetir sobre banco com dados' }
-

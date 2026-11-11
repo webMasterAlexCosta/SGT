@@ -15,4 +15,3 @@ $arguments = @('-Xmx512m', '-XX:MaxMetaspaceSize=256m', '-Duser.timezone=America
     "--env-file=$($checked.ConfigPath)", "--spring.config.import=$($checked.ConfigUri)", '--sgt.schema.autorizado=true')
 & $checked.Java @arguments
 if ($LASTEXITCODE -ne 0) { throw 'SGT_WINDOWS_SCHEMA_PREPARATION_FAILED: nao apagar nem repetir sobre acervo existente' }
-

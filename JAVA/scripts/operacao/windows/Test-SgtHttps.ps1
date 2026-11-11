@@ -24,4 +24,3 @@ try {
 } finally {
     [Net.ServicePointManager]::SecurityProtocol = $oldProtocols
 }
-

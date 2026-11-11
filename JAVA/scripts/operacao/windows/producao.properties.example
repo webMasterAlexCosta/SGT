@@ -140,4 +140,3 @@ sgt.admin.email=
 sgt.admin.password=
 # Redis remoto deve ter endpoint/TLS/trust definidos pelo responsavel.
 spring.data.redis.ssl.enabled=false
-

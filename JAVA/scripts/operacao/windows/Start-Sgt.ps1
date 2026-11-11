@@ -18,4 +18,3 @@ $arguments = @("-Xmx${HeapMiB}m", '-XX:MaxMetaspaceSize=256m', '-Duser.timezone=
     '-jar', $checked.Jar, '--spring.profiles.active=prod', "--env-file=$($checked.ConfigPath)", "--spring.config.import=$($checked.ConfigUri)")
 & $checked.Java @arguments
 if ($LASTEXITCODE -ne 0) { throw 'SGT_WINDOWS_PROCESS_FAILED: confira o log privado' }
-

@@ -43,4 +43,3 @@ function Get-SgtCheckedInputs {
         Java = $javaCommand.Source
     }
 }
-
