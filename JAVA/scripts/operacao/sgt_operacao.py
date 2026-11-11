@@ -114,6 +114,36 @@ def _check_layout(cfg):
         raise OperationError('SGT_OP_PRIVATE_RECOVERY_AND_AUDIT_MUST_BE_SEPARATE_FROM_UPLOADS')
 
 
+def _restore_layout(cfg, backup):
+    # Reject before DB construction, phase receipts or file publication, also
+    # for --resume-files-only. resolve() includes existing parent symlinks.
+    try:
+        source = Path(backup).resolve()
+        for key in ['uploads', 'recovery_material', 'audit_fallback', '_settings_path']:
+            if cfg.get(key) is None: continue
+            target = Path(cfg[key]).resolve()
+            if target.is_relative_to(source) or source.is_relative_to(target):
+                raise OperationError('SGT_OP_RESTORE_BACKUP_LAYOUT_CONFLICT')
+    except (OSError, RuntimeError) as error:
+        if isinstance(error, OperationError): raise
+        raise OperationError('SGT_OP_RESTORE_PATH_INVALID') from None
+
+
+def _database_identity_key(identity):
+    # Addresses/ports are not global server identities. Read the actual
+    # initdb identifier; never replace missing proof with an operator label.
+    if not isinstance(identity, dict): raise OperationError('SGT_OP_CLUSTER_IDENTITY_REQUIRED')
+    cluster = identity.get('system_identifier'); oid = identity.get('database_oid')
+    if not isinstance(cluster, str) or not re.fullmatch(r'[1-9][0-9]{0,19}', cluster) or int(cluster) >= 2**64:
+        raise OperationError('SGT_OP_CLUSTER_IDENTITY_REQUIRED')
+    # PostgreSQL json_build_object serializes oid as text; normalize the
+    # catalog decimal representation without accepting booleans/floats.
+    if isinstance(oid, str) and re.fullmatch(r'[1-9][0-9]{0,9}', oid): oid = int(oid)
+    if type(oid) is not int or not 0 < oid < 2**32:
+        raise OperationError('SGT_OP_CLUSTER_IDENTITY_REQUIRED')
+    return cluster, oid
+
+
 def _relative(name):
     p = PurePosixPath(name)
     if not name or '\\' in name or ':' in name or p.is_absolute() or any(v in {'.', '..'} for v in p.parts) or str(p) != name:
@@ -177,6 +207,7 @@ class Database:
     def identity(self):
         d = self.query("""SELECT json_build_object('version',current_setting('server_version_num')::int,
           'database',current_database(),'database_oid',d.oid,'current_user',current_user,
+          'system_identifier',(SELECT system_identifier::text FROM pg_control_system()),
           'server_address',inet_server_addr()::text,'server_port',inet_server_port(),
           'owned',d.datdba=r.oid,'limited',NOT(r.rolsuper OR r.rolcreatedb OR r.rolcreaterole OR r.rolreplication OR r.rolbypassrls),
           'no_memberships',NOT EXISTS(SELECT 1 FROM pg_auth_members WHERE member=r.oid),
@@ -185,6 +216,7 @@ class Database:
           FROM pg_database d JOIN pg_roles r ON r.rolname=current_user WHERE d.datname=current_database();""")
         if d['version'] != 180006 or d['database'] != self.db['name'] or d['current_user'] != self.db['user'] or not all(d[k] for k in ['owned', 'limited', 'no_memberships', 'all_relations_owned', 'no_other_user_schemas']):
             raise OperationError('SGT_OP_DATABASE_IDENTITY_REFUSED')
+        _database_identity_key(d)
         for tool in ['psql', 'pg_dump', 'pg_restore']:
             if not re.search(r'\b18\.6(?:\s|$)', self._run(tool, ['--version'])):
                 raise OperationError('SGT_OP_POSTGRES_CLIENT_186_REQUIRED')
@@ -317,10 +349,11 @@ def _publish_file(source, target):
 def restore(cfg, path, expected_manifest_sha256, *, application_stopped=False, resume_files_only=False):
     if not application_stopped: raise OperationError('SGT_OP_STOP_APPLICATION_FIRST')
     _check_layout(cfg)
-    path = Path(path);manifest = verify_bundle(path, expected_manifest_sha256)
+    path = Path(path);_restore_layout(cfg, path)
+    manifest = verify_bundle(path, expected_manifest_sha256)
+    source_key = _database_identity_key(manifest.get('identity'))
     db = Database(cfg);identity = db.identity()
-    key = lambda d: (d['server_address'], d['server_port'], d['database_oid'])
-    if key(identity) == key(manifest['identity']): raise OperationError('SGT_OP_RESTORE_SOURCE_DATABASE_REFUSED')
+    if _database_identity_key(identity) == source_key: raise OperationError('SGT_OP_RESTORE_SOURCE_DATABASE_REFUSED')
     db.idle()
     if db.schema() != manifest['schema']: raise OperationError('SGT_OP_JPA_SCHEMA_MISMATCH')
     before = db.fingerprint()

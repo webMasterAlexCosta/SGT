@@ -14,7 +14,7 @@ class OperacaoTest(unittest.TestCase):
   self.settings=self.root/'private.json';self.settings.write_text(json.dumps(self.cfg));self.settings.chmod(0o600)
   self.fp={'tables':{'t':{'rows':2,'sha256':'a'*64}},'sequences':{'t_seq':{'last_value':2,'is_called':True}}}
   self.schema={'columns':[{'table':'t','name':'id','type':'bigint'}],'constraints':[],'indexes':[]}
-  self.identity={'database':'sgt_sintetico','database_oid':41,'server_address':'127.0.0.1','server_port':55432}
+  self.identity={'database':'sgt_sintetico','database_oid':41,'server_address':'127.0.0.1','server_port':55432,'system_identifier':'1000000000000000001'}
 
  def fake_db(self,target=False):
   d=MagicMock();d.identity.return_value={**self.identity,**({'database':'sgt_destino','database_oid':42} if target else {})}
@@ -158,5 +158,53 @@ class OperacaoTest(unittest.TestCase):
   with patch.object(op,'Database',return_value=db):
    with self.assertRaises(op.OperationError):op.restore(cfg,out,result['manifest_sha256'],application_stopped=True,resume_files_only=True)
   self.assertEqual(sentinel.read_bytes(),b'nao-apagar')
+
+
+ def _restore_overlap_refused_before_database(self,key):
+  out,result=self.make_backup();before=op.tree_files(out)
+  for resume in [False,True]:
+   for target in [out/('nested-'+key),out]:
+    with self.subTest(resume=resume,target=str(target)):
+     cfg=self.target();cfg[key]=target
+     with patch.object(op,'Database') as db:
+      actual=self.fake_db(target=True);actual.fingerprint.side_effect=[{'tables':{'t':{'rows':0,'sha256':'0'*64}},'sequences':{}},self.fp];db.return_value=actual
+      with self.assertRaisesRegex(op.OperationError,'SGT_OP_RESTORE_BACKUP_LAYOUT_CONFLICT'):
+       op.restore(cfg,out,result['manifest_sha256'],application_stopped=True,resume_files_only=resume)
+      db.assert_not_called()
+     self.assertEqual(op.tree_files(out),before)
+
+ def test_restore_recusa_uploads_dentro_do_proprio_backup(self):self._restore_overlap_refused_before_database('uploads')
+ def test_restore_recusa_chaves_dentro_do_proprio_backup(self):self._restore_overlap_refused_before_database('recovery_material')
+ def test_restore_recusa_auditoria_dentro_do_proprio_backup(self):self._restore_overlap_refused_before_database('audit_fallback')
+ def test_restore_recusa_marcadores_dentro_do_proprio_backup(self):self._restore_overlap_refused_before_database('_settings_path')
+
+ def test_outro_cluster_com_mesmo_endereco_porta_oid_nao_e_a_fonte(self):
+  out,result=self.make_backup();cfg=self.target();db=self.fake_db(target=True)
+  db.identity.return_value={**self.identity,'system_identifier':'1000000000000000002'}
+  db.fingerprint.side_effect=[{'tables':{'t':{'rows':0,'sha256':'0'*64}},'sequences':{}},self.fp]
+  with patch.object(op,'Database',return_value=db):r=op.restore(cfg,out,result['manifest_sha256'],application_stopped=True)
+  self.assertTrue(r['verified']);db.restore_data.assert_called_once()
+
+ def test_cluster_e_oid_originais_recusados_mesmo_por_outro_endereco(self):
+  out,result=self.make_backup();db=self.fake_db(target=True)
+  db.identity.return_value={**self.identity,'server_address':'127.0.0.2','server_port':55433}
+  with patch.object(op,'Database',return_value=db):
+   with self.assertRaisesRegex(op.OperationError,'SGT_OP_RESTORE_SOURCE_DATABASE_REFUSED'):
+    op.restore(self.target(),out,result['manifest_sha256'],application_stopped=True)
+   db.restore_data.assert_not_called()
+
+ def test_manifesto_sem_identidade_de_cluster_recusado_sem_fallback(self):
+  out,result=self.make_backup();p=out/'manifest.json';m=json.loads(p.read_text());m['identity'].pop('system_identifier');p.write_text(json.dumps(m))
+  with patch.object(op,'Database') as db:
+   with self.assertRaisesRegex(op.OperationError,'SGT_OP_CLUSTER_IDENTITY_REQUIRED'):
+    op.restore(self.target(),out,op.file_hash(p),application_stopped=True)
+   db.assert_not_called()
+
+ def test_oid_json_postgres_texto_e_inteiro_identificam_o_mesmo_banco(self):
+  self.assertEqual(op._database_identity_key(self.identity),op._database_identity_key({**self.identity,'database_oid':'41'}))
+  for invalid in [True,'4.1','',0,-1,2**32]:
+   with self.subTest(oid=invalid):
+    with self.assertRaisesRegex(op.OperationError,'SGT_OP_CLUSTER_IDENTITY_REQUIRED'):
+     op._database_identity_key({**self.identity,'database_oid':invalid})
 
 if __name__=='__main__':unittest.main()

@@ -122,6 +122,44 @@
       "peak_aggregate_bytes": 10380120064,
       "own_peak_bytes": 918065152,
       "stopped": null
+    },
+    {
+      "batch": "prod70-review-green03",
+      "kind": "31 Python isolated tests, including two review regressions and PostgreSQL textual OID",
+      "private_receipt_sha256": "a479fecaf758c18da07a6549cb884d4555de9d64dff7fac412ae5c096915b315",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 10145873920,
+      "own_peak_bytes": 48123904,
+      "stopped": null,
+      "tests_executed": 31
+    },
+    {
+      "batch": "prod70-backup-real04",
+      "kind": "Final actual PostgreSQL backup/restore with eight overlap counterchecks",
+      "private_receipt_sha256": "37bdcafd56f68ef93dc0c0387d90b1b14525a71113622b9872b6d7b27350297a",
+      "passed": true,
+      "jar_sha256": "6d55cba894b037b6a20cca83a6d49b6f30b0e4a1c62ba95bfb434bdfbadf6944",
+      "tool_sha256": "c1af414d9389faff1d001836a8b6b8e97755e480f35db33d590bc33e659b336a",
+      "tables": 72,
+      "rows": 7383,
+      "sequences": 68,
+      "durable_uploads": 6,
+      "private_recovery_files": 5,
+      "overlap_controls": 8,
+      "backup_tree_overlap_refused_before_changes": true,
+      "cluster_identity_read_by_limited_role_without_privilege_changes": true,
+      "same_cluster_different_database_restore_verified": true,
+      "cross_cluster_collision_classification": "Unit tested, no second physical cluster claimed",
+      "source_unchanged": true
+    },
+    {
+      "batch": "prod70-backup-resources04",
+      "kind": "Final backup memory and immutable source wrapper",
+      "private_receipt_sha256": "08df2115b74b6a99b0a8fa0b7d02147eefbbf9fe726877ae905e5d493271ce6b",
+      "exit_code": 0,
+      "peak_aggregate_bytes": 10470993920,
+      "own_peak_bytes": 61079552,
+      "stopped": null
     }
   ],
   "browser": {
@@ -135,7 +173,7 @@
     "batch_size": "2-4 related classes/files when useful; finite native phases sequential",
     "human_cap_bytes": 15000000000,
     "preventive_ram_plus_swap_bytes": 12000000000,
-    "max_recent_observed_ram_plus_swap_bytes": 10380120064,
+    "max_recent_observed_ram_plus_swap_bytes": 10470993920,
     "checkpoint_before_each_heavy_batch": true,
     "global_cooperative_queue": true,
     "own_test_cgroups_oom_zero": true,
@@ -154,8 +192,17 @@
     "native Windows execution",
     "new institutional acceptance"
   ],
-  "independent_reviews": "PENDING_CURRENT_DIFF",
+  "independent_reviews": {
+    "Java_initial": "PENDING: two P2 found in76baa29d, corrected and revalidated; independent recheck still pending",
+    "frontend": "PENDING_CURRENT_DIFF"
+  },
   "no_sonar": true,
   "frontend_lint": "NO_SCRIPT_AVAILABLE",
-  "protected_existing_test_sha256": "eb2e5a34c9f47efb8151e52470b438d24f1e22215bc694e945fa813bf52e679b"
+  "protected_existing_test_sha256": "eb2e5a34c9f47efb8151e52470b438d24f1e22215bc694e945fa813bf52e679b",
+  "current_support_tool_sha256": "c1af414d9389faff1d001836a8b6b8e97755e480f35db33d590bc33e659b336a",
+  "review_corrections": [
+    "Reject restore destinations and phase marker configuration inside/equal/containing backup before Database construction, including resume",
+    "Compare server-read system_identifier plus normalized database OID, not non-global address/port/OID",
+    "Refuse missing cluster identity, no implicit grant or override; native textual OID regression included"
+  ]
 }
