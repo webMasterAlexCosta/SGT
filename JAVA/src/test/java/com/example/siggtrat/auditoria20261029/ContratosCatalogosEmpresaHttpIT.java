@@ -329,7 +329,9 @@ class ContratosCatalogosEmpresaHttpIT extends ContratosHttpBase {
         var original = consultar(c.localA, posicao, "Empresa da publicação sem fornecedor na fotografia");
         var fotoA = original.path("versaoContratual");
         assertThat(fotoA.hasNonNull("fornecedorId")).isFalse();
-        String cnpjB = fotoLegada ? "74001234000236" : "74001234000155";
+        // A fixture é persistida: identifique B pela gestão sintética desta execução.
+        // Constantes por variante colidem ao repetir a suíte no mesmo laboratório.
+        String cnpjB = String.format(java.util.Locale.ROOT, "74%012d", c.gestaoA.getId());
         long b = enviar(c.localA, "/api/fornecedores", mapa("razaoSocial", "Empresa B", "cnpj", cnpjB),
                 200, "Fornecedor sintético B exclusivo da variante").path("id").asLong();
         var req = aditamento("TROCA-COM-EFEITO-JA-VIGENTE", d);
