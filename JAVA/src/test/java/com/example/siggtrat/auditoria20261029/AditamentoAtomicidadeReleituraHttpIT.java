@@ -61,6 +61,12 @@ class AditamentoAtomicidadeReleituraHttpIT extends ContratosHttpBase {
             catch (Exception e) { throw new IllegalStateException(e); } });
         var habilitada = new java.util.concurrent.atomic.AtomicBoolean(true);
         var disparos = new java.util.concurrent.atomic.AtomicInteger();
+        // Resolva o alvo AOP antes de abrir o contexto de stubbing do Mockito.
+        // A inspeção do proxy nesse contexto pode consumir a resposta no logger.
+        var motorAlvo = org.springframework.test.util.AopTestUtils
+                .<com.example.siggtrat.servico.MotorTemporalContratoServico>getUltimateTargetObject(motor);
+        assertThat(org.mockito.Mockito.mockingDetails(motorAlvo).isSpy())
+                .as("A falha é injetada no spy real do motor, após resolver o proxy").isTrue();
         org.mockito.Mockito.doAnswer(invocacao -> {
             Contrato contrato = invocacao.getArgument(0);
             EventoCicloVidaContrato evento = invocacao.getArgument(1);
@@ -88,7 +94,7 @@ class AditamentoAtomicidadeReleituraHttpIT extends ContratosHttpBase {
                 throw new FalhaSinteticaPersistencia();
             }
             return fotografia;
-        }).when(org.springframework.test.util.AopTestUtils.<com.example.siggtrat.servico.MotorTemporalContratoServico>getUltimateTargetObject(motor))
+        }).when(motorAlvo)
                 .registrarFotografiaProjetada(org.mockito.ArgumentMatchers.any(Contrato.class),
                         org.mockito.ArgumentMatchers.any(EventoCicloVidaContrato.class), org.mockito.ArgumentMatchers.any(java.time.LocalDate.class),
                         org.mockito.ArgumentMatchers.any(com.example.siggtrat.dto.VersaoContratoNegocialDTO.class));
