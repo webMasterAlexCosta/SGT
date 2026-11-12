@@ -376,7 +376,7 @@ export const LeituraGerencialPeriodo = ({
         <div><span>Taxa de presença</span><strong>{temBaseAtual ? percentual(periodo.taxaPresenca) : "—"}</strong></div>
         <div><span>Empregados com ausência</span><strong>{numero(periodo.empregadosComAusencia)}</strong></div>
         <div><span>Recorrentes (3+ ausências)</span><strong>{numero(periodo.empregadosComAusenciaRecorrente)}</strong></div>
-        <div><span>Período analisado</span><strong>{numero(periodo.dias)} dias</strong></div>
+        <div><span>Período analisado</span><strong>{numero(periodo.dias)} {periodo.dias === 1 ? "dia" : "dias"}</strong></div>
       </div>
 
       <div className={estilos.composicaoAusencias}>
@@ -387,7 +387,9 @@ export const LeituraGerencialPeriodo = ({
 
       <p className={estilos.nota}>
         Os números acima usam todos os lançamentos operacionais entre {intervaloPeriodo(periodo)}.
-        A data de referência é o último dia da janela, não o único dia analisado.
+        {periodo.dias === 1
+          ? "Nesta janela diária, o período e a data de referência correspondem ao mesmo dia."
+          : "A data de referência é o último dia da janela, não o único dia analisado."}
       </p>
 
       {!temBaseAtual ? (

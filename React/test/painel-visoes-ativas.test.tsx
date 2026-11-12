@@ -37,6 +37,8 @@ describe('visões vigentes do painel', () => {
     expect(screen.getByRole('heading', { name: 'Operação e frequência', exact: true })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Confiabilidade e integridade', exact: true })).toBeTruthy();
     expect(screen.getByRole('heading', { name: 'Atividade gerencial recente', exact: true })).toBeTruthy();
+    expect(screen.getByText('Período analisado').parentElement).toHaveTextContent('1 dia');
+    expect(screen.getByText(/Nesta janela diária, o período e a data de referência correspondem ao mesmo dia/)).toBeVisible();
     expect(screen.queryByText(/checklist de governança/i)).toBeNull();
   });
 });

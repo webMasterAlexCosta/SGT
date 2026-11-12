@@ -101,10 +101,12 @@
 .tooltipGrafico li { display: flex; align-items: center; gap: 7px; color: #506672; font-size: .75rem; }
 .tooltipGrafico li span { width: 9px; height: 9px; border-radius: 50%; flex: 0 0 9px; }
 
-.funilFrequencia { display: grid; gap: 7px; margin-top: 8px; }
-.funilFrequencia > div { display: grid; grid-template-columns: minmax(95px, .55fr) minmax(120px, 1fr) 54px; align-items: center; gap: 8px; }
-.funilFrequencia label { color: #5d707b; font-size: .75rem; }
-.funilFrequencia strong { color: #203541; font-size: .75rem; text-align: right; }
+.funilFrequencia { display: grid; margin-top: 8px; }
+.funilFrequencia > div { display: grid; gap: 6px; min-width: 0; padding: 10px 0; border-bottom: 1px solid #edf1f4; }
+.funilFrequencia > div:last-child { border-bottom: 0; }
+.funilFrequencia > div > div:first-child { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; color: #5d707b; font-size: .8rem; }
+.funilFrequencia strong { flex-shrink: 0; color: #203541; font-size: .95rem; text-align: right; }
+.funilFrequencia small { color: var(--cor-texto-secundario); font-size: .75rem; line-height: 1.4; }
 .faixaFunil { height: 9px; overflow: hidden; border-radius: 99px; background: #e9eef1; }
 .faixaFunil span { display: block; height: 100%; border-radius: inherit; }
 
@@ -121,6 +123,11 @@
 .auditoriaCabecalho { display: flex; align-items: flex-start; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
 .auditoriaCabecalho h4 { margin: 0; color: #203541; font-size: .88rem; }
 .auditoriaCabecalho p { margin: 3px 0 0; color: var(--cor-texto-secundario); font-size: .75rem; }
+.auditoriaCabecalho > span { color: var(--cor-texto-secundario); font-size: .8rem; line-height: 1.5; }
+.auditoriaCabecalho button { flex-shrink: 0; min-height: 40px; padding: 8px 12px; border: 1px solid var(--cor-correios-azul-100); border-radius: 8px; background: var(--cor-correios-azul-50); color: var(--cor-correios-azul-800); font: inherit; font-size: .8rem; font-weight: 650; cursor: pointer; }
+.auditoriaCabecalho button:hover:not(:disabled) { background: var(--cor-correios-azul-100); border-color: var(--cor-correios-azul-500); }
+.auditoriaCabecalho button:focus-visible { outline: 3px solid var(--cor-correios-amarelo-500); outline-offset: 2px; }
+.auditoriaCabecalho button:disabled { opacity: .65; cursor: wait; }
 .tabelaRanking { width: 100%; overflow-x: auto; border: 1px solid #e4ebef; border-radius: 9px; }
 .tabelaRanking table { width: 100%; border-collapse: collapse; font-size: .75rem; }
 .tabelaRanking th { padding: 8px; border-bottom: 1px solid #dce6eb; background: #f6f9fb; color: #5d707b; text-align: right; white-space: nowrap; }
@@ -171,7 +178,6 @@
   .chipResumo { min-width: 0; }
   .graficoMedio { height: 240px; }
   .graficoAlto { height: 280px; }
-  .funilFrequencia > div { grid-template-columns: 86px minmax(90px, 1fr) 48px; }
   .listaPrioridades > div { grid-template-columns: 28px minmax(0, 1fr); }
   .listaPrioridades > div > :last-child { grid-column: 2; }
 }
