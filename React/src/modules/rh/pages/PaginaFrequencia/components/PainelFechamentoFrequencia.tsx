@@ -36,7 +36,7 @@ export const PainelFechamentoFrequencia = ({
         <div>
           <span className={estilos.sobreTitulo}><ShieldCheck size={16} aria-hidden="true" /> Fechamento autoritativo</span>
           <h2 id="titulo-fechamento-frequencia">Fechamento do escopo</h2>
-          <p>O processamento, estados e validações pertencem ao Java. O React apenas acompanha o comando assíncrono.</p>
+          <p>Acompanhe o processamento e o resultado do fechamento deste escopo.</p>
         </div>
         <button type="button" className={estilos.botaoSecundario} onClick={aoAtualizar} disabled={carregando || !filtrosProntos}>
           <RefreshCw size={16} aria-hidden="true" /> Atualizar

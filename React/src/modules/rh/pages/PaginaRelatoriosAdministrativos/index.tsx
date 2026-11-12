@@ -289,9 +289,9 @@ export const PaginaRelatoriosAdministrativos = ({ podeEmitir = false }: { podeEm
   };
 
   return (
-    <main className={estilos.pagina}>
+    <div className={estilos.pagina}>
       <header className={estilos.cabecalho}>
-        <div><span className={estilos.selo}>Governança e rastreabilidade</span><h1>Emissões administrativas</h1><p>Prévia atual, snapshots imutáveis, versões e visão “conhecida até” fornecidas pelo Java.</p></div>
+        <div><span className={estilos.selo}>Governança e rastreabilidade</span><h1>Emissões administrativas</h1><p>Consulte prévias, registre versões formais e recupere o que era conhecido em cada data.</p></div>
         <FileCheck2 size={34} aria-hidden="true" />
       </header>
 
@@ -311,7 +311,7 @@ export const PaginaRelatoriosAdministrativos = ({ podeEmitir = false }: { podeEm
           <button type="button" disabled={carregando} onClick={() => executar((opcoes) => ServicoRelatorioAdministrativo.previa(carga, opcoes))}><Search size={16} /> Gerar prévia</button>
           <button type="button" className={estilos.primario} disabled={carregando || !podeEmitir || presidente} onClick={emitir}><FileCheck2 size={16} /> Emitir versão formal</button>
         </div>
-        <p className={estilos.observacao}>XLSX/PDF nesta série são atributos da emissão administrativa persistida; o controlador Java não possui endpoint binário de download para essas emissões. Exportações de arquivo continuam nos relatórios operacionais.</p>
+        <p className={estilos.observacao}>A emissão formal registra uma versão dos dados. Para baixar arquivos XLSX ou PDF, use os relatórios operacionais.</p>
       </section>
 
       <section className={estilos.cartao} aria-label="Conhecimento histórico">
@@ -345,6 +345,6 @@ export const PaginaRelatoriosAdministrativos = ({ podeEmitir = false }: { podeEm
         {!carregandoLista && !erroLista && emissoes.length === 0 && <p className={estilos.textoSecundario}>Nenhuma emissão formal encontrada.</p>}
         {pagina.totalPaginas > 1 && <div className={estilos.paginacao}><button type="button" disabled={pagina.primeira} onClick={() => carregarLista(Math.max(0, pagina.numero - 1))}>Anterior</button><span>Página {pagina.numero + 1} de {pagina.totalPaginas}</span><button type="button" disabled={pagina.ultima} onClick={() => carregarLista(pagina.numero + 1)}>Próxima</button></div>}
       </section>
-    </main>
+    </div>
   );
 };

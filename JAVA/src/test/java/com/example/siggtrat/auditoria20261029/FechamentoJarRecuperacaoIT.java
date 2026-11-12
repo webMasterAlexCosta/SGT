@@ -51,6 +51,7 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
     private static final Duration PRAZO = Duration.ofSeconds(120);
     private static final ZoneId ZONA = ZoneId.of("America/Sao_Paulo");
     private static final Path PREPARO = diretorioPrivado("preparo-");
+    private static final String SCHEMA_ISOLADO = System.getenv("SGT_INTEGRATION_SCHEMA");
     private static final String API = "/api/frequencias/fechamentos";
     @Autowired private JdbcTemplate jdbc;
     private final List<Filho> filhos = new ArrayList<>();
@@ -65,6 +66,16 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
         propriedades.add("file.upload-dir", () -> PREPARO.resolve("uploads").toString());
         propriedades.add("audit.fallback-log", () -> PREPARO.resolve("auditoria-fallback.jsonl").toString());
         propriedades.add("app.relatorios.temp.diretorio", () -> PREPARO.resolve("relatorios").toString());
+        if (SCHEMA_ISOLADO != null) {
+            if (!SCHEMA_ISOLADO.matches("sgt_auditoria_[a-z0-9_]+"))
+                throw new IllegalArgumentException("Schema explícito deve identificar o laboratório de auditoria");
+            URI banco = URI.create(ConfiguracaoPostgresIntegracao.carregar().url().substring("jdbc:".length()));
+            assertEquals("127.0.0.1", banco.getHost());
+            assertNotNull(banco.getQuery(), "URL deve selecionar explicitamente o schema isolado");
+            assertTrue(Arrays.asList(banco.getQuery().split("&")).contains("currentSchema=" + SCHEMA_ISOLADO));
+            propriedades.add("spring.jpa.properties.hibernate.default_schema", () -> SCHEMA_ISOLADO);
+            propriedades.add("spring.jpa.properties.hibernate.hbm2ddl.create_namespaces", () -> "true");
+        }
     }
 
     @Test
@@ -521,6 +532,14 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
         assertTrue(Files.isRegularFile(jar), "O root deve empacotar o candidato antes da execução opt-in");
         hashJar = hashArquivo(jar);
         conferirClasses();
+        if (SCHEMA_ISOLADO != null) {
+            assertEquals(SCHEMA_ISOLADO, jdbc.queryForObject("SELECT current_schema()", String.class));
+            assertEquals(Boolean.TRUE, jdbc.queryForObject("SELECT pg_get_userbyid(nspowner)=current_user "
+                    + "FROM pg_namespace WHERE nspname=current_schema()", Boolean.class));
+        }
+        assertEquals(0L, jdbc.queryForObject("SELECT count(*) FROM fechamento_frequencia "
+                + "WHERE status IN ('PENDENTE','PROCESSANDO')", Long.class),
+                "Cada cenário adversarial exige contexto sem jobs anteriores recuperáveis; não purgar para satisfazer o teste");
         Cenario c = criarCenarioPersistido();
         Massa massa = emTransacao(() -> {
             Contrato contrato = em.find(Contrato.class, c.contratoA.getId());
@@ -558,7 +577,7 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
                         .setParameter("data", candidata).getSingleResult();
                 if (calendario == 0) { data = candidata; break; }
             }
-            assertNotNull(data, "Fixture precisa de um dia útil sem evento de calendário, dentro do padrão30");
+            assertNotNull(data, "Fixture precisa de um dia útil sem evento de calendário na cobertura do contrato");
             return new Massa(c, data, Set.copyOf(empregados), Set.copyOf(vinculos),
                     "Conferência sintética coletiva de duzentos vínculos " + UUID.randomUUID());
         });
@@ -566,7 +585,7 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
         gravar("fixture-sem-credenciais.json", mapa("sintetica", true, "dataReferencia", massa.data().toString(),
                 "quantidade", QUANTIDADE, "empregados", massa.empregados(), "vinculos", massa.vinculos(),
                 "contratoId", c.contratoA.getId(), "gestaoId", c.gestaoA.getId(),
-                "jarSha256", hashJar, "janelaPadraoDias", 30));
+                "jarSha256", hashJar, "janelaPadraoDias", 7, "horasEdicao", 72));
         return massa;
     }
 
@@ -757,18 +776,26 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
                     WHERE a.datname=current_database()
                 )
                 SELECT a.pid,a.application_name,a.wait_event_type,a.wait_event,a.query,
-                       pg_blocking_pids(a.pid)::text AS bloqueadores
+                       pg_blocking_pids(a.pid)::text AS bloqueadores,
+                       EXISTS(SELECT 1 FROM pg_locks l WHERE l.pid=a.pid
+                         AND l.locktype='tuple' AND l.relation=to_regclass(?)) AS tupla_tabela_alvo
                 FROM pg_stat_activity a JOIN fila f ON f.pid=a.pid
-                """, bloqueador);
+                """, bloqueador, tabela);
             List<Map<String, String>> prova = new ArrayList<>();
             for (var espera : esperas) {
                 if (!aplicacoes.contains(espera.get("application_name"))) continue;
                 String sql = espera.get("query").toLowerCase(Locale.ROOT).replace('"', ' ');
                 boolean alvo = sql.matches("(?s).*\\b(?:from|update)\\s+(?:[a-z0-9_]+\\.)?" + tabela + "\\b.*")
                         && (sql.contains("for update") || sql.contains("for no key update") || sql.stripLeading().startsWith("update "));
-                if (!alvo || !"Lock".equals(espera.get("wait_event_type"))) continue;
+                // pg_stat_activity.query é truncável (1 KiB por padrão). A fila
+                // vem do bloqueador conhecido, e pg_locks identifica a tupla da
+                // tabela alvo mesmo quando FROM/FOR UPDATE não cabem no texto.
+                if (!"1".equals(espera.get("tupla_tabela_alvo"))
+                        || !"Lock".equals(espera.get("wait_event_type"))) continue;
                 Map<String, String> sanitizada = new TreeMap<>(espera);
                 sanitizada.remove("query"); sanitizada.put("querySha256", hash(sql.getBytes(StandardCharsets.UTF_8)));
+                sanitizada.put("criterioSqlAnteriorReconheceria", Boolean.toString(alvo));
+                sanitizada.put("textoConsultaBytes", Integer.toString(sql.getBytes(StandardCharsets.UTF_8).length));
                 sanitizada.put("tabelaAlvo", tabela); prova.add(sanitizada);
             }
             if (prova.stream().map(l -> l.get("application_name")).collect(Collectors.toSet()).containsAll(aplicacoes)) return prova;
@@ -820,7 +847,7 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
         String aplicacao = "closure-" + nome + "-" + UUID.randomUUID().toString().substring(0, 8);
         Path log = Files.createFile(evidencias.resolve(nome + ".log"), permissaoArquivo());
         Path arquivos = evidencias.resolve("uploads");
-        List<String> comando = List.of(Path.of(System.getProperty("java.home"), "bin", "java").toString(),
+        List<String> comando = new ArrayList<>(List.of(Path.of(System.getProperty("java.home"), "bin", "java").toString(),
                 "-Xmx192m", "-XX:MaxMetaspaceSize=192m", "-XX:ActiveProcessorCount=2", "-XX:+UseSerialGC", "-Duser.timezone=America/Sao_Paulo",
                 "-jar", jar.toString(), "--env-file=./src/test/resources/auditoria-endpoints.env",
                 "--server.address=127.0.0.1", "--server.port=" + porta, "--server.ssl.enabled=false",
@@ -836,7 +863,9 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
                 "--app.relatorios.temp.diretorio=" + evidencias.resolve("relatorios"),
                 "--frequencia.fechamento.chunk-size=" + chunk, "--frequencia.fechamento.executor-core-pool-size=1",
                 "--frequencia.fechamento.executor-max-pool-size=1", "--frequencia.fechamento.recovery-delay-ms=" + recoveryDelayMs,
-                "--frequencia.fechamento.stale-after-seconds=" + staleAfterSeconds);
+                "--frequencia.fechamento.stale-after-seconds=" + staleAfterSeconds));
+        if (SCHEMA_ISOLADO != null)
+            comando.add("--spring.jpa.properties.hibernate.default_schema=" + SCHEMA_ISOLADO);
         ProcessBuilder builder = new ProcessBuilder(comando).redirectErrorStream(true).redirectOutput(log.toFile());
         var ambiente = builder.environment(); ambiente.clear(); ambiente.put("TZ", "America/Sao_Paulo");
         var banco = ConfiguracaoPostgresIntegracao.carregar();

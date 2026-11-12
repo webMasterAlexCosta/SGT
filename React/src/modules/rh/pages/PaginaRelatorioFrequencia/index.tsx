@@ -194,7 +194,7 @@ export const PaginaRelatorioFrequencia = () => {
   };
 
   return (
-    <main className={estilos.containerGeral}>
+    <div className={estilos.containerGeral}>
       <CabecalhoRelatorio
         existemDados={paginacao.totalColaboradores > 0}
         aoExportarExcel={() => gerarPlanilhaExcel(propriedadesExportacao, iniciarExportacao)}
@@ -248,6 +248,6 @@ export const PaginaRelatorioFrequencia = () => {
       ) : (
         <EstadoVazioRelatorio carregando={carregando} />
       )}
-    </main>
+    </div>
   );
 };

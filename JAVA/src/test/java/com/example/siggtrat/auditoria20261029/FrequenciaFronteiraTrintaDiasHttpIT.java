@@ -38,61 +38,51 @@ class FrequenciaFronteiraTrintaDiasHttpIT extends ContratosHttpBase {
     @Autowired FilaRegistroAuditoria fila;
 
     @ParameterizedTest @CsvSource({"-1,200", "0,403", "1,403"})
-    void apiAplicaTrintaDatasCivisELimiteExclusivoSemEfeitoNaRecusa(long nanos, int esperado) throws Exception {
+    void primeiroLancamentoAplicaTrintaDatasCivisSemEfeitoNaRecusa(long nanos, int esperado) throws Exception {
         var c = criarCenarioPersistido();
         declararFonteNominalSintetica(c, "MESTRE-FRONTEIRA-TRINTA-SINTETICA");
         LocalDate data = RelogioSistema.hoje().minusDays(35).with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
         assertThat(data).isAfterOrEqualTo(INICIO);
         assertThat(politica.diasJanela()).isEqualTo(30);
         ZonedDateTime limite = data.plusDays(30).atStartOfDay(RelogioSistema.ZONA);
-        ZonedDateTime antesDoLimite = limite.minusSeconds(1);
         ZonedDateTime instante = limite.plusNanos(nanos);
         assertThat(politica.instanteFechamento(data)).isEqualTo(limite);
         String consulta = "/api/frequencias?data=" + data + "&contratoId=" + c.contratoA.getId();
-        // Sessões reais são estabelecidas antes do controle exclusivo do relógio negocial.
         consultar(c.operacionalA, consulta, "Controle positivo de sessão operacional");
         consultar(c.localA, consulta, "Controle positivo de sessão do gestor");
+        fila.descarregar();
+        var antes = snapshot();
         try (var relogio = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
-            relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(antesDoLimite);
-            var criada = enviar(c.operacionalA, "/api/frequencias", pedido(c, data, "FALTA"), 200,
-                    "N30: criação legítima antes do fechamento");
-            long id = criada.path("id").asLong();
-            assertThat(LocalDateTime.parse(criada.path("prazoEdicao").asText())).isEqualTo(limite.toLocalDateTime());
-            fila.descarregar();
-            var antes = snapshot();
-            var eventosAntes = consultar(c.localA, "/api/frequencias/" + id + "/eventos", "Evento original real");
-            assertThat(eventosAntes.size()).isEqualTo(1);
             relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(instante);
-            var resposta = enviar(c.operacionalA, "/api/frequencias", pedido(c, data, "PRESENCA"), esperado,
-                    "N30: um nanossegundo antes, no instante exclusivo e um nanossegundo depois");
+            var resposta = enviar(c.operacionalA, "/api/frequencias", pedido(c, data, "FALTA"), esperado,
+                    "Primeiro lançamento: antes, no limite civil exclusivo e depois dele");
             fila.descarregar();
             var depois = snapshot();
-            var eventosDepois = consultar(c.localA, "/api/frequencias/" + id + "/eventos", "Cadeia após comando");
             if (esperado == 200) {
-                assertThat(resposta.path("id").asLong()).isEqualTo(id);
-                assertThat(resposta.path("status").asText()).isEqualTo("PRESENCA");
+                long id = resposta.path("id").asLong();
+                var fonte = emTransacao(() -> { em.clear(); return em.find(Frequencia.class, id); });
+                assertThat(fonte.getPrazoLancamentoEm()).isEqualTo(limite.toInstant());
+                assertThat(fonte.getPrazoEdicaoEm()).isEqualTo(fonte.getRegistradoEm().plus(java.time.Duration.ofHours(72)));
+                assertThat(LocalDateTime.parse(resposta.path("prazoEdicao").asText()).atZone(RelogioSistema.ZONA).toInstant())
+                        .isEqualTo(fonte.getPrazoEdicaoEm());
                 assertThat(resposta.path("estadoNegocial").asText()).isEqualTo("ABERTA");
-                assertThat(resposta.path("versaoNegocial").asLong()).isEqualTo(criada.path("versaoNegocial").asLong() + 1);
-                assertThat(eventosDepois.size()).isEqualTo(2);
-                assertThat(eventosDepois.get(0)).isEqualTo(eventosAntes.get(0));
-                String persistido = emTransacao(() -> { em.clear(); return String.valueOf(em.find(Frequencia.class, id).getStatus()); });
-                assertThat(persistido).isEqualTo("PRESENCA");
+                assertThat(resposta.path("versaoNegocial").asLong()).isEqualTo(1);
+                var eventos = consultar(c.localA, "/api/frequencias/" + id + "/eventos", "Evento original real");
+                assertThat(eventos.size()).isEqualTo(1);
+                assertThat(auditoria.evidenciasIntegridade(id).cadeiaIntegra()).isTrue();
             } else {
                 assertThat(resposta.path("code").asText()).isEqualTo("HTTP_403");
                 assertThat(resposta.path("message").asText()).contains("FECHADA");
                 assertThat(depois).isEqualTo(antes);
-                assertThat(eventosDepois).isEqualTo(eventosAntes);
             }
-            var pagina = consultar(c.localA, consulta, "Projeção temporal não altera a fonte");
-            assertThat(pagina.path("totalElements").asInt()).isEqualTo(1);
-            assertThat(pagina.path("content").get(0).path("estadoNegocial").asText()).isEqualTo(esperado == 200 ? "ABERTA" : "FECHADA");
+            var pagina = consultar(c.localA, consulta, "Leitura não altera a fonte");
+            assertThat(pagina.path("totalElements").asInt()).isEqualTo(esperado == 200 ? 1 : 0);
             assertThat(snapshot()).isEqualTo(depois);
-            assertThat(auditoria.evidenciasIntegridade(id).cadeiaIntegra()).isTrue();
             SnapshotQuantitativos.registrar(mapper, "frequencia-trinta", "limite-" + nanos,
-                    mapa("janela", 30, "dataReferencia", data, "zona", RelogioSistema.ZONA.getId(),
-                            "limiteExclusivo", limite, "instanteControlado", instante, "httpEsperado", esperado,
-                            "antes", antes, "depois", depois, "eventosAntes", eventosAntes.size(),
-                            "eventosDepois", eventosDepois.size(), "controleRelogio",
+                    mapa("janelaLancamento", 30, "horasEdicao", 72, "dataReferencia", data,
+                            "zona", RelogioSistema.ZONA.getId(), "limiteExclusivo", limite,
+                            "instanteControlado", instante, "httpEsperado", esperado,
+                            "antes", antes, "depois", depois, "controleRelogio",
                             "Somente ZonedDateTime.now(zona), CALLS_REAL_METHODS; sem virada física/TCP/Chrome"));
         }
     }

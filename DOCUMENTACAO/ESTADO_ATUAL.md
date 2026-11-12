@@ -1,6 +1,8 @@
 # SGT — estado atual
 
-**Campanha atual: homologação funcional integrada do laboratório aprovada, em Chrome/Chromium desktop, pelos pareceres independentes backend26 e frontend12. Sem P0–P3 nem obrigação aplicável remanescente no recorte examinado.** [Alcance e evidências](CODEX/CAMPANHA_20261109/HOMOLOGACAO_FUNCIONAL_LABORATORIO.md). Produção e implantação não foram homologadas ou autorizadas.
+**Auditoria de 12/11/2026 concluída no alcance do repositório e do laboratório isolado**, com 14 achados corrigidos. Passaram 808 testes unitários Java, 875 React e 1.597 ITs na consolidação da última execução por classe; os ITs não correspondem a uma única execução integral sobre os bytes finais. JAR `963677cb995456c40b3f61a2865d8dfe1b8be93e8f8be9b2ae11861b4a6789d4` integrado e conferido por HTTP/navegador, com ensaios de recuperação e 200 registros abaixo de 120 segundos. Ver [plano](CODEX/AUDITORIA_20261112/PLANO.md), [relatório e limites](CODEX/AUDITORIA_20261112/RELATORIO.md) e [recibos](CODEX/AUDITORIA_20261112/EVIDENCIAS.json). O checkpoint anterior foi enviado ao origin antes das alterações; as correções permanecem locais. Sem homologação de produção ou revisão independente desta auditoria; resultados anteriores não aprovam seus bytes.
+
+**Campanha de 09/11 (histórica): homologação funcional integrada do laboratório aprovada, em Chrome/Chromium desktop, pelos pareceres independentes backend26 e frontend12. Sem P0–P3 nem obrigação aplicável remanescente no recorte examinado.** [Alcance e evidências](CODEX/CAMPANHA_20261109/HOMOLOGACAO_FUNCIONAL_LABORATORIO.md). Produção e implantação não foram homologadas ou autorizadas.
 
 ## O que existe
 
@@ -13,15 +15,15 @@ O [resumo C25-H04](01_RESUMO_REQUISITOS_E_REGRAS_DE_NEGOCIO.md) e as [notas da c
 ## Exigências históricas e alcance atual
 
 - Reconciliar critérios aplicáveis e áreas removidas com a derivada e seus hashes atuais; não declarar 198/198 por herança.
-- Executar e documentar as jornadas reais pertinentes, incluindo autorização/CSRF, janela configurável com padrão30 e limites exclusivos, integrações, arquivos e reinício, em recursos isolados aprovados.
+- Executar e documentar as jornadas reais pertinentes, incluindo autorização/CSRF, janela configurável e limites exclusivos, integrações, arquivos e reinício, em recursos isolados aprovados. O padrão30 pertence à campanha de 09/11; a regra de 11/11 separa lançamento em sete datas civis e edição em 72 horas.
 - Resolver ou revalidar as pendências funcionais/documentais apontadas nos pareceres anteriores. Fixtures não comprovam autenticidade administrativa.
 - Definir e comprovar destino, operação, segurança, backup/recuperação e aceite institucional de produção.
 
-Os três primeiros itens foram reconciliados e demonstrados no alcance do laboratório da campanha atual, conforme os pareceres26/12 e o ledger820. Não se aprovam automaticamente todos os635 critérios por associação de classe, nem autenticidade administrativa de fixtures. O quarto item permanece condição de uma futura implantação em produção, fora do pedido executado. A jornada LAN completa foi confirmada pelo usuário em outro computador físico. Status e limites ficam nos recibos com fonte/diff/hash.
+Os três primeiros itens foram reconciliados e demonstrados no alcance do laboratório da campanha de 09/11, conforme os pareceres26/12 e o ledger820. Não se aprovam automaticamente todos os635 critérios por associação de classe, nem autenticidade administrativa de fixtures. O quarto item permanece condição de uma futura implantação em produção, fora do pedido executado. A jornada LAN completa foi confirmada pelo usuário em outro computador físico. Status e limites ficam nos recibos com fonte/diff/hash.
 
-## Campanha atual —09/11/2026
+## Campanha de 09/11/2026 — histórica
 
-Execução autorizada no [plano atual](CODEX/CAMPANHA_20261109/PLANO.md): Java → revisão/homologação backend → React/TSX → revisão frontend → homologação integrada. Sol/Xalto confirmado na sessão; somente Chrome/Chromium desktop; Sonar excluído por decisão humana e teto agregado15GB, com execução pesada sequencial. A [janela vigente](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) substitui referências antigas a sete dias fixos. Recursos reais isolados dependem da conferência/autorização registrada na campanha; nenhum aceite histórico é promovido.
+Execução autorizada no [plano da campanha](CODEX/CAMPANHA_20261109/PLANO.md): Java → revisão/homologação backend → React/TSX → revisão frontend → homologação integrada. Sol/Xalto confirmado na sessão; somente Chrome/Chromium desktop; Sonar excluído por decisão humana e teto agregado15GB, com execução pesada sequencial. Essa campanha adotou a janela de 30 dias, posteriormente substituída pelos [prazos separados de lançamento e edição de 11/11](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md). Recursos reais isolados dependem da conferência/autorização registrada na campanha; nenhum aceite histórico é promovido.
 
 ## Preparação operacional de 11/11/2026
 

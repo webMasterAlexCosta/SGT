@@ -2,8 +2,11 @@ import React from "react";
 import { EnvolucroDica } from "../../../core/ui/EnvolucroDica";
 import estilos from "../index.module.css";
 
-const ItemLink = ({ dica, rotulo, destino = "#", aoClicar }: { dica?: string; rotulo: string; destino?: string; aoClicar?: () => void }) => (
+const ItemLink = ({ dica, rotulo, destino, aoClicar }: { dica?: string; rotulo: string; destino?: string; aoClicar?: () => void }) => (
   <li>
+    {!aoClicar && (!destino || destino === "#") ? (
+      <span className={estilos.linkIndisponivel}><span>{rotulo}</span><small>Indisponível</small></span>
+    ) : (
     <EnvolucroDica
       tooltip={dica}
       position="top"
@@ -17,6 +20,7 @@ const ItemLink = ({ dica, rotulo, destino = "#", aoClicar }: { dica?: string; ro
         <a href={destino}>{rotulo}</a>
       )}
     </EnvolucroDica>
+    )}
   </li>
 );
 

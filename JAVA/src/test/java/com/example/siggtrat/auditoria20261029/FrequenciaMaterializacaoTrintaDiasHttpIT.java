@@ -28,7 +28,7 @@ import java.util.concurrent.TimeUnit;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertAll;
 
-/** TMP004/ROP034: relógio semântico; serviço/lotes REQUIRES_NEW/commit reais. */
+/** Lançamento configurado N30, fechamento pela edição de 72 horas; commits reais. */
 @TestPropertySource(properties = "frequencia.janela-operacional-dias=30")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class FrequenciaMaterializacaoTrintaDiasHttpIT extends MaterializacaoTrintaSuporte {
@@ -37,25 +37,36 @@ class FrequenciaMaterializacaoTrintaDiasHttpIT extends MaterializacaoTrintaSupor
 
     @Test
     @Timeout(value = 90, unit = TimeUnit.SECONDS)
-    void getProjetaFechadaSemEscreverEServicoMaterializaUmaVezNoTrigesimoPrimeiroDia() throws Exception {
-        Cenario c = criarCenarioPersistido();
-        declararFonteNominalSintetica(c, "N30-MATERIALIZACAO-SINTETICA");
+    void getProjetaFechadaSemEscreverEServicoMaterializaUmaVezAposPrazoDeEdicao() throws Exception {
+        Cenario c;
         LocalDate hoje = RelogioSistema.hoje();
         LocalDate d = hoje.minusDays(29).with(TemporalAdjusters.nextOrSame(DayOfWeek.MONDAY));
         LocalDate recente = hoje.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY));
-        ZonedDateTime limite = d.plusDays(30).atStartOfDay(RelogioSistema.ZONA);
-        String consulta = "/api/frequencias?data=" + d + "&contratoId=" + c.contratoA.getId();
         assertThat(politica.diasJanela()).isEqualTo(30);
         assertThat(Mockito.mockingDetails(taskScheduler).isMock()).isTrue();
-        long id = seed(c, d), controle = seed(c, recente);
+        // O alvo nasce com registro anterior; o limite não vence em massa as
+        // frequências recentes dos outros ensaios que compartilham o laboratório.
+        Instant primeiroLancamento = Instant.now().minus(java.time.Duration.ofDays(4));
+        long id;
+        try (var relogio = Mockito.mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
+            relogio.when(Instant::now).thenReturn(primeiroLancamento);
+            c = criarCenarioPersistido();
+            declararFonteNominalSintetica(c, "N30-MATERIALIZACAO-SINTETICA");
+            id = seed(c, d);
+        }
+        String consulta = "/api/frequencias?data=" + d + "&contratoId=" + c.contratoA.getId();
+        long controle = seed(c, recente);
+        Instant limite = emTransacao(() -> em.find(Frequencia.class, id).getPrazoEdicaoEm());
+        Instant limiteControle = emTransacao(() -> em.find(Frequencia.class, controle).getPrazoEdicaoEm());
+        assertThat(limiteControle).isAfter(limite);
         Foto original = foto(id), controleAntes = foto(controle);
         registrar("semantico-seed", mapa("original", original, "controle", controleAntes, "limite", limite));
         conferirOriginal(original, c.operacionalA.getId());
         conferirOriginal(controleAntes, c.operacionalA.getId());
         consultar(c.localA, consulta, "Sessão legítima do observador antes do relógio semântico");
         // Todas as datas/instantes foram calculadas antes de abrir o MockedStatic.
-        try (var relogio = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
-            relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(limite);
+        try (var relogio = Mockito.mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
+            relogio.when(Instant::now).thenReturn(limite);
             var get = consultar(c.localA, consulta, "GET calcula FECHADA mas não materializa evento");
             Foto depoisGet = foto(id);
             int primeira = fechamento.fecharVencidas();
@@ -67,12 +78,17 @@ class FrequenciaMaterializacaoTrintaDiasHttpIT extends MaterializacaoTrintaSupor
                     "depoisGet", depoisGet, "fechada", fechada, "estavel", estavel, "controleAntes", controleAntes,
                     "controleDepois", controleDepois, "controleEstavel", controleEstavel, "primeiraExecucao", primeira,
                     "repeticao", repeticao, "cadeiaIntegra", integra,
-                    "limiteDaProva", "Só ZonedDateTime.now(zona) controlado. Não prova timer/JAR/virada física."));
+                    "limiteDaProva", "Só Instant.now controlado. Não prova timer/JAR/virada física."));
             assertAll(() -> assertThat(get.path("totalElements").asInt()).isEqualTo(1),
                     () -> assertThat(get.path("content").get(0).path("estadoNegocial").asText()).isEqualTo("FECHADA"),
                     () -> assertThat(depoisGet).as("GET preserva banco ABERTA/v1 e evento original").isEqualTo(original),
                     () -> assertThat(primeira).isGreaterThanOrEqualTo(1),
-                    () -> conferirFechada(original, fechada),
+                    () -> conferirFechada(original, fechada, false),
+                    () -> {
+                        String motivo = emTransacao(() -> em.find(EventoFrequencia.class,
+                                fechada.eventos().get(1).id()).getMotivo());
+                        assertThat(motivo).isEqualTo("Fechamento automático após o prazo de edição do primeiro lançamento.");
+                    },
                     () -> assertThat(integra).isTrue(),
                     () -> assertThat(controleDepois).isEqualTo(controleAntes),
                     () -> assertThat(repeticao).isZero(),
@@ -124,6 +140,11 @@ abstract class MaterializacaoTrintaSuporte extends ContratosHttpBase {
     }
 
     protected void conferirFechada(Foto original, Foto fechada) {
+        conferirFechada(original, fechada, true);
+    }
+
+    /** O ensaio histórico de JAR mantém a exigência original de motivo do 31º dia. */
+    protected void conferirFechada(Foto original, Foto fechada, boolean motivoTrintaUmDias) {
         assertAll(() -> assertThat(fechada.estado()).isEqualTo("FECHADA"), () -> assertThat(fechada.versao()).isEqualTo(2),
                 () -> assertThat(fechada.status()).isEqualTo(original.status()), () -> assertThat(fechada.data()).isEqualTo(original.data()),
                 () -> assertThat(fechada.autorOriginal()).isEqualTo(original.autorOriginal()),
@@ -135,7 +156,7 @@ abstract class MaterializacaoTrintaSuporte extends ContratosHttpBase {
                     Evento e = fechada.eventos().get(1);
                     assertAll(() -> assertThat(e.tipo()).isEqualTo("FECHAMENTO_AUTOMATICO"), () -> assertThat(e.versao()).isEqualTo(2),
                             () -> assertThat(e.data()).isEqualTo(original.data()), () -> assertThat(e.usuario()).isNull(),
-                            () -> assertThat(e.sistema()).isTrue(), () -> assertThat(e.motivo31Dia()).isTrue(),
+                            () -> assertThat(e.sistema()).isTrue(), () -> assertThat(e.motivo31Dia()).isEqualTo(motivoTrintaUmDias),
                             () -> assertThat(e.snapshotV2()).isTrue(), () -> assertThat(e.anterior()).isEqualTo(original.eventos().get(0).hash()),
                             () -> assertThat(e.hash()).hasSize(64), () -> assertThat(e.registradoEm()).isNotNull());
                 });

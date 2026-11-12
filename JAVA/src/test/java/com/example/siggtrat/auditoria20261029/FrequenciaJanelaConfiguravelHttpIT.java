@@ -20,7 +20,7 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
 
-/** Proposta TDD fase36. Não executada. Trinta datas civis, incluindo D como dia1. */
+/** Lançamento configurado para trinta datas civis; edição independente de 72 horas. */
 @TestPropertySource(properties = "frequencia.janela-operacional-dias=30")
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class FrequenciaJanelaConfiguravelHttpIT extends ContratosHttpBase {
@@ -45,15 +45,20 @@ class FrequenciaJanelaConfiguravelHttpIT extends ContratosHttpBase {
         declararFonteNominalSintetica(c, "FASE36-JANELA-CONFIGURAVEL");
         LocalDate data = LocalDate.now(ZONA).minusDays(8)
                 .with(TemporalAdjusters.previousOrSame(DayOfWeek.WEDNESDAY));
-        assertTrue(data.isBefore(LocalDate.now(ZONA).minusDays(6)), "Preparo excede a regra antiga");
+        assertTrue(data.isBefore(LocalDate.now(ZONA).minusDays(6)), "Preparo excede o padrão de sete datas");
         assertFalse(data.isBefore(LocalDate.now(ZONA).minusDays(29)), "Preparo dentro das30datas");
+        Instant antes = Instant.now();
         JsonNode inicial = gravar(c.operacionalA, corpo(c, data, "FALTA", null), 200);
+        Instant depois = Instant.now();
         JsonNode editada = gravar(c.operacionalA, corpo(c, data, "PRESENCA", null), 200);
         assertEquals(inicial.path("id"), editada.path("id"));
         assertEquals("ABERTA", editada.path("estadoNegocial").asText());
         assertEquals("ALTERADA_OPERACIONAL", editada.path("estadoAuditoria").asText());
         assertEquals(inicial.path("versaoNegocial").asLong() + 1, editada.path("versaoNegocial").asLong());
-        assertEquals(data.plusDays(30).atStartOfDay(), LocalDateTime.parse(editada.path("prazoEdicao").asText()));
+        Instant prazo = LocalDateTime.parse(inicial.path("prazoEdicao").asText()).atZone(ZONA).toInstant();
+        assertFalse(prazo.isBefore(antes.plus(Duration.ofHours(72))));
+        assertFalse(prazo.isAfter(depois.plus(Duration.ofHours(72))));
+        assertEquals(inicial.path("prazoEdicao"), editada.path("prazoEdicao"));
         JsonNode retificada = gravar(c.localA, corpo(c, data, "FALTA", "gestor-" + UUID.randomUUID()), 200);
         assertEquals("ABERTA", retificada.path("estadoNegocial").asText());
         assertTrue(retificada.path("bloqueadaEdicaoOperacional").asBoolean());

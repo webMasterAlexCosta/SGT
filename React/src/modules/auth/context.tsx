@@ -162,7 +162,7 @@ const calcularExpiracao = (info: SessionResponse | null | undefined) => {
   return Number.isFinite(declarada) ? Math.max(declarada, estimada) : estimada;
 };
 
-export const ProvedorAutenticacao = ({ children }: React.PropsWithChildren) => {
+export const ProvedorAutenticacao = ({ children, aoConcluirSaida }: React.PropsWithChildren<{ aoConcluirSaida?: () => void }>) => {
   const [usuario, setUsuario] = useState<AuthenticatedUser | null>(null);
   const [carregandoSistema, setCarregandoSistema] = useState(true);
   const [encerrandoSessao, setEncerrandoSessao] = useState(false);
@@ -349,11 +349,11 @@ export const ProvedorAutenticacao = ({ children }: React.PropsWithChildren) => {
     encerramentoRef.current = null;
     limparDadosSessao();
     redefinirIndicadorRedirecionamento?.();
-    window.history.pushState(null, "", "/login");
+    aoConcluirSaida?.();
     setEncerrandoSessao(false);
     setEstadoAutenticacao(ESTADOS_AUTENTICACAO.NAO_AUTENTICADO);
     sessaoExpiradaRef.current = false;
-  }, [limparDadosSessao]);
+  }, [limparDadosSessao, aoConcluirSaida]);
 
   useEffect(() => {
     montadoRef.current = true;

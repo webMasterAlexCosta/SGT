@@ -217,7 +217,7 @@ export const PaginaEmpresasContratadas = () => {
     : pesquisa.trim() ? "Nenhum registro encontrado para esta pesquisa." : "Nenhuma empresa contratada encontrada.";
 
   return (
-    <main className={estilos.pagina}>
+    <div className={estilos.pagina}>
       <ModalConfirmacao />
       <header className={estilos.cabecalho}>
         <h1>Empresas contratadas</h1>
@@ -281,6 +281,6 @@ export const PaginaEmpresasContratadas = () => {
         <button type="button" aria-label="Página anterior de empresas" disabled={carregando || paginaAtual === 0} onClick={() => setPagina(paginaAtual - 1)}>Anterior</button>
         <button type="button" aria-label="Próxima página de empresas" disabled={carregando || paginaAtual + 1 >= totalPaginas} onClick={() => setPagina(paginaAtual + 1)}>Próxima</button>
       </nav>
-    </main>
+    </div>
   );
 };

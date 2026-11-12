@@ -62,7 +62,7 @@ class CacheEscopoTemporalHttpIT extends ContratosHttpBase {
     }
 
     @Test
-    void cacheInternoNaoConservaEstadoAbertoDepoisDoInicioDoOitavoDia() throws Exception {
+    void cachePreservaEdicaoAindaAbertaDepoisDoPrazoDeLancamento() throws Exception {
         var c = criarCenario();
         LocalDate hoje = RelogioSistema.hoje(), data = hoje.minusDays(politica.diasJanela() - 1L), amanha = hoje.plusDays(1);
         String statusCompativel = data.getDayOfWeek().getValue() >= 6 ? "DESCANSO" : "FALTA";
@@ -92,25 +92,67 @@ class CacheEscopoTemporalHttpIT extends ContratosHttpBase {
             calendario.when(RelogioSistema::hoje).thenReturn(amanha);
             instante.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(depoisDaVirada);
             assertTrue(politica.fechada(data, null), "Controle: regra vigente já considera a fronteira configurada fechada");
-            var atual = consultar(c.operacionalA, rota, "FRE-003 cache acompanha fechamento derivado da passagem do tempo");
-            assertEquals("FECHADA", atual.path("content").get(0).path("estadoNegocial").asText());
+            var atual = consultar(c.operacionalA, rota, "Cache respeita a independência entre lançamento e edição");
+            assertEquals("ABERTA", atual.path("content").get(0).path("estadoNegocial").asText(),
+                    "O fim do lançamento não encerra as 72 horas independentes de edição");
             assertEquals(criada.path("id").asLong(), atual.path("content").get(0).path("id").asLong());
             var novas = new java.util.HashSet<>(cache.getNativeCache().keySet()); novas.removeAll(chavesAntes);
-            assertEquals(1, novas.size(), "FRE013 nova data negocial usa uma entrada distinta, sem servir a ABERTA anterior");
+            assertEquals(1, novas.size(), "Nova data negocial usa uma entrada distinta");
             var paginaAtual = (com.example.siggtrat.dto.PaginaCacheDTO<?>) cache.get(novas.iterator().next()).get();
             var linhaAtual = (com.example.siggtrat.dto.FrequenciaDTO) paginaAtual.content().get(0);
             assertEquals(criada.path("id").asLong(), linhaAtual.getId().longValue());
-            assertEquals("FECHADA", linhaAtual.getEstadoNegocial().name());
+            assertEquals("ABERTA", linhaAtual.getEstadoNegocial().name());
             assertEquals(cargasAntes + 1, cache.carregamentos);
             int acertosNaVirada = cache.acertos;
             var repetidaFechada = consultar(c.operacionalA, rota, "FRE013 HIT da entrada vigente após a fronteira");
-            assertEquals("FECHADA", repetidaFechada.path("content").get(0).path("estadoNegocial").asText());
+            assertEquals("ABERTA", repetidaFechada.path("content").get(0).path("estadoNegocial").asText());
             assertEquals(acertosNaVirada + 1, cache.acertos);
             assertEquals(cargasAntes + 1, cache.carregamentos);
         }
         var fonte = em.find(com.example.siggtrat.entidade.Frequencia.class, criada.path("id").asLong());
         assertEquals(com.example.siggtrat.dominio.frequencia.EstadoNegocialFrequencia.ABERTA, fonte.getEstadoNegocial(),
                 "Consulta não materializa fato negocial fictício ao derivar fechamento");
+    }
+
+    @ParameterizedTest
+    @ValueSource(strings = {"dia", "intervalo", "mensal"})
+    void cacheDerivaFechamentoNoInstanteExatoDoPrazoDeEdicao(String consulta) throws Exception {
+        var c = criarCenario();
+        LocalDate data = RelogioSistema.hoje();
+        String status = data.getDayOfWeek().getValue() >= 6 ? "DESCANSO" : "FALTA";
+        var criada = enviar(c.operacionalA, "/api/frequencias", mapa("vinculoContratualId", c.vinculoA.getId(),
+                "dataReferencia", data, "status", status), 200, "Primeiro lançamento fixa prazo de edição");
+        var prazo = java.time.LocalDateTime.parse(criada.path("prazoEdicao").asText())
+                .atZone(RelogioSistema.ZONA).toInstant();
+        String rota = switch (consulta) {
+            case "intervalo" -> "/api/frequencias/intervalo?inicio=" + data + "&fim=" + data;
+            case "mensal" -> "/api/frequencias/mensal?mes=" + data.getMonthValue() + "&ano=" + data.getYear();
+            default -> "/api/frequencias?data=" + data;
+        };
+        rota += "&contratoId=" + c.contratoA.getId();
+        limparCaches();
+        // Mantém o mesmo dia na chave para isolar uma fronteira de horas/minutos dentro do dia.
+        try (var instante = Mockito.mockStatic(java.time.Instant.class, Mockito.CALLS_REAL_METHODS)) {
+            instante.when(java.time.Instant::now).thenReturn(prazo.minusSeconds(1));
+            var antes = consultar(c.operacionalA, rota, "Consulta antes do limite exclusivo");
+            assertEquals("ABERTA", antes.path("content").get(0).path("estadoNegocial").asText());
+            var cache = (CacheObservadoB06) caches.getCache(com.example.siggtrat.configuracao.NomesCache.FREQUENCIAS_CONSULTA);
+            assertNotNull(cache);
+            int cargas = cache.carregamentos, acertos = cache.acertos;
+            var chave = cache.getNativeCache().keySet().iterator().next();
+            var pagina = (com.example.siggtrat.dto.PaginaCacheDTO<?>) cache.get(chave).get();
+            instante.when(java.time.Instant::now).thenReturn(prazo);
+            var depois = consultar(c.operacionalA, rota, "HIT deve derivar fechamento exato sem esperar o TTL");
+            assertEquals("FECHADA", depois.path("content").get(0).path("estadoNegocial").asText());
+            assertEquals(cargas, cache.carregamentos, "A projeção temporal preserva o cache de dados");
+            assertEquals(acertos + 1, cache.acertos, "A consulta atravessou um HIT real");
+            assertSame(pagina, cache.get(chave).get());
+            assertEquals("ABERTA", ((com.example.siggtrat.dto.FrequenciaDTO) pagina.content().get(0))
+                    .getEstadoNegocial().name(), "A leitura não altera o DTO compartilhado no cache");
+        }
+        assertEquals(com.example.siggtrat.dominio.frequencia.EstadoNegocialFrequencia.ABERTA,
+                em.find(com.example.siggtrat.entidade.Frequencia.class, criada.path("id").asLong()).getEstadoNegocial(),
+                "A consulta não materializa fechamento no banco");
     }
 
     @ParameterizedTest

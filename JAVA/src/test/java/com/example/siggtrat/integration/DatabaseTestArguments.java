@@ -41,6 +41,7 @@ final class DatabaseTestArguments {
         String n = name == null ? "" : name.toLowerCase(Locale.ROOT);
 
         if (raw == String.class) {
+            if (n.equals("metrica")) return "registros";
             if (n.contains("status")) return "ATIVO";
             if (n.contains("uf")) return "ZZ";
             if (n.contains("busca") || n.contains("filtro") || n.contains("prefix")) return "__SEM_RESULTADO__";

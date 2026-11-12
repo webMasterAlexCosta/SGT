@@ -20,20 +20,20 @@
 - `estadoNegocial`, `validadeOperacional` e `estadoAuditoria` continuam independentes. Perda retroativa de cobertura preserva a prova e retira o fato da visão operacional válida conforme o fluxo autorizado.
 - O limite é aplicado na leitura/escrita independentemente de o scheduler já ter persistido fechamento/evento. Não existe tolerância adicional pelo intervalo do job.
 
-## Catálogos anteriores (redação histórica substituída pela decisão acima)
+## Correspondência dos catálogos anteriores com a regra vigente
 
 | Identificador preservado | Redação temporal aplicável agora |
 |---|---|
-| `CANONICAL198::FRE-002` | Janela N configurável, padrão de 30 dias civis, D dia1, fuso São Paulo. |
-| `CANONICAL198::FRE-003` | Exemplo padrão:01/01 até instante anterior a31/01 00:00; limite exclusivo. |
+| `CANONICAL198::FRE-002` | Lançamento em N datas civis configuráveis, padrão7, D dia1, fuso São Paulo. Edição em 72 horas configuráveis desde o primeiro lançamento. |
+| `CANONICAL198::FRE-003` | Lançamento padrão:01/01 até instante anterior a08/01 00:00; edição até primeiro timestamp + 72 horas, também exclusiva. |
 | `CANONICAL198::FRE-006` | Correção gerencial dentro da janela configurada exige identificação/justificativa; preserva bloqueio por registro. |
-| `CANONICAL198::FRE-013` | No início de D+N há fechamento negocial; mudança posterior é retificação. |
-| `MASTER::8.5::TMP-001/002/003` | Antes/no/depois do limite D+N, mantendo todas as demais condições dos oráculos. |
-| `MASTER::8.5::TMP-004`, `MASTER::ANEXO_A::ROP-034` | Job verifica vencidas pela mesma política N; atraso do processamento não amplia permissão. |
-| `MASTER::6::M11/M12/M13`, `MASTER::8.7::E2E-10` | Jornada noturna, janela e fechamento conforme N efetivo/padrão de 30. |
+| `CANONICAL198::FRE-013` | O prazo de edição capturado determina o fechamento do registro existente; FECHADA persistida não reabre por configuração. |
+| `MASTER::8.5::TMP-001/002/003` | Antes/no/depois de D+N para lançamento e do primeiro timestamp + horas configuradas para edição, mantendo os demais oráculos. |
+| `MASTER::8.5::TMP-004`, `MASTER::ANEXO_A::ROP-034` | Job fecha registros vencidos pela mesma política de edição; atraso do processamento não amplia permissão. |
+| `MASTER::6::M11/M12/M13`, `MASTER::8.7::E2E-10` | Jornada noturna pertence a D; lançamento e edição seguem seus prazos independentes capturados. |
 
 As matrizes C03/C04, CSVs e mestre de03/11 mantêm os textos/resultados do corte histórico. Este suplemento determina a substituição temporal na campanha atual, sem renomear IDs, promover PASS antigo ou converter GOV-003/004 em Governança de Terceiros.
 
 ## Evidência necessária
 
-Validar padrão de 30 e alternativa, antes/no/depois do limite, conversão por instante de outro fuso, data futura, autorização histórica/atual, autoria, retificação/bloqueio por registro, lote/rollback e job. Unitários/MockMvc não substituem PostgreSQL/Tomcat/JAR/navegador/LAN. Atravessamento físico de meia-noite precisa de prova própria, separada de relógio controlado. Resultados e limitações ficam no [plano da campanha](../../DOCUMENTACAO/CODEX/CAMPANHA_20261109/PLANO.md).
+Validar padrões7/72 e alternativas, antes/no/depois de cada limite, edição após o fim do prazo de lançamento sem renovar seu timestamp, conversão por instante de outro fuso, data futura, autorização histórica/atual, autoria, retificação/bloqueio por registro, lote/rollback e job. Preservar acervo sem captura e FECHADA persistida. Unitários/MockMvc não substituem PostgreSQL/Tomcat/JAR/navegador/LAN. Atravessamento físico de meia-noite precisa de prova própria, separada de relógio controlado. Resultados atuais e limites estão na [verificação do dashboard](../../DOCUMENTACAO/CODEX/DASHBOARD_20261111/VERIFICACAO.json); o [plano de09/11](../../DOCUMENTACAO/CODEX/CAMPANHA_20261109/PLANO.md) conserva os cenários e recibos da regra anterior.

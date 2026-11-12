@@ -16,6 +16,7 @@ import { PaginaRelatorioAbsenteismo } from '../src/modules/rh/pages/PaginaRelato
 
 let totalColaboradores;
 let contextosDoPrimeiro;
+let nomeAusente;
 const paginarComoJava = params => {
   const tamanho = Math.min(Math.max(Number(params.size ?? 100), 25), 500);
   const totalPaginas = Math.ceil(totalColaboradores / tamanho);
@@ -28,6 +29,7 @@ const linhasPrincipais = () => [...screen.getAllByRole('table')[0].tBodies[0].ch
 beforeEach(() => {
   totalColaboradores = 31;
   contextosDoPrimeiro = 1;
+  nomeAusente = false;
   iniciarExportacao.mockReset().mockResolvedValue({ id: 'job-sintetico' });
   requisitar.mockReset().mockImplementation(async ({ url, params = {} }) => {
     if (url === '/relatorios/filtros') return {
@@ -41,7 +43,7 @@ beforeEach(() => {
       return {
         ...pagina, completo: true, inicio: params.inicio, fim: params.fim,
         registros: ids.flatMap(id => Array.from({ length: id === 1 ? contextosDoPrimeiro : 1 }, (_, context) => ({
-          empregadoId: id, chaveAlocacao: `${id}-contexto-${context}`, nome: `Pessoa ${id}`,
+          empregadoId: id, chaveAlocacao: `${id}-contexto-${context}`, nome: nomeAusente ? null : `Pessoa ${id}`,
           cargo: `Cargo ${id}`, lotacao: id === 1 && contextosDoPrimeiro > 1 ? `Lotação histórica ${context + 1}` : `Lotação ${id}`,
           contrato: `Contrato do contexto ${context + 1}`, turno: 'Diurno', diario: {}, totais: {},
         }))),
@@ -49,7 +51,7 @@ beforeEach(() => {
     }
     if (url === '/relatorios/absenteismo/paginado') {
       const { ids, ...pagina } = paginarComoJava(params);
-      return { ...pagina, registros: ids.map(id => ({ empregadoId: id, nome: `Pessoa ${id}`, cargo: `Cargo ${id}`, lotacao: 'Lotação', turno: 'Diurno', diasTrabalhaveis: 20, faltas: 0, atestados: 0, dsrPerdido: 0, taxaIndividual: 0, disrupcao: 0 })) };
+      return { ...pagina, registros: ids.map(id => ({ empregadoId: id, nome: nomeAusente ? null : `Pessoa ${id}`, cargo: `Cargo ${id}`, lotacao: 'Lotação', turno: 'Diurno', diasTrabalhaveis: 20, faltas: 0, atestados: 0, dsrPerdido: 0, taxaIndividual: 0, disrupcao: 0 })) };
     }
     if (url === '/relatorios/absenteismo/resumo') return { totalColaboradores, diasTrabalhaveis: totalColaboradores * 20, maioresTaxas: [] };
     throw new Error(`Consulta não prevista pela reprodução: ${url}`);
@@ -143,6 +145,22 @@ describe('Páginas visuais de cinco sobre os blocos Java de vinte e cinco', () =
     await screen.findByText('Pessoa 6');
     expect(linhasPrincipais()).toHaveLength(1);
     expect(screen.queryByText('Lotação histórica 6')).not.toBeInTheDocument();
+  });
+
+  it.each([1, 2])('explica nome ausente sem inventar identidade em %s contexto(s)', async contextos => {
+    totalColaboradores = 1;
+    contextosDoPrimeiro = contextos;
+    nomeAusente = true;
+    render(<PaginaRelatorioFrequencia />);
+    fireEvent.click(screen.getByRole('button', { name: 'Gerar Relatório' }));
+    await screen.findAllByText('Nome não informado no relatório');
+    if (contextos > 1) {
+      const detalhes = screen.getByRole('table', { name: 'Relatório de frequência por colaborador' }).querySelector('details');
+      fireEvent.click(detalhes.querySelector('summary'));
+      await waitFor(() => expect(detalhes.open).toBe(true));
+      expect(screen.getByRole('table', { name: 'Contextos históricos — nome não informado no relatório' })).toBeInTheDocument();
+    }
+    expect(screen.queryByText('Pessoa 1')).not.toBeInTheDocument();
   });
 
   it('a exportação mensal conserva os filtros completos, sem page/size do recorte visual', async () => {

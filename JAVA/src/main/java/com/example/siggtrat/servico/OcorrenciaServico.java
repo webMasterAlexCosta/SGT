@@ -554,10 +554,11 @@ public class OcorrenciaServico implements com.example.siggtrat.diagnostico.Diagn
                 Path definitivo = resolverArquivoArmazenado(nomeSalvo);
                 garantirDentroDiretorio(temporario, uploadTempRoot);
 
+                // Inclui o temporário na limpeza mesmo se a cópia ou o fechamento do stream falhar.
+                staged.add(new EnvioPreparado(temporario, definitivo, nomeOriginal, nomeSalvo, resolverTipoConteudoSeguro(arquivo.getContentType())));
                 try (var entrada = arquivo.getInputStream()) {
                     Files.copy(entrada, temporario, StandardCopyOption.REPLACE_EXISTING);
                 }
-                staged.add(new EnvioPreparado(temporario, definitivo, nomeOriginal, nomeSalvo, resolverTipoConteudoSeguro(arquivo.getContentType())));
             }
             return List.copyOf(staged);
         } catch (Exception e) {

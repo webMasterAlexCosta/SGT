@@ -90,7 +90,7 @@ class JarHttpRealIT extends ContratosHttpBase {
 
     @Test
     @Timeout(value = 3, unit = TimeUnit.MINUTES)
-    void tomcatRealPreservaSessaoJanelaPadraoDocumentosEAuditoriaDepoisDoReinicio() throws Exception {
+    void tomcatRealPreservaSessaoPrazosVigentesDocumentosEAuditoriaDepoisDoReinicio() throws Exception {
         LocalDate hoje = LocalDate.now(ZONA);
         assertFalse(hoje.isBefore(INICIO.plusDays(45)), "Fixture possui cobertura temporal explícita");
         assertFalse(hoje.plusDays(120).isAfter(FIM), "Atualizar a fixture quando terminar sua cobertura");
@@ -146,17 +146,22 @@ class JarHttpRealIT extends ContratosHttpBase {
                 gestor.json("DELETE", caminhoDocumento, null, 409);
                 conferirDownload(gestor, caminhoDocumento);
 
-                LocalDate dia = hoje.minusDays(10).with(TemporalAdjusters.previousOrSame(DayOfWeek.WEDNESDAY));
-                assertTrue(dia.isBefore(hoje.minusDays(7)), "Lançamento ultrapassa a janela antiga de sete dias");
+                LocalDate dia = hoje.with(TemporalAdjusters.previousOrSame(DayOfWeek.WEDNESDAY));
+                assertFalse(dia.isBefore(hoje.minusDays(6)), "Lançamento dentro das sete datas civis vigentes");
+                Instant antesDoPrimeiroLancamento = Instant.now();
                 JsonNode frequencia = operacional.json("POST", "/api/frequencias", frequencia(c, dia, "FALTA"), 200);
+                Instant depoisDoPrimeiroLancamento = Instant.now();
                 JsonNode editada = operacional.json("POST", "/api/frequencias", frequencia(c, dia, "PRESENCA"), 200);
                 long frequenciaId = frequencia.path("id").asLong();
                 assertEquals(frequenciaId, editada.path("id").asLong());
                 assertEquals("ABERTA", editada.path("estadoNegocial").asText());
                 assertEquals("ALTERADA_OPERACIONAL", editada.path("estadoAuditoria").asText());
                 assertEquals(frequencia.path("versaoNegocial").asInt() + 1, editada.path("versaoNegocial").asInt());
-                assertEquals(dia.plusDays(30).atStartOfDay(), LocalDateTime.parse(editada.path("prazoEdicao").asText()));
-                operacional.json("POST", "/api/frequencias", frequencia(c, hoje.minusDays(31), "FALTA"), 403);
+                Instant prazoEdicao = LocalDateTime.parse(frequencia.path("prazoEdicao").asText()).atZone(ZONA).toInstant();
+                assertFalse(prazoEdicao.isBefore(antesDoPrimeiroLancamento.plus(Duration.ofHours(72))));
+                assertFalse(prazoEdicao.isAfter(depoisDoPrimeiroLancamento.plus(Duration.ofHours(72))));
+                assertEquals(frequencia.path("prazoEdicao"), editada.path("prazoEdicao"), "Editar não renova as 72 horas");
+                operacional.json("POST", "/api/frequencias", frequencia(c, hoje.minusDays(7), "FALTA"), 403);
                 operacional.json("POST", "/api/frequencias", frequencia(c, hoje.plusDays(1), "FALTA"), 400);
                 gestor.json("POST", "/api/frequencias", frequencia(c, hoje.plusDays(1), "FALTA"), 400);
                 Map<String, Object> retificacao = frequencia(c, dia, "FALTA");
@@ -179,7 +184,8 @@ class JarHttpRealIT extends ContratosHttpBase {
                 original.remove("updatedAt"); replay.remove("updatedAt");
                 assertEquals(original, replay, "Reenvio preserva todos os demais campos do DTO");
                 operacional.json("POST", "/api/frequencias", frequencia(c, dia, "PRESENCA"), 403);
-                JsonNode controle = operacional.json("POST", "/api/frequencias", frequencia(c, dia.minusDays(1), "PRESENCA"), 200);
+                LocalDate diaControle = dia.equals(hoje) ? dia.minusDays(1) : dia.plusDays(1);
+                JsonNode controle = operacional.json("POST", "/api/frequencias", frequencia(c, diaControle, "PRESENCA"), 200);
                 assertFalse(controle.path("bloqueadaEdicaoOperacional").asBoolean());
                 assertEquals("ABERTA", controle.path("estadoNegocial").asText());
                 JsonNode eventos = gestor.get("/api/frequencias/" + frequenciaId + "/eventos", 200);
@@ -257,7 +263,7 @@ class JarHttpRealIT extends ContratosHttpBase {
                 escreverPrivado("resultado.json", mapa("concluidoEm", Instant.now().toString(), "jar", jar.toString(),
                         "jarSha256", hashJar, "pids", processos, "origem", origem.toString(),
                         "arquivoSha256", sha256(PDF), "auditoriasConfirmadasAntesDoShutdown", auditorias,
-                        "janelaPadraoDias", 30, "concessaoContextual", mapa("ocorrenciaId", concessao.ocorrenciaId(),
+                        "janelaPadraoDias", 7, "horasEdicao", 72, "concessaoContextual", mapa("ocorrenciaId", concessao.ocorrenciaId(),
                                 "outraOcorrenciaId", concessao.outraId(), "anexoId", concessao.anexoId(),
                                 "permissaoId", concessao.permissaoId(), "usosAntesReinicio", 2,
                                 "usosDepoisReinicio", 4, "revogadaSemNovoConsumo", true), "requisicoes", requisicoes));
@@ -609,7 +615,7 @@ class JarHttpRealIT extends ContratosHttpBase {
                 "--spring.datasource.hikari.register-mbeans=true", "--server.tomcat.mbeanregistry.enabled=true"));
         ProcessBuilder builder = new ProcessBuilder(comando).redirectErrorStream(true).redirectOutput(log.toFile());
         Map<String, String> ambiente = builder.environment();
-        // Não herdar overrides (inclusive a janela7 do contexto MockMvc), dotenv operacional ou agentes JVM.
+        // Não herdar overrides do contexto preparador, dotenv operacional ou agentes JVM.
         ambiente.clear();
         ambiente.put("TZ", "America/Sao_Paulo");
         ConfiguracaoPostgresIntegracao banco = ConfiguracaoPostgresIntegracao.carregar();

@@ -2,7 +2,8 @@
 // Transporte controlado; nenhuma asserção pretende provar revogação no servidor.
 import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { act, cleanup, render, waitFor } from '@testing-library/react';
+import { act, cleanup, render, screen, waitFor } from '@testing-library/react';
+import { BrowserRouter, useLocation, useNavigate } from 'react-router-dom';
 import { ProvedorAutenticacao, useAutenticacao } from '../src/modules/auth/context.tsx';
 import { redefinirIndicadorRedirecionamento } from '../src/core/events.ts';
 import { iniciarContextoSessaoIsolado } from './fixtures/contextoSessaoIsolado.js';
@@ -18,6 +19,13 @@ const Observador = () => { contexto = useAutenticacao(); return <output>{context
 const montar = () => render(<ProvedorAutenticacao><Observador /></ProvedorAutenticacao>);
 const montarA = async () => { const tela = montar(); await waitFor(() => expect(contexto.user?.id).toBe(A.id)); return tela; };
 const prepararB = () => { servico.autenticar.mockResolvedValue(B); servico.buscarMeuPerfil.mockResolvedValue(B); servico.informacoesSessao.mockResolvedValue(sessao(B)); };
+const ObservadorRota = () => <output aria-label="Rota atual">{useLocation().pathname}</output>;
+const AutenticacaoRoteada = () => {
+  const navegar = useNavigate();
+  return <ProvedorAutenticacao aoConcluirSaida={() => navegar('/login', { replace: true })}>
+    <Observador /><ObservadorRota />
+  </ProvedorAutenticacao>;
+};
 beforeEach(() => {
   localStorage.clear(); sessionStorage.clear(); redefinirIndicadorRedirecionamento();
   iniciarContextoSessaoIsolado();
@@ -28,6 +36,17 @@ beforeEach(() => {
 });
 afterEach(() => cleanup());
 describe('Logout atravessa remontagem sem restaurar cookie antigo', () => {
+  it('sincroniza a URL e o roteador ao concluir a saída de uma página interna', async () => {
+    window.history.replaceState(null, '', '/historico');
+    render(<BrowserRouter><AutenticacaoRoteada /></BrowserRouter>);
+    await waitFor(() => expect(contexto.user?.id).toBe(A.id));
+    expect(screen.getByLabelText('Rota atual').textContent).toBe('/historico');
+    act(() => contexto.encerrarSessao());
+    await act(async () => contexto.concluirSaida());
+    expect(contexto.user).toBeNull();
+    expect(window.location.pathname).toBe('/login');
+    expect(screen.getByLabelText('Rota atual').textContent).toBe('/login');
+  });
   it('uma nova instância não restaura A depois da saída, mesmo que o servidor ainda retorne A', async () => {
     const tela = await montarA();
     act(() => contexto.encerrarSessao());

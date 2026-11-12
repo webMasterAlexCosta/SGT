@@ -464,6 +464,8 @@ const EstruturaAplicacao = () => {
 };
 
 const Aplicacao = () => {
+  const navegar = useNavigate();
+  const irParaLogin = useCallback(() => navegar("/login", { replace: true }), [navegar]);
   const [configuracaoEfetiva, definirConfiguracaoEfetiva] = useState<(Readonly<{ API_URL: string; HTTP_TIMEOUT: number; HTTP_RETRY_BASE_MS: number; HTTP_RETRY_MAX_MS: number; PING_INTERVAL_MS: number; SESSION_MAX_TIME_MS: number; INTRO_MIN_DURATION_MS: number; APP_NAME: string; APP_VERSION: string; APP_COMPANY: string; APP_CNPJ: string; AUTHOR_ELABORADOR_1: string; AUTHOR_ELABORADOR_2: string; AUTHOR_NAME: string; AUTHOR_MATRICULA: string; EM_MANUTENCAO: boolean; PREVISAO_RETORNO: string; FREQUENCIA_MAX_GRID_ITEMS: number; FREQUENCIA_EDIT_WARNING_MINUTES: number; ABSENTEISMO_DEFAULT_META: number; PAGINATION_MAX_SIZE: number; SHOW_TEST_CREDENTIALS: boolean; TEST_GLOBAL_PASSWORD: string; TEST_GESTOR_PASSWORD: string; PAGINATION_DEFAULT_SIZE: number; EMPREGADOS_INITIAL_SIZE: number; AUDIT_DEFAULT_SIZE: number; PAGINATION_OPTIONS: readonly number[]; AUDIT_PAGINATION_OPTIONS: readonly number[]; DASHBOARD_RECENT_ACTIVITIES: number; UPLOAD_MAX_SIZE_MB: number; TOAST_DURATION_MS: number; TOAST_DEDUPE_WINDOW_MS: number; HOMOLOGACAO_EXPIRY_DAYS: number; CONNECTION_SUCCESS_DELAY_MS: number; OFFLINE_RETRY_INTERVAL_MS: number; SESSION_WARN_5MIN_MS: number; SESSION_WARN_1MIN_MS: number; SESSION_REFRESH_INTERVAL_MS: number; HELP_TOOLTIP_DAYS: number; INACTIVITY_TIMEOUT_MS: number; LATENCY_CHECK_INTERVAL_MS: number; ABSENTEISMO_DISRUPCAO_THRESHOLD: number; APP_ALLOWED_DOMAIN: string; APP_CLIENT_ID: string; SEARCH_DEBOUNCE_MS: number; COMPANY_DEPARTMENT: string; JORNADA_REFERENCIA_HORAS: number; JORNADA_LIMIAR_INFERIOR: number; JORNADA_LIMIAR_MEDIO: number; }>) | null>(null);
 
   useEffect(() => {
@@ -502,7 +504,7 @@ const Aplicacao = () => {
   return (
     <FronteiraErro>
       <ProvedorConfirmacaoSenhaHttp>
-        <ProvedorAutenticacao>
+        <ProvedorAutenticacao aoConcluirSaida={irParaLogin}>
           <EstruturaAplicacao />
         </ProvedorAutenticacao>
       </ProvedorConfirmacaoSenhaHttp>

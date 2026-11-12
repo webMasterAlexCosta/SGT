@@ -86,7 +86,13 @@ export const useDialogoAcessivel = ({
 
       const primeiro = focaveis[0];
       const ultimo = focaveis[focaveis.length - 1];
-      if (evento.shiftKey && document.activeElement === primeiro) {
+      const focoForaDaSequencia = !focaveis.some(elemento => elemento === document.activeElement);
+      if (focoForaDaSequencia) {
+        // Títulos com tabindex=-1 podem receber o foco inicial do diálogo.
+        // A navegação seguinte também deve permanecer dentro do modal.
+        evento.preventDefault();
+        (evento.shiftKey ? ultimo : primeiro).focus();
+      } else if (evento.shiftKey && document.activeElement === primeiro) {
         evento.preventDefault();
         ultimo.focus();
       } else if (!evento.shiftKey && document.activeElement === ultimo) {

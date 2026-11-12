@@ -276,6 +276,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
         // é limitado à paginação, sem materializar toda a população nacional.
         Map<ContextoLeitura, NivelExposicaoDadosPessoais> niveis = new HashMap<>();
         String finalidade = "Consulta de frequência de " + inicio + " a " + fim + ", página " + pagina.getNumber();
+        Instant agora = Instant.now();
         return pagina.map(original -> {
             ContextoComplementoFrequenciaDTO escopo = original.getEscopoHistoricoEfetivo();
             ContextoLeitura contexto = new ContextoLeitura(original.getContratoId(),
@@ -283,12 +284,19 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
             NivelExposicaoDadosPessoais nivel = niveis.computeIfAbsent(contexto,
                     chave -> leituraFrequencia.nivel(usuario, chave.contratoId(), chave.gestaoLocalId(),
                             finalidade, "ConsultaFrequenciaContrato", chave.contratoId()));
-            if (nivel == NivelExposicaoDadosPessoais.COMPLETO) return original;
             FrequenciaDTO limitado = new FrequenciaDTO();
             BeanUtils.copyProperties(original, limitado);
-            limitado.setObservacao(null);
-            limitado.setJustificativaRetificacao(null);
-            limitado.setChaveIdempotencia(null);
+            // A janela de edição pode terminar entre dois HITs no mesmo dia.
+            // Deriva o estado na cópia de leitura, sem alterar o DTO compartilhado.
+            if (original.getPrazoEdicao() != null
+                    && !agora.isBefore(original.getPrazoEdicao().atZone(politicaTemporal.zona()).toInstant())) {
+                limitado.setEstadoNegocial(EstadoNegocialFrequencia.FECHADA);
+            }
+            if (nivel != NivelExposicaoDadosPessoais.COMPLETO) {
+                limitado.setObservacao(null);
+                limitado.setJustificativaRetificacao(null);
+                limitado.setChaveIdempotencia(null);
+            }
             return limitado;
         });
     }

@@ -22,7 +22,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 /**
  * Executa todos os métodos de repositorio definidos pela aplicação contra um
- * PostgreSQL vazio com schema real. O objetivo é detectar cedo JPQL inválida,
+ * PostgreSQL isolado com schema real e IDs inexistentes. O objetivo é detectar JPQL inválida,
  * derived-query quebrada, coluna/tabela divergente e SQL nativo incompatível.
  */
 @DisplayName("Integração PostgreSQL: smoke de todas as queries de repositorio")
@@ -65,6 +65,8 @@ class RepositoryQuerySmokeIT extends PostgresIntegrationTestSupport {
                 if (!Modifier.isPublic(modifiers) || Modifier.isStatic(modifiers)
                         || method.isSynthetic() || method.isBridge()) continue;
                 if (method.getName().equals(type.getSimpleName())) continue;
+                // Injeção de dependências não é uma operação de consulta.
+                if (method.isAnnotationPresent(Autowired.class)) continue;
                 executarIsolado(type.getSimpleName(), bean, method, falhas);
             }
         }
@@ -84,6 +86,11 @@ class RepositoryQuerySmokeIT extends PostgresIntegrationTestSupport {
                     fecharSeNecessario(result);
                     status.setRollbackOnly();
                 } catch (InvocationTargetException ex) {
+                    if (ex.getTargetException() instanceof org.springframework.dao.EmptyResultDataAccessException) {
+                        // queryForObject executou SQL válido para o ID inexistente.
+                        status.setRollbackOnly();
+                        return;
+                    }
                     throw rethrow(ex.getTargetException());
                 } catch (ReflectiveOperationException ex) {
                     throw new IllegalStateException(ex);

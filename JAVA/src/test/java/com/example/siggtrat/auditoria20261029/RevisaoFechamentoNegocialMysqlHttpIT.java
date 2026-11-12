@@ -15,7 +15,8 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDate;
-import java.time.ZonedDateTime;
+import java.time.Instant;
+import java.time.Duration;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -28,15 +29,21 @@ class RevisaoFechamentoNegocialMysqlHttpIT extends ContratosHttpBase {
     @Autowired AuditoriaFrequenciaServico auditoria;
 
     @Test
-    void oitavoDiaPersisteFechamentoComEventoEncadeadoSemAlterarFonteNemDuplicarNoReprocessamento() throws Exception {
-        Cenario c = criarCenarioPersistido();
-        LocalDate hoje = RelogioSistema.hoje(), diaSete = hoje.minusDays(6), amanha = hoje.plusDays(1);
-        long id = enviar(c.operacionalA, "/api/frequencias", mapa(
+    void prazoEdicaoPersisteFechamentoComEventoEncadeadoSemAlterarFonteNemDuplicarNoReprocessamento() throws Exception {
+        Cenario c;
+        LocalDate hoje = RelogioSistema.hoje(), diaSete = hoje.minusDays(6);
+        Instant primeiroLancamento = Instant.now().minus(Duration.ofDays(4));
+        long id;
+        try (var instantes = Mockito.mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
+            instantes.when(Instant::now).thenReturn(primeiroLancamento);
+            c = criarCenarioPersistido();
+            id = enviar(c.operacionalA, "/api/frequencias", mapa(
                 "vinculoContratualId", c.vinculoA.getId(), "dataReferencia", diaSete, "status", statusCompativelComJornadaDoCenario(diaSete)),
-                200, "Frequência real ainda aberta no sétimo dia").path("id").asLong();
+                200, "Primeiro registro anterior fixa o prazo de edição").path("id").asLong();
+        }
         long controleId = enviar(c.operacionalA, "/api/frequencias", mapa(
                 "vinculoContratualId", c.vinculoA.getId(), "dataReferencia", hoje, "status", statusCompativelComJornadaDoCenario(hoje)),
-                200, "Controle dentro da janela continua aberto depois da próxima virada").path("id").asLong();
+                200, "Controle recém-registrado mantém sua própria janela de edição").path("id").asLong();
         Foto original = foto(id);
         assertEquals(EstadoNegocialFrequencia.ABERTA, original.frequencia().getEstadoNegocial());
         assertEquals(1, original.frequencia().getVersaoNegocial());
@@ -44,17 +51,16 @@ class RevisaoFechamentoNegocialMysqlHttpIT extends ContratosHttpBase {
         assertEquals(1, original.eventos().size());
         assertEquals(TipoEventoFrequencia.REGISTRO, original.eventos().get(0).getTipoEvento());
         EventoFrequencia registro = original.eventos().get(0);
-        ZonedDateTime virada = amanha.atStartOfDay(politica.zona());
-        var zona = politica.zona();
+        Instant limite = original.frequencia().getPrazoEdicaoEm();
+        assertEquals(original.frequencia().getRegistradoEm().plus(Duration.ofHours(72)), limite);
 
         // Somente o relógio é controlado. Serviço, gerenciador de transação,
         // repositórios, bloqueios, commit e leitura posterior usam PostgreSQL real.
-        try (var datas = Mockito.mockStatic(LocalDate.class, Mockito.CALLS_REAL_METHODS);
-             var instantes = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
-            datas.when(() -> LocalDate.now(zona)).thenReturn(amanha);
-            instantes.when(() -> ZonedDateTime.now(zona)).thenReturn(virada);
-            assertTrue(politica.fechada(diaSete, null));
-            assertFalse(politica.fechada(hoje, null));
+        try (var instantes = Mockito.mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
+            instantes.when(Instant::now).thenReturn(limite);
+            assertFalse(politica.fechada(diaSete, limite.atZone(politica.zona())));
+            assertTrue(politica.edicaoEncerrada(original.frequencia(), limite));
+            assertFalse(politica.edicaoEncerrada(foto(controleId).frequencia(), limite));
             assertTrue(fechamento.fecharVencidas() >= 1,
                     "A execução real precisa confirmar ao menos a frequência deste cenário.");
 
@@ -77,7 +83,7 @@ class RevisaoFechamentoNegocialMysqlHttpIT extends ContratosHttpBase {
             assertEquals(registro.getHashEvento(), evento.getHashAnterior());
             assertTrue(evento.getSnapshotAnterior().contains("estado=ABERTA"));
             assertTrue(evento.getSnapshotNovo().contains("estado=FECHADA"));
-            assertTrue(evento.getMotivo().contains("8º dia"));
+            assertEquals("Fechamento automático após o prazo de edição do primeiro lançamento.", evento.getMotivo());
             assertEquals("SISTEMA", evento.getUsuarioUsername());
             assertNull(evento.getUsuarioId());
             assertNotNull(evento.getRegistradoEm());
@@ -89,7 +95,7 @@ class RevisaoFechamentoNegocialMysqlHttpIT extends ContratosHttpBase {
             assertEquals(1, controle.frequencia().getVersaoNegocial());
             assertEquals(1, controle.eventos().size());
 
-            assertEquals(0, fechamento.fecharVencidas(), "Reprocessar a mesma virada não publica outro fechamento.");
+            assertEquals(0, fechamento.fecharVencidas(), "Reprocessar o mesmo instante não publica outro fechamento.");
             Foto repetida = foto(id);
             assertEquals(2, repetida.frequencia().getVersaoNegocial());
             assertEquals(fechada.eventos().stream().map(EventoFrequencia::getId).toList(),

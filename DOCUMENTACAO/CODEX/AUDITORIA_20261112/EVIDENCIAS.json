@@ -1,0 +1,216 @@
+{
+  "checkpoint_git": "678758afe271cf531560e612d13bad292cab7536",
+  "jar_sha256": "963677cb995456c40b3f61a2865d8dfe1b8be93e8f8be9b2ae11861b4a6789d4",
+  "fontes_manifesto_sha256": "f83c65f437c081ad5be2c8399207d34d312de8443abfce85c29bb2e036619251",
+  "manifesto_local": "fontes-candidato-03.json",
+  "classes_compiladas": 866,
+  "classes_teste_compiladas": 958,
+  "assets_dist_static_jar": 111,
+  "assets_anteriores_preservados": 595,
+  "unitarios_java": {
+    "tests": 808,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "react": {
+    "arquivos": 111,
+    "tests": 875,
+    "preparacao": 6,
+    "typecheck": "pass",
+    "build": "pass",
+    "lint": "script inexistente"
+  },
+  "integracao_por_ultima_execucao_de_cada_classe": {
+    "classes": 378,
+    "tests": 1597,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "limite_da_consolidacao": "As classes de regressão ampla foram executadas antes das últimas correções de exportação/upload. Classes afetadas e casos focais foram rechecados; a consolidação não é uma execução integral única sobre a candidata final.",
+  "dependencias": {
+    "npm": 258,
+    "npm_avisos": 0,
+    "java_coordenadas": 123,
+    "java_osv_avisos": 0
+  },
+  "limites_memoria": {
+    "teto_autorizado_bytes": 15000000000,
+    "servicos_max_bytes": 4294967296,
+    "suite_jar_max_bytes": 3221225472,
+    "swap_suite": 0,
+    "maximo_agregado_cgroups_bytes": 7516192768,
+    "maior_pico_suite_bytes": 2250080256,
+    "recibos_suites": 22
+  },
+  "logs_privados_locais": ".homologacao/auditoria-20261112",
+  "checks": {
+    "frontend-final-resultados.json": [
+      {
+        "check": "react-preparacao-final",
+        "exit_code": 0
+      },
+      {
+        "check": "react-test-final",
+        "exit_code": 0
+      },
+      {
+        "check": "react-build-final",
+        "exit_code": 0
+      }
+    ],
+    "focais-green-resultados.json": [
+      {
+        "check": "exportacao-green",
+        "exit_code": 0
+      },
+      {
+        "check": "upload-green",
+        "exit_code": 0
+      },
+      {
+        "check": "temporais-green",
+        "exit_code": 0
+      },
+      {
+        "check": "react-focal-green",
+        "exit_code": 0
+      }
+    ]
+  },
+  "status": "concluida_no_repositorio_e_laboratorio_isolado",
+  "achados_corrigidos": 14,
+  "correcoes_git": "locais_sem_commit_ou_push_posterior",
+  "operacao_testes": 31,
+  "franquia_semanal_fechamento": {
+    "usedPercent": 92,
+    "remainingPercent": 8,
+    "limiar_pausa_restante": 1,
+    "limiar_atingido": false,
+    "retomada_agendada": false,
+    "credito_reset_usado": false
+  },
+  "smoke_http_jar": {
+    "jar_sha256": "963677cb995456c40b3f61a2865d8dfe1b8be93e8f8be9b2ae11861b4a6789d4",
+    "spa": [
+      {
+        "rota": "/",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/painel",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/contratos",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/relatorio-mensal",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/historico",
+        "status": 200,
+        "igual_dist": true
+      }
+    ],
+    "assets_servidos_com_hash_igual_ao_dist": 111,
+    "api_anonima_contratos": 401,
+    "csrf_bootstrap": 200,
+    "cookies_e_tokens_nao_registrados": true
+  },
+  "navegador_final": {
+    "browser": "Chromium 157.0.8103.50",
+    "origem": "http://127.0.0.1:58501",
+    "jar_sha256": "963677cb995456c40b3f61a2865d8dfe1b8be93e8f8be9b2ae11861b4a6789d4",
+    "login_logout_novo_login": true,
+    "logout_rota": "/login",
+    "novo_login_rota": "/painel",
+    "recarga_preservou_sessao": true,
+    "regioes_main": 1,
+    "overflow_horizontal": false,
+    "links_href_hash": 0,
+    "recarga_final_console": {
+      "errors": 0,
+      "warnings": 0
+    },
+    "historico_rede": "401 da sessão antiga e ERR_ABORTED do touch cancelado na saída, preservados no log; não são zero erros em toda a campanha.",
+    "relatorio_mensal": {
+      "colaboradores": 27,
+      "nomes_historicos_ausentes_na_pagina": 5,
+      "fallback_explicito_preserva_ausencia": true,
+      "pdf_solicitacao_status": 202,
+      "pdf_download_status": 200,
+      "pdf_paginas_inspecionadas": 2,
+      "pdf_tagged": false,
+      "xlsx_solicitacao_status": 202,
+      "xlsx_download_status": 200,
+      "xlsx_zip_xml_integro": true
+    },
+    "screenshot": "painel-jar-final.png",
+    "rede": "rede-navegador-final.txt",
+    "sem_valores_de_cookie_ou_credenciais": true
+  },
+  "exportacoes_finais": {
+    "pdf_sha256": "6ad70e7e2b6b440ea2fc3e3509c7609357481863f62f4f04a777eefb37d914e5",
+    "xlsx_sha256": "8804240942ebf636c2f7d75ce1ff509f705f1ab3cee272347e0201f3598caffd",
+    "xlsx_folhas_linhas": {
+      "xl/worksheets/sheet1.xml": 40
+    }
+  },
+  "recuperacao_jar": {
+    "criterios": 5,
+    "aprovados": 5,
+    "registros_controle": 200,
+    "limite_ms": 120000,
+    "chunk_1_ms": 80025,
+    "chunk_500_ms": 103637,
+    "atomicidade_alvo_ms": 79317,
+    "atomicidade_rollback_integral": true,
+    "revogacao_terminal_ms": 44075,
+    "retomada_ms": 66490,
+    "retomada_mesmo_job": true,
+    "retomada_prefixo_registros": 2,
+    "retomada_novos_registros": 198,
+    "dois_executores_disputa_real": true,
+    "isolamento": "schema Hibernate e índice Redis exclusivo por cenário; nenhuma purga"
+  },
+  "carga_postgresql": {
+    "workers": 24,
+    "duracao_segundos": 15,
+    "operacoes": 140438,
+    "erros": 0,
+    "p95_ms": 11,
+    "p99_ms": 23,
+    "escritas_confirmadas": 28176,
+    "limite": "Cenário de banco; não equivale a SLA da aplicação ou escala nacional."
+  },
+  "sonar": "Sem projeto SGT disponível na conexão; gate não aferido",
+  "revisao_independente": false,
+  "verificacao_final": {
+    "fontes_inalteradas": 2010,
+    "classes_jar": 866,
+    "assets_jar": 111,
+    "links_locais_validos": 54,
+    "git_diff_check": "pass",
+    "arquivos_alterados_ou_novos": 93,
+    "assets_novos": 47,
+    "privados_fora_git": true,
+    "jar_sha256": "963677cb995456c40b3f61a2865d8dfe1b8be93e8f8be9b2ae11861b4a6789d4",
+    "head": "678758afe271cf531560e612d13bad292cab7536",
+    "upstream": "678758afe271cf531560e612d13bad292cab7536"
+  },
+  "memoria_fechamento": {
+    "servicos_consumo_bytes": 1982169088,
+    "servicos_teto_bytes": 4294967296,
+    "host_mem_available_kib": 15922772,
+    "suite_pesada_ativa": false,
+    "swap_servicos_max_bytes": 0
+  }
+}

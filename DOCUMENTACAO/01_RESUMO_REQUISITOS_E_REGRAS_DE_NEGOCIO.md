@@ -2,7 +2,7 @@
 
 > **Estado atual: projeto não concluído e não homologado para produção.** O corpo original preserva o corte C25-H04/MySQL; a derivada local usa PostgreSQL e a toolchain registrada em [CODEX/TOOLCHAIN.md](CODEX/TOOLCHAIN.md). Contagens, commits e aceites históricos não aprovam os bytes atuais. Leia [ESTADO_ATUAL.md](ESTADO_ATUAL.md) e o [índice](README.md).
 
-> **Decisão vigente de09/11/2026:** a janela fixa de sete dias citada no corpo histórico abaixo foi substituída por N configurável, padrão30, limite exclusivo D+N. Consulte a [regra vigente](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md). Governança de Terceiros continua excluída; demais permissões e invariantes preservadas. Nenhum resultado histórico aprova a campanha atual.
+> **Decisão vigente de11/11/2026:** lançamento em N datas civis configuráveis, padrão7, limite exclusivo D+N; edição em 72 horas configuráveis desde o primeiro lançamento, sem reinício por retificação. Essa decisão substitui a janela compartilhada/padrão30 de09/11 e a regra fixa do corpo histórico abaixo. Consulte a [regra vigente](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md). Governança de Terceiros continua excluída; demais permissões e invariantes preservadas. Nenhum resultado histórico aprova os bytes atuais.
 
 **Referência documental:** campanha C25-H04, corte C03/C04 de 04/11/2026. **Empacotado:** 05/11/2026, sem alteração do código-fonte.
 
@@ -84,7 +84,7 @@ Esta entrega não é apenas um resumo de arquitetura: inclui o levantamento vige
 
 ## Contrato de preservação da derivada atual — 07/11/2026
 
-Consolidação das obrigações do AGENTS anterior, preservado no checkpoint `d8c415f4`. Esta seção não inventa novos requisitos nem certifica que todos estejam implementados.
+Consolidação histórica das obrigações do AGENTS anterior, preservado no checkpoint `d8c415f4`, com reconciliação de09/11. As referências temporais a padrão30 nesta seção foram substituídas pela decisão de11/11 no início deste documento. Esta seção não inventa novos requisitos nem certifica que todos estejam implementados.
 
 - Preservar autorização atual, núcleo operacional, Fornecedor compartilhado, GOV-003, documentos, histórico/auditoria, perfis/escopos/senha/CSRF, locks/transações/rollback, fotografias e limites operacionais. A duração fixa anterior foi substituída pela decisão humana de09/11/2026: N dias civis configuráveis, padrão30.
 - Governança de Terceiros/financeira e risco manual/contínuo removidos na baseline não devem ser reintroduzidos. Cadastro operacional de Fornecedor e funções compartilhadas não são automaticamente áreas removidas. O escopo detalhado e suas exceções estão em [MAPA_REMOVIDOS_PRESERVADOS.md](MATRIZES_COMPLETAS/MAPA_REMOVIDOS_PRESERVADOS.md), inclusive o suplemento PostgreSQL.

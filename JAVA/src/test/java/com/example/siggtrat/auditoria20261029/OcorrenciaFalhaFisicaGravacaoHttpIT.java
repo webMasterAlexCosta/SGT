@@ -135,6 +135,60 @@ class OcorrenciaFalhaFisicaGravacaoHttpIT extends MestreConcorrenciaSuporte {
                 "bytesSha", h(new String(baixado, StandardCharsets.UTF_8)), "aposCommit", fotografia(root)));
     }
 
+    @org.junit.jupiter.params.ParameterizedTest
+    @org.junit.jupiter.params.provider.ValueSource(strings = {"leitura", "fechamento"})
+    void falhaNoFluxoDeUploadNaoDeixaArquivosParciais(String etapa) throws Exception {
+        Cenario c = criarCenarioPersistido();
+        LocalDate dia = DataJornadaSintetica.ultimoDiaDeTrabalhoAnterior(c.jornadaA);
+        Path root = armazenamento.uploadDir().toAbsolutePath().normalize();
+        Path preservado = root.resolve("controle-upload-" + UUID.randomUUID() + ".bin");
+        Files.write(preservado, BYTES);
+        Map<String, Object> antes = fotografia(root);
+        Set<Path> temporariosAntes;
+        try (var arquivos = Files.list(root.resolve(".staging"))) {
+            temporariosAntes = Set.copyOf(arquivos.toList());
+        }
+        AtomicInteger aberturas = new AtomicInteger();
+        var falho = new MockMultipartFile("anexos", "falha-io.txt", "text/plain", BYTES) {
+            @Override public java.io.InputStream getInputStream() throws java.io.IOException {
+                var original = super.getInputStream();
+                // A primeira leitura calcula o hash da intenção; a segunda prepara o arquivo.
+                if (aberturas.incrementAndGet() == 1) return original;
+                return new java.io.FilterInputStream(original) {
+                    private boolean iniciou;
+                    @Override public int read(byte[] b, int off, int len) throws java.io.IOException {
+                        if (!etapa.equals("leitura")) return super.read(b, off, len);
+                        if (iniciou) throw new java.io.IOException("Falha sintética de leitura do upload");
+                        iniciou = true;
+                        return super.read(b, off, Math.min(len, 5));
+                    }
+                    @Override public void close() throws java.io.IOException {
+                        super.close();
+                        if (etapa.equals("fechamento")) throw new java.io.IOException("Falha sintética ao fechar upload");
+                    }
+                };
+            }
+        };
+        try {
+            var resposta = executar(c.localA, pedido(c, dia).file(falho), 500,
+                    "Falha de I/O deve abortar o upload e limpar todos os temporários da tentativa");
+            assertThat(aberturas.get()).isEqualTo(2);
+            assertThat(resposta.getResolvedException()).hasRootCauseInstanceOf(java.io.IOException.class);
+            assertThat(resposta.getResponse().getContentAsString()).doesNotContain(root.toString(), "IOException");
+            Map<String, Object> depois = fotografia(root);
+            assertThat(depois.get("arquivos")).as("Temporários da tentativa abortada").isEqualTo(antes.get("arquivos"));
+            assertThat(depois).isEqualTo(antes);
+            assertThat(Files.readAllBytes(preservado)).isEqualTo(BYTES);
+        } finally {
+            // Isola a regressão negativa: remove somente resíduos desta tentativa, após as asserções.
+            try (var arquivos = Files.list(root.resolve(".staging"))) {
+                for (Path arquivo : arquivos.toList()) {
+                    if (!temporariosAntes.contains(arquivo)) Files.deleteIfExists(arquivo);
+                }
+            }
+        }
+    }
+
     private MockMultipartHttpServletRequestBuilder pedido(Cenario c, LocalDate dia) {
         return multipart("/api/ocorrencias").file(new MockMultipartFile("anexos", "prova-io.txt", "text/plain", BYTES))
                 .param("empregadoId", c.empregadoA.getId().toString()).param("motivo", "ATESTADO")

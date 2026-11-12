@@ -33,8 +33,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 
 /**
  * FRE-002/003/013/014: Spring MVC, autenticação, autorização, política e persistência
- * reais, com PostgreSQL 18.6. Somente a leitura do relógio ZonedDateTime.now(zona) é
- * controlada para atingir a fronteira exata sem modificar política ou banco.
+ * reais, com PostgreSQL 18.6. Relógios de lançamento e edição controlados para
+ * atingir as fronteiras exatas sem modificar política ou banco.
  * MockMvc não substitui o gate separado de transporte TCP/navegador do JAR.
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
@@ -45,7 +45,7 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
     @Autowired AuditoriaFrequenciaServico auditoria;
 
     @BeforeEach
-    void confirmarMySqlESchemaGeridoPeloHibernate() throws Exception {
+    void confirmarPostgresESchemaGeridoPeloHibernate() throws Exception {
         try (var conexao = dataSource.getConnection()) {
             assertThat(conexao.getMetaData().getDatabaseProductName()).isEqualTo("PostgreSQL");
             assertThat(conexao.getMetaData().getDatabaseProductVersion()).matches("18\\.6(?: \\(Debian [^()]+\\))?");
@@ -56,22 +56,26 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
 
     @ParameterizedTest(name = "Editar em limite{0}ns retorna HTTP {1}")
     @CsvSource({"-1,200", "0,403", "1,403"})
-    void apiAplicaLimiteExclusivoSemAlterarFrequenciaRecusada(long deslocamentoNanos, int esperado) throws Exception {
+    void apiAplicaLimiteDeEdicaoExclusivoSemAlterarFrequenciaRecusada(long deslocamentoNanos, int esperado) throws Exception {
         Cenario c = criarCenarioPersistido();
-        // Segunda-feira real coberta pela jornada da fixture, anterior a hoje.
-        LocalDate data = segundaAnterior();
+        // Primeiro dia útil dentro das sete datas: sua janela de lançamento
+        // termina antes das 72 horas contadas a partir deste registro.
+        LocalDate candidata = RelogioSistema.hoje().minusDays(6);
+        while (candidata.getDayOfWeek().getValue() >= 6) candidata = candidata.plusDays(1);
+        LocalDate data = candidata;
         ZonedDateTime limite = data.plusDays(7).atStartOfDay(RelogioSistema.ZONA);
-        ZonedDateTime antes = limite.minusSeconds(1);
-        ZonedDateTime instanteTeste = limite.plusNanos(deslocamentoNanos);
+        ZonedDateTime antes = ZonedDateTime.now(RelogioSistema.ZONA);
+        Instant instanteTeste;
         assertThat(politica.instanteFechamento(data)).isEqualTo(limite);
         long id;
         Foto original;
         JsonNode resposta;
         Foto posterior;
-        try (var relogio = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+        try (var relogio = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS);
+             var edicao = Mockito.mockStatic(Instant.class, Mockito.CALLS_REAL_METHODS)) {
             relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(antes);
             JsonNode criada = enviar(c.operacionalA, "/api/frequencias", pedido(c, data, "FALTA"), 200,
-                    "Controle positivo: registro operacional no sétimo dia antes do fechamento");
+                    "Controle positivo: primeiro registro operacional dentro das sete datas");
             id = criada.path("id").asLong();
             assertThat(criada.path("estadoNegocial").asText()).isEqualTo("ABERTA");
             assertThat(criada.path("bloqueadaEdicaoOperacional").asBoolean()).isFalse();
@@ -79,9 +83,14 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
             assertThat(original.eventos()).hasSize(1);
             assertThat(original.raiz().get("versaoNegocial")).isEqualTo(1);
 
-            relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(instanteTeste);
+            Instant limiteEdicao = java.time.LocalDateTime.parse(criada.path("prazoEdicao").asText())
+                    .atZone(RelogioSistema.ZONA).toInstant();
+            instanteTeste = limiteEdicao.plusNanos(deslocamentoNanos);
+            edicao.when(Instant::now).thenReturn(instanteTeste);
+            ZonedDateTime calendarioTeste = instanteTeste.atZone(RelogioSistema.ZONA);
+            relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(calendarioTeste);
             resposta = enviar(c.operacionalA, "/api/frequencias", pedido(c, data, "PRESENCA"), esperado,
-                    "FRE-002/003: edição direta à API antes, no limite exclusivo ou depois dele");
+                    "Edição direta à API antes, no limite de 72 horas ou depois dele");
             posterior = foto(id);
             if (esperado == 200) {
                 assertThat(resposta.path("id").asLong()).isEqualTo(id);
@@ -113,9 +122,38 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
             assertThat(auditoria.evidenciasIntegridade(id).cadeiaIntegra()).isTrue();
         }
         registrar("limite-" + deslocamentoNanos, mapa("dataReferencia", data,
-                "zona", RelogioSistema.ZONA.getId(), "limiteExclusivo", limite,
+                "zona", RelogioSistema.ZONA.getId(), "limiteLancamentoExclusivo", limite,
                 "instantePolitica", instanteTeste, "statusEsperado", esperado,
                 "raizAntes", original, "raizDepois", posterior, "resposta", resposta));
+    }
+
+    @ParameterizedTest(name = "Primeiro lançamento em D+7{0}ns retorna HTTP {1}")
+    @CsvSource({"-1,200", "0,403", "1,403"})
+    void primeiroLancamentoMantemFronteiraCivilDeSeteDatas(long nanos, int esperado) throws Exception {
+        Cenario c = criarCenarioPersistido();
+        LocalDate data = segundaAnterior();
+        ZonedDateTime limite = data.plusDays(7).atStartOfDay(RelogioSistema.ZONA);
+        ZonedDateTime instante = limite.plusNanos(nanos);
+        assertThat(politica.diasJanela()).isEqualTo(7);
+        try (var relogio = Mockito.mockStatic(ZonedDateTime.class, Mockito.CALLS_REAL_METHODS)) {
+            relogio.when(() -> ZonedDateTime.now(RelogioSistema.ZONA)).thenReturn(instante);
+            JsonNode resposta = enviar(c.operacionalA, "/api/frequencias", pedido(c, data, "FALTA"), esperado,
+                    "Primeiro lançamento respeita o limite civil exclusivo de sete datas");
+            long quantidade = emTransacao(() -> em.createQuery(
+                    "select count(f) from Frequencia f where f.vinculoContratual.id=:v", Long.class)
+                    .setParameter("v", c.vinculoA.getId()).getSingleResult());
+            assertThat(quantidade).isEqualTo(esperado == 200 ? 1 : 0);
+            if (esperado == 200) {
+                long id = resposta.path("id").asLong();
+                Foto criada = foto(id);
+                assertThat(criada.eventos()).hasSize(1);
+                assertThat(criada.raiz().get("estadoNegocial").toString()).isEqualTo("ABERTA");
+                assertThat(auditoria.evidenciasIntegridade(id).cadeiaIntegra()).isTrue();
+            } else {
+                assertThat(resposta.path("code").asText()).isEqualTo("HTTP_403");
+                assertThat(resposta.path("message").asText()).contains("FECHADA");
+            }
+        }
     }
 
     @Test
@@ -204,7 +242,7 @@ class FrequenciaJanelaSeteDiasHttpIT extends ContratosHttpBase {
     private void registrar(String nome, Map<String, Object> evidencia) throws Exception {
         evidencia.put("observadoEmReal", Instant.now());
         evidencia.put("transporte", "Spring MockMvc; cadeia real de aplicação e PostgreSQL, sem TCP");
-        evidencia.put("controleRelogio", "Somente ZonedDateTime.now(America/Sao_Paulo), CALLS_REAL_METHODS");
+        evidencia.put("controleRelogio", "ZonedDateTime.now(America/Sao_Paulo) e, na fronteira de edição, Instant.now; CALLS_REAL_METHODS");
         Path path = Path.of("target/auditoria-http/frequencia-sete-dias-" + nome + ".json");
         Files.createDirectories(path.getParent());
         Files.writeString(path, mapper.writerWithDefaultPrettyPrinter().writeValueAsString(evidencia));

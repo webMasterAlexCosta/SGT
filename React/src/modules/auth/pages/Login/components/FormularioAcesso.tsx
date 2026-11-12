@@ -276,7 +276,7 @@ export const FormularioAcesso = React.memo(({
           {!segundoFatorPendente && (
             <div className={estilos.dicaLogin2FA}>
               <ShieldCheck size={14} />
-              <span>Se o 2FA estiver ativo, o backend solicitará o código do aplicativo autenticador antes de criar a sessão.</span>
+              <span>Se a verificação em duas etapas estiver ativa, informe o código do aplicativo autenticador para entrar.</span>
             </div>
           )}
         </>

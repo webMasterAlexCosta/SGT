@@ -242,7 +242,7 @@ export const FiltrosFrequencia = memo(
                 maxLength={500}
                 placeholder="Obrigatória para qualquer gravação realizada pelo Gestor Local (mínimo 5 caracteres)."
               />
-              <span>{String(justificativaRetificacao || "").trim().length}/500 · o backend exige ao menos 5 caracteres</span>
+              <span>{String(justificativaRetificacao || "").trim().length}/500 · informe ao menos 5 caracteres</span>
             </div>
           )}
 

@@ -10,6 +10,7 @@
     background-color: rgba(23, 37, 84, 0.7);
     backdrop-filter: blur(4px);
     padding: 1rem;
+    box-sizing: border-box;
     animation: surgimentoSuave 0.3s ease-out;
 }
 
@@ -29,10 +30,16 @@
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 100%;
     max-width: 32rem;
-    overflow: hidden;
+    max-height: calc(100dvh - 2rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
     border-top: 4px solid #eab308;
     display: flex;
     flex-direction: column;
+}
+
+.cartaoModal > * {
+    flex-shrink: 0;
 }
 
 .cabecalhoAviso {
@@ -179,6 +186,12 @@
     border-color: var(--cor-correios-azul-600);
 }
 
+.caixaCustomizada:focus-within,
+.botaoCiente:focus-visible {
+    outline: 2px solid var(--cor-correios-azul-600);
+    outline-offset: 3px;
+}
+
 .entradaEscondida {
     position: absolute;
     opacity: 0;
@@ -246,4 +259,15 @@
 
 .botaoCiente:active {
     transform: scale(0.95);
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .sobreposicaoModal,
+    .envoltorioIcone {
+        animation: none;
+    }
+
+    .botaoCiente:active {
+        transform: none;
+    }
 }

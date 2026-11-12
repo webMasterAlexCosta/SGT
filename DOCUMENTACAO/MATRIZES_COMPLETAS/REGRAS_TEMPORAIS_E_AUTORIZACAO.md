@@ -1,6 +1,6 @@
 # Regras temporais e de autorização — contrato e rastreabilidade
 
-> **Reconciliação vigente de09/11/2026:** este documento preserva os textos/resultados do corte histórico. A [decisão humana vigente](../../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) substitui sete dias fixos por N configurável, padrão30, limite exclusivo D+N; preserva as outras permissões, IDs e namespaces. MySQL/recibos antigos não aprovam PostgreSQL ou os bytes atuais. Governança de Terceiros permanece removida; Sonar está fora desta missão. Consulte o [plano atual](../CODEX/CAMPANHA_20261109/PLANO.md) para gates/evidências atuais.
+> **Reconciliação vigente de11/11/2026:** este documento preserva os textos/resultados do corte histórico. A [decisão humana vigente](../../JAVA/docs/REGRA_JANELA_FREQUENCIA.md) define lançamento em N datas civis configuráveis, padrão7, limite exclusivo D+N, e edição em 72 horas configuráveis desde o primeiro lançamento. Substitui a janela compartilhada/padrão30 de09/11; preserva outras permissões, IDs e namespaces. MySQL/recibos antigos não aprovam PostgreSQL ou os bytes atuais. Governança de Terceiros permanece removida. O [plano de09/11](../CODEX/CAMPANHA_20261109/PLANO.md) e a exclusão de Sonar nele registrada pertencem àquela campanha; consulte o [estado atual](../ESTADO_ATUAL.md) para evidências posteriores.
 
 ## Escopo desta leitura
 

@@ -101,13 +101,14 @@ public class ArmazenamentoTemporarioRelatorioServico implements com.example.sigg
      * assíncronas para permitir nova tentativa caso o navegador ou a rede
      * interrompa o download depois que o relatório já foi gerado com sucesso.
      */
-    public void transferir(Path arquivoConcluido, OutputStream destino) throws IOException {
+    public long transferir(Path arquivoConcluido, OutputStream destino) throws IOException {
         if (arquivoConcluido == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Arquivo da exportação é obrigatório.");
         if (destino == null) throw new com.example.siggtrat.excecao.ExcecaoValidacaoNegocio("Destino da exportação é obrigatório.");
         arquivosAtivos.add(arquivoConcluido);
         try (InputStream arquivo = new BufferedInputStream(Files.newInputStream(arquivoConcluido), BUFFER_IO_BYTES)) {
-            arquivo.transferTo(destino);
+            long transferidos = arquivo.transferTo(destino);
             destino.flush();
+            return transferidos;
         } finally {
             arquivosAtivos.remove(arquivoConcluido);
         }

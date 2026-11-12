@@ -135,12 +135,9 @@ public class RelatorioExportacaoAssincronaServico implements com.example.siggtra
             if (tarefa.status != Status.CONCLUIDO || tarefa.arquivo == null) {
                 throw new ResponseStatusException(HttpStatus.CONFLICT, "A exportação ainda não está pronta para download.");
             }
-            long tamanho = Math.max(tarefa.tamanhoBytes, armazenamentoTemporario.tamanho(tarefa.arquivo));
-            if (tamanho <= 0L) {
-                tarefa.status = Status.FALHA;
-                tarefa.etapa = "Arquivo indisponível";
-                tarefa.mensagem = "O relatório foi concluído, mas o arquivo temporário não está mais disponível.";
-                tarefa.atualizadoEm = Instant.now();
+            long tamanho = armazenamentoTemporario.tamanho(tarefa.arquivo);
+            if (tamanho <= 0L || tamanho != tarefa.tamanhoBytes) {
+                marcarArquivoIndisponivel(tarefa);
                 throw new ResponseStatusException(HttpStatus.GONE, "Arquivo temporário da exportação não está disponível.");
             }
             return new TransferenciaExportacao(
@@ -177,8 +174,19 @@ public class RelatorioExportacaoAssincronaServico implements com.example.siggtra
             tarefa.atualizadoEm = Instant.now();
         }
 
+        boolean arquivoInvalido = false;
         try {
-            armazenamentoTemporario.transferir(arquivo, destino);
+            // O arquivo pode desaparecer entre a autorização HTTP e o streaming.
+            if (transferencia.tamanhoBytes() <= 0L
+                    || armazenamentoTemporario.tamanho(arquivo) != transferencia.tamanhoBytes()) {
+                arquivoInvalido = true;
+                throw new IOException("Arquivo temporário da exportação indisponível ou incompleto.");
+            }
+            long transferidos = armazenamentoTemporario.transferir(arquivo, destino);
+            if (transferidos != transferencia.tamanhoBytes()) {
+                arquivoInvalido = true;
+                throw new IOException("A transferência não leu o arquivo completo da exportação.");
+            }
             synchronized (tarefa) {
                 armazenamentoTemporario.excluir(arquivo);
                 tarefa.arquivo = null;
@@ -189,17 +197,28 @@ public class RelatorioExportacaoAssincronaServico implements com.example.siggtra
             }
         } catch (IOException e) {
             synchronized (tarefa) {
-                // A geração já terminou e continua íntegra no disco. Não apaga
-                // o arquivo por uma falha do cliente/proxy durante o download.
                 if (tarefa.arquivo != null && tarefa.arquivo.equals(arquivo)) {
-                    tarefa.status = Status.CONCLUIDO;
-                    tarefa.etapa = "Arquivo pronto";
-                    tarefa.mensagem = "O download foi interrompido. Clique em Baixar arquivo para tentar novamente.";
-                    tarefa.atualizadoEm = Instant.now();
+                    if (arquivoInvalido || armazenamentoTemporario.tamanho(arquivo) != transferencia.tamanhoBytes()) {
+                        marcarArquivoIndisponivel(tarefa);
+                    } else {
+                        // Falha do cliente/proxy: conserva o arquivo completo para nova tentativa.
+                        tarefa.status = Status.CONCLUIDO;
+                        tarefa.etapa = "Arquivo pronto";
+                        tarefa.mensagem = "O download foi interrompido. Clique em Baixar arquivo para tentar novamente.";
+                        tarefa.atualizadoEm = Instant.now();
+                    }
                 }
             }
             throw e;
         }
+    }
+
+    private void marcarArquivoIndisponivel(TarefaExportacao tarefa) {
+        tarefa.status = Status.FALHA;
+        tarefa.etapa = "Arquivo indisponível";
+        tarefa.mensagem = "O arquivo temporário está indisponível ou incompleto. Solicite uma nova exportação.";
+        tarefa.atualizadoEm = Instant.now();
+        LOGGER.warn("Arquivo de exportação indisponível: id={} tamanhoEsperado={}", tarefa.id, tarefa.tamanhoBytes);
     }
 
     public record TransferenciaExportacao(

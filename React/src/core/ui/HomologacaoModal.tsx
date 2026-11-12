@@ -1,48 +1,57 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useId } from "react";
 import { AlertTriangle, CheckCircle, Info } from "lucide-react";
 import { CONFIG } from "../config";
+import { useDialogoAcessivel } from "./acessibilidadeDialogo";
 import estilos from "./HomologacaoModal.module.css";
 
 const HomologacaoModal = () => {
   const [aberto, setAberto] = useState(false);
   const [naoMostrarNovamente, setNaoMostrarNovamente] = useState(false);
   const buildProducao = CONFIG.BUILD_PRODUCAO;
+  const tituloId = useId();
 
   const CHAVE_ARMAZENAMENTO = `ocultarHomologacao_${CONFIG.APP_NAME}_Expiracao`;
 
   useEffect(() => {
     if (buildProducao) return;
-    const dadosExpiracao = localStorage.getItem(CHAVE_ARMAZENAMENTO);
-
-    if (dadosExpiracao) {
-      const agora = new Date().getTime();
-      const tempoExpiracao: unknown = JSON.parse(dadosExpiracao);
-
-      if (agora > Number(tempoExpiracao)) {
-        localStorage.removeItem(CHAVE_ARMAZENAMENTO);
-        setAberto(true);
-      } else {
+    try {
+      const dadosExpiracao = localStorage.getItem(CHAVE_ARMAZENAMENTO);
+      const tempoExpiracao: unknown = dadosExpiracao ? JSON.parse(dadosExpiracao) : null;
+      if (typeof tempoExpiracao === "number" && Number.isFinite(tempoExpiracao) && tempoExpiracao > Date.now()) {
         setAberto(false);
+        return;
       }
-    } else {
-      setAberto(true);
+      if (dadosExpiracao) localStorage.removeItem(CHAVE_ARMAZENAMENTO);
+    } catch {
+      // Preferência local opcional: dados inválidos ou armazenamento bloqueado
+      // não podem interromper o acesso à aplicação nem ocultar o aviso.
     }
+    setAberto(true);
   }, [CHAVE_ARMAZENAMENTO, buildProducao]);
 
   const lidarComFechamento = () => {
     if (naoMostrarNovamente) {
       const limiteEmMs = CONFIG.HOMOLOGACAO_EXPIRY_DAYS * 24 * 60 * 60 * 1000;
       const expiraEm = new Date().getTime() + limiteEmMs;
-      localStorage.setItem(CHAVE_ARMAZENAMENTO, JSON.stringify(expiraEm));
+      try {
+        localStorage.setItem(CHAVE_ARMAZENAMENTO, JSON.stringify(expiraEm));
+      } catch {
+        // O aviso volta no próximo acesso se o navegador não puder lembrar.
+      }
     }
     setAberto(false);
   };
+
+  const referenciaDialogo = useDialogoAcessivel({
+    aberto: aberto && !buildProducao,
+    aoFechar: lidarComFechamento,
+  });
 
   if (buildProducao || !aberto) return null;
 
   return (
     <div className={estilos.sobreposicaoModal}>
-      <div className={estilos.cartaoModal}>
+      <div className={estilos.cartaoModal} ref={referenciaDialogo} role="dialog" aria-modal="true" aria-labelledby={tituloId} tabIndex={-1}>
         <div className={estilos.cabecalhoAviso}>
           <div className={estilos.fundoTracejado}></div>
           <div className={estilos.envoltorioIcone}>
@@ -52,7 +61,7 @@ const HomologacaoModal = () => {
               strokeWidth={2.5}
             />
           </div>
-          <h2 className={estilos.tituloAviso}>Ambiente de DESENVOLVIMENTO</h2>
+          <h2 id={tituloId} className={estilos.tituloAviso} tabIndex={-1} data-foco-inicial>Ambiente de DESENVOLVIMENTO</h2>
           <p className={estilos.subtituloAviso}>
             {CONFIG.APP_NAME} 
           </p>
@@ -62,14 +71,13 @@ const HomologacaoModal = () => {
           <p>
             Olá! Seja bem-vindo(a) ao{" "}
             <strong>{CONFIG.APP_NAME} - DESENVOLVIMENTO</strong>. Você está
-            navegando em uma versão de testes De novas funcionalidades.
+            navegando em uma versão de testes de novas funcionalidades.
           </p>
           <div className={estilos.caixaDestaqueAzul}>
             <Info className={estilos.iconeInformacao} size={24} />
             <p>
-              <strong>Fique tranquilo(a)!</strong> Os dados inseridos, alterados
-              ou apagados aqui{" "}
-              <strong> não afetam o ambiente oficial de produção</strong>.
+              <strong>Use dados de teste.</strong> Este ambiente serve para
+              simular rotinas e avaliar as funcionalidades do sistema.
             </p>
           </div>
           <p>

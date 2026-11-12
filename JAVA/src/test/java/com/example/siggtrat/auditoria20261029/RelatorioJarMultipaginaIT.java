@@ -165,10 +165,11 @@ class RelatorioJarMultipaginaIT extends ContratosHttpBase {
     private record PessoaEsperada(long empregado, long vinculo, String nome, int minutos) {}
     private record Massa(Cenario c, LocalDate data, List<PessoaEsperada> pessoas, PessoaEsperada controleB) {}
 
-    private Massa preparar() throws Exception {
-        ConfiguracaoPostgresIntegracao.carregar(); // Sem fallback de credenciais ou dotenv.
-        Cenario c = criarCenarioPersistido();
-        Massa massa = emTransacao(() -> {
+    private void validarBancoIsolado() {
+        ConfiguracaoPostgresIntegracao banco = ConfiguracaoPostgresIntegracao.carregar();
+        assertEquals("127.0.0.1", URI.create(banco.url().substring("jdbc:".length())).getHost(),
+                "Somente PostgreSQL do laboratório local explícito");
+        emTransacao(() -> {
             Object[] identidade = (Object[]) em.createNativeQuery("""
                 SELECT current_setting('server_version_num')::integer,current_database(),
                   d.datdba=r.oid,
@@ -182,8 +183,23 @@ class RelatorioJarMultipaginaIT extends ContratosHttpBase {
                   JOIN pg_namespace n ON n.nspname='public' WHERE r.rolname=current_user
                 """).getSingleResult();
             assertEquals(180006, ((Number) identidade[0]).intValue());
-            assertTrue(identidade[1].toString().startsWith("sgt_20261109_"));
+            String bancoEsperado = System.getenv("SGT_INTEGRATION_DATABASE_EXPECTED");
+            if (bancoEsperado == null) {
+                assertTrue(identidade[1].toString().startsWith("sgt_20261109_"),
+                        "Laboratório diferente exige SGT_INTEGRATION_DATABASE_EXPECTED explícito");
+            } else {
+                assertFalse(bancoEsperado.isBlank(), "Nome explícito de banco não pode ser vazio");
+                assertEquals(bancoEsperado, identidade[1].toString(), "Banco real deve corresponder ao laboratório autorizado");
+            }
             for (int i = 2; i < identidade.length; i++) assertEquals(Boolean.TRUE, identidade[i], "Role limitada/ownership explícitos");
+            return null;
+        });
+    }
+
+    private Massa preparar() throws Exception {
+        validarBancoIsolado(); // Provar identidade e privilégios antes de criar a massa.
+        Cenario c = criarCenarioPersistido();
+        Massa massa = emTransacao(() -> {
             Contrato contrato = em.find(Contrato.class, c.contratoA.getId());
             ComposicaoContratual composicao = em.find(ComposicaoContratual.class, c.composicaoA.getId());
             contrato.setEfetivoPrevisto(QUANTIDADE); contrato.setEfetivoOriginalPublicado(QUANTIDADE);

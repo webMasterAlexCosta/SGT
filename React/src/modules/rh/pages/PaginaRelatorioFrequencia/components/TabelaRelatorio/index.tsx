@@ -57,7 +57,7 @@ const CabecalhoTabela = ({ diasDoMes }: { diasDoMes: string[] }) => (
 const LinhaContexto = ({ empregado, indice, diasDoMes }: { empregado: FrequencyReportRow; indice: number; diasDoMes: string[] }) => (
   <tr key={empregado.id || indice} className={indice % 2 === 0 ? estilos.par : estilos.impar}>
     <td className={estilos.nome}>
-      <strong title={(empregado.nome) ?? undefined}>{empregado.nome}</strong>
+      <strong title={empregado.nome ?? undefined}>{empregado.nome || "Nome não informado no relatório"}</strong>
       <span title={empregado.cargo}>{empregado.cargo || "Função não informada"}</span>
       <span title={empregado.contrato}>{empregado.contrato || "Contrato não informado"}</span>
     </td>
@@ -96,9 +96,11 @@ const LinhaColaborador = ({ grupo, indice, diasDoMes }: { grupo: { id: string | 
     <tr className={indice % 2 === 0 ? estilos.par : estilos.impar}>
       <td colSpan={diasDoMes.length + 13} className={estilos.contextosColaborador}>
         <details>
-          <summary><strong>{grupo.linhas[0].nome}</strong> · {grupo.linhas.length} contextos históricos</summary>
+          <summary><strong>{grupo.linhas[0].nome || "Nome não informado no relatório"}</strong> · {grupo.linhas.length} contextos históricos</summary>
           <div className={estilos.rolagem}>
-            <table className={estilos.tabela} aria-label={`Contextos históricos de ${grupo.linhas[0].nome}`}>
+            <table className={estilos.tabela} aria-label={grupo.linhas[0].nome
+              ? `Contextos históricos de ${grupo.linhas[0].nome}`
+              : "Contextos históricos — nome não informado no relatório"}>
               <CabecalhoTabela diasDoMes={diasDoMes} />
               <tbody>{grupo.linhas.map((empregado, contexto) => <LinhaContexto key={empregado.id || contexto} empregado={empregado} indice={contexto} diasDoMes={diasDoMes} />)}</tbody>
             </table>

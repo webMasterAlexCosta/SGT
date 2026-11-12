@@ -260,7 +260,7 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
   const dataReferenciaOperacional = dados?.frequencia?.data || dados?.referencia || referencia;
 
   return (
-    <main className={estilos.pagina}>
+    <div className={estilos.pagina}>
       <NavegacaoPainel visao={visaoPainel} aoMudar={setVisaoPainel} />
       {visaoPainel === 'desempenho' ? (
         <Suspense fallback={<p role="status">Abrindo painel de desempenho…</p>}>
@@ -407,6 +407,6 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
         </>
       )}
       </>}
-    </main>
+    </div>
   );
 };

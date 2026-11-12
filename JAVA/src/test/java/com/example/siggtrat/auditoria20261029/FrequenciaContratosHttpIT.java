@@ -18,9 +18,15 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 class FrequenciaContratosHttpIT extends AuditoriaHttpSuporte {
     @Test void consultasDiariaMensalEIntervaloRetornamIdentidadeCanonicaEEstadosIndependentes() throws Exception {
         Cenario c = criarCenario();
+        var antes = java.time.Instant.now();
         JsonNode criada = dados(executar(c.localA, post("/api/frequencias").contentType(APPLICATION_JSON)
                         .content(json(payload(c.vinculoA.getId(), DATA, "FALTA", "consulta-" + UUID.randomUUID()))),
                 200, "FRE-001 criação canônica"));
+        var depois = java.time.Instant.now();
+        var prazo = java.time.LocalDateTime.parse(criada.path("prazoEdicao").asText())
+                .atZone(com.example.siggtrat.utilitario.RelogioSistema.ZONA).toInstant();
+        assertFalse(prazo.isBefore(antes.plus(java.time.Duration.ofHours(72))));
+        assertFalse(prazo.isAfter(depois.plus(java.time.Duration.ofHours(72))));
         long id = criada.path("id").longValue();
         // TMP-001:002[0]: Pessoa/Vínculo/Contrato/Alocação de D continuam A;
         // somente a projeção cadastral atual passa a apontar para B.
@@ -52,7 +58,7 @@ class FrequenciaContratosHttpIT extends AuditoriaHttpSuporte {
             assertEquals("VALIDA", item.path("validadeOperacional").asText());
             assertEquals("RETIFICADA_GESTOR", item.path("estadoAuditoria").asText());
             assertTrue(item.path("bloqueadaEdicaoOperacional").asBoolean());
-            assertTrue(item.path("prazoEdicao").asText().startsWith(DATA.plusDays(7).toString()));
+            assertEquals(criada.path("prazoEdicao"), item.path("prazoEdicao"));
             JsonNode alheia = dados(executar(c.localB, get("/api/frequencias" + rota)
                             .param("contratoId", c.contratoA.getId().toString()),
                     200, "FRE-015 consulta de outra Gestão não expõe registro"));
