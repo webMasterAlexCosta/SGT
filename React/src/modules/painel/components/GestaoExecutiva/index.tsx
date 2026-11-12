@@ -138,7 +138,8 @@ const PainelExecutivo = ({ titulo, icone: Icone, detalhe, acao, ajuda, largo = f
   );
 };
 
-export const CabecalhoGovernanca = ({
+export const CabecalhoGerencial = ({
+  titulo,
   dados,
   referencia,
   hoje,
@@ -149,14 +150,13 @@ export const CabecalhoGovernanca = ({
   aoRecarregar,
   aoExportarXlsx,
   aoExportarPdf,
-}: { dados?: ManagementPanelView; referencia: string; hoje: string; periodoDias: number; carregando?: boolean; aoMudarReferencia: (data: string) => void; aoMudarPeriodo: (dias: string) => void; aoRecarregar: () => void; aoExportarXlsx: () => void; aoExportarPdf: () => void }) => (
+}: { titulo: string; dados?: ManagementPanelView; referencia: string; hoje: string; periodoDias: number; carregando?: boolean; aoMudarReferencia: (data: string) => void; aoMudarPeriodo: (dias: string) => void; aoRecarregar: () => void; aoExportarXlsx: () => void; aoExportarPdf: () => void }) => (
   <header className={estilos.cabecalho}>
     <div className={estilos.identidadeCabecalho}>
-      <span className={estilos.selo}>Painel de governança</span>
-      <h1>Gestão operacional e contratual</h1>
+      <h1>{titulo}</h1>
       <p>
         {dados?.escopo?.nome || "Escopo autenticado"} · janela analítica de {dataBr(dados?.periodo?.inicio)} a {dataBr(dados?.periodo?.fim || dados?.referencia || referencia)}
-        {" "}({numero(dados?.periodo?.dias || periodoDias)} dias) · referência final em {dataBr(dados?.referencia || referencia)}
+        {" "}({numero(dados?.periodo?.dias || periodoDias)} {Number(dados?.periodo?.dias || periodoDias) === 1 ? "dia" : "dias"}) · referência final em {dataBr(dados?.referencia || referencia)}
       </p>
     </div>
     <div className={estilos.controlesCabecalho}>
@@ -164,6 +164,7 @@ export const CabecalhoGovernanca = ({
         <label>
           Período analítico
           <select value={periodoDias} onChange={(evento) => aoMudarPeriodo(evento.target.value)}>
+            <option value="1">Diário</option>
             <option value="7">7 dias</option>
             <option value="15">15 dias</option>
             <option value="30">30 dias</option>
@@ -266,7 +267,7 @@ export const ResumoExecutivo = ({ dados, indicadorEfetivo }: { dados?: Managemen
           : "Aguardando consolidação do indicador"}
         classeCartao={Number(resumoEfetivoOperacional?.pendentesLancamento || 0) > 0 ? estilos.indicadorAlerta : estilos.indicadorVerde}
       />
-      <CartaoIndicador icone={CalendarClock} titulo={`Absenteísmo — ${numero(periodo.dias)} dias`} valor={temOperacionais ? percentual(periodo.taxaAbsenteismo) : "Sem lançamentos"} detalhe={`${numero(ausenciasPeriodo)} ausência(s) · ${dataBr(periodo.inicio)} a ${dataBr(periodo.fim)}`} classeCartao={estilos.indicadorAlerta} />
+      <CartaoIndicador icone={CalendarClock} titulo={`Absenteísmo — ${numero(periodo.dias)} ${periodo.dias === 1 ? "dia" : "dias"}`} valor={temOperacionais ? percentual(periodo.taxaAbsenteismo) : "Sem lançamentos"} detalhe={`${numero(ausenciasPeriodo)} ausência(s) · ${dataBr(periodo.inicio)} a ${dataBr(periodo.fim)}`} classeCartao={estilos.indicadorAlerta} />
       <CartaoIndicador ajuda={AJUDA.integridade} icone={ShieldCheck} titulo="Integridade dos dados" valor={numero(integridade.totalInconsistencias)} detalhe={integridade.totalInconsistencias ? "inconsistências para saneamento" : "nenhuma inconsistência detectada"} classeValor={integridade.totalInconsistencias ? estilos.valorCritico : estilos.valorNormal} classeCartao={integridade.totalInconsistencias ? estilos.indicadorAlerta : estilos.indicadorNeutro} />
     </section>
   );
@@ -363,27 +364,27 @@ export const IntegridadeDados = ({ integridade }: { integridade?: Partial<DTO.Pa
   );
 };
 
-export const EvolucaoOperacional = ({ evolucao = [], periodoDias = 30 }: { evolucao?: DTO.PainelGestaoDTOSerieTemporal[]; periodoDias?: number }) => {
+export const EvolucaoOperacional = ({ evolucao = [], periodoDias = 1 }: { evolucao?: DTO.PainelGestaoDTOSerieTemporal[]; periodoDias?: number }) => {
   const dados = evolucao.map((item) => ({ ...item, rotulo: new Intl.DateTimeFormat("pt-BR", { day: "2-digit", month: "2-digit" }).format(new Date(`${item.data}T12:00:00`)) }));
   const totais = dados.reduce((acc, item) => ({ presencas: acc.presencas + Number(item.presencas || 0), ausencias: acc.ausencias + Number(item.ausencias || 0), repousosTrabalhados: acc.repousosTrabalhados + Number(item.repousosTrabalhados || 0) }), { presencas: 0, ausencias: 0, repousosTrabalhados: 0 });
   return (
-    <PainelExecutivo titulo={`Evolução operacional — ${periodoDias} dias`} icone={ClipboardCheck} detalhe="Série histórica" largo>
+    <PainelExecutivo titulo={`Evolução operacional — ${periodoDias} ${periodoDias === 1 ? "dia" : "dias"}`} icone={ClipboardCheck} detalhe="Série histórica" largo>
       <FaixaResumo itens={[
         { rotulo: "Presenças", valor: numero(totais.presencas), classe: estilos.resumoSucesso },
         { rotulo: "Ausências", valor: numero(totais.ausencias), classe: estilos.resumoCritico },
         { rotulo: "RT", valor: numero(totais.repousosTrabalhados), classe: estilos.resumoInfo },
       ]} />
       <div className={estilos.grafico}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
           <LineChart data={dados} margin={{ top: 10, right: 16, left: -14, bottom: 0 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d7e4eb" />
             <XAxis dataKey="rotulo" minTickGap={24} tick={{ fill: "#566a77", fontSize: 11 }} />
             <YAxis allowDecimals={false} tick={{ fill: "#566a77", fontSize: 11 }} />
             <Tooltip content={<TooltipPadrao />} />
             <Legend wrapperStyle={{ paddingTop: 12 }} />
-            <Line type="monotone" dataKey="presencas" name="Presenças" stroke={CORES.positivo} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="ausencias" name="Ausências" stroke={CORES.critico} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
-            <Line type="monotone" dataKey="repousosTrabalhados" name="RT" stroke={CORES.informativo} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+            <Line isAnimationActive={false} type="monotone" dataKey="presencas" name="Presenças" stroke={CORES.positivo} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+            <Line isAnimationActive={false} type="monotone" dataKey="ausencias" name="Ausências" stroke={CORES.critico} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
+            <Line isAnimationActive={false} type="monotone" dataKey="repousosTrabalhados" name="RT" stroke={CORES.informativo} strokeWidth={3} dot={false} activeDot={{ r: 5 }} />
           </LineChart>
         </ResponsiveContainer>
       </div>

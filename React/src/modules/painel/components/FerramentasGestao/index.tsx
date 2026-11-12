@@ -1,5 +1,5 @@
 import type * as DTO from '../../../../contracts/java';
-import type { CoverageView, ManagementPanelView, IndicatorHelp, SummaryItem, ChartTooltipProps } from '../../../../contracts/painel';
+import type { CoverageView, IndicatorHelp, SummaryItem, ChartTooltipProps } from '../../../../contracts/painel';
 import React, { useMemo, useState } from "react";
 import {
   Activity,
@@ -11,7 +11,6 @@ import {
   Building2,
   CalendarCheck,
   CalendarRange,
-  CheckCircle2,
   ChevronRight,
   Clock3,
   FileBarChart,
@@ -23,7 +22,6 @@ import {
   UserCog,
   Users,
   UsersRound,
-  XCircle,
   Zap,
 } from "lucide-react";
 import {
@@ -54,7 +52,7 @@ const dataBr = (valor: (string) | (`${number}-${number}-${number}` | null | unde
 const intervaloPeriodo = (periodo: Partial<DTO.PainelGestaoDTOAnalisePeriodo> = {}) => (
   periodo?.inicio && periodo?.fim
     ? `${dataBr(periodo.inicio)} a ${dataBr(periodo.fim)}`
-    : `${numero(periodo?.dias)} dias`
+    : `${numero(periodo?.dias)} ${periodo?.dias === 1 ? "dia" : "dias"}`
 );
 
 const AJUDA = {
@@ -285,9 +283,9 @@ export const QuadroPessoal = ({ quadro = {} }: { quadro?: Partial<DTO.PainelGest
       />
       <div className={estilos.quadroConteudo}>
         <div className={estilos.graficoRosca}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
             <PieChart>
-              <Pie data={dados} dataKey="value" nameKey="name" innerRadius={48} outerRadius={72} paddingAngle={2}>
+              <Pie isAnimationActive={false} data={dados} dataKey="value" nameKey="name" innerRadius={48} outerRadius={72} paddingAngle={2}>
                 {dados.map((item) => <Cell key={item.name} fill={item.cor} />)}
               </Pie>
               <Tooltip content={<TooltipPadrao formatadorValor={numero} />} />
@@ -307,7 +305,7 @@ export const QuadroPessoal = ({ quadro = {} }: { quadro?: Partial<DTO.PainelGest
   );
 };
 
-export const AnaliseCadastral = ({ analise = {}, admissoesMensais = [], periodoDias = 30 }: { analise?: Partial<DTO.PainelGestaoDTOAnaliseCadastro>; admissoesMensais?: DTO.PainelGestaoDTOAdmissaoMensal[]; periodoDias?: number }) => {
+export const AnaliseCadastral = ({ analise = {}, admissoesMensais = [], periodoDias = 1 }: { analise?: Partial<DTO.PainelGestaoDTOAnaliseCadastro>; admissoesMensais?: DTO.PainelGestaoDTOAdmissaoMensal[]; periodoDias?: number }) => {
   const serieBase = Array.isArray(admissoesMensais) ? admissoesMensais.map((item) => ({
     ...item,
     rotulo: mesAno(item?.mes),
@@ -319,20 +317,20 @@ export const AnaliseCadastral = ({ analise = {}, admissoesMensais = [], periodoD
     <Cartao titulo="Movimentação cadastral" icone={Activity} ajuda={AJUDA.cadastro} detalhe="Admissões reais da base" largo>
       <FaixaResumo
         itens={[
-          { rotulo: `Admitidos em ${periodoDias} dias`, valor: numero(analise.admitidosNoPeriodo), classe: estilos.resumoSucesso },
+          { rotulo: `Admitidos em ${periodoDias} ${periodoDias === 1 ? "dia" : "dias"}`, valor: numero(analise.admitidosNoPeriodo), classe: estilos.resumoSucesso },
           { rotulo: "No mês da referência", valor: numero(analise.admitidosNoMesReferencia), classe: estilos.resumoInfo },
           { rotulo: "Últimos 12 meses", valor: numero(analise.admitidosUltimos12Meses), classe: estilos.resumoInfo },
           { rotulo: "Sem data de admissão", valor: numero(analise.semDataAdmissao), classe: Number(analise.semDataAdmissao || 0) ? estilos.resumoAtencao : estilos.resumoSucesso },
         ]}
       />
       <div className={estilos.graficoMedio}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
           <BarChart data={serie} margin={{ top: 8, right: 8, left: -14, bottom: 2 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d9e5eb" />
             <XAxis dataKey="rotulo" />
             <YAxis allowDecimals={false} />
             <Tooltip content={<TooltipPadrao formatadorValor={numero} />} />
-            <Bar dataKey="quantidade" name="Admissões" radius={[6, 6, 0, 0]}>
+            <Bar isAnimationActive={false} dataKey="quantidade" name="Admissões" radius={[6, 6, 0, 0]}>
               {serie.map((item) => <Cell key={item.mes || item.rotulo} fill={item.cor} />)}
             </Bar>
           </BarChart>
@@ -361,7 +359,7 @@ export const LeituraGerencialPeriodo = ({
     <Cartao
       titulo="Desempenho operacional do período"
       icone={FileBarChart}
-      detalhe={`${intervaloPeriodo(periodo)} · ${numero(periodo.dias)} dias`}
+      detalhe={`${intervaloPeriodo(periodo)} · ${numero(periodo.dias)} ${periodo.dias === 1 ? "dia" : "dias"}`}
       largo
       expansivel={false}
     >
@@ -486,13 +484,13 @@ export const HorizonteContratual = ({ horizonte = {} }: { horizonte?: Partial<DT
         ]}
       />
       <div className={estilos.graficoMedio}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
           <BarChart data={dados} margin={{ top: 8, right: 8, left: -18, bottom: 2 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d9e5eb" />
             <XAxis dataKey="faixa" tick={{ fontSize: 11 }} />
             <YAxis allowDecimals={false} />
             <Tooltip content={<TooltipPadrao formatadorValor={numero} />} />
-            <Bar dataKey="total" name="Contratos" radius={[6, 6, 0, 0]}>
+            <Bar isAnimationActive={false} dataKey="total" name="Contratos" radius={[6, 6, 0, 0]}>
               {dados.map((item) => <Cell key={item.faixa} fill={item.cor} />)}
             </Bar>
           </BarChart>
@@ -548,13 +546,13 @@ export const DistribuicaoStatus = ({ dados = [], periodo = {} }: { dados?: DTO.P
 
       <div className={estilos.graficoAlto}>
         {principais.length ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
             <BarChart data={principais} layout="vertical" margin={{ top: 4, right: 28, left: 18, bottom: 2 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#d9e5eb" />
               <XAxis type="number" allowDecimals={false} />
               <YAxis type="category" dataKey="rotulo" width={112} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(valor, nome, item) => [`${numero(valor)} (${percentual(item.payload.percentual)})`, "Registros"]} />
-              <Bar dataKey="quantidade" name="Registros" radius={[0, 6, 6, 0]}>
+              <Bar isAnimationActive={false} dataKey="quantidade" name="Registros" radius={[0, 6, 6, 0]}>
                 {principais.map((item, indice) => <Cell key={`${item.status || item.rotulo || "status"}-${indice}`} fill={item.cor} />)}
               </Bar>
             </BarChart>
@@ -597,7 +595,7 @@ export const PadraoSemanal = ({ dados = [] }: { dados?: DTO.PainelGestaoDTOPadra
         ]}
       />
       <div className={estilos.graficoMedio}>
-        <ResponsiveContainer width="100%" height="100%">
+        <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
           <BarChart data={semana} margin={{ top: 8, right: 8, left: -18, bottom: 2 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d9e5eb" />
             <XAxis dataKey="dia" tickFormatter={(valor: string) => valor.slice(0, 3)} />
@@ -606,7 +604,7 @@ export const PadraoSemanal = ({ dados = [] }: { dados?: DTO.PainelGestaoDTOPadra
               `${percentual(valor)} · ${numero(item.payload.ausencias)} ausência(s) · ${numero(item.payload.registrosOperacionais)} lançamento(s) operacionais`,
               "Absenteísmo",
             ]} />
-            <Bar dataKey="taxaAbsenteismo" name="Absenteísmo" radius={[6, 6, 0, 0]}>
+            <Bar isAnimationActive={false} dataKey="taxaAbsenteismo" name="Absenteísmo" radius={[6, 6, 0, 0]}>
               {semana.map((item) => <Cell key={item.dia} fill={item.cor} />)}
             </Bar>
           </BarChart>
@@ -685,16 +683,16 @@ export const ComparativoUnidades = ({ unidades = [], nivel }: { unidades?: DTO.P
           <span><i style={{ background: CORES.vermelho }} />Crítico</span>
         </div>
         <div className={estilos.graficoUnidades} style={{ height: `${Math.max(300, dados.length * 42)}px` }}>
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
             <BarChart data={dados} layout="vertical" margin={{ top: 8, right: 18, left: 22, bottom: 4 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#d9e5eb" />
               <XAxis type="number" unit="%" domain={[0, (maximo) => Math.max(120, Math.ceil(maximo / 10) * 10)]} />
               <YAxis type="category" dataKey="nome" width={150} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(valor, nome, item) => [`${percentual(valor)}${nome === "Cobertura da escala" ? ` · ${numero(item.payload.pendentes)} pendência(s)` : ""}`, nome]} />
-              <Bar dataKey="cobertura" name="Cobertura da escala" radius={[0, 5, 5, 0]}>
+              <Bar isAnimationActive={false} dataKey="cobertura" name="Cobertura da escala" radius={[0, 5, 5, 0]}>
                 {dados.map((item) => <Cell key={`cob-${item.nome}`} fill={item.corCobertura} />)}
               </Bar>
-              <Bar dataKey="ocupacao" name="Ocupação contratual" radius={[0, 5, 5, 0]}>
+              <Bar isAnimationActive={false} dataKey="ocupacao" name="Ocupação contratual" radius={[0, 5, 5, 0]}>
                 {dados.map((item) => <Cell key={`ocu-${item.nome}`} fill={item.corOcupacao} />)}
               </Bar>
             </BarChart>
@@ -747,7 +745,7 @@ export const PrioridadesPorUnidade = ({ unidades = [], nivel }: { unidades?: DTO
   );
 };
 
-export const RankingLotacaoTurno = ({ dados = [], periodoDias = 30, carregando = false, aoCarregar }: { dados?: DTO.PainelRankingDTO[]; periodoDias?: number; carregando?: boolean; aoCarregar?: () => void }) => {
+export const RankingLotacaoTurno = ({ dados = [], periodoDias = 1, carregando = false, aoCarregar }: { dados?: DTO.PainelRankingDTO[]; periodoDias?: number; carregando?: boolean; aoCarregar?: () => void }) => {
   const comRegistros = useMemo(() => dados
     .map((item) => ({ ...item, totalOperacional: Number(item.presencas || 0) + Number(item.faltas || 0) }))
     .filter((item) => item.totalOperacional > 0)
@@ -756,7 +754,7 @@ export const RankingLotacaoTurno = ({ dados = [], periodoDias = 30, carregando =
     .slice(0, 12), [dados]);
   const semRegistros = dados.filter((item) => Number(item.presencas || 0) + Number(item.faltas || 0) === 0).length;
   return (
-    <Cartao titulo="Atenção por lotação e turno" icone={Gauge} detalhe={`${periodoDias} dias`} largo>
+    <Cartao titulo="Atenção por lotação e turno" icone={Gauge} detalhe={`${periodoDias} ${periodoDias === 1 ? "dia" : "dias"}`} largo>
       {!dados.length && (
         <div className={estilos.auditoriaCabecalho}>
           <span>Consulta detalhada sob demanda para não bloquear a abertura do painel com grandes efetivos.</span>
@@ -947,13 +945,13 @@ export const SituacaoDetalhadaQuadro = ({ dados = [] }: { dados?: DTO.PainelGest
       />
       <div className={estilos.graficoAlto}>
         {itens.length ? (
-          <ResponsiveContainer width="100%" height="100%">
+          <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
             <BarChart data={itens} layout="vertical" margin={{ top: 4, right: 34, left: 24, bottom: 2 }}>
               <CartesianGrid strokeDasharray="3 3" horizontal={false} stroke="#d9e5eb" />
               <XAxis type="number" allowDecimals={false} />
               <YAxis type="category" dataKey="rotulo" width={122} tick={{ fontSize: 11 }} />
               <Tooltip formatter={(valor, nome, item) => [`${numero(valor)} (${percentual(item.payload.percentual)})`, "Empregados"]} />
-              <Bar dataKey="quantidade" name="Empregados" radius={[0, 6, 6, 0]}>
+              <Bar isAnimationActive={false} dataKey="quantidade" name="Empregados" radius={[0, 6, 6, 0]}>
                 {itens.map((item, indice) => (
                   <Cell key={`${item.status || item.rotulo}-${indice}`} fill={item.cor} />
                 ))}
@@ -962,57 +960,6 @@ export const SituacaoDetalhadaQuadro = ({ dados = [] }: { dados?: DTO.PainelGest
           </ResponsiveContainer>
         ) : <div className={estilos.vazio}>Sem empregados no escopo autenticado.</div>}
       </div>
-    </Cartao>
-  );
-};
-
-export const ChecklistGovernanca = ({ dados = {} }: { dados?: ManagementPanelView }) => {
-  const verificacoes = [
-    {
-      rotulo: "Vínculos organizacionais e contratuais íntegros",
-      conforme: Number(dados.integridade?.totalInconsistencias || 0) === 0,
-      detalhe: `${numero(dados.integridade?.totalInconsistencias)} inconsistência(s)`,
-    },
-    {
-      rotulo: "Cobertura da frequência na data de referência em pelo menos 95%",
-      conforme: Number(dados.frequencia?.empregadosEsperados || 0) === 0
-        || Number(dados.frequencia?.percentualCobertura || 0) >= 95,
-      detalhe: percentual(dados.frequencia?.percentualCobertura),
-    },
-    {
-      rotulo: "Nenhum contrato vencido mantido como ativo",
-      conforme: Number(dados.contratos?.vencidosMarcadosAtivos || 0) === 0,
-      detalhe: `${numero(dados.contratos?.vencidosMarcadosAtivos)} contrato(s)`,
-    },
-    {
-      rotulo: "Nenhum empregado ativo sem contrato vigente",
-      conforme: Number(dados.efetivo?.ativosSemContrato || 0) === 0,
-      detalhe: `${numero(dados.efetivo?.ativosSemContrato)} empregado(s)`,
-    },
-    {
-      rotulo: "Nenhum trabalho fora da escala sem RT",
-      conforme: Number(dados.frequencia?.trabalhosForaEscalaSemRt || 0) === 0,
-      detalhe: `${numero(dados.frequencia?.trabalhosForaEscalaSemRt)} registro(s)`,
-    },
-  ];
-  const conformes = verificacoes.filter((item) => item.conforme).length;
-  return (
-    <Cartao titulo="Checklist de governança" icone={ShieldCheck} detalhe={`${conformes}/${verificacoes.length} controles conformes`}>
-      <FaixaResumo
-        itens={[
-          { rotulo: "Conformes", valor: numero(conformes), classe: estilos.resumoSucesso },
-          { rotulo: "Pendentes", valor: numero(verificacoes.length - conformes), classe: conformes === verificacoes.length ? estilos.resumoInfo : estilos.resumoAtencao },
-        ]}
-      />
-      <ul className={estilos.checklist}>
-        {verificacoes.map((item) => (
-          <li key={item.rotulo} className={item.conforme ? estilos.itemConforme : estilos.itemPendente}>
-            {item.conforme ? <CheckCircle2 size={18} aria-hidden="true" /> : <XCircle size={18} aria-hidden="true" />}
-            <div><strong>{item.rotulo}</strong><span>{item.detalhe}</span></div>
-          </li>
-        ))}
-      </ul>
-      <p className={estilos.nota}>O checklist não cria uma nota opaca: cada controle e sua condição são exibidos separadamente.</p>
     </Cartao>
   );
 };

@@ -46,166 +46,32 @@
     }
 }
 
-/* BACKGROUND ANIMADO */
-.fundoAnimadoContainer {
-    position: absolute;
-    inset: 0;
-    overflow: hidden;
-    z-index: 0;
-    pointer-events: none;
-    background: linear-gradient(135deg, var(--cor-neutra-100) 0%, var(--cor-neutra-200) 100%);
-}
-
-.areaAnimacao {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-}
-
-.formaFlutuante {
-    position: absolute;
-    display: block;
-    color: rgba(0, 65, 107, 0.12);
-    animation: flutuarItem 25s linear infinite;
-    bottom: -150px;
-}
-
-.forma1 {
-    left: 10%;
-    width: 70px;
-    height: 70px;
-    animation-delay: 0s;
-    animation-duration: 24s;
-}
-
-.forma2 {
-    left: 25%;
-    width: 55px;
-    height: 55px;
-    animation-delay: 4s;
-    animation-duration: 18s;
-    color: rgba(255, 230, 0, 0.3);
-}
-
-.forma3 {
-    left: 40%;
-    width: 90px;
-    height: 90px;
-    animation-delay: 1s;
-    animation-duration: 28s;
-}
-
-.forma4 {
-    left: 60%;
-    width: 50px;
-    height: 50px;
-    animation-delay: 7s;
-    animation-duration: 22s;
-    color: rgba(255, 230, 0, 0.25);
-}
-
-.forma5 {
-    left: 75%;
-    width: 75px;
-    height: 75px;
-    animation-delay: 2s;
-    animation-duration: 26s;
-}
-
-.forma6 {
-    left: 85%;
-    width: 45px;
-    height: 45px;
-    animation-delay: 8s;
-    animation-duration: 19s;
-    color: rgba(0, 65, 107, 0.15);
-}
-
-.forma7 {
-    left: 5%;
-    width: 60px;
-    height: 60px;
-    animation-delay: 11s;
-    animation-duration: 25s;
-}
-
-.forma8 {
-    left: 50%;
-    width: 95px;
-    height: 95px;
-    animation-delay: 13s;
-    animation-duration: 32s;
-    color: rgba(255, 230, 0, 0.2);
-}
-
-.forma9 {
-    left: 90%;
-    width: 55px;
-    height: 55px;
-    animation-delay: 5s;
-    animation-duration: 21s;
-}
-
-@keyframes flutuarItem {
-    0% {
-        transform: translateY(0) rotate(0deg) translateX(0);
-        opacity: 0;
-    }
-
-    10% {
-        opacity: 1;
-    }
-
-    25% {
-        transform: translateY(-250px) rotate(15deg) translateX(30px);
-    }
-
-    50% {
-        transform: translateY(-500px) rotate(-10deg) translateX(-20px);
-    }
-
-    75% {
-        transform: translateY(-800px) rotate(20deg) translateX(40px);
-    }
-
-    90% {
-        opacity: 1;
-    }
-
-    100% {
-        transform: translateY(-1100px) rotate(-5deg) translateX(-10px);
-        opacity: 0;
-    }
-}
-
 /* Contêiner Principal */
 .envoltorioGeral {
-    min-height: 100vh;
+    min-height: 100dvh;
     width: 100%;
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    padding: 1rem;
+    padding: 1.25rem 1rem;
     position: relative;
-    overflow: hidden;
+    overflow: visible;
     background-color: var(--cor-neutra-100);
-    transition: all 0.7s;
+    transition: all 0.7s; gap: 1.5rem; box-sizing: border-box;
 }
 
 /* BOTÕES SUPERIORES */
 .containerBotoesTopo {
-    position: absolute;
-    top: 1rem;
-    right: 1rem;
+    position: relative;
+    top: auto;
+    right: auto;
     display: flex;
     flex-direction: column;
     align-items: flex-end;
     gap: 0.5rem;
     z-index: 100;
-    max-width: calc(100vw - 2rem);
+    max-width: calc(100vw - 2rem); align-self: flex-end; flex-shrink: 0;
 }
 
 @media (min-width: 640px) {
@@ -245,16 +111,6 @@
     flex-shrink: 0 !important;
 }
 
-.temaDesempenhoAtivo {
-    color: #d97706;
-    background-color: var(--cor-alerta-50);
-}
-
-.temaDesempenhoInativo {
-    color: var(--cor-correios-azul-800);
-    background-color: var(--cor-correios-azul-50);
-}
-
 /* Cartão de Login */
 .cartaoPrincipalLogin {
     position: relative;
@@ -263,12 +119,12 @@
     width: 100%;
     max-width: 400px;
     animation: surgirEAcender 0.5s ease-out;
-    margin-bottom: 2.5rem;
+    margin-bottom: 0;
     background-color: var(--cor-neutra-0);
     box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     border-radius: 0.5rem;
     border-top: 8px solid var(--cor-correios-amarelo-500);
-    color: var(--cor-neutra-800);
+    color: var(--cor-neutra-800); flex-shrink: 0; padding-bottom: 1.5rem;
 }
 
 .sobreposicaoBloqueio {
@@ -512,224 +368,6 @@
     gap: 0.5rem;
 }
 
-.botaoFluido {
-    filter: url("#fluidoGooey");
-    position: relative;
-    z-index: 1;
-}
-
-.bolhasFluido {
-    position: absolute;
-    top: 0;
-    left: 0;
-    bottom: 0;
-    right: 0;
-    z-index: -1;
-}
-
-.bolhaUnica {
-    background-color: var(--correios-blue, var(--cor-correios-azul-800));
-    border-radius: 100%;
-    position: absolute;
-    display: block;
-    z-index: -1;
-}
-
-.botaoAcaoPrimario:hover .bolhaUnica {
-    background-color: var(--correios-blue, var(--cor-correios-azul-800));
-}
-
-/* Animações das Bolhas */
-.bolhaUnica:nth-child(1) {
-    left: 10%;
-    width: 25px;
-    height: 25px;
-    animation: moverBolha1 3.0s infinite;
-    animation-delay: 0.2s;
-}
-
-.bolhaUnica:nth-child(2) {
-    left: 20%;
-    width: 20px;
-    height: 20px;
-    animation: moverBolha2 3.4s infinite;
-    animation-delay: 0.4s;
-}
-
-.bolhaUnica:nth-child(3) {
-    left: 30%;
-    width: 25px;
-    height: 25px;
-    animation: moverBolha3 3.2s infinite;
-    animation-delay: 0.6s;
-}
-
-.bolhaUnica:nth-child(4) {
-    left: 40%;
-    width: 22px;
-    height: 22px;
-    animation: moverBolha4 3.6s infinite;
-    animation-delay: 0.8s;
-}
-
-.bolhaUnica:nth-child(5) {
-    left: 50%;
-    width: 25px;
-    height: 25px;
-    animation: moverBolha5 3.1s infinite;
-    animation-delay: 1.0s;
-}
-
-.bolhaUnica:nth-child(6) {
-    left: 60%;
-    width: 20px;
-    height: 20px;
-    animation: moverBolha6 3.5s infinite;
-    animation-delay: 1.2s;
-}
-
-.bolhaUnica:nth-child(7) {
-    left: 70%;
-    width: 25px;
-    height: 25px;
-    animation: moverBolha7 3.3s infinite;
-    animation-delay: 1.4s;
-}
-
-.bolhaUnica:nth-child(8) {
-    left: 80%;
-    width: 22px;
-    height: 22px;
-    animation: moverBolha8 3.7s infinite;
-    animation-delay: 1.6s;
-}
-
-.bolhaUnica:nth-child(9) {
-    left: 90%;
-    width: 25px;
-    height: 25px;
-    animation: moverBolha9 3.1s infinite;
-    animation-delay: 1.8s;
-}
-
-.bolhaUnica:nth-child(10) {
-    left: 95%;
-    width: 20px;
-    height: 20px;
-    animation: moverBolha10 3.4s infinite;
-    animation-delay: 2.0s;
-}
-
-@keyframes moverBolha1 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-35px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha2 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-45px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha3 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-40px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha4 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha5 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-30px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha6 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-45px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha7 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-35px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha8 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-50px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha9 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-30px);
-        opacity: 0;
-    }
-}
-
-@keyframes moverBolha10 {
-    0% {
-        transform: translateY(0);
-    }
-
-    100% {
-        transform: translateY(-40px);
-        opacity: 0;
-    }
-}
-
 .secaoRodapeCard {
     margin-top: 1rem;
     padding-top: 0.75rem;
@@ -738,14 +376,14 @@
 }
 
 .textoRodapeCard {
-    font-size: 0.625rem;
+    font-size: .75rem;
     margin-bottom: 0.375rem;
-    color: var(--cor-neutra-600);
+    color: var(--cor-neutra-600); line-height: 1.5;
 }
 
 .botaoAlternarCard {
     font-weight: 700;
-    font-size: 0.625rem;
+    font-size: .75rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     display: flex;
@@ -759,7 +397,7 @@
     background: none;
     border: none;
     cursor: pointer;
-    transition: all 0.3s;
+    transition: all 0.3s; min-height: 40px;
 }
 
 .botaoAlternarCard:hover:not(:disabled) {
@@ -769,16 +407,16 @@
 
 /* Tecnologias de Fundo */
 .secaoTecnologias {
-    position: absolute;
+    position: static;
     bottom: 1rem;
-    width: 100%;
+    width: min(100%, 400px);
     display: flex;
     flex-direction: column;
     align-items: center;
     justify-content: center;
     gap: 0.375rem;
     z-index: 10;
-    pointer-events: none;
+    pointer-events: auto; flex-shrink: 0;
 }
 
 .blocoTecnologia {
@@ -1102,3 +740,5 @@
     opacity: 0.55;
     cursor: not-allowed;
 }
+
+/* Ações e créditos participam do fluxo: não cobrem os formulários em janelas baixas. */

@@ -111,18 +111,18 @@ const EixosTemporais = () => (
 );
 
 const GraficoLinhas = ({ serie, comparar, exibirPendentes }: { serie: import("../../../../contracts/painel").StaffingSeriesPoint[]; comparar: (boolean); exibirPendentes: (boolean) }) => (
-  <ResponsiveContainer width="100%" height="100%">
+  <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
     <LineChart data={serie} margin={{ top: 14, right: 18, left: -4, bottom: 2 }}>
       <EixosTemporais />
-      <Line type="monotone" dataKey="efetivoPrevisto" name="Previsto em contrato" stroke={CORES.previsto} strokeDasharray="5 4" strokeWidth={2.2} dot={false} />
-      <Line type="monotone" dataKey="efetivoAlocado" name="Efetivo operacional" stroke={CORES.operacional} strokeWidth={2.8} dot={serie.length <= 31} />
-      <Line type="monotone" dataKey="presentes" name="Presentes" stroke={CORES.presentes} strokeWidth={2.3} dot={serie.length <= 16} />
-      <Line type="monotone" dataKey="ausentes" name="Ausentes" stroke={CORES.ausentes} strokeWidth={2} dot={serie.length <= 16} />
+      <Line isAnimationActive={false} type="monotone" dataKey="efetivoPrevisto" name="Previsto em contrato" stroke={CORES.previsto} strokeDasharray="5 4" strokeWidth={2.2} dot={false} />
+      <Line isAnimationActive={false} type="monotone" dataKey="efetivoAlocado" name="Efetivo operacional" stroke={CORES.operacional} strokeWidth={2.8} dot={serie.length <= 31} />
+      <Line isAnimationActive={false} type="monotone" dataKey="presentes" name="Presentes" stroke={CORES.presentes} strokeWidth={2.3} dot={serie.length <= 16} />
+      <Line isAnimationActive={false} type="monotone" dataKey="ausentes" name="Ausentes" stroke={CORES.ausentes} strokeWidth={2} dot={serie.length <= 16} />
       {exibirPendentes && (
-        <Line type="monotone" dataKey="pendentesLancamento" name="Pendentes de lançamento" stroke={CORES.pendentes} strokeWidth={1.8} dot={serie.length <= 16} />
+        <Line isAnimationActive={false} type="monotone" dataKey="pendentesLancamento" name="Pendentes de lançamento" stroke={CORES.pendentes} strokeWidth={1.8} dot={serie.length <= 16} />
       )}
       {comparar && (
-        <Line type="monotone" dataKey="presentesAnoAnterior" name="Presentes no ano anterior" stroke={CORES.anterior} strokeDasharray="3 4" strokeWidth={1.7} dot={false} connectNulls />
+        <Line isAnimationActive={false} type="monotone" dataKey="presentesAnoAnterior" name="Presentes no ano anterior" stroke={CORES.anterior} strokeDasharray="3 4" strokeWidth={1.7} dot={false} connectNulls />
       )}
     </LineChart>
   </ResponsiveContainer>
@@ -172,18 +172,18 @@ const BarrasFotografia = ({ resumo, exibirPendentes }: { resumo: Partial<import(
 const GraficoBarras = ({ serie, resumo, comparar, exibirPendentes }: { serie: import("../../../../contracts/painel").StaffingSeriesPoint[]; resumo: Partial<import("../../../../contracts/java").PainelEfetivoDTOResumo>; comparar: (boolean); exibirPendentes: (boolean) }) => {
   if (serie.length <= 1) return <BarrasFotografia resumo={resumo} exibirPendentes={exibirPendentes} />;
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
       <BarChart data={serie} margin={{ top: 14, right: 18, left: -4, bottom: 2 }} barGap={1}>
         <EixosTemporais />
-        <Bar dataKey="efetivoPrevisto" name="Previsto em contrato" fill={CORES.previsto} radius={[3, 3, 0, 0]} maxBarSize={15} />
-        <Bar dataKey="efetivoAlocado" name="Efetivo operacional" fill={CORES.operacional} radius={[3, 3, 0, 0]} maxBarSize={15} />
-        <Bar dataKey="presentes" name="Presentes" fill={CORES.presentes} radius={[3, 3, 0, 0]} maxBarSize={15} />
-        <Bar dataKey="ausentes" name="Ausentes" fill={CORES.ausentes} radius={[3, 3, 0, 0]} maxBarSize={13} />
+        <Bar isAnimationActive={false} dataKey="efetivoPrevisto" name="Previsto em contrato" fill={CORES.previsto} radius={[3, 3, 0, 0]} maxBarSize={15} />
+        <Bar isAnimationActive={false} dataKey="efetivoAlocado" name="Efetivo operacional" fill={CORES.operacional} radius={[3, 3, 0, 0]} maxBarSize={15} />
+        <Bar isAnimationActive={false} dataKey="presentes" name="Presentes" fill={CORES.presentes} radius={[3, 3, 0, 0]} maxBarSize={15} />
+        <Bar isAnimationActive={false} dataKey="ausentes" name="Ausentes" fill={CORES.ausentes} radius={[3, 3, 0, 0]} maxBarSize={13} />
         {exibirPendentes && (
-          <Bar dataKey="pendentesLancamento" name="Pendentes de lançamento" fill={CORES.pendentes} radius={[3, 3, 0, 0]} maxBarSize={12} />
+          <Bar isAnimationActive={false} dataKey="pendentesLancamento" name="Pendentes de lançamento" fill={CORES.pendentes} radius={[3, 3, 0, 0]} maxBarSize={12} />
         )}
         {comparar && (
-          <Bar dataKey="presentesAnoAnterior" name="Presentes no ano anterior" fill={CORES.anterior} radius={[3, 3, 0, 0]} maxBarSize={12} />
+          <Bar isAnimationActive={false} dataKey="presentesAnoAnterior" name="Presentes no ano anterior" fill={CORES.anterior} radius={[3, 3, 0, 0]} maxBarSize={12} />
         )}
       </BarChart>
     </ResponsiveContainer>
@@ -201,7 +201,7 @@ const GraficoDispersao = ({ pontos }: { pontos: import("../../../../contracts/pa
   ])) * 1.08));
 
   return (
-    <ResponsiveContainer width="100%" height="100%">
+    <ResponsiveContainer width="100%" height="100%" initialDimension={{ width: 400, height: 300 }}>
       <ScatterChart margin={{ top: 12, right: 22, left: 10, bottom: 18 }}>
         <CartesianGrid strokeDasharray="3 3" stroke={CORES.grade} />
         <XAxis
@@ -231,7 +231,7 @@ const GraficoDispersao = ({ pontos }: { pontos: import("../../../../contracts/pa
           ifOverflow="extendDomain"
         />
         <Tooltip content={<TooltipDispersao />} cursor={{ strokeDasharray: "3 3" }} />
-        <Scatter name="Pontos analisados" data={dados} fill={CORES.previsto}>
+        <Scatter isAnimationActive={false} name="Pontos analisados" data={dados} fill={CORES.previsto}>
           {dados.map((ponto, indice) => (
             <Cell
               key={`${ponto.data || ponto.rotulo}-${indice}`}

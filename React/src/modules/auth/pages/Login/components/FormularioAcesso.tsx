@@ -17,7 +17,7 @@ import { CONFIG } from "../../../../../core/config";
 import { formatarGestaoLocal, formatarGestorEstadual } from "../../../../../core/formatters/nomenclaturaGestao.ts";
 import estilos from "../index.module.css";
 
-// 🚀 MELHORIA: React.memo() garante que o formulário só vai renderizar de novo 
+// 🚀 MELHORIA: React.memo() garante que o formulário só vai renderizar de novo
 // se os dados passados para ele de fato mudarem.
 export const FormularioAcesso = React.memo(({
   estadoTela,
@@ -28,7 +28,6 @@ export const FormularioAcesso = React.memo(({
   aoMudarNovaSenha,
   carregando,
   bloqueado,
-  modoDesempenho,
   superintendencias,
   carregandoSuperintendencias,
   gestoesLocais,
@@ -37,7 +36,7 @@ export const FormularioAcesso = React.memo(({
   aoReiniciarLogin,
   aoRecuperarSenha,
   aoSubmeter,
-}: { estadoTela: string; credenciais: Record<'username' | 'password' | 'confirmPassword' | 'email' | 'matricula' | 'totp' | 'superintendenciaId' | 'gestaoLocalId', string>; aoMudarCredenciais: (campo: "username" | "password" | "confirmPassword" | "email" | "matricula" | "totp" | "superintendenciaId" | "gestaoLocalId", valor: string) => void; aoMudarMatricula: React.ChangeEventHandler<HTMLInputElement>; novaSenha: { password: string; confirm: string }; aoMudarNovaSenha: (campo: "password" | "confirm", valor: string) => void; carregando?: boolean; bloqueado?: boolean; modoDesempenho?: boolean; superintendencias?: AutenticacaoSuperintendenciaDTO[]; carregandoSuperintendencias?: boolean; gestoesLocais?: AutenticacaoGestaoLocalDTO[]; carregandoGestoesLocais?: boolean; segundoFatorPendente?: boolean; aoReiniciarLogin: () => void; aoRecuperarSenha: () => void; aoSubmeter: React.FormEventHandler<HTMLFormElement> }) => {
+}: { estadoTela: string; credenciais: Record<'username' | 'password' | 'confirmPassword' | 'email' | 'matricula' | 'totp' | 'superintendenciaId' | 'gestaoLocalId', string>; aoMudarCredenciais: (campo: "username" | "password" | "confirmPassword" | "email" | "matricula" | "totp" | "superintendenciaId" | "gestaoLocalId", valor: string) => void; aoMudarMatricula: React.ChangeEventHandler<HTMLInputElement>; novaSenha: { password: string; confirm: string }; aoMudarNovaSenha: (campo: "password" | "confirm", valor: string) => void; carregando?: boolean; bloqueado?: boolean; superintendencias?: AutenticacaoSuperintendenciaDTO[]; carregandoSuperintendencias?: boolean; gestoesLocais?: AutenticacaoGestaoLocalDTO[]; carregandoGestoesLocais?: boolean; segundoFatorPendente?: boolean; aoReiniciarLogin: () => void; aoRecuperarSenha: () => void; aoSubmeter: React.FormEventHandler<HTMLFormElement> }) => {
   return (
     <form
       onSubmit={aoSubmeter}
@@ -287,7 +286,7 @@ export const FormularioAcesso = React.memo(({
           type="submit"
           carregando={carregando}
           desabilitado={bloqueado || (estadoTela === "REGISTRO" && (carregandoSuperintendencias || carregandoGestoesLocais))}
-          modoDesempenho={modoDesempenho}
+
         >
           {estadoTela === "LOGIN"
             ? segundoFatorPendente ? "Validar segundo fator" : "Entrar no Sistema"

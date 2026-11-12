@@ -70,7 +70,7 @@ export const usePainel = (onNavigate: ((caminho: string) => void), ativo = true)
   const { user } = useAutenticacao();
   const presidente = useMemo(() => ePresidente(user), [user]);
   const [referencia, setReferencia] = useState(dataOntem);
-  const [periodoDias, setPeriodoDias] = useState(30);
+  const [periodoDias, setPeriodoDias] = useState(1);
   const [dados, setDados] = useState<(import("../../../contracts/java").PainelGestaoDTO) | null>(null);
   const [atividades, setAtividades] = useState<ReturnType<typeof normalizarAtividades>>([]);
   const [rankingLotacoes, setRankingLotacoes] = useState<(import("../../../contracts/java").PainelRankingDTO[])>([]);

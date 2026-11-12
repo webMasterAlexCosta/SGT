@@ -48,7 +48,7 @@ public class PainelControlador implements com.example.siggtrat.diagnostico.Diagn
     public ResponseEntity<PainelEfetivoDTO> obterIndicadorEfetivo(
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate referencia,
-            @RequestParam(required = false, defaultValue = "MENSAL") String periodo,
+            @RequestParam(required = false, defaultValue = "DIARIO") String periodo,
             @RequestParam(required = false) Long contratoId,
             @RequestParam(required = false) Long lotacaoId,
             @RequestParam(required = false) Long jornadaId,
@@ -62,7 +62,7 @@ public class PainelControlador implements com.example.siggtrat.diagnostico.Diagn
     public ResponseEntity<PainelGestaoDTO> obterGestao(
             @RequestParam(required = false)
             @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate referencia,
-            @RequestParam(required = false, defaultValue = "30") Integer periodoDias) {
+            @RequestParam(required = false, defaultValue = "1") Integer periodoDias) {
         return ResponseEntity.ok(dashboardServico.obterGestao(referencia, periodoDias));
     }
 

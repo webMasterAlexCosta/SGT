@@ -63,7 +63,7 @@ class RelatorioJarMultipaginaIT extends ContratosHttpBase {
     void mesmoJarExportaQuarentaEUmEmDuasPaginasPdfEPaginacaoApiVinteECincoMaisDezesseis() throws Exception {
         evidencias = diretorioPrivado("cenario-");
         Files.createFile(evidencias.resolve("http-status.jsonl"), permissaoArquivo());
-        Path jar = Path.of("target/sig-gtrat-backend-0.0.4-operacional-20261101.jar").toAbsolutePath();
+        Path jar = Path.of("target/SGT.jar").toAbsolutePath();
         assertTrue(Files.isRegularFile(jar), "Empacotar o candidato corrente antes do IT");
         String hashJar = hashArquivo(jar);
         Process filho = null;

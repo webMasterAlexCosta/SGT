@@ -96,7 +96,7 @@ class JarHttpRealIT extends ContratosHttpBase {
         assertFalse(hoje.plusDays(120).isAfter(FIM), "Atualizar a fixture quando terminar sua cobertura");
         Cenario c = criarCenarioPersistido();
         declararFonteNominalSintetica(c, "JAR-TCP-" + UUID.randomUUID());
-        Path jar = Path.of("target/sig-gtrat-backend-0.0.4-operacional-20261101.jar").toAbsolutePath();
+        Path jar = Path.of("target/SGT.jar").toAbsolutePath();
         assertTrue(Files.isRegularFile(jar), "Empacotar o candidato corrente antes do IT");
         conferirClassesEmpacotadas(jar);
         String hashJar = sha256(jar);

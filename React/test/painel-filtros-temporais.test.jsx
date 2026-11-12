@@ -142,6 +142,7 @@ async function abrirComRelatorio(responderDados) {
     return undefined;
   };
   render(<IndicadorEfetivo referencia="2026-06-30" aoAtualizarRelatorio={(valor) => relatorios.push(valor)} />);
+  fireEvent.click(screen.getByRole('button', { name: 'Mensal', exact: true }));
   await waitFor(() => expect(pdf()).toBeEnabled());
   expect(cartaoPrevisto()).toHaveTextContent('11');
   expect(relatorios.at(-1)?.dados.resumoAtual.efetivoPrevisto).toBe(11);
@@ -240,6 +241,7 @@ const dados = () => pedidos.filter((item) => item.url === '/painel/efetivo');
 const selecionar = (rotulo) => screen.getByRole('combobox', { name: rotulo, exact: true });
 async function abrir() {
   const tela = render(<IndicadorEfetivo referencia="2026-06-30" />);
+  fireEvent.click(screen.getByRole('button', { name: 'Mensal', exact: true }));
   await waitFor(() => expect(dados().length).toBeGreaterThan(0));
   return tela;
 }
@@ -360,4 +362,12 @@ describe('Filtros temporais do consumidor real do indicador', () => {
       expect(pedido.params).not.toHaveProperty('cargoId');
     }
   });
+});
+
+
+it('inicia em diário nos dois endpoints sem ampliar o recorte por padrão', async () => {
+  render(<IndicadorEfetivo referencia="2026-06-30" />);
+  await esperarContexto({ referencia: '2026-06-30', periodo: 'DIARIO', compararAnoAnterior: false });
+  expect(screen.getByRole('button', { name: 'Diário', exact: true })).toHaveAttribute('aria-pressed', 'true');
+  expect(screen.queryByRole('option', { name: 'Contrato encerrado em 10 de junho' })).not.toBeInTheDocument();
 });

@@ -378,7 +378,7 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
         }
 
         private static PeriodoIndicador resolver(String valor) {
-            String normalizado = valor == null ? "MENSAL" : valor.trim().toUpperCase(java.util.Locale.ROOT);
+            String normalizado = valor == null ? "DIARIO" : valor.trim().toUpperCase(java.util.Locale.ROOT);
             return switch (normalizado) {
                 case "DIARIO" -> new PeriodoIndicador("DIARIO", false);
                 case "SEMANAL" -> new PeriodoIndicador("SEMANAL", false);
@@ -413,7 +413,7 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
         LocalDate referencia = referenciaInformada == null
                 ? LocalDate.now(ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO)).minusDays(1)
                 : referenciaInformada;
-        int periodoDias = periodoDiasInformado == null ? 30 : periodoDiasInformado;
+        int periodoDias = periodoDiasInformado == null ? 1 : periodoDiasInformado;
         String chave = EsquemaPainel.CACHE_PREFIX + redisCacheKeyServico.painelEscopo(
                 contexto.nivel(), contexto.superintendenciaId(), contexto.gestaoLocalId(),
                 contexto.permiteDetalhamentoOperacional(), contexto.podeVisualizarContratos(),
@@ -468,11 +468,11 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A data de referência deve estar dentro dos últimos dois anos.");
         }
 
-        int periodoDias = periodoDiasInformado == null ? 30 : periodoDiasInformado;
-        if (!List.of(7, 15, 30, 60, 90).contains(periodoDias)) {
+        int periodoDias = periodoDiasInformado == null ? 1 : periodoDiasInformado;
+        if (!List.of(1, 7, 15, 30, 60, 90).contains(periodoDias)) {
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
-                    "O período deve ser um dos valores permitidos: 7, 15, 30, 60 ou 90 dias."
+                    "O período deve ser um dos valores permitidos: 1, 7, 15, 30, 60 ou 90 dias."
             );
         }
         LocalDate inicioPeriodo = referencia.minusDays(periodoDias - 1L);

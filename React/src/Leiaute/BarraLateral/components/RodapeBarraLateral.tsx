@@ -15,7 +15,7 @@ export const RodapeBarraLateral = () => {
       <p className={estilos.textoTopo}>© {anoAtual}</p>
       <div className={estilos.divisorRodape}></div>
       <p className={estilos.textoFundo}>
-        desenvolvido por {CONFIG.AUTHOR_NAME}{" "}
+        Sistema desenvolvido por {CONFIG.AUTHOR_NAME}{" "}
         <span className={estilos.matriculaRodape}>
           {CONFIG.AUTHOR_MATRICULA}
         </span>

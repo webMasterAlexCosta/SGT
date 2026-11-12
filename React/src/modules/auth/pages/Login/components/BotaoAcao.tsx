@@ -8,11 +8,12 @@ export const BotaoAcao = React.memo(
     children,
     carregando,
     dica,
-    modoDesempenho,
     desabilitado,
+    disabled,
+    className,
     ...propriedadesBotao
-  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { carregando?: boolean; dica?: React.ReactNode; modoDesempenho?: boolean; desabilitado?: boolean }) => {
-    const estaBloqueado = desabilitado || carregando;
+  }: React.ButtonHTMLAttributes<HTMLButtonElement> & { carregando?: boolean; dica?: React.ReactNode; desabilitado?: boolean }) => {
+    const estaBloqueado = disabled || desabilitado || carregando;
     const classeVariante = estaBloqueado
       ? estilos.botaoAcaoDesabilitado
       : estilos.botaoAcaoPrimario;
@@ -20,17 +21,11 @@ export const BotaoAcao = React.memo(
     return (
       <EnvolucroDica tooltip={dica} position="top" disabled={estaBloqueado}>
         <button
-          className={`${estilos.botaoAcaoGeral} ${classeVariante} ${!estaBloqueado && !modoDesempenho ? estilos.botaoFluido : ""}`}
-          disabled={estaBloqueado}
           {...propriedadesBotao}
+          className={`${estilos.botaoAcaoGeral} ${classeVariante} ${className || ""}`}
+          disabled={estaBloqueado}
+          aria-busy={carregando || undefined}
         >
-          {!estaBloqueado && !modoDesempenho && (
-            <span className={estilos.bolhasFluido}>
-              {Array.from({ length: 10 }).map((_, indice) => (
-                <span key={`bolha-decorativa-${indice + 1}`} className={estilos.bolhaUnica}></span>
-              ))}
-            </span>
-          )}
           {carregando ? (
             <Loader2 size={18} className={estilos.iconeCarregandoBotao} />
           ) : (

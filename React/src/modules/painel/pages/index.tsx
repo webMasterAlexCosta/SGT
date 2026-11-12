@@ -9,14 +9,13 @@ import {
   ShieldCheck,
 } from "lucide-react";
 import { usePainel } from "./index.ts";
-import { ServicoSistema } from "../../../services/system/ServicoSistema.ts";
 import estilos from "./index.module.css";
 import { IndicadorEfetivo } from "../components/IndicadorEfetivo/index.tsx";
 const PainelDesempenho = lazy(() => import('../components/PainelDesempenho'));
 import { exportarPainelGerencial, exportarPainelPdf } from "../exportacao.ts";
 import {
   AlertasDecisao,
-  CabecalhoGovernanca,
+  CabecalhoGerencial,
   CoberturaFrequencia,
   EvolucaoOperacional,
   IntegridadeDados,
@@ -29,7 +28,6 @@ import {
   AnaliseCadastral,
   AtalhosGerenciais,
   AuditoriaRecente,
-  ChecklistGovernanca,
   ComparativoPeriodo,
   ComparativoUnidades,
   DistribuicaoStatus,
@@ -44,88 +42,6 @@ import {
   QuadroPessoal,
   SituacaoDetalhadaQuadro,
 } from "../components/FerramentasGestao/index.tsx";
-
-const obterNomeUsuario = (user: (import("../../../contracts/auth").AuthenticatedUser | null)) =>
-  user?.nomeCompleto ||
-  user?.nome ||
-  user?.displayName ||
-  user?.username ||
-  "Usuário";
-
-const obterLocalizacaoUsuario = (user: import("../../../contracts/auth").AuthFields | null) => {
-  const lotacao =
-    user?.lotacaoNome ||
-    (user?.lotacao && typeof user.lotacao === 'object' ? user.lotacao.label || user.lotacao.nome : null) ||
-    (typeof user?.lotacao === "string" ? user.lotacao : null);
-  const unidade =
-    user?.gestaoLocal?.label ||
-    user?.gestaoLocal?.nome ||
-    user?.gestaoLocalNome ||
-    user?.superintendencia?.label ||
-    user?.superintendencia?.nome ||
-    user?.superintendenciaNome ||
-    null;
-  const uf = user?.uf || user?.superintendencia?.uf || null;
-
-  const localBase = lotacao || unidade;
-  if (localBase && uf && !String(localBase).toUpperCase().includes(String(uf).toUpperCase())) {
-    return `${localBase} - ${uf}`;
-  }
-  if (localBase) return localBase;
-  if (uf) return `UF ${uf}`;
-  return "Localização não disponível";
-};
-
-const DataHoraLocalUsuario = ({ user }: { user: import("../../../contracts/auth").AuthenticatedUser | null }) => {
-  const [dataHora, setDataHora] = useState(new Date());
-  const localizacaoUsuario = obterLocalizacaoUsuario(user);
-  const [local, setLocal] = useState(localizacaoUsuario);
-
-  useEffect(() => {
-    const timer = setInterval(() => setDataHora(new Date()), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  useEffect(() => {
-    let ativo = true;
-    const controlador = new AbortController();
-    setLocal(localizacaoUsuario);
-
-    if (!("geolocation" in navigator)) return () => { ativo = false; };
-
-    navigator.geolocation.getCurrentPosition(
-      async ({ coords }) => {
-        try {
-          const { cidade, estado } = await ServicoSistema.buscarLocalizacaoPorCoordenadas(
-            coords,
-            { signal: controlador.signal },
-          );
-
-          if (ativo && cidade) {
-            setLocal(`${cidade}${estado ? ` - ${estado}` : ""}`);
-          }
-        } catch {
-          if (ativo) setLocal(localizacaoUsuario);
-        }
-      },
-      () => {
-        if (ativo) setLocal(localizacaoUsuario);
-      },
-      { enableHighAccuracy: false, timeout: 8000, maximumAge: 300000 },
-    );
-
-    return () => {
-      ativo = false;
-      controlador.abort();
-    };
-  }, [localizacaoUsuario]);
-
-  return (
-    <>
-      {dataHora.toLocaleDateString("pt-BR")} às {dataHora.toLocaleTimeString("pt-BR")} | {local}
-    </>
-  );
-};
 
 const numero = (valor: (number)) => new Intl.NumberFormat("pt-BR").format(Number(valor || 0));
 const dataBr = (valor: string | null | undefined) => valor
@@ -175,7 +91,7 @@ const RadarExecutivo = ({ dados, aoAbrirSecao }: { dados: (import("../../../cont
       rotulo: "Integridade",
       valor: Number(dados?.integridade?.totalInconsistencias || 0),
       detalhe: "inconsistências identificadas",
-      secao: "governanca",
+      secao: "operacao",
       classe: Number(dados?.integridade?.totalInconsistencias || 0) > 0 ? estilos.radarCritico : estilos.radarOk,
       icone: ShieldCheck,
     },
@@ -206,7 +122,6 @@ const OPCOES_VISAO = [
   { id: "resumo", rotulo: "Resumo" },
   { id: "contratos", rotulo: "Contratos" },
   { id: "operacao", rotulo: "Operação" },
-  { id: "governanca", rotulo: "Governança" },
   { id: "tudo", rotulo: "Tudo" },
 ];
 
@@ -245,7 +160,6 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
     erro,
     processamento,
     perfil,
-    user,
     acoes,
   } = usePainel(onNavigate, visaoPainel !== 'desempenho');
   const [indicadorEfetivoRelatorio, setIndicadorEfetivoRelatorio] = useState<import("../../../contracts/painel").StaffingReport | null>(null);
@@ -255,8 +169,8 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
   const fimPeriodo = dados?.periodo?.fim || dados?.referencia || referencia;
   const diasPeriodo = Number(dados?.periodo?.dias || periodoDias || 0);
   const rotuloJanela = inicioPeriodo && fimPeriodo
-    ? `${dataBr(inicioPeriodo)} a ${dataBr(fimPeriodo)} (${diasPeriodo} dias)`
-    : `${diasPeriodo} dias até ${dataBr(fimPeriodo)}`;
+    ? `${dataBr(inicioPeriodo)} a ${dataBr(fimPeriodo)} (${diasPeriodo} ${diasPeriodo === 1 ? "dia" : "dias"})`
+    : `${diasPeriodo} ${diasPeriodo === 1 ? "dia" : "dias"} até ${dataBr(fimPeriodo)}`;
   const dataReferenciaOperacional = dados?.frequencia?.data || dados?.referencia || referencia;
 
   return (
@@ -267,7 +181,8 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
           <PainelDesempenho referenciaInicial={referencia} aoNavegar={onNavigate} />
         </Suspense>
       ) : <>
-      <CabecalhoGovernanca
+      <CabecalhoGerencial
+        titulo={visaoPainel === "resumo" ? "Resumo gerencial" : visaoPainel === "contratos" ? "Contratos e dimensionamento" : visaoPainel === "operacao" ? "Operação e frequência" : "Painel gerencial"}
         dados={(dados) ?? undefined}
         referencia={referencia}
         hoje={hoje}
@@ -298,13 +213,14 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
       {dados && (
         <>
           <div className={estilos.avisoEscopo}>
-            Seja bem-vindo, {obterNomeUsuario(user)}. <DataHoraLocalUsuario user={user} />.
+            <span>{dados.escopo?.nome || "Escopo autenticado"}</span>
+            <span>{dados.geradoEm ? `Atualizado em ${new Date(dados.geradoEm).toLocaleString("pt-BR")}` : "Consulta ao servidor"}</span>
           </div>
 
           {exibir("resumo") && (
             <section id="painel-resumo" className={estilos.blocoVisao}>
-              <IndicadorEfetivo referencia={referencia} aoAtualizarRelatorio={setIndicadorEfetivoRelatorio} />
               <ResumoExecutivo dados={dados} indicadorEfetivo={(indicadorEfetivoRelatorio) ?? undefined} />
+              <IndicadorEfetivo referencia={referencia} aoAtualizarRelatorio={setIndicadorEfetivoRelatorio} />
               <RadarExecutivo dados={dados} aoAbrirSecao={setVisaoPainel} />
               <section className={`${estilos.gradeBento} ${estilos.gradeAcoes}`}>
                 <Espaco tamanho="triplo"><AtalhosGerenciais perfil={perfil} aoNavegar={acoes.navegar} /></Espaco>
@@ -327,6 +243,8 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
                 <Espaco><HorizonteContratual horizonte={(dados.horizonteContratual) ?? undefined} /></Espaco>
                 <Espaco tamanho="triplo"><AnaliseCadastral analise={(dados.analiseCadastro) ?? undefined} admissoesMensais={(dados.admissoesMensais) ?? undefined} periodoDias={periodoDias} /></Espaco>
                 <Espaco><SituacaoDetalhadaQuadro dados={(dados.situacaoQuadro) ?? undefined} /></Espaco>
+                <Espaco tamanho="triplo"><ComparativoUnidades unidades={(dados.unidades) ?? undefined} nivel={(dados.escopo?.nivel) ?? undefined} /></Espaco>
+                <Espaco tamanho="triplo"><MatrizUnidades unidades={(dados.unidades) ?? undefined} nivel={(dados.escopo?.nivel) ?? undefined} /></Espaco>
               </div>
             </section>
           )}
@@ -335,7 +253,7 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
             <section id="painel-operacao" className={estilos.secaoPainel}>
               <TituloSecao
                 icone={BarChart3}
-                titulo={`Análise histórica da operação — ${diasPeriodo} dias`}
+                titulo={`Análise histórica da operação — ${diasPeriodo} ${diasPeriodo === 1 ? "dia" : "dias"}`}
                 descricao={`Janela real de ${rotuloJanela}. Absenteísmo, comparação, distribuição, padrão semanal, evolução e ranking usam todos os lançamentos desse intervalo.`}
                 marcador="Histórico"
               />
@@ -348,7 +266,7 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
                 </Espaco>
                 <Espaco><ImpactoAbsenteismo periodo={(dados.periodo) ?? undefined} /></Espaco>
                 <Espaco><PressaoOperacional pressao={(dados.pressaoOperacional) ?? undefined} /></Espaco>
-                <Espaco><PadraoSemanal dados={(dados.padraoSemanal) ?? undefined} /></Espaco>
+                <Espaco tamanho="triplo"><PadraoSemanal dados={(dados.padraoSemanal) ?? undefined} /></Espaco>
                 <Espaco tamanho="triplo"><ComparativoPeriodo periodo={(dados.periodo) ?? undefined} comparativo={(dados.comparativoPeriodo) ?? undefined} /></Espaco>
                 <Espaco tamanho="triplo"><EvolucaoOperacional evolucao={(dados.evolucao) ?? undefined} periodoDias={diasPeriodo} /></Espaco>
                 <Espaco tamanho="duplo"><DistribuicaoStatus dados={(dados.distribuicaoStatus) ?? undefined} periodo={(dados.periodo) ?? undefined} /></Espaco>
@@ -374,36 +292,14 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
               <div className={estilos.gradeBento}>
                 <Espaco tamanho="duplo"><CoberturaFrequencia frequencia={(dados.frequencia) ?? undefined} podeOperar={perfil.podeOperarFrequencia} aoNavegar={acoes.navegar} /></Espaco>
                 <Espaco><FunilFrequencia frequencia={(dados.frequencia) ?? undefined} /></Espaco>
+                <Espaco tamanho="triplo"><IntegridadeDados integridade={(dados.integridade) ?? undefined} /></Espaco>
+                {!perfil.presidente && <Espaco tamanho="triplo"><AuditoriaRecente atividades={atividades} podeAbrirLogs={perfil.podeAcessarAuditoria} aoNavegar={acoes.navegar} /></Espaco>}
               </div>
             </section>
           )}
 
-          {exibir("governanca") && (
-            <section id="painel-governanca" className={estilos.secaoPainel}>
-              <TituloSecao
-                icone={ShieldCheck}
-                titulo="Governança, integridade e comparação"
-                descricao="Sinais de qualidade dos dados, comparação entre unidades e rastreabilidade das alterações."
-                marcador="Controle"
-              />
-              <div className={estilos.gradeBento}>
-                <Espaco tamanho="duplo"><IntegridadeDados integridade={(dados.integridade) ?? undefined} /></Espaco>
-                <Espaco><ChecklistGovernanca dados={dados} /></Espaco>
-                <Espaco tamanho="triplo"><ComparativoUnidades unidades={(dados.unidades) ?? undefined} nivel={(dados.escopo?.nivel) ?? undefined} /></Espaco>
-                <Espaco tamanho="triplo"><MatrizUnidades unidades={(dados.unidades) ?? undefined} nivel={(dados.escopo?.nivel) ?? undefined} /></Espaco>
-                {!perfil.presidente && (
-                  <Espaco tamanho="triplo">
-                    <AuditoriaRecente
-                      atividades={atividades}
-                      podeAbrirLogs={perfil.podeAcessarAuditoria}
-                      aoNavegar={acoes.navegar}
-                    />
-                  </Espaco>
-                )}
-              </div>
-              <NotasMetodologicas notas={(dados.notasMetodologicas) ?? undefined} geradoEm={(dados.geradoEm) ?? undefined} />
-            </section>
-          )}
+
+          <NotasMetodologicas notas={(dados.notasMetodologicas) ?? undefined} geradoEm={(dados.geradoEm) ?? undefined} />
         </>
       )}
       </>}

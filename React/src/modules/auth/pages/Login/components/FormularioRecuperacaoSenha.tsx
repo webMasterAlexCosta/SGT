@@ -14,10 +14,9 @@ export const FormularioRecuperacaoSenha = React.memo(({
   mensagemToken,
   confirmada,
   aoConfirmarToken,
-  modoDesempenho,
   aoSubmeterSolicitacao,
   aoVoltarLogin,
-}: { modo: 'SOLICITAR' | 'REDEFINIR'; email: string; aoMudarEmail: (valor: string) => void; carregando?: boolean; validandoToken?: boolean; tokenValido?: boolean | null; mensagemToken?: string; confirmada?: boolean; aoConfirmarToken: () => void; modoDesempenho?: boolean; aoSubmeterSolicitacao: React.FormEventHandler<HTMLFormElement>; aoVoltarLogin: () => void }) => {
+}: { modo: 'SOLICITAR' | 'REDEFINIR'; email: string; aoMudarEmail: (valor: string) => void; carregando?: boolean; validandoToken?: boolean; tokenValido?: boolean | null; mensagemToken?: string; confirmada?: boolean; aoConfirmarToken: () => void; aoSubmeterSolicitacao: React.FormEventHandler<HTMLFormElement>; aoVoltarLogin: () => void }) => {
   if (modo === "REDEFINIR") {
     const valido = !validandoToken && tokenValido === true;
     const invalido = !validandoToken && tokenValido === false;
@@ -45,7 +44,7 @@ export const FormularioRecuperacaoSenha = React.memo(({
               type="button"
               carregando={carregando}
               desabilitado={carregando}
-              modoDesempenho={modoDesempenho}
+
               onClick={aoConfirmarToken}
             >
               Confirmar recuperação e enviar senha temporária
@@ -98,7 +97,7 @@ export const FormularioRecuperacaoSenha = React.memo(({
         autoComplete="email"
       />
       <div className={estilos.containerBotao}>
-        <BotaoAcao type="submit" carregando={carregando} desabilitado={carregando} modoDesempenho={modoDesempenho}>
+        <BotaoAcao type="submit" carregando={carregando} desabilitado={carregando}>
           Enviar link de recuperação
         </BotaoAcao>
       </div>

@@ -327,7 +327,7 @@ export const IndicadorEfetivo = ({ referencia, aoAtualizarRelatorio }: { referen
   });
   const [filtrosCarregados, setFiltrosCarregados] = useState(false);
   const [filtrosAtualizando, setFiltrosAtualizando] = useState(false);
-  const [periodo, setPeriodo] = useState("MENSAL");
+  const [periodo, setPeriodo] = useState("DIARIO");
   const [comparar, setComparar] = useState(false);
   const [contratoId, setContratoId] = useState("");
   const [lotacaoId, setLotacaoId] = useState("");
@@ -627,7 +627,7 @@ export const IndicadorEfetivo = ({ referencia, aoAtualizarRelatorio }: { referen
           <div className={estilos.periodos} aria-label="Período do gráfico">
             <span><CalendarDays size={14} /> Período</span>
             <div>{PERIODOS.map(([id, rotulo]) => (
-              <button key={id} type="button" className={periodo === id ? estilos.ativo : ""} onClick={() => setPeriodo(id)}>{rotulo}</button>
+              <button key={id} type="button" aria-pressed={periodo === id} className={periodo === id ? estilos.ativo : ""} onClick={() => setPeriodo(id)}>{rotulo}</button>
             ))}</div>
           </div>
 

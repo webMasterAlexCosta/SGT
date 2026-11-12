@@ -528,7 +528,7 @@ class FechamentoJarRecuperacaoIT extends ContratosHttpBase {
     private Massa preparar(String nome) throws Exception {
         evidencias = diretorioPrivado(nome + "-");
         Files.createFile(evidencias.resolve("http.jsonl"), permissaoArquivo());
-        jar = Path.of("target/sig-gtrat-backend-0.0.4-operacional-20261101.jar").toAbsolutePath();
+        jar = Path.of("target/SGT.jar").toAbsolutePath();
         assertTrue(Files.isRegularFile(jar), "O root deve empacotar o candidato antes da execução opt-in");
         hashJar = hashArquivo(jar);
         conferirClasses();

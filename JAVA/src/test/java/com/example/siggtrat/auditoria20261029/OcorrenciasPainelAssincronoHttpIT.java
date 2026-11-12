@@ -118,6 +118,28 @@ class OcorrenciasPainelAssincronoHttpIT extends AuditoriaHttpSuporte {
         executar(c.operacionalA, post("/api/painel/calculos"), 403, "Operacional não solicita painel de gestão");
         executar(c.operacionalA, get("/api/painel/calculos/{id}", id), 403, "Operacional não lê resultado gerencial");
     }
+    @Test
+    void consultasSemPeriodoUsamDiarioNoGestaoEfetivoECalculoAssincrono() throws Exception {
+        Cenario c = criarCenarioPersistido();
+        JsonNode gestao = dados(executar(c.localA, get("/api/painel/gestao")
+                .param("referencia", DATA.toString()), 200, "Gestão sem período é diária"));
+        assertEquals(1, gestao.path("periodo").path("dias").asInt());
+        assertEquals(DATA.toString(), gestao.path("periodo").path("inicio").asText());
+        assertEquals(DATA.toString(), gestao.path("periodo").path("fim").asText());
+        JsonNode efetivo = dados(executar(c.localA, get("/api/painel/efetivo")
+                .param("referencia", DATA.toString()), 200, "Efetivo sem período é diário"));
+        assertEquals("DIARIO", efetivo.path("periodo").asText());
+        assertEquals(DATA.toString(), efetivo.path("inicio").asText());
+        assertEquals(DATA.toString(), efetivo.path("fim").asText());
+        JsonNode inicial = dados(executar(c.localA, post("/api/painel/calculos")
+                .param("referencia", DATA.toString()), 202, "Cálculo sem período enfileira somente o dia"));
+        JsonNode pronto = aguardarPainel(c, inicial.path("id").asLong());
+        assertEquals(1, pronto.path("dados").path("periodo").path("dias").asInt());
+        assertEquals(DATA.toString(), pronto.path("dados").path("periodo").path("inicio").asText());
+        executar(c.localA, post("/api/painel/calculos").param("referencia", DATA.toString()).param("periodoDias", "0"),
+                400, "Zero continua sendo janela inválida");
+    }
+
     private JsonNode aguardarPainel(Cenario c, long id) throws Exception {
         long limite = System.nanoTime() + java.util.concurrent.TimeUnit.SECONDS.toNanos(25);
         JsonNode estado;

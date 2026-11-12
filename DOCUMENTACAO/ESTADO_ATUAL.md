@@ -1,5 +1,7 @@
 # SGT — estado atual
 
+**Correção das demais visões e login em 12/11/2026:** Resumo, Contratos e Operação refinados; aba/checklist exclusivos de Governança removidos; padrão Diário também nos endpoints de gestão e efetivo; login separado em hook/apresentação, sem modo visual, com rolagem que mantém os controles acessíveis; identificação Alex Costa 89618815 e Maven/JAR SGT. Implementação em validação; suíte completa pós-commit ainda pendente. Ver [escopo e pré-verificações](CODEX/DASHBOARD_20261111/PAINEL_GERAL_LOGIN_20261112.md).
+
 **Build e execução solicitados em 12/11/2026:** checkpoint prévio `c9a1d0fb` publicado antes das alterações; React compilado, 111 arquivos de `dist` copiados para `static`, Maven wrapper `clean package` com 808 testes sem falhas e JAR `13dda6173b8af06d371ee1264d456c0b70dd5e5a169fdd65b88fc58324e358d8` executado a partir de `JAVA/target` no laboratório, porta 58501. Cinco rotas SPA, 111 assets e API conferidos. Ver [recibo desta execução](CODEX/DASHBOARD_20261111/BUILD_EXECUCAO_20261112.json).
 
 **UX do painel gerencial completo refinado em 12/11/2026:** filtros, quatro KPIs, evolução/comparação, metas, heatmap, funil, diagnóstico, alertas, navegação e detalhes, preservando cálculos e contratos. Substitui a iteração parcial restrita às três barras. Alteração local posterior ao commit da auditoria; JAR `bdf997e2cec5b5605a64f29b541ead4ea0c5aaa693eb1be67c757011f85cccc4` conferido no laboratório. Ver [escopo, testes, capturas e limites](CODEX/DASHBOARD_20261111/PAINEL_UX_COMPLETO_20261112.md).

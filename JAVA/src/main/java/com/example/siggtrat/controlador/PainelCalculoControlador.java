@@ -25,7 +25,7 @@ public class PainelCalculoControlador implements com.example.siggtrat.diagnostic
     @PostMapping
     public ResponseEntity<PainelCalculoDTO> solicitar(
             @RequestParam(required = false) @DateTimeFormat(pattern = "yyyy-MM-dd") LocalDate referencia,
-            @RequestParam(required = false, defaultValue = "30") Integer periodoDias,
+            @RequestParam(required = false, defaultValue = "1") Integer periodoDias,
             @RequestParam(required = false, defaultValue = "false") boolean forcar) {
         var resultado = servico.solicitar(referencia, periodoDias, forcar);
         return ResponseEntity.status(resultado.status()).body(resultado.corpo());

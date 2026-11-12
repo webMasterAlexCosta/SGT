@@ -71,7 +71,7 @@ public class PainelCalculoServico implements com.example.siggtrat.diagnostico.Di
         LocalDate referenciaNormalizada = referencia == null
                 ? LocalDate.now(zoneId).minusDays(1)
                 : referencia;
-        int periodoNormalizado = periodoDias == null ? 30 : periodoDias;
+        int periodoNormalizado = periodoDias == null ? 1 : periodoDias;
         // Reutiliza as validações oficiais antes de criar trabalho persistido.
         validarSemExecutarConsultas(referenciaNormalizada, periodoNormalizado);
 
@@ -246,9 +246,9 @@ public class PainelCalculoServico implements com.example.siggtrat.diagnostico.Di
         if (referencia.isBefore(hoje.minusYears(2))) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "A data de referência deve estar dentro dos últimos dois anos.");
         }
-        if (!java.util.Set.of(7, 15, 30, 60, 90).contains(periodoDias)) {
+        if (!java.util.Set.of(1, 7, 15, 30, 60, 90).contains(periodoDias)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "O período deve ser um dos valores permitidos: 7, 15, 30, 60 ou 90 dias.");
+                    "O período deve ser um dos valores permitidos: 1, 7, 15, 30, 60 ou 90 dias.");
         }
     }
 

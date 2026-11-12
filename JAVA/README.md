@@ -71,7 +71,7 @@ O perfil `prod` usa `ddl-auto=validate`, `generate-ddl=false` e `sql.init.mode=n
 
 Regressão focal sem banco: `bash mvnw -Dtest=ConfiguracaoPostgresIntegracaoTest,GuardaPostgres186Test,PostgresPersistenceContractTest test`. Integrações devem ser executadas em lotes sequenciais de5ou10 classes, com `test-compile failsafe:integration-test failsafe:verify -Pintegration -Dit.test=<classes>`. Não passar `-DskipTests`, pois também desativa Failsafe.
 
-JAR: target/sig-gtrat-backend-0.0.4-operacional-20261101.jar. Seus recursos estáticos devem coincidir com o dist do React do mesmo manifesto.
+JAR: target/SGT.jar. Seus recursos estáticos devem coincidir com o dist do React do mesmo manifesto.
 
 ## Rastreabilidade e pendências
 

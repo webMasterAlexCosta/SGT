@@ -8,9 +8,10 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>com.example</groupId>
-    <artifactId>sig-gtrat-backend</artifactId>
+    <artifactId>SGT</artifactId>
     <version>0.0.4-operacional-20261101</version>
     <packaging>jar</packaging>
+    <name>SGT</name>
 
     <parent>
         <groupId>org.springframework.boot</groupId>
@@ -283,6 +284,7 @@
     </dependencies>
 
     <build>
+        <finalName>SGT</finalName>
         <plugins>
 
             <plugin>
