@@ -136,6 +136,7 @@ export const PaginaFrequencia = () => {
       />
 
       <TabelaFrequencia
+        aoRevisaoConcluida={acoes.recarregarFrequencia}
         estaCarregando={estado.indicadorCarregamento}
         erroCarregamento={estado.erroCargaFrequencia}
         listaDeFrequencia={estado.listaDaFrequenciaFiltradaNaMemoria}

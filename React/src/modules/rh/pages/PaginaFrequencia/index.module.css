@@ -2249,3 +2249,6 @@
     flex: 1;
   }
 }
+
+.botaoRevisaoFrequencia { margin-bottom: .3rem; padding: .2rem .4rem; color: var(--cor-correios-azul-800); border: 1px solid var(--cor-borda-sutil); border-radius: 4px; background: var(--cor-fundo-elevado); font-size: .68rem; cursor: pointer; }
+.botaoRevisaoFrequencia:focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 2px; }

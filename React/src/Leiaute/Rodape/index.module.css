@@ -21,6 +21,7 @@
 
 .colunas { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: clamp(1.5rem, 4vw, 4rem); }
 .coluna { min-width: 0; }
+.tecnologias { margin: 1.3rem 0 0; padding-top: .9rem; border-top: 1px solid var(--cor-borda-sutil); color: var(--cor-texto-secundario); font-size: .78rem; line-height: 1.6; }
 .colunaDireita { text-align: left; }
 .coluna h4 { margin: 0 0 .65rem; color: var(--cor-correios-azul-900); font-size: .82rem; font-weight: var(--peso-extra); letter-spacing: .02em; }
 .coluna ul { margin: 0; padding: 0; list-style: none; }
@@ -102,3 +103,9 @@
 .statusServidorErro { border-color: var(--cor-perigo-100); color: var(--cor-perigo-700); background: var(--cor-perigo-50); }
 .statusServidorOk .pontoStatus { background: var(--cor-sucesso-600); box-shadow: 0 0 6px rgba(21,134,83,.45); }
 .statusServidorErro .pontoStatus { background: var(--cor-perigo-600); box-shadow: 0 0 6px rgba(200,61,61,.45); }
+
+.tecnologias { display: flex; flex-wrap: wrap; align-items: center; gap: .8rem 1.25rem; }
+.tecnologias ul { display: flex; flex-wrap: wrap; align-items: center; gap: 1rem; list-style: none; margin: 0; padding: 0; }
+.tecnologias li { display: inline-flex; align-items: center; gap: .4rem; }
+.tecnologias img { object-fit: contain; }
+.tecnologias a { color: var(--cor-correios-azul-800); text-underline-offset: 3px; font-size: .7rem; }

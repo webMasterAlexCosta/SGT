@@ -51,7 +51,9 @@ export const usePreviaHistorica = ({ tipo, alvo, formulario, permitido, aoSucess
   useEffect(() => {
     if (anteriorRef.current !== assinatura) {
       anteriorRef.current = assinatura;
-      invalidar();
+      // Um clique pode iniciar uma prévia da assinatura nova antes do efeito
+      // da edição anterior. Preserve essa intenção; descarte somente a antiga.
+      if (intencaoRef.current?.assinatura !== assinatura) invalidar();
     }
   }, [assinatura, invalidar]);
   useEffect(() => {

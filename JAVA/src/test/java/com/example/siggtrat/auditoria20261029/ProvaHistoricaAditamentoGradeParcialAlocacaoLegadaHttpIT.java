@@ -50,6 +50,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
  */
 @Transactional(propagation = Propagation.NOT_SUPPORTED)
 class ProvaHistoricaAditamentoGradeParcialAlocacaoLegadaHttpIT extends ContratosHttpBase {
+    @Autowired com.example.siggtrat.repositorio.PainelEfetivoRepositorio coberturaAnalitica;
     private static final String GRADE = "MONDAY|true|08:00|12:00|13:00|17:00;"
             + "TUESDAY|true|08:00|12:00|13:00|17:00;WEDNESDAY|true|08:00|12:00|13:00|17:00;"
             + "THURSDAY|true|08:00|12:00|13:00|17:00;FRIDAY|true|08:00|12:00|13:00|17:00;"
@@ -113,6 +114,9 @@ class ProvaHistoricaAditamentoGradeParcialAlocacaoLegadaHttpIT extends Contratos
         assertThat(configuracaoProjetada(o, k1).lotacaoMunicipio()).isNull();
         assertThat(configuracaoAlocacao(vinculo, o.dia(), k0).jornadaSemanal()).isNull();
         var depois = configuracaoAlocacao(vinculo, o.dia(), k1);
+        var basesCobertura=emTransacao(() -> coberturaAnalitica.obterCoberturaAnalitica(o.dia(),o.dia(),o.n().id(),null,o.c().gestaoA.getId(),null,com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade.LOTACAO));
+        assertThat(basesCobertura.stream().mapToLong(com.example.siggtrat.repositorio.PainelEfetivoRepositorio.BaseCobertura::semGrade).sum()).isZero();
+        assertThat(basesCobertura.stream().mapToLong(com.example.siggtrat.repositorio.PainelEfetivoRepositorio.BaseCobertura::esperados).sum()).isEqualTo(1);
         // Imutabilidade e custódia verificadas antes do oráculo que isola a guarda ADI.
         assertThat(itemOriginal(o)).isEqualTo(itemOriginal);
         assertThat(versaoOriginal(o)).isEqualTo(versaoOriginal);

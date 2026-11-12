@@ -1,0 +1,55 @@
+{
+  "natureza": "UI real sobre API PostgreSQL; dados sintéticos",
+  "periodos": [
+    {
+      "tipo": "DIARIO",
+      "registros": 23,
+      "inicio": "2026-11-10",
+      "fim": "2026-11-10"
+    },
+    {
+      "tipo": "SEMANAL",
+      "registros": 47,
+      "inicio": "2026-11-09",
+      "fim": "2026-11-10"
+    },
+    {
+      "tipo": "MENSAL",
+      "registros": 161,
+      "inicio": "2026-11-01",
+      "fim": "2026-11-10"
+    },
+    {
+      "tipo": "TRIMESTRAL",
+      "registros": 188,
+      "inicio": "2026-10-01",
+      "fim": "2026-11-10"
+    },
+    {
+      "tipo": "ANUAL",
+      "registros": 188,
+      "inicio": "2026-01-01",
+      "fim": "2026-11-10"
+    }
+  ],
+  "verificacoes": [
+    "cinco períodos reconciliados com API",
+    "KPIs e metas propostas",
+    "funil real",
+    "origem mínima",
+    "heatmap de pendências",
+    "ESC e foco",
+    "sete ícones locais",
+    "sem overflow horizontal"
+  ],
+  "exportacoes": [
+    {
+      "tipo": "xlsx",
+      "bytes": 40534
+    },
+    {
+      "tipo": "pdf",
+      "bytes": 100642
+    }
+  ]
+}

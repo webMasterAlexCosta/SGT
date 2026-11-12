@@ -49,6 +49,15 @@ const consultarRelatorioPaginado = async <T extends { empregadoId?: number | nul
 };
 
 export const ServicoFrequencia = {
+  consultarRevisao: async (id: ResourceIdentifierInput, options: RequestOptions = {}) => {
+    id = exigirIdentificadorRota(id);
+    return requisitar<import('../../contracts/revisao-frequencia').RevisaoFrequencia>({ method:'GET', url:`/frequencias/${id}/revisao`, ...options });
+  },
+  comandarRevisao: async (id: ResourceIdentifierInput, comando: import('../../contracts/revisao-frequencia').ComandoRevisaoFrequencia, decidir: boolean, options: RequestOptions = {}) => {
+    id = exigirIdentificadorRota(id);
+    return requisitar<import('../../contracts/revisao-frequencia').RevisaoFrequencia>({ method:'POST', url:`/frequencias/${id}/revisao${decidir?'/decisao':''}`, data:comando,
+      retries:0, confirmacaoSenha:{titulo:decidir?'Concluir revisão de frequência':'Solicitar revisão de frequência'}, ...options });
+  },
   carregarFiltrosRelatorio: async (options: RequestOptions = {}) => requisitar<DTO.RelatorioFiltrosDTO>({ method: 'GET', url: '/relatorios/filtros', ...options }),
   buscarDoDia: async (dataIso: (string | null), params: QueryParams = {}, options: RequestOptions = {}) => requisitarTodasAsPaginas<DTO.FrequenciaDTO>({
     url: '/frequencias', params: { data: dataIso, ...params }, options, otimizarContagem: true,

@@ -27,7 +27,7 @@ export const BotaoExpandirPainel = ({ titulo, aoAbrir }: { titulo: string; aoAbr
   </button>
 );
 
-export const ModalPainel = ({ aberto, titulo, detalhe, aoFechar, children, selo = "Análise detalhada", permitirTelaCheia = true }: { aberto: (boolean); titulo: (string); detalhe: (string) | (React.ReactNode); aoFechar: (() => void); children: React.ReactNode; selo?: (string); permitirTelaCheia?: boolean }) => {
+export const ModalPainel = ({ aberto, titulo, detalhe, aoFechar, children, selo = "Análise detalhada", permitirTelaCheia = true, lateral = false }: { aberto: (boolean); titulo: (string); detalhe: (string) | (React.ReactNode); aoFechar: (() => void); children: React.ReactNode; selo?: (string); permitirTelaCheia?: boolean; lateral?: boolean }) => {
   const tituloId = useId();
   const modalRef = useRef<HTMLDivElement | null>(null);
   const fecharRef = useRef<HTMLElementTagNameMap['button'] | null>(null);
@@ -84,7 +84,7 @@ export const ModalPainel = ({ aberto, titulo, detalhe, aoFechar, children, selo 
 
   return createPortal(
     <div
-      className={estilos.sobreposicao}
+      className={`${estilos.sobreposicao} ${lateral ? estilos.sobreposicaoLateral : ''}`}
       role="presentation"
       onMouseDown={(evento) => {
         if (evento.target === evento.currentTarget) aoFechar?.();
@@ -92,7 +92,7 @@ export const ModalPainel = ({ aberto, titulo, detalhe, aoFechar, children, selo 
     >
       <section
         ref={modalRef}
-        className={`${estilos.modal} ${telaCheia ? estilos.modalTelaCheia : ""}`}
+        className={`${estilos.modal} ${telaCheia ? estilos.modalTelaCheia : ""} ${lateral ? estilos.modalLateral : ''}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby={tituloId}

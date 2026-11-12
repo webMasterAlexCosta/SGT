@@ -304,6 +304,72 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
         return salvarOuAtualizarInterno(dto, user, new HashMap<>(), null, true, false);
     }
 
+    @Transactional
+    public com.example.siggtrat.dto.RevisaoFrequenciaDTO consultarRevisao(Long id) {
+        var contexto = autorizarConsultaEventos(id);
+        var f = contexto.frequencia();
+        var nivel = leituraFrequencia.nivel(contexto.usuario(), f.getContratoSnapshotId(),
+                contexto.escopo() == null ? null : contexto.escopo().gestaoLocalId(),
+                "Consulta de solicitação de revisão de frequência", "Frequencia", id);
+        var dto = revisaoDTO(f, contexto.usuario());
+        return new com.example.siggtrat.dto.RevisaoFrequenciaDTO(dto.frequenciaId(), dto.versao(), dto.status(),
+                dto.solicitadaEm(), leituraFrequencia.textoRestrito(dto.motivo(), nivel), dto.decididaEm(),
+                leituraFrequencia.textoRestrito(dto.decisao(), nivel), dto.podeSolicitar(), dto.podeDecidir());
+    }
+
+    @Transactional
+    public com.example.siggtrat.dto.RevisaoFrequenciaDTO comandarRevisao(Long id,
+            com.example.siggtrat.dto.RevisaoFrequenciaDTO.Comando comando, boolean decidir) {
+        var contexto = autorizarConsultaEventos(id);
+        var usuario = contexto.usuario();
+        boolean gestor = acessoOrganizacionalServico.ehGestaoLocal(usuario);
+        if (decidir ? !gestor : !acessoOrganizacionalServico.ehOperacional(usuario))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN, "Perfil sem permissão para esta ação de revisão.");
+        var origem = contexto.frequencia();
+        if (origem.getVinculoContratual() == null)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "Frequência sem vínculo canônico; trate a integridade histórica primeiro.");
+        bloqueioEscrita.bloquearVinculos(List.of(origem.getVinculoContratual().getId()));
+        usuario = acessoOrganizacionalServico.recarregarAposEspera(usuario);
+        var f = bloqueioEscrita.bloquearFrequencia(id);
+        exigirAutorizacaoNoContexto(usuario, resolvedorContextoTemporal.resolver(f.getEmpregado(), f.getDataReferencia()));
+        String decisao = decidir ? comando.decisao() : "PENDENTE";
+        if (decidir && !List.of("CONFERIDA", "REJEITADA").contains(decisao == null ? "" : decisao))
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Decisão inválida: use CONFERIDA ou REJEITADA.");
+        String motivo = comando.motivo().trim();
+        if (motivo.length() < 5) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Descreva o motivo com ao menos 5 caracteres.");
+        String hash = UtilitarioHashSeguranca.sha256Hexadecimal("REVISAO-1|" + id + "|" + usuario.getId()
+                + "|" + comando.versao() + "|" + decisao + "|" + motivo);
+        if (auditoriaFrequencia.chaveJaAplicada(id, comando.chaveIdempotencia(), hash)) return revisaoDTO(f, usuario);
+        if (!Objects.equals(comando.versao(), f.getVersaoNegocial()))
+            throw new ResponseStatusException(HttpStatus.CONFLICT, "A frequência mudou. Atualize antes de continuar.");
+        boolean pendente = "PENDENTE".equals(f.getRevisaoSolicitadaStatus());
+        if (decidir != pendente)
+            throw new ResponseStatusException(HttpStatus.CONFLICT, decidir ? "Não há solicitação pendente." : "Já existe uma solicitação pendente para esta frequência.");
+        String antes = auditoriaFrequencia.snapshot(f);
+        f.setRevisaoSolicitadaStatus(decisao);
+        if (decidir) {
+            f.setRevisaoDecididaEm(com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros());
+            f.setRevisaoDecisorId(usuario.getId()); f.setRevisaoDecisaoMotivo(motivo);
+        } else {
+            f.setRevisaoSolicitadaEm(com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros());
+            f.setRevisaoSolicitanteId(usuario.getId()); f.setRevisaoSolicitadaMotivo(motivo);
+            f.setRevisaoDecididaEm(null); f.setRevisaoDecisorId(null); f.setRevisaoDecisaoMotivo(null);
+        }
+        f.setVersaoNegocial(f.getVersaoNegocial() + 1);
+        repositorio.saveAndFlush(f);
+        auditoriaFrequencia.registrar(f, decidir ? TipoEventoFrequencia.REVISAO_DECIDIDA : TipoEventoFrequencia.REVISAO_SOLICITADA,
+                antes, motivo, usuario, comando.chaveIdempotencia(), hash);
+        return revisaoDTO(f, usuario);
+    }
+
+    private com.example.siggtrat.dto.RevisaoFrequenciaDTO revisaoDTO(Frequencia f, UsuarioAplicacao usuario) {
+        boolean pendente = "PENDENTE".equals(f.getRevisaoSolicitadaStatus());
+        return new com.example.siggtrat.dto.RevisaoFrequenciaDTO(f.getId(), f.getVersaoNegocial(),
+                f.getRevisaoSolicitadaStatus() == null ? "SEM_SOLICITACAO" : f.getRevisaoSolicitadaStatus(),
+                f.getRevisaoSolicitadaEm(), f.getRevisaoSolicitadaMotivo(), f.getRevisaoDecididaEm(), f.getRevisaoDecisaoMotivo(),
+                !pendente && acessoOrganizacionalServico.ehOperacional(usuario), pendente && acessoOrganizacionalServico.ehGestaoLocal(usuario));
+    }
+
     public List<com.example.siggtrat.dto.EventoFrequenciaDTO> listarEventos(Long id) {
         ContextoConsultaEventos contexto = autorizarConsultaEventos(id);
         var nivel = leituraFrequencia.nivel(contexto.usuario(), contexto.frequencia().getContratoSnapshotId(),
@@ -717,6 +783,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
             entity.setBloqueadaEdicaoOperacional(false);
             entity.setVersaoNegocial(1);
             capturarRetratoCanonico(entity, temporal, dataRef, true);
+            politicaTemporal.capturarPrazos(entity, com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros());
         } else {
             // Nova intenção manual confirmada: o replay já retornou sem mutação.
             // Preserva a fonte de Ocorrência e sua história; somente desfaz a projeção automática neste registro.
@@ -889,6 +956,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
             frequencia.setEstadoNegocial(politicaTemporal.fechada(data, null)
                     ? EstadoNegocialFrequencia.FECHADA : EstadoNegocialFrequencia.ABERTA);
             frequencia.setValidadeOperacional(ValidadeOperacionalFrequencia.VALIDA);
+            politicaTemporal.capturarPrazos(frequencia, com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros());
         }
         capturarRetratoCanonico(frequencia, temporal, data, false);
         frequencia.setVersaoNegocial(existente
@@ -981,7 +1049,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
 
     private void validarEdicaoOperacional(Frequencia frequencia, LocalDate dataRef) {
         if (frequencia.getEstadoNegocial() == EstadoNegocialFrequencia.FECHADA
-                || !politicaTemporal.abertaParaOperacional(dataRef, null)) {
+                || politicaTemporal.edicaoEncerrada(frequencia, null)) {
             throw new ResponseStatusException(HttpStatus.FORBIDDEN,
                     "A frequência está FECHADA; alteração posterior exige retificação do Gestor Local.");
         }
@@ -1054,13 +1122,13 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
 
     private void fecharNegocialmenteSeNecessario(Frequencia frequencia) {
         if (frequencia.getEstadoNegocial() == EstadoNegocialFrequencia.ABERTA
-                && politicaTemporal.fechada(frequencia.getDataReferencia(), null)) {
+                && politicaTemporal.edicaoEncerrada(frequencia, null)) {
             String antes = auditoriaFrequencia.snapshot(frequencia);
             frequencia.setEstadoNegocial(EstadoNegocialFrequencia.FECHADA);
             frequencia.setVersaoNegocial(frequencia.getVersaoNegocial() == null ? 2 : frequencia.getVersaoNegocial() + 1);
             repositorio.saveAndFlush(frequencia);
             auditoriaFrequencia.registrar(frequencia, TipoEventoFrequencia.FECHAMENTO_AUTOMATICO, antes,
-                    politicaTemporal.motivoFechamento(), null, null, null);
+                    politicaTemporal.motivoFechamentoEdicao(), null, null, null);
         }
     }
 
@@ -1501,7 +1569,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
         dto.setHorarioSaida(entity.getHorarioSaida());
         dto.setHorasNoturnas(entity.getHorasNoturnas());
         dto.setObservacao(entity.getObservacao());
-        dto.setPrazoEdicao(politicaTemporal.prazoLocal(entity.getDataReferencia()));
+        dto.setPrazoEdicao(politicaTemporal.prazoEdicao(entity).atZone(politicaTemporal.zona()).toLocalDateTime());
         dto.setUpdatedAt(entity.getUpdatedAt());
         dto.setPessoaId(entity.getPessoa() == null ? null : entity.getPessoa().getId());
         dto.setVinculoContratualId(id(entity.getVinculoContratual()));
@@ -1511,7 +1579,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
         dto.setJornadaId(entity.getJornadaSnapshotId());
         dto.setCargoId(entity.getCargoSnapshotId());
         dto.setGestaoLocalId(entity.getGestaoLocalSnapshotId());
-        dto.setEstadoNegocial(politicaTemporal.fechada(entity.getDataReferencia(), null)
+        dto.setEstadoNegocial(politicaTemporal.edicaoEncerrada(entity, null)
                 ? EstadoNegocialFrequencia.FECHADA : entity.getEstadoNegocial());
         dto.setValidadeOperacional(entity.getValidadeOperacional());
         dto.setEstadoAuditoria(entity.getEstadoAuditoria());

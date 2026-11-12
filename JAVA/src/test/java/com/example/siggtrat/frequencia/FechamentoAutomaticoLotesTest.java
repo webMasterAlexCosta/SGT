@@ -50,6 +50,7 @@ class FechamentoAutomaticoLotesTest {
                 frequencia.setDataReferencia(LocalDate.now(new PoliticaTemporalFrequenciaServico(7).zona()).minusDays(8));
                 frequencia.setEstadoNegocial(EstadoNegocialFrequencia.ABERTA);
                 frequencia.setVersaoNegocial(1);
+                frequencia.setRegistradoEm(java.time.Instant.now().minus(java.time.Duration.ofDays(8)));
                 registros.add(frequencia);
             }
         }

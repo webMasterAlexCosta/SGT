@@ -5,6 +5,15 @@ import { StatusServidor } from "./components/StatusServidor";
 import logotipoGoverno from "../../assets/logo-footer.png";
 import estilos from "./index.module.css";
 
+import iconeJava from "../../assets/tecnologias/java.svg";
+import iconePostgresql from "../../assets/tecnologias/postgresql.svg";
+import iconeReact from "../../assets/tecnologias/react.svg";
+import iconeSpring from "../../assets/tecnologias/spring.svg";
+import iconeTypescript from "../../assets/tecnologias/typescript.svg";
+import iconeVitejs from "../../assets/tecnologias/vitejs.svg";
+
+import iconeRedis from "../../assets/tecnologias/redis.svg";
+
 const ModalCreditos = lazy(() =>
   import("../../core/ui/ModalCreditosColaboracao").then((m) => ({
     default: m.ModalCreditosColaboracao,
@@ -22,6 +31,14 @@ const Rodape = () => {
             <LinksRodape
               aoAbrirCreditos={() => definirModalCreditosAberto(true)}
             />
+            <div className={estilos.tecnologias} aria-label="Tecnologias utilizadas">
+              <strong>Tecnologias utilizadas</strong>
+              <ul>{[
+                ['React', iconeReact], ['TypeScript', iconeTypescript], ['Vite', iconeVitejs],
+                ['Java 25', iconeJava], ['Spring Boot', iconeSpring], ['PostgreSQL', iconePostgresql], ['Redis', iconeRedis],
+              ].map(([nome, icone]) => <li key={nome}><img src={icone} alt="" width="24" height="24" loading="lazy" /><span>{nome}</span></li>)}</ul>
+              <a href="/licenses/devicon.txt" target="_blank" rel="noopener noreferrer">Ícones Devicon · MIT</a>
+            </div>
           </div>
         </div>
 

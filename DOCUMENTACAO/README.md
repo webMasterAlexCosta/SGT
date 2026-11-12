@@ -8,6 +8,7 @@ Leia primeiro o [estado atual](ESTADO_ATUAL.md). O projeto não está concluído
 | O que foi removido e o que deve permanecer? | [Mapa e suplemento PostgreSQL](MATRIZES_COMPLETAS/MAPA_REMOVIDOS_PRESERVADOS.md). |
 | Como funciona a janela de frequência? | [Regra vigente: N configurável, padrão30](../JAVA/docs/REGRA_JANELA_FREQUENCIA.md), [oráculos temporais/autorização](MATRIZES_COMPLETAS/REGRAS_TEMPORAIS_E_AUTORIZACAO.md). |
 | Como preparar e validar? | [Toolchain atual](CODEX/TOOLCHAIN.md), [matriz de comandos](../.codex/validation.toml), [AGENTS](../AGENTS.md). |
+| Como funciona o dashboard de cinco períodos? | [Contrato, fontes e limites do painel desktop](CODEX/DASHBOARD_20261111/CONTRATO.md), [plano aprovado e adendo](CODEX/DASHBOARD_20261111/PLANO_GESTAO_REFERENCIA.md), [verificação atual](CODEX/DASHBOARD_20261111/VERIFICACAO.json). |
 | O que foi comprovado? | [Limites e pendências](ESTADO_ATUAL.md), recibos em CODEX/ e relatórios de AUDITORIA_E_PENDENCIAS/. Cada resultado vale para seus bytes. |
 | Onde estão os gerados anteriores? | [Arquivo e recuperação](ARQUIVO/README.md). |
 

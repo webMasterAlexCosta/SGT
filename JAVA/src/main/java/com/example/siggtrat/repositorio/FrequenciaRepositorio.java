@@ -14,6 +14,7 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 import java.time.LocalDate;
+import java.time.Instant;
 import java.util.List;
 import java.util.Optional;
 
@@ -121,6 +122,16 @@ public interface FrequenciaRepositorio extends JpaRepository<Frequencia, Long>, 
             @org.springframework.data.repository.query.Param("limite") LocalDate limite,
             @org.springframework.data.repository.query.Param("ultimoId") long ultimoId,
             Pageable pagina);
+
+    @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
+    @Query("select f from Frequencia f where f.estadoNegocial = :estado and f.id > :ultimoId " +
+            "and ((f.prazoEdicaoEm is not null and f.prazoEdicaoEm <= :agora) " +
+            "or (f.prazoEdicaoEm is null and f.registradoEm <= :limiteLegado)) order by f.id")
+    List<Frequencia> buscarEdicoesVencidasApos(
+            @org.springframework.data.repository.query.Param("estado") com.example.siggtrat.dominio.frequencia.EstadoNegocialFrequencia estado,
+            @org.springframework.data.repository.query.Param("agora") Instant agora,
+            @org.springframework.data.repository.query.Param("limiteLegado") Instant limiteLegado,
+            @org.springframework.data.repository.query.Param("ultimoId") long ultimoId, Pageable pagina);
 
     @org.springframework.data.jpa.repository.Lock(jakarta.persistence.LockModeType.PESSIMISTIC_WRITE)
     @Query("select f from Frequencia f where f.vinculoContratual.id = :origemId " +

@@ -45,31 +45,31 @@ public class FechamentoAutomaticoFrequenciaNegocialServico implements com.exampl
 
     @Scheduled(cron = "${frequencia.fechamento-negocial.cron:0 * * * * *}", zone = "America/Sao_Paulo")
     public int fecharVencidas() {
-        LocalDate limite = politica.limiteFechamento(null);
+        java.time.Instant agora = java.time.Instant.now();
         int total = 0;
         long ultimoId = 0;
         while (true) {
             long cursor = ultimoId;
-            ResultadoLote lote = transacaoLote.execute(status -> fecharLote(limite, cursor));
+            ResultadoLote lote = transacaoLote.execute(status -> fecharLote(agora, cursor));
             if (lote == null || lote.consultadas() == 0) return total;
             total += lote.fechadas();
             ultimoId = lote.ultimoId();
         }
     }
 
-    private ResultadoLote fecharLote(LocalDate limite, long ultimoId) {
-        List<Frequencia> lote = repositorio.buscarAbertasVencidasApos(
-                EstadoNegocialFrequencia.ABERTA, limite, ultimoId, PageRequest.of(0, tamanhoLote));
+    private ResultadoLote fecharLote(java.time.Instant agora, long ultimoId) {
+        List<Frequencia> lote = repositorio.buscarEdicoesVencidasApos(
+                EstadoNegocialFrequencia.ABERTA, agora, agora.minus(java.time.Duration.ofHours(politica.horasEdicao())), ultimoId, PageRequest.of(0, tamanhoLote));
         if (lote.isEmpty()) return new ResultadoLote(0, 0, ultimoId);
         int fechadas = 0;
         for (Frequencia frequencia : lote) {
-            if (!politica.fechada(frequencia.getDataReferencia(), null)) continue;
+            if (!politica.edicaoEncerrada(frequencia, agora)) continue;
             String antes = auditoria.snapshot(frequencia);
             frequencia.setEstadoNegocial(EstadoNegocialFrequencia.FECHADA);
             frequencia.setVersaoNegocial(frequencia.getVersaoNegocial() == null ? 2 : frequencia.getVersaoNegocial() + 1);
             repositorio.save(frequencia);
             auditoria.registrar(frequencia, TipoEventoFrequencia.FECHAMENTO_AUTOMATICO, antes,
-                    politica.motivoFechamento(), null, null, null);
+                    politica.motivoFechamentoEdicao(), null, null, null);
             fechadas++;
         }
         // O estado e seus eventos são confirmados juntos. O contexto JPA é

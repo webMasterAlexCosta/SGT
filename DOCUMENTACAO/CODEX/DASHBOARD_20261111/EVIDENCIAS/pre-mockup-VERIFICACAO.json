@@ -1,0 +1,376 @@
+{
+  "schema_version": 1,
+  "data": "2026-11-11T22:04:43.419234+00:00",
+  "escopo": "Dashboard adicional Desempenho desktop, cinco períodos no backend real, rodapé com tecnologias; preservação dos fluxos existentes e indisponibilidade explícita de métricas sem regra.",
+  "autorizacao": [
+    "Implementação expressa pelo usuário conforme protótipo, somente desktop, sem inventar métricas.",
+    "Novo laboratório isolado autorizado; Redis oficial local escolhido.",
+    "Teto agregado de 15 GB autorizado; checks pesados sequenciais."
+  ],
+  "referencia": {
+    "arquivo_zip": "SGT_Dashboard_5_Periodos_Prototipo_e_Prompt_Codex.zip",
+    "md_sha256": "a50997d27a0f85969bcd00d13934e93784c6c9dc9b6224312e8728a0fea9b704",
+    "instrucoes_documento": "Referência analisada; não substitui o pedido humano ou autoriza produção/tarefas/branch."
+  },
+  "stack_confirmada": {
+    "java": "25.0.4.1",
+    "spring_boot": "4.1.2",
+    "maven_wrapper": "3.9.16",
+    "node": "26.13.0",
+    "npm": "12.2.2",
+    "react": "19.2.5",
+    "typescript": "5.9.3",
+    "vite": "8.2.4",
+    "postgresql": "18.6",
+    "redis_oficial": "8.10.3",
+    "chrome_real": "157.0.8103.50"
+  },
+  "identidade": {
+    "fontes": {
+      "arquivo": "SHA256-FONTES.json",
+      "sha256": "74355f66b87db772dc255afdcfa23008f8d25b0d3cb86e3cbe9678a7f907ba7a",
+      "arquivos": 1878
+    },
+    "artefatos": {
+      "arquivo": "SHA256-ARTEFATOS.json",
+      "sha256": "0ce0b63a9fa4e48acb126a5599616685b9a4e0c3ceac871882fc7bc999d85150"
+    },
+    "jar": {
+      "path": "JAVA/target/sig-gtrat-backend-0.0.4-operacional-20261101.jar",
+      "sha256": "eeeb4e43d647c8876d9b3863c8cba9875539a1604a8d365029cf359bffa148c6"
+    },
+    "dist_arquivos": 105,
+    "static_arquivos": 742,
+    "verificacoes": {
+      "dist_igual_static_igual_jar": true,
+      "static_inteiro_igual_jar": true,
+      "originais_preservados_exceto_entrypoint": true,
+      "originais_arquivos": 595,
+      "originais_alterados": [
+        "index.html"
+      ],
+      "segredos_laboratorio_encontrados": 0,
+      "harness_teste_empacotado": false,
+      "backend_inalterado_apos_integracoes": true
+    }
+  },
+  "checks": {
+    "frontend": {
+      "testes": 853,
+      "arquivos_teste": 108,
+      "falhas": 0,
+      "exit_code": 0,
+      "preparacao": {
+        "testes": 6,
+        "falhas": 0
+      },
+      "typecheck": "tsc --noEmit, incluído em npm run build; aprovado",
+      "build": "aprovado, template público .env.example",
+      "lint": "Não há script lint; não executado nem instalado."
+    },
+    "java_unitarios_package": {
+      "testes": 795,
+      "falhas": 0,
+      "erros": 0,
+      "ignorados": 0,
+      "exit_code": 0
+    },
+    "postgresql": {
+      "novos_IT": {
+        "classe": "PainelAnaliticoPostgresIT",
+        "testes": 2,
+        "falhas": 0,
+        "erros": 0,
+        "log": "/tmp/sgt-dashboard-postgres-novo.log"
+      },
+      "regressao_temporal": {
+        "classe": "PainelEfetivoTemporalIT",
+        "testes": 27,
+        "falhas": 0,
+        "erros": 0,
+        "log": "/tmp/sgt-dashboard-postgres-verify.log",
+        "observacao": "Classe aprovada nessa tentativa; o comando completo falhou nos dois novos ITs por fixture incompleta. Não é declarado sucesso global dessa tentativa."
+      },
+      "preparacao_lab": {
+        "classe": "PrepararPainelAnaliticoLaboratorioIT",
+        "testes": 1,
+        "falhas": 0,
+        "log": "/tmp/sgt-dashboard-lab-preparado.log",
+        "opt_in_explicito": true
+      },
+      "backend_apos_checks": "Java de produção/teste inalterado no manifesto; mudanças posteriores foram apenas na exportação React e documentação.",
+      "comando_equivalente_reproducao": [
+        "bash",
+        "./mvnw",
+        "-o",
+        "-B",
+        "-ntp",
+        "-T1",
+        "-Dmaven.repo.local=/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/maven-repository",
+        "-Pintegration",
+        "-Dtest=ResolvedorPeriodoPainelTest,PainelAnaliticoServicoTest",
+        "-Dit.test=PainelAnaliticoPostgresIT,PainelEfetivoTemporalIT",
+        "verify"
+      ],
+      "parametros": "INTEGRATION_POSTGRES_URL/USER/PASSWORD carregados privadamente do laboratório; não incluídos neste recibo."
+    },
+    "navegador_real": {
+      "exit_code": 0,
+      "evidencia": "EVIDENCIAS/jornada-real.json",
+      "natureza": "JAR/API/POSTGRESQL/REDIS REAIS; DADOS SINTETICOS",
+      "referencia": "2026-11-10",
+      "periodos": [
+        {
+          "granularidade": "DIARIO",
+          "inicio": "2026-11-10",
+          "fim": "2026-11-10",
+          "registros": 1
+        },
+        {
+          "granularidade": "SEMANAL",
+          "inicio": "2026-11-09",
+          "fim": "2026-11-10",
+          "registros": 2
+        },
+        {
+          "granularidade": "MENSAL",
+          "inicio": "2026-11-01",
+          "fim": "2026-11-10",
+          "registros": 3
+        },
+        {
+          "granularidade": "TRIMESTRAL",
+          "inicio": "2026-10-01",
+          "fim": "2026-11-10",
+          "registros": 4
+        },
+        {
+          "granularidade": "ANUAL",
+          "inicio": "2026-01-01",
+          "fim": "2026-11-10",
+          "registros": 6
+        }
+      ],
+      "verificacoes": [
+        "origem mínima real",
+        "contrato/unidade externos 403",
+        "sessão preservada após 403",
+        "CSRF real",
+        "painel legado",
+        "efetivo temporal",
+        "isolamento entre gestores",
+        "Presidente restrito a agregados",
+        "SPA/assets reais",
+        "cinco períodos na UI",
+        "filtros reais",
+        "heatmap → registro real",
+        "ESC/foco",
+        "tecnologias no footer",
+        "sem erro de execução",
+        "downloads reais XLSX/PDF"
+      ],
+      "assets_de_origem": "JAR final; rota profunda /painel; requisições sem transporte substituído."
+    },
+    "exportacoes": {
+      "arquivos": [
+        {
+          "nome": "sgt_desempenho_ANUAL_2026-11-10.xlsx",
+          "bytes": 13572,
+          "sha256": "e2add9bb4d94b619cfd952c33f3f774c1e154b754a075dc5ff85c0a99fcb8c7b"
+        },
+        {
+          "nome": "sgt_desempenho_ANUAL_2026-11-10.pdf",
+          "bytes": 24860,
+          "sha256": "793d1b1a27dc7799dae446443fa7172f0acff168d09d4813f4b6b9d88593fa64"
+        }
+      ],
+      "xlsx": "Download real; XML válido, metadados/metodologia; registros atual=6/anterior=1.",
+      "pdf": "Download real; duas páginas renderizadas com /usr/bin/pdftoppm e inspecionadas; extração confirma comparação 6/1, 4/1 e 2/0, evolução 6/4/2 e metodologia.",
+      "arquivos_sinteticos_privados": "/tmp/sgt-dashboard-lab-20261111-01/exportacoes",
+      "pdf_ua": "Não avaliado; não é alegado."
+    },
+    "visual_fixture": {
+      "servidor_temporario": "encerrado",
+      "viewports": [
+        "1440x1000",
+        "1152x800 equivalente a 125%",
+        "720x500 equivalente a 200%"
+      ],
+      "sem_overflow_nesses_viewports": true,
+      "zoom_nativo": "Não acionado no headless; sem comprovação de zoom físico.",
+      "separacao": "desktop-fixture-* usa fixture; dashboard-anual-real.png usa o JAR/API/banco reais com dados sintéticos."
+    },
+    "diff_check": {
+      "comando": [
+        "git",
+        "diff",
+        "--check"
+      ],
+      "exit_code": 0
+    },
+    "sonar": "Não foi executado scanner ou promovido gate histórico para esta alteração.",
+    "revisao_independente": "Não solicitada/autorizada para esta alteração; não foram criados chats, agentes ou mensagens."
+  },
+  "laboratorio": {
+    "documentacao": "LABORATORIO.md",
+    "url": "http://127.0.0.1:40283/painel",
+    "base_privada": "/tmp/sgt-dashboard-lab-20261111-01",
+    "natureza": "Recursos novos isolados, sintéticos, em loopback; sem dados operacionais.",
+    "postgresql_role": "sgt_dashboard_app",
+    "postgresql_database": "sgt_dashboard_lab",
+    "ownership_validado": true,
+    "privilegios_administrativos_aplicacao": false,
+    "redis_sha256_distribuicao": "edde778f6bdee7581e42fc139ca9e07e2822212092f7501f99989656e3629d02",
+    "schema": "Hibernate/JPA update; sql.init never; sem DDL manual de aplicação.",
+    "parametros_e_acesso": "Somente arquivos 0600 fora do repositório; valores não incluídos.",
+    "persistencia_diretorio": "Transitório em /tmp; sujeito a limpeza/reinício."
+  },
+  "recursos": {
+    "teto_agregado_bytes": 15000000000,
+    "pesados_sequenciais": true,
+    "maven_heap_mib": 512,
+    "fork_java_heap_mib": 768,
+    "fork_java_metaspace_mib": 256,
+    "node_heap_mib": 768,
+    "workers_react": 1,
+    "pool_teste": 8,
+    "jar_cgroup_max_mib": 2048,
+    "browser_teste_cgroup_max_mib": 2048,
+    "browser_teste_peak_bytes": 457949184,
+    "browser_teste_eventos": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0",
+    "amostras_observadas_durante_checks": "Desktop + JAR + regressão entre aproximadamente 7,7 e 8,4 GiB nas amostras registradas nas ferramentas; sem eventos OOM observados.",
+    "observacao_atual": "EVIDENCIAS/memoria.json",
+    "desktop_encerrado": false,
+    "processos_alheios_encerrados": false,
+    "reinicializacoes": "Somente o JAR próprio do laboratório, para novos assets."
+  },
+  "checkpoint_anterior": {
+    "diretorio": "/tmp/sgt-dashboard-checkpoint-20261111",
+    "static_arquivos": 595,
+    "entrypoint": "index.html atualizado; demais 594 arquivos originais preservados por hash.",
+    "jar_anterior_preservado": true,
+    "assets": "Sincronizador aprovado preserva assets anteriores; também há chunks de builds intermediários desta implementação, sem rotas ativas no entrypoint final."
+  },
+  "comandos_checkpoint_final": [
+    {
+      "nome": "sgt-dashboard-react-entrega",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "test"
+      ],
+      "env_publico": {
+        "NODE_OPTIONS": "--max-old-space-size=768"
+      },
+      "exit_code": 0,
+      "log": "/tmp/sgt-dashboard-react-entrega.log"
+    },
+    {
+      "nome": "sgt-dashboard-build-entrega",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "env_publico": {
+        "NODE_OPTIONS": "--max-old-space-size=768",
+        "SGT_PUBLIC_ENV_TEMPLATE": ".env.example"
+      },
+      "exit_code": 0,
+      "log": "/tmp/sgt-dashboard-build-entrega.log"
+    },
+    {
+      "nome": "sgt-dashboard-assets-check-entrega",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "run",
+        "sync:java:check"
+      ],
+      "env_publico": {},
+      "exit_code": 0,
+      "log": "/tmp/sgt-dashboard-assets-check-entrega.log"
+    },
+    {
+      "nome": "sgt-dashboard-assets-sync-entrega",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "run",
+        "sync:java"
+      ],
+      "env_publico": {},
+      "exit_code": 0,
+      "log": "/tmp/sgt-dashboard-assets-sync-entrega.log"
+    },
+    {
+      "nome": "sgt-dashboard-stop-proprio",
+      "cwd": ".",
+      "argv": [
+        "systemctl",
+        "--user",
+        "stop",
+        "sgt-dashboard-lab-http-20261111.scope"
+      ],
+      "env_publico": {},
+      "exit_code": 0,
+      "log": "/tmp/sgt-dashboard-stop-proprio.log"
+    },
+    {
+      "nome": "sgt-dashboard-package-entrega",
+      "cwd": "JAVA",
+      "argv": [
+        "bash",
+        "./mvnw",
+        "-o",
+        "-B",
+        "-ntp",
+        "-T1",
+        "-Dmaven.repo.local=/home/alexcosta/Documents/Codex/2026-11-06/que/work/migration-20261106/maven-repository",
+        "package"
+      ],
+      "env_publico": {
+        "MAVEN_OPTS": "-Xmx512m -XX:MaxMetaspaceSize=256m"
+      },
+      "exit_code": 0,
+      "log": "/tmp/sgt-dashboard-package-entrega.log"
+    }
+  ],
+  "tentativas_e_correcoes": [
+    "EPERM em oito testes Node de subprocesso na sandbox; reexecução no host aprovada e verde; suíte final completa 853/853 passou no host.",
+    "Primeira integração nova falhou porque a fixture tentava criar empregado ativo sem contrato canônico; fixture corrigida sem relaxar regra da aplicação; 2/2 novos ITs passaram.",
+    "Dois seletores receberam nome acessível explícito após diagnóstico na UI real; tooltip Recharts passou a usar spans para preservar HTML válido.",
+    "Inspeção do PDF real mostrou omissão das colunas após a primeira linha; regressão vermelha reproduzida, quatro colunas explícitas com colSpan nas descrições; unitário real de PDF e jornada final verdes.",
+    "Renderizador Poppler empacotado produziu alertas de cache/fontes; inspeção final usa /usr/bin/pdftoppm disponível, sem alteração de fontes ou configurações globais."
+  ],
+  "limites": [
+    "Escopo desktop Chrome e laboratório sintético; não é carga nacional, produção ou autenticidade institucional.",
+    "Tempestividade, revisão, metas oficiais, pendências históricas por escala e qualidade cadastral no recorte permanecem explicitamente indisponíveis.",
+    "Novos agregados sem cache; Redis real é preservado nos cenários existentes.",
+    "Nenhum commit, push, branch/worktree, publicação, deploy, migração de acervo ou alteração global executado."
+  ],
+  "logs_origem_sha256": {
+    "/tmp/sgt-dashboard-react-entrega.log": "b14987e902a9924c22f5f368883d7d1537b1b908e40afcdc0c949d4984a910a2",
+    "/tmp/sgt-dashboard-build-entrega.log": "46b218ea98a92ad62ffa9f3e8ff426579bf427211d5113f272743b4141996078",
+    "/tmp/sgt-dashboard-assets-check-entrega.log": "422dfc0944c18410a108af1e1a07f4d25999744be6d97f3915b7302de511cb97",
+    "/tmp/sgt-dashboard-assets-sync-entrega.log": "03a625d19918fd6abab6045de39158f9de23cf0371ca5cbdd160951e3df39683",
+    "/tmp/sgt-dashboard-package-entrega.log": "c372eafded6229d78d2578eb73a2a4318bfcbe1b3603cb9273af67d5e2981346",
+    "/tmp/sgt-dashboard-postgres-novo.log": "7f9e29a8d3c31bf09ab1385328796e04d6d7ca856eeb32c6dee6c352c3e270ed",
+    "/tmp/sgt-dashboard-postgres-verify.log": "a82fb9d87b2d1f800a1e2375b53e9da6a0b14ea9f26598c8f2f4ec3d5881df42",
+    "/tmp/sgt-dashboard-lab-preparado.log": "795a858e8552d5db3cd385ebd3fca62055fc8a3aa756acd94ef1495a92c206fd",
+    "/tmp/sgt-dashboard-preparacao.log": "a4e9186c8c4b70da1059db7aee84093e8c7c7c5ef8afb719bb246ee3efcabc7a",
+    "/tmp/sgt-dashboard-pdf-red.log": "b8e2d2f39e42eb4cbbed48f297aaa66f06b34172b146a902448f7d0e8be39f74",
+    "/tmp/sgt-dashboard-pdf-green.log": "d76588062a1f50fee4bef77e4c4ca2f979c23eabd8a219f24ba879f028727866",
+    "/tmp/sgt-dashboard-e2e-real.log": "90995198e5f72f832055d81b01089b9b3e62e2fd44fc3bfa00382427895a628c"
+  },
+  "evidencias_sha256": {
+    "EVIDENCIAS/CHECKS.log": "56c5700f9f2aed8ff5bb0f6d2b0c36d1fa8bf5117b733ba32e9d03a91390447e",
+    "EVIDENCIAS/dashboard-anual-real.png": "0b7117384db15ec64e7ecf18b50ee94540c336724c0cb7486c1ee1dbdcc101cf",
+    "EVIDENCIAS/desktop-fixture-1440.png": "45a7fa858066e005560829b66622c5344ca08e2177eb4c66d83ca1c383252c52",
+    "EVIDENCIAS/desktop-fixture-viewport-equivalente125.png": "628c24c0fadc049dc41425edc6f1164bf8b64f28a2c868d6e18a24164da51cf4",
+    "EVIDENCIAS/desktop-fixture-viewport-equivalente200.png": "5f2170382246a97f4b11ca129203d11f3b46d14494dcfd007c99481a4a112cb4",
+    "EVIDENCIAS/jornada-real.json": "536b235cf99c0300bd84cc3fedbb0394b1336aa14db08827678fdfcdbc0a84e1",
+    "EVIDENCIAS/memoria.json": "e8dad3da7a05b8f14f49bfb184f7188dfd89d4b8e14554e617550d5c7eb1a943"
+  }
+}

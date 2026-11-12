@@ -26,7 +26,7 @@ import java.util.function.BiConsumer;
  * reconstruída pelos mesmos motores usados nos comandos negociais.
  *
  * Contratos são lidos por cursor em lotes de 100. Pessoas e frequências não são
- * materializadas como entidades: suas contagens são agregadas no MySQL.
+ * materializadas como entidades: suas contagens são agregadas no PostgreSQL.
  */
 @Repository
 @Transactional(readOnly = true)
@@ -38,6 +38,11 @@ public class PainelEfetivoRepositorio {
     private final MotorTemporalContratoServico motor;
     private final ComposicaoContratualTemporalServico composicoes;
     @PersistenceContext private EntityManager entityManager;
+    private org.springframework.beans.factory.ObjectProvider<com.example.siggtrat.servico.ResolvedorContextoTemporalFrequenciaServico> resolvedorCanonico;
+    @org.springframework.beans.factory.annotation.Autowired
+    public void configurarResolvedorCanonico(org.springframework.beans.factory.ObjectProvider<com.example.siggtrat.servico.ResolvedorContextoTemporalFrequenciaServico> resolvedor) {
+        this.resolvedorCanonico = resolvedor;
+    }
 
     public PainelEfetivoRepositorio(NamedParameterJdbcTemplate jdbc, ContratoRepositorio contratos,
                                    MotorTemporalContratoServico motor, ComposicaoContratualTemporalServico composicoes) {
@@ -45,6 +50,120 @@ public class PainelEfetivoRepositorio {
         this.contratos = contratos;
         this.motor = motor;
         this.composicoes = composicoes;
+    }
+
+    /** Data negocial reconstruída; o chamador fornece somente contratos já filtrados/autorizados. */
+    public LocalDate obterFimVigenciaCanonica(Long contratoId, LocalDate referencia) {
+        return contratos.findById(contratoId)
+                .map(c -> motor.reconstruirPosicao(c, referencia, Instant.now()).vigenciaFim()).orElse(null);
+    }
+
+    /** Bases diárias agregadas: contratos pelo motor temporal, vínculos/alocações vigentes e grade fotografada. */
+    public record BaseCobertura(LocalDate data, Long unidadeId, long vinculados, long esperados,
+            long lancados, long semGrade, long comAdmissao) {
+        public long pendentes() { return Math.max(0, esperados - lancados); }
+    }
+
+    public List<BaseCobertura> obterCoberturaAnalitica(LocalDate inicio, LocalDate fim, Long contratoId,
+            Long lotacaoId, Long gestaoLocalId, Long superintendenciaId,
+            com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade tipo) {
+        return obterCoberturaAnalitica(inicio,fim,contratoId,lotacaoId,gestaoLocalId,superintendenciaId,tipo,null);
+    }
+    public List<BaseCobertura> obterCoberturaAnalitica(LocalDate inicio, LocalDate fim, Long contratoId, Long lotacaoId,
+            Long gestaoLocalId, Long superintendenciaId, com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade tipo, Long prestadorId) {
+        Filtro filtro = new Filtro(contratoId, lotacaoId, null, null, gestaoLocalId, superintendenciaId, prestadorId);
+        List<BaseCobertura> resultado = new ArrayList<>();
+        percorrer(filtro, inicio, fim, (contrato, segmentos) -> {
+            for (Segmento segmento : segmentos) {
+                var p = parametros(contrato.getId(), segmento.inicio, segmento.fim, filtro)
+                        .addValue("gestaoHistorica", segmento.gestao).addValue("seHistorica", segmento.se);
+                String unidade = switch (tipo) {
+                    case LOTACAO -> "a.id_lotacao";
+                    case GESTAO_LOCAL -> "CAST(:gestaoHistorica AS BIGINT)";
+                    case SUPERINTENDENCIA -> "CAST(:seHistorica AS BIGINT)";
+                };
+                String fontes=fontesCanonicas(contrato,segmento,filtro,p);
+                String sql = """
+                    WITH fontes(id,grade,municipio) AS (%s), datas AS (SELECT generate_series(CAST(:inicio AS DATE), CAST(:fim AS DATE), INTERVAL '1 day')::date dia),
+                    base AS (
+                      SELECT d.dia, %s unidade, v.id_vinculo_contratual vinculo,
+                             e.data_admissao, f.id registro,
+                             NULLIF(TRIM(COALESCE(prova.grade,a.jornada_semanal_fotografia)),'') IS NULL sem_grade,
+                             EXISTS (SELECT 1 FROM unnest(string_to_array(COALESCE(prova.grade,a.jornada_semanal_fotografia),';')) grade
+                               WHERE split_part(grade,'|',1) = (ARRAY['MONDAY','TUESDAY','WEDNESDAY','THURSDAY','FRIDAY','SATURDAY','SUNDAY'])[EXTRACT(ISODOW FROM d.dia)::int]
+                                 AND split_part(grade,'|',2) = 'true')
+                             AND NOT EXISTS (SELECT 1 FROM frequencia_excecao fx
+                               WHERE fx.id_empregado=e.id_empregado AND d.dia BETWEEN fx.data_inicio AND fx.data_fim
+                                 AND fx.status='APROVADO' AND fx.tipo='FOLGA_REMUNERADA')
+                             AND NOT EXISTS (SELECT 1 FROM calendario_evento ce
+                               WHERE ce.data_evento=d.dia AND COALESCE(ce.ativo,TRUE) AND ce.tipo IN ('FERIADO','DIA_DESCANSO')
+                                 AND (ce.abrangencia='NACIONAL'
+                                   OR (ce.abrangencia='ESTADUAL' AND (ce.id_superintendencia=:seHistorica OR (ce.id_superintendencia IS NULL AND ce.uf=se.uf)))
+                                   OR (ce.abrangencia='MUNICIPAL' AND ce.municipio=CASE WHEN prova.id IS NOT NULL THEN prova.municipio ELSE a.lotacao_municipio_fotografia END
+                                     AND (ce.id_gestao_local IS NULL OR ce.id_gestao_local=:gestaoHistorica))
+                                   OR (ce.abrangencia='LOTACAO' AND ce.id_lotacao=a.id_lotacao))) esperado
+                        FROM datas d JOIN vinculo_contratual v ON v.id_contrato=:contratoId
+                          AND v.estado_negocial='REGISTRADO' AND v.data_inicio<=d.dia AND (v.data_fim IS NULL OR v.data_fim>=d.dia)
+                        JOIN alocacao_vinculo a ON a.id_vinculo_contratual=v.id_vinculo_contratual
+                          AND a.estado_negocial='REGISTRADA' AND a.data_inicio<=d.dia AND (a.data_fim IS NULL OR a.data_fim>=d.dia)
+                        LEFT JOIN fontes prova ON prova.id=a.id_alocacao_vinculo
+                        JOIN superintendencia_estadual se ON se.id_superintendencia=:seHistorica
+                        LEFT JOIN empregado e ON e.id_pessoa_canonica=v.id_pessoa
+                        LEFT JOIN frequencia f ON f.id_vinculo_contratual=v.id_vinculo_contratual AND f.id_alocacao_vinculo=a.id_alocacao_vinculo
+                          AND f.data_referencia=d.dia AND f.validade_operacional='VALIDA'
+                          AND f.status IN ('PRESENCA','PRESENCA_PARCIAL','ATRASO','TR','FALTA','ATESTADO','SUSPENSAO')
+                       WHERE 1=1
+                    """.formatted(fontes,unidade) + filtroDimensoes("a",false) + """
+                    ) SELECT dia, unidade, COUNT(DISTINCT vinculo) vinculados,
+                        COUNT(DISTINCT vinculo) FILTER (WHERE esperado) esperados,
+                        COUNT(DISTINCT vinculo) FILTER (WHERE esperado AND registro IS NOT NULL) lancados,
+                        COUNT(DISTINCT vinculo) FILTER (WHERE sem_grade) sem_grade,
+                        COUNT(DISTINCT vinculo) FILTER (WHERE data_admissao IS NOT NULL) com_admissao
+                      FROM base GROUP BY dia, unidade
+                    """;
+                resultado.addAll(jdbc.query(sql,p,(rs,n)->new BaseCobertura(rs.getDate("dia").toLocalDate(),rs.getLong("unidade"),
+                        rs.getLong("vinculados"),rs.getLong("esperados"),rs.getLong("lancados"),rs.getLong("sem_grade"),rs.getLong("com_admissao"))));
+            }
+        });
+        return List.copyOf(resultado);
+    }
+
+    /** Complementa apenas lacunas, pelo mesmo resolvedor dos comandos, em lotes de metadados de alocação.
+     * Não carrega pessoas/frequências e não executa uma consulta por empregado/dia. */
+    private String fontesCanonicas(Contrato contrato, Segmento segmento, Filtro filtro, MapSqlParameterSource parametros) {
+        var resolvedor = resolvedorCanonico == null ? null : resolvedorCanonico.getIfAvailable();
+        if (resolvedor == null || entityManager == null) return "SELECT CAST(NULL AS BIGINT) id, CAST(NULL AS TEXT) grade, CAST(NULL AS TEXT) municipio WHERE FALSE";
+        List<String> valores = new ArrayList<>();
+        long cursor = 0;
+        int indice = 0;
+        Instant conhecido = Instant.now();
+        while (true) {
+            parametros.addValue("cursorFonte",cursor);
+            List<Long> ids = jdbc.queryForList("""
+                SELECT a.id_alocacao_vinculo FROM alocacao_vinculo a
+                  JOIN vinculo_contratual v ON v.id_vinculo_contratual=a.id_vinculo_contratual
+                 WHERE v.id_contrato=:contratoId AND v.estado_negocial='REGISTRADO' AND a.estado_negocial='REGISTRADA'
+                   AND a.id_alocacao_vinculo>:cursorFonte
+                   AND a.data_inicio<=:fim AND (a.data_fim IS NULL OR a.data_fim>=:inicio)
+                   AND v.data_inicio<=:fim AND (v.data_fim IS NULL OR v.data_fim>=:inicio)
+                   AND (NULLIF(TRIM(a.jornada_semanal_fotografia),'') IS NULL
+                     OR (a.lotacao_municipio_fotografia IS NULL AND a.municipio_ausencia_comprovada=FALSE))
+                """ + filtroDimensoes("a",false) + " ORDER BY a.id_alocacao_vinculo LIMIT 100",parametros,Long.class);
+            if (ids.isEmpty()) break;
+            List<AlocacaoVinculo> alocacoes = entityManager.createQuery("select a from AlocacaoVinculo a join fetch a.vinculo v join fetch v.contrato "
+                    + "join fetch a.lotacao join fetch a.jornada join fetch a.cargo left join fetch a.composicao where a.id in :ids order by a.id",AlocacaoVinculo.class)
+                    .setParameter("ids",ids).getResultList();
+            for (var a : alocacoes) {
+                LocalDate data = segmento.inicio.isAfter(a.getDataInicio()) ? segmento.inicio : a.getDataInicio();
+                var fonte = resolvedor.resolverConfiguracao(a,data,conhecido);
+                parametros.addValue("fonteId"+indice,a.getId()).addValue("fonteGrade"+indice,fonte.jornadaSemanal()).addValue("fonteMunicipio"+indice,fonte.lotacaoMunicipio());
+                valores.add("(CAST(:fonteId"+indice+" AS BIGINT),CAST(:fonteGrade"+indice+" AS TEXT),CAST(:fonteMunicipio"+indice+" AS TEXT))");
+                indice++;
+            }
+            cursor=ids.get(ids.size()-1);
+            if (ids.size()<100) break;
+        }
+        return valores.isEmpty() ? "SELECT CAST(NULL AS BIGINT) id, CAST(NULL AS TEXT) grade, CAST(NULL AS TEXT) municipio WHERE FALSE" : "VALUES "+String.join(",",valores);
     }
 
     public List<PainelEfetivoDTO.PontoDiario> obterSerie(LocalDate inicio, LocalDate fim, Long contratoId,
@@ -69,7 +188,11 @@ public class PainelEfetivoRepositorio {
 
     public List<PainelEfetivoDTO.DetalheContrato> obterDetalhamentoContratos(LocalDate data, Long contratoId,
             Long lotacaoId, Long jornadaId, Long cargoId, Long gestaoLocalId, Long superintendenciaId) {
-        Filtro filtro = new Filtro(contratoId, lotacaoId, jornadaId, cargoId, gestaoLocalId, superintendenciaId);
+        return obterDetalhamentoContratos(data,contratoId,lotacaoId,jornadaId,cargoId,gestaoLocalId,superintendenciaId,null);
+    }
+    public List<PainelEfetivoDTO.DetalheContrato> obterDetalhamentoContratos(LocalDate data, Long contratoId, Long lotacaoId,
+            Long jornadaId, Long cargoId, Long gestaoLocalId, Long superintendenciaId, Long prestadorId) {
+        Filtro filtro = new Filtro(contratoId, lotacaoId, jornadaId, cargoId, gestaoLocalId, superintendenciaId, prestadorId);
         List<PainelEfetivoDTO.DetalheContrato> resultado = new ArrayList<>();
         percorrer(filtro, data, data, (contrato, segmentos) -> {
             if (segmentos.isEmpty()) return;
@@ -216,6 +339,7 @@ public class PainelEfetivoRepositorio {
                 SELECT c.id_contrato FROM contrato c
                   JOIN gestao_local gl ON gl.id_gestao_local = c.id_gestao_local
                  WHERE c.id_contrato > :cursor AND (CAST(:contratoId AS BIGINT) IS NULL OR c.id_contrato = :contratoId)
+                   AND (CAST(:prestadorId AS BIGINT) IS NULL OR c.id_fornecedor=:prestadorId)
                    AND ((CAST(:gestaoLocalId AS BIGINT) IS NULL AND CAST(:superintendenciaId AS BIGINT) IS NULL)
                      OR c.id_gestao_local = :gestaoLocalId OR gl.id_superintendencia = :superintendenciaId
                      OR EXISTS (SELECT 1 FROM contrato_versao_negocial cv
@@ -273,7 +397,8 @@ public class PainelEfetivoRepositorio {
                     .filter(x -> filtro.jornada == null || Objects.equals(filtro.jornada, x.jornada().getId()))
                     .filter(x -> filtro.cargo == null || Objects.equals(filtro.cargo, x.cargo().getId())).toList();
             String nome = pos.versaoContratual() != null ? pos.versaoContratual().numeroContrato() : c.getNumeroContrato();
-            resultado.add(new Segmento(d, datas.get(i + 1).minusDays(1), nome, selecionadas));
+            resultado.add(new Segmento(d, datas.get(i + 1).minusDays(1), nome, selecionadas, gestao,
+                    superintendencias.computeIfAbsent(gestao, id -> jdbc.queryForObject("SELECT id_superintendencia FROM gestao_local WHERE id_gestao_local=:id", new MapSqlParameterSource("id",id), Long.class))));
         }
         return resultado;
     }
@@ -330,17 +455,18 @@ public class PainelEfetivoRepositorio {
         return new MapSqlParameterSource().addValue("contratoId", contrato)
                 .addValue("inicio", Date.valueOf(inicio)).addValue("fim", Date.valueOf(fim))
                 .addValue("lotacaoId", f.lotacao).addValue("jornadaId", f.jornada).addValue("cargoId", f.cargo)
-                .addValue("gestaoLocalId", f.gestao).addValue("superintendenciaId", f.se);
+                .addValue("prestadorId", f.prestador).addValue("gestaoLocalId", f.gestao).addValue("superintendenciaId", f.se);
     }
     private PainelEfetivoDTO.PontoDiario ponto(LocalDate data, long[] n) {
         return new PainelEfetivoDTO.PontoDiario(data, n[0], n[1], n[2], n[3], n[4], Math.max(0, n[2]-n[3]-n[4]),
                 Math.max(0,n[1]-n[2]), Math.max(0,n[0]-n[1]), Math.max(0,n[1]-n[0]), percentual(n[2],n[1]), percentual(n[3],n[0]));
     }
     private static double percentual(long valor, long total) { return total <= 0 ? 0 : Math.round(valor * 10000D / total) / 100D; }
-    private record Filtro(Long contrato, Long lotacao, Long jornada, Long cargo, Long gestao, Long se) {
+    private record Filtro(Long contrato, Long lotacao, Long jornada, Long cargo, Long gestao, Long se, Long prestador) {
+        Filtro(Long contrato, Long lotacao, Long jornada, Long cargo, Long gestao, Long se) { this(contrato,lotacao,jornada,cargo,gestao,se,null); }
         boolean temDimensao() { return lotacao != null || jornada != null || cargo != null; }
     }
-    private record Segmento(LocalDate inicio, LocalDate fim, String nome, List<ComposicaoProjetada> composicoes) {}
+    private record Segmento(LocalDate inicio, LocalDate fim, String nome, List<ComposicaoProjetada> composicoes, Long gestao, Long se) {}
     private record Chave(Long lotacao, Long jornada, Long cargo) {}
     private static final class Linha {
         final Chave chave; final String lotacao; final String turno; final String cargo;

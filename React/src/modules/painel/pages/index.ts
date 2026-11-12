@@ -66,7 +66,7 @@ const calculoTerminou = (resposta: (import("../../../contracts/java").PainelCalc
   resposta?.concluido || resposta?.status === "CONCLUIDO" || resposta?.status === "ERRO",
 );
 
-export const usePainel = (onNavigate: ((caminho: string) => void)) => {
+export const usePainel = (onNavigate: ((caminho: string) => void), ativo = true) => {
   const { user } = useAutenticacao();
   const presidente = useMemo(() => ePresidente(user), [user]);
   const [referencia, setReferencia] = useState(dataOntem);
@@ -184,12 +184,12 @@ export const usePainel = (onNavigate: ((caminho: string) => void)) => {
 
   useEffect(() => {
     setDados(null);
-    iniciar(false);
+    if (ativo) iniciar(false);
     return () => {
       controladorRef.current?.abort();
       controladorRankingRef.current?.abort();
     };
-  }, [referencia, periodoDias]); // A mudança dos filtros cria uma nova consulta; não depende da identidade de iniciar.
+  }, [referencia, periodoDias, ativo]); // A mudança dos filtros cria uma nova consulta; não depende da identidade de iniciar.
 
   const carregarRanking = useCallback(async () => {
     if (presidente || rankingCarregandoRef.current) return;

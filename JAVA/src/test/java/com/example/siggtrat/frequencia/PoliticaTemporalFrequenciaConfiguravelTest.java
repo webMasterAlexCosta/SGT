@@ -46,7 +46,7 @@ class PoliticaTemporalFrequenciaConfiguravelTest {
     }
 
     @Test
-    void valorPadraoSegueReferenciaHumanaTrinta() {
-        assertEquals(30, new PoliticaTemporalFrequenciaServico().diasJanela());
+    void valorPadraoSeguePropostaHumanaSete() {
+        assertEquals(7, new PoliticaTemporalFrequenciaServico().diasJanela());
     }
 }

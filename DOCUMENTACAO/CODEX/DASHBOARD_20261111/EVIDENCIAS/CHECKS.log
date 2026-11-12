@@ -1,0 +1,49 @@
+sgt-dashboard-react-entrega.log
+ Test Files  108 passed (108)
+      Tests  853 passed (853)
+
+sgt-dashboard-build-entrega.log
+npm notice run tsc --noEmit
+✓ built in 1.66s
+
+sgt-dashboard-assets-check-entrega.log
+
+sgt-dashboard-assets-sync-entrega.log
+
+sgt-dashboard-package-entrega.log
+[INFO] Tests run: 795, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+sgt-dashboard-postgres-novo.log
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.00 s -- in com.example.siggtrat.integration.PainelAnaliticoPostgresIT
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+sgt-dashboard-postgres-verify.log
+[INFO] Tests run: 795, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 27, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 4.790 s -- in com.example.siggtrat.integration.PainelEfetivoTemporalIT
+[INFO] BUILD FAILURE
+
+sgt-dashboard-lab-preparado.log
+[INFO] Tests run: 20, Failures: 0, Errors: 0, Skipped: 0
+[INFO] Tests run: 2, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.03 s -- in com.example.siggtrat.integration.PainelAnaliticoPostgresIT
+[INFO] Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 0.336 s -- in com.example.siggtrat.integration.PrepararPainelAnaliticoLaboratorioIT
+[INFO] Tests run: 3, Failures: 0, Errors: 0, Skipped: 0
+[INFO] BUILD SUCCESS
+
+sgt-dashboard-preparacao.log
+ℹ tests 6
+ℹ pass 6
+ℹ fail 0
+
+sgt-dashboard-pdf-red.log
+⎯⎯⎯⎯⎯⎯⎯ Failed Tests 1 ⎯⎯⎯⎯⎯⎯⎯
+ Test Files  1 failed (1)
+      Tests  1 failed (1)
+
+sgt-dashboard-pdf-green.log
+ Test Files  2 passed (2)
+      Tests  8 passed (8)
+
+sgt-dashboard-e2e-real.log

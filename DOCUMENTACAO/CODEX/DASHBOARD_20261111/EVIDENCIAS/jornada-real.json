@@ -1,0 +1,71 @@
+{
+  "natureza": "JAR/API/POSTGRESQL/REDIS REAIS; DADOS SINTETICOS",
+  "periodos": [
+    {
+      "granularidade": "DIARIO",
+      "inicio": "2026-11-10",
+      "fim": "2026-11-10",
+      "registros": 1
+    },
+    {
+      "granularidade": "SEMANAL",
+      "inicio": "2026-11-09",
+      "fim": "2026-11-10",
+      "registros": 2
+    },
+    {
+      "granularidade": "MENSAL",
+      "inicio": "2026-11-01",
+      "fim": "2026-11-10",
+      "registros": 3
+    },
+    {
+      "granularidade": "TRIMESTRAL",
+      "inicio": "2026-10-01",
+      "fim": "2026-11-10",
+      "registros": 4
+    },
+    {
+      "granularidade": "ANUAL",
+      "inicio": "2026-01-01",
+      "fim": "2026-11-10",
+      "registros": 6
+    }
+  ],
+  "verificacoes": [
+    "origem mínima real",
+    "contrato/unidade externos 403",
+    "sessão preservada após 403",
+    "CSRF real",
+    "painel legado",
+    "efetivo temporal",
+    "isolamento entre gestores",
+    "Presidente restrito a agregados",
+    "SPA/assets reais",
+    "cinco períodos na UI",
+    "filtros reais",
+    "heatmap → registro real",
+    "ESC/foco",
+    "tecnologias no footer",
+    "sem erro de execução",
+    "downloads reais XLSX/PDF"
+  ],
+  "exportacoes": [
+    {
+      "nome": "sgt_desempenho_ANUAL_2026-11-10.xlsx",
+      "bytes": 13572,
+      "sha256": "e2add9bb4d94b619cfd952c33f3f774c1e154b754a075dc5ff85c0a99fcb8c7b"
+    },
+    {
+      "nome": "sgt_desempenho_ANUAL_2026-11-10.pdf",
+      "bytes": 24860,
+      "sha256": "793d1b1a27dc7799dae446443fa7172f0acff168d09d4813f4b6b9d88593fa64"
+    }
+  ],
+  "browser": "157.0.8103.50",
+  "executadoEm": "2026-11-11T22:02:10.738Z",
+  "memoriaTeste": {
+    "peakBytes": 457949184,
+    "eventos": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+  }
+}

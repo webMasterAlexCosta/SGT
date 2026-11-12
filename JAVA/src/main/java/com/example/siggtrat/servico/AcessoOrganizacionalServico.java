@@ -58,6 +58,39 @@ public class AcessoOrganizacionalServico implements com.example.siggtrat.diagnos
         revalidarAposEspera(usuario, true);
     }
 
+    /** Recarrega também os vínculos usados na pré-autorização, depois do lock negocial. */
+    public UsuarioAplicacao recarregarAposEspera(UsuarioAplicacao usuario) {
+        if (usuario == null || usuario.getId() == null)
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado.");
+        if (entityManager == null) { revalidarAposEspera(usuario); return usuario; }
+        PerfilAcesso perfilAnterior = usuario.getPerfil();
+        List<Long> escopoAnterior = escopoIdentificado(usuario);
+        Set<List<Long>> vinculosAnteriores = vinculosIdentificados(usuario);
+        Long id = usuario.getId();
+        // refresh em grafo já inicializado falha no Hibernate fixado no projeto.
+        // Desanexa somente o executor e seus vínculos (cascade DETACH), sem limpar
+        // o contexto ou descartar escritas de auditoria/autorização da transação.
+        entityManager.detach(usuario);
+        UsuarioAplicacao atual = entityManager.find(UsuarioAplicacao.class, id,
+                jakarta.persistence.LockModeType.PESSIMISTIC_READ);
+        if (atual == null || !Boolean.TRUE.equals(atual.getActive()))
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "O executor foi desativado.");
+        if (perfilAnterior != atual.getPerfil() || !escopoAnterior.equals(escopoIdentificado(atual))
+                || !vinculosAnteriores.equals(vinculosIdentificados(atual)))
+            throw new ResponseStatusException(HttpStatus.FORBIDDEN,
+                    "O perfil ou escopo do executor mudou enquanto a operação aguardava. Refaça a autorização.");
+        return atual;
+    }
+
+    private Set<List<Long>> vinculosIdentificados(UsuarioAplicacao usuario) {
+        Set<List<Long>> resultado = new HashSet<>();
+        if (usuario.getVinculosGestao() != null) for (var vinculo : usuario.getVinculosGestao()) {
+            resultado.add(Arrays.asList(vinculo.getLotacao() == null ? null : vinculo.getLotacao().getId(),
+                    vinculo.getJornada() == null ? null : vinculo.getJornada().getId()));
+        }
+        return resultado;
+    }
+
     /** Evita fechar um ciclo com a edição administrativa após bloquear o namespace de Cargo. */
     public void revalidarAposEsperaSemAguardarExecutor(UsuarioAplicacao usuario) {
         revalidarAposEspera(usuario, false);

@@ -221,7 +221,7 @@ export const FormularioProvaHistorica = ({ tipo, alvo, aoSucesso, aoOcupacao }: 
     </section>}
     {fluxo.recibo && <section className={estilos.sucesso} role="status"><strong>Registrado com sucesso no servidor.</strong><p>O recibo abaixo identifica a intenção incorporada. Consulte novamente para obter os efeitos no recorte desejado.</p><DetalhesDados dados={fluxo.recibo} /></section>}
     <div className={estilos.acoes}>
-      <button type="button" className={estilos.secundario} disabled={Boolean(fluxo.processando) || Boolean(fluxo.recibo) || fluxo.incerto} onClick={fluxo.gerarPrevia}><RefreshCw size={16} aria-hidden="true" />{fluxo.processando === 'previa' ? 'Analisando fonte…' : 'Gerar prévia'}</button>
+      <button type="button" className={estilos.secundario} disabled={carregandoVersoes || Boolean(fluxo.processando) || Boolean(fluxo.recibo) || fluxo.incerto} onClick={fluxo.gerarPrevia}><RefreshCw size={16} aria-hidden="true" />{fluxo.processando === 'previa' ? 'Analisando fonte…' : 'Gerar prévia'}</button>
       <button type="submit" className={estilos.primario} disabled={!fluxo.previa || !fluxo.confirmarImpacto || Boolean(fluxo.processando) || Boolean(fluxo.recibo) || fluxo.incerto}><FileCheck2 size={16} aria-hidden="true" />{fluxo.processando === 'confirmacao' ? 'Aguardando confirmação do servidor…' : tipo === 'catalogo' ? 'Registrar transição' : 'Confirmar incorporação'}</button>
       {fluxo.incerto && <button type="button" className={estilos.primario} disabled={Boolean(fluxo.processando)} onClick={() => fluxo.confirmar(true)}>Repetir a mesma intenção</button>}
     </div>

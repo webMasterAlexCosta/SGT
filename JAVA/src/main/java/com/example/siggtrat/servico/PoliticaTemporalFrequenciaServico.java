@@ -14,14 +14,20 @@ public class PoliticaTemporalFrequenciaServico implements com.example.siggtrat.d
 
     private final ZoneId zona = ZoneId.of(ConstantesDominio.TIMEZONE_PADRAO);
     private final int diasJanela;
+    private final int horasEdicao;
 
-    public PoliticaTemporalFrequenciaServico() { this(30); }
+    public PoliticaTemporalFrequenciaServico() { this(7, 72); }
+
+    public PoliticaTemporalFrequenciaServico(int diasJanela) { this(diasJanela, 72); }
 
     @org.springframework.beans.factory.annotation.Autowired
     public PoliticaTemporalFrequenciaServico(
-            @org.springframework.beans.factory.annotation.Value("${frequencia.janela-operacional-dias:30}") int diasJanela) {
+            @org.springframework.beans.factory.annotation.Value("${frequencia.janela-operacional-dias:7}") int diasJanela,
+            @org.springframework.beans.factory.annotation.Value("${frequencia.edicao-horas:72}") int horasEdicao) {
         if (diasJanela < 1) throw new IllegalArgumentException("frequencia.janela-operacional-dias deve ser positivo.");
+        if (horasEdicao < 1) throw new IllegalArgumentException("frequencia.edicao-horas deve ser positivo.");
         this.diasJanela = diasJanela;
+        this.horasEdicao = horasEdicao;
     }
 
     public int diasJanela() { return diasJanela; }
@@ -58,6 +64,27 @@ public class PoliticaTemporalFrequenciaServico implements com.example.siggtrat.d
     public LocalDateTime prazoLocal(LocalDate dataFrequencia) {
         return instanteFechamento(dataFrequencia).toLocalDateTime();
     }
+
+    /** Não recalcula os prazos depois do primeiro lançamento. */
+    public void capturarPrazos(com.example.siggtrat.entidade.Frequencia frequencia, Instant primeiro) {
+        if (frequencia.getPrazoLancamentoEm() != null) return;
+        frequencia.setRegistradoEm(primeiro);
+        frequencia.setPrazoLancamentoEm(instanteFechamento(frequencia.getDataReferencia()).toInstant());
+        frequencia.setPrazoEdicaoEm(primeiro.plus(Duration.ofHours(horasEdicao)));
+    }
+
+    public Instant prazoEdicao(com.example.siggtrat.entidade.Frequencia frequencia) {
+        // Acervo: aplica a nova janela de edição sem fabricar classificação de tempestividade.
+        return frequencia.getPrazoEdicaoEm() != null ? frequencia.getPrazoEdicaoEm()
+                : frequencia.getRegistradoEm().plus(Duration.ofHours(horasEdicao));
+    }
+
+    public boolean edicaoEncerrada(com.example.siggtrat.entidade.Frequencia frequencia, Instant agora) {
+        return !(agora == null ? Instant.now() : agora).isBefore(prazoEdicao(frequencia));
+    }
+
+    public int horasEdicao() { return horasEdicao; }
+    public String motivoFechamentoEdicao() { return "Fechamento automático após o prazo de edição do primeiro lançamento."; }
 
     public ZoneId zona() { return zona; }
 }

@@ -1,0 +1,143 @@
+{
+  "schema_version": 2,
+  "data": "2026-11-11",
+  "checkpoint": "R4",
+  "estado": "APROVADO_LABORATORIO_DESKTOP",
+  "escopo": "Dashboard e regressões pertinentes do sistema em laboratório PostgreSQL/Redis reais isolados, desktop Chromium; dados exclusivamente sintéticos",
+  "regras": {
+    "lancamento": "7 dias civis inclusivos desde o plantão; D+7 00:00 exclusivo, America/Sao_Paulo",
+    "edicao": "72 horas exclusivas desde o primeiro lançamento; editar não renova prazo",
+    "configuravel": true,
+    "periodo_padrao": "DIARIO",
+    "revisao": "Operacional solicita; Gestor Local retifica e decide, com escopo/justificativa/auditoria"
+  },
+  "jar_sha256": "b1b87261111a5ac182b498a2fcb93a3f4c986f22795e593a0bf66a3bd53eb814",
+  "manifesto_fontes_sha256": "baba3f76a8d02cf1137d78739fa1befb861e4126c226ab4c5b38f3045fc2120e",
+  "checks": [
+    {
+      "descricao": "Java unitários + package integrado",
+      "log_local": ".homologacao/dashboard-proposta-20261111/r4-package.log",
+      "sha256": "9306a44cb9d2820e9df0f195dbc4cfb729f87edf1563739bc2460e328b7cf771",
+      "testes": 800,
+      "resultado": "PASSOU"
+    },
+    {
+      "descricao": "PostgreSQL/HTTP reais: 7 unitários e 8 ITs",
+      "log_local": ".homologacao/dashboard-proposta-20261111/r4-regressoes.log",
+      "sha256": "260d868527dd94c476c7bb3f2a14c48b22e5730c790658b5fcc90e5469aee2aa",
+      "testes": 15,
+      "resultado": "PASSOU"
+    },
+    {
+      "descricao": "React: 860 testes + 6 preparação + typecheck/build",
+      "log_local": ".homologacao/dashboard-proposta-20261111/r4-front-completo.log",
+      "sha256": "44a167bb6c5eb80ae1827c79733db70e268cc6f79171cba760237293c4de2cff",
+      "testes": 866,
+      "resultado": "PASSOU"
+    },
+    {
+      "descricao": "Sincronização React dist → Java static",
+      "log_local": ".homologacao/dashboard-proposta-20261111/r4-sync.log",
+      "sha256": "bed703ba7f727ad4d216c9f705993f3f1f267917ea31c9d0790fc681100084bc",
+      "testes": null,
+      "resultado": "PASSOU"
+    }
+  ],
+  "recibos_locais_sha256": {
+    "e2e-dashboard-ui.json": "d5ad4c1c92cde70d4d8f90e9220bd9cd7c9de2cb99a8e7f7e369339ac35d2e49",
+    "jornada-revisao-ui-r4.json": "a6bbcb739fe7b6386e9e2b914b0a7dceb4b6d3fab79687c22e08835bfa6fbcab",
+    "viewports-desktop-r4.json": "e2d3d5a67c2ed377332c29fedbf3cbc3a12e856deee8dcb55bc490c2a12b33e5",
+    "artefatos-homologacao.json": "3465dc4dbf19684dc33cc0e48e2ce10015639b28a9d6ab4dacf73f893a09872e"
+  },
+  "memoria": {
+    "teto_agregado_gb": 15,
+    "suites_pesadas_sequenciais": true,
+    "grupos": [
+      {
+        "grupo": "memoria-sgt-dashboard-repro-revisao-r4.scope.json",
+        "pico_bytes": 1479057408,
+        "limite_bytes": 2147483648,
+        "exit_code": 1,
+        "fase": "reproducao_pre_correcao_falha_esperada"
+      },
+      {
+        "grupo": "memoria-sgt-dashboard-diagnostico-revisao-r4.scope.json",
+        "pico_bytes": 1489657856,
+        "limite_bytes": 2147483648,
+        "exit_code": 1,
+        "fase": "reproducao_pre_correcao_falha_esperada"
+      },
+      {
+        "grupo": "memoria-sgt-dashboard-regressoes-r4.scope.json",
+        "pico_bytes": 1777332224,
+        "limite_bytes": 2147483648,
+        "exit_code": 0,
+        "fase": "validacao_final_aprovada"
+      },
+      {
+        "grupo": "memoria-sgt-dashboard-front-r4.scope.json",
+        "pico_bytes": 797569024,
+        "limite_bytes": 2147483648,
+        "exit_code": 0,
+        "fase": "validacao_final_aprovada"
+      },
+      {
+        "grupo": "memoria-sgt-dashboard-sync-r4.scope.json",
+        "pico_bytes": 51691520,
+        "limite_bytes": 2147483648,
+        "exit_code": 0,
+        "fase": "validacao_final_aprovada"
+      },
+      {
+        "grupo": "memoria-sgt-dashboard-package-r4.scope.json",
+        "pico_bytes": 1343111168,
+        "limite_bytes": 2147483648,
+        "exit_code": 0,
+        "fase": "validacao_final_aprovada"
+      }
+    ]
+  },
+  "revisao": {
+    "modelo_execucao": "gpt-6-astra/xhigh",
+    "thread_id": "01a1cd45-040f-7762-9f55-281305a2db98",
+    "parecer": "PARECER_ASTRA_R4.md",
+    "decisao": "APROVADO_FONTES"
+  },
+  "homologacao": {
+    "modelo_execucao": "gpt-6.1-sol/xhigh",
+    "thread_id": "01a1cd63-d762-7483-aaee-315114ff5781",
+    "decisao": "APROVADO_LABORATORIO_DESKTOP",
+    "parecer": "PARECER_FINAL_SOL_R4.md",
+    "checks_proprios_api": 77,
+    "checks_revisao_integridade_prazos": 24,
+    "checks_exportacoes": 8,
+    "recibos_locais_sha256": {
+      "precheck-r4.json": "8512284334edafff52be252050dc7502a38ded4a9dae4a2ba35b030df11e8472",
+      "integridade-r4.json": "380aade9753c50a179284f17f5fafb96eb311b81c95235a7aabeb1ad94da7b77",
+      "api-real-r4.json": "78699cc7609e6fa7bcad197681d4c915d264f4709f0a2487500bae34d683c251",
+      "contratos-r4.json": "1151083b73d09928fa50ebfaa2d7b67f13a0f09c5bb340f7185bfc2b0dd1c948",
+      "diagnostico-contratos-r4.json": "ab22b30e9b5ab2a7f41ae2373b216e2c7f77e966ab3c8a2a49cd22797e274320",
+      "checks-herdados-r4.json": "394d7a8e1cd3afe5f0fb52b7509aa5ef699c80e3fc73ffb37e0b3d1d557bd099",
+      "revisao-r4.json": "0edeab58e67d24291c947bfd10bc6681118cdbf7de2db4d1fd841f2d9c611dbb",
+      "diagnostico-revisao-r4.json": "e4b943c04f1d150deaf99afe876c6471500d55845e32341fda0edbffdb9b6ac0",
+      "exportacoes-r4.json": "153ab7826070cd7913e1b41c833369e5b8c5a844ed4181ba2cfbc0f7e9d3cad5",
+      "integridade-final-r4.json": "89b8655a67873d2c20755939f9718867d9e5744972c032f29aa3974bc2768d2a",
+      "decisao-final-r4.json": "4d957dce3df652933f367581e26ae47d73b5509ce45212efe52704505593c6fe"
+    }
+  },
+  "limites": [
+    "Sem script lint no projeto; não inventada aprovação.",
+    "Sonar somente leitura: projeto SGT não localizado; nenhum gate ou scanner desta alteração.",
+    "Zoom nativo não comprovado no IAB; viewports equivalentes CSS não são zoom.",
+    "Não aprova produção, Windows nativo, LAN externa, carga nacional, autenticidade institucional, todo catálogo histórico ou PDF/UA."
+  ],
+  "git": {
+    "commit_push": "Autorizados após conclusão e aprovação; executar somente os caminhos auditados. O hash do commit e o resultado do push são informados na entrega, evitando recibo autorreferente."
+  },
+  "auditoria_segredos": {
+    "recibo_local": ".homologacao/dashboard-proposta-20261111/auditoria-segredos-r4.json",
+    "sha256": "e62c46226bb6bb6987c86753693bd4847763625910331b6f547243d807c03c26",
+    "ocorrencias": 0,
+    "env_credenciais_tokens_empacotados": false
+  }
+}

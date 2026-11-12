@@ -1,0 +1,20 @@
+{
+  "observadoEm": "2026-11-11T22:05:57.125607+00:00",
+  "escopos": [
+    {
+      "scope": "app-org.chromium.Chromium-2138915.scope",
+      "currentBytes": 7063842816,
+      "peakBytesScope": 8748277760,
+      "events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    },
+    {
+      "scope": "sgt-dashboard-lab-http-20261111.scope",
+      "currentBytes": 748404736,
+      "peakBytesScope": 750399488,
+      "events": "low 0\nhigh 0\nmax 0\noom 0\noom_kill 0\noom_group_kill 0\nsock_throttled 0"
+    }
+  ],
+  "tetoAgregadoBytes": 15000000000,
+  "natureza": "Amostra ap\u00f3s conclus\u00e3o das su\u00edtes; JAR final preservado em execu\u00e7\u00e3o.",
+  "somaObservadaBytes": 7812247552
+}

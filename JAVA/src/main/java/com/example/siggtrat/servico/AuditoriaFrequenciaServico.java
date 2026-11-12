@@ -272,6 +272,19 @@ public class AuditoriaFrequenciaServico implements com.example.siggtrat.diagnost
         campos.put("gestaoLocal", f.getGestaoLocalSnapshotId()); campos.put("superintendencia", f.getSuperintendenciaSnapshotId());
         campos.put("estado", f.getEstadoNegocial()); campos.put("validade", f.getValidadeOperacional());
         campos.put("auditoria", f.getEstadoAuditoria()); campos.put("bloqueada", f.getBloqueadaEdicaoOperacional());
+        if (f.getPrazoLancamentoEm() != null) {
+        campos.put("prazoLancamentoEm", f.getPrazoLancamentoEm());
+        campos.put("prazoEdicaoEm", f.getPrazoEdicaoEm());
+        }
+        if (f.getRevisaoSolicitadaStatus() != null) {
+        campos.put("revisaoSolicitadaStatus", f.getRevisaoSolicitadaStatus());
+        campos.put("revisaoSolicitadaEm", f.getRevisaoSolicitadaEm());
+        campos.put("revisaoSolicitanteId", f.getRevisaoSolicitanteId());
+        campos.put("revisaoSolicitadaMotivo", f.getRevisaoSolicitadaMotivo());
+        campos.put("revisaoDecididaEm", f.getRevisaoDecididaEm());
+        campos.put("revisaoDecisorId", f.getRevisaoDecisorId());
+        campos.put("revisaoDecisaoMotivo", f.getRevisaoDecisaoMotivo());
+        }
         campos.put("versaoNegocial", f.getVersaoNegocial()); campos.put("motivoRevisao", f.getMotivoRevisao());
         campos.put("autorOriginalId", f.getAutorOriginalId()); campos.put("autorOriginalUsername", f.getAutorOriginalUsername());
         campos.put("ultimaRetificacaoPorId", f.getUltimaRetificacaoPorId());

@@ -1,0 +1,206 @@
+{
+  "jar": "b1b87261111a5ac182b498a2fcb93a3f4c986f22795e593a0bf66a3bd53eb814",
+  "provas": [
+    {
+      "width": 1366,
+      "height": 768,
+      "tipo": "desktop",
+      "altura": 768,
+      "escala": 1,
+      "icones": [
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        }
+      ],
+      "largura": 1366,
+      "overflow": false,
+      "scrollWidth": 1366
+    },
+    {
+      "width": 1440,
+      "height": 900,
+      "tipo": "desktop",
+      "altura": 900,
+      "escala": 1,
+      "icones": [
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        }
+      ],
+      "largura": 1440,
+      "overflow": false,
+      "scrollWidth": 1440
+    },
+    {
+      "width": 1920,
+      "height": 1080,
+      "tipo": "desktop",
+      "altura": 1080,
+      "escala": 1,
+      "icones": [
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        }
+      ],
+      "largura": 1920,
+      "overflow": false,
+      "scrollWidth": 1920
+    },
+    {
+      "width": 1152,
+      "height": 720,
+      "tipo": "equivalenteCSS125",
+      "altura": 720,
+      "escala": 1,
+      "icones": [
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        }
+      ],
+      "largura": 1152,
+      "overflow": false,
+      "scrollWidth": 1152
+    },
+    {
+      "width": 720,
+      "height": 450,
+      "tipo": "equivalenteCSS200",
+      "altura": 450,
+      "escala": 1,
+      "icones": [
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        },
+        {
+          "carregado": true,
+          "local": true
+        }
+      ],
+      "largura": 720,
+      "overflow": false,
+      "scrollWidth": 720
+    }
+  ],
+  "zoomNativo": "Não comprovado: atalhos Ctrl+plus/Ctrl+equal não alteraram innerWidth/devicePixelRatio no IAB; Ctrl+0 enviado. Reduções CSS são equivalentes de layout, não teste de zoom nativo."
+}

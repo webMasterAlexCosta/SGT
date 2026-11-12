@@ -143,6 +143,23 @@ class AcessoOrganizacionalServicoTest {
         return user;
     }
 
+    @Test
+    void recargaAposLockRecusaVinculoRevogadoMesmoComPerfilERaizIguais() {
+        var em = mock(jakarta.persistence.EntityManager.class);
+        org.springframework.test.util.ReflectionTestUtils.setField(servico,"entityManager",em);
+        var se=superintendencia(1L,"RJ");var gestao=gestaoLocal(10L,se);
+        var antes=usuario(ConstantesDominio.PERFIL_OPERACIONAL,se,gestao);antes.setId(7L);antes.setActive(true);
+        var lotacao=new Lotacao();lotacao.setId(100L);
+        var jornada=new Jornada();jornada.setId(200L);
+        antes.setVinculosGestao(List.of(new VinculoGestaoUsuarioAplicacao(antes,lotacao,jornada)));
+        var depois=usuario(ConstantesDominio.PERFIL_OPERACIONAL,se,gestao);depois.setId(7L);depois.setActive(true);
+        org.mockito.Mockito.when(em.find(UsuarioAplicacao.class,7L,jakarta.persistence.LockModeType.PESSIMISTIC_READ)).thenReturn(depois);
+        var erro=org.junit.jupiter.api.Assertions.assertThrows(org.springframework.web.server.ResponseStatusException.class,
+                ()->servico.recarregarAposEspera(antes));
+        org.junit.jupiter.api.Assertions.assertEquals(403,erro.getStatusCode().value());
+        org.mockito.Mockito.verify(em).detach(antes);
+    }
+
     private SuperintendenciaEstadual superintendencia(Long id, String uf) {
         SuperintendenciaEstadual se = new SuperintendenciaEstadual("SE/" + uf, uf);
         se.setId(id);

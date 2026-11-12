@@ -1,7 +1,7 @@
 interface VirtualListProps { itemCount: number; itemSize: number; height: number; width: number; itemData: FrequencyRowData; children: React.ComponentType<{ index: number; data: FrequencyRowData; style: React.CSSProperties }> }
 import type { FrequencyRow } from '../../../../../contracts/frequencia';
 type FrequencyTableProps = React.ComponentProps<typeof TabelaFrequencia>;
-type FrequencyRowData = Pick<FrequencyTableProps, 'statusDaData' | 'eGestorOperacional' | 'edicaoBloqueada' | 'funcaoObterJanelaDeEdicao' | 'aoSelecionarStatusDaTabela' | 'aoAtualizarObservacaoDaTabela' | 'aoAbrirModalParcial'> & { listaOrdenada: FrequencyRow[] };
+type FrequencyRowData = Pick<FrequencyTableProps, 'statusDaData' | 'eGestorOperacional' | 'edicaoBloqueada' | 'funcaoObterJanelaDeEdicao' | 'aoSelecionarStatusDaTabela' | 'aoAtualizarObservacaoDaTabela' | 'aoAbrirModalParcial'> & { listaOrdenada: FrequencyRow[]; aoRevisar: (id: number) => void };
 import type { useLogicaFrequencia } from '../useLogicaFrequencia';
 type FrequencyModel = ReturnType<typeof useLogicaFrequencia>;
 import React, { memo, useMemo, useState, useEffect, useRef } from "react";
@@ -29,6 +29,8 @@ import {
 import { agruparFaltasNoTopo } from "../../../../../services/rh/ServicoDominioFrequencia.ts";
 
 import estilos from "../index.module.css";
+import { RevisaoRegistro } from "../../../components/RevisaoRegistro";
+import { ModalPainel } from "../../../../painel/components/ModalPainel";
 
 const ListaVirtualNativa = ({
   itemCount,
@@ -167,6 +169,7 @@ const ComponenteLinha = memo(({ index, style, data }: { index: number; style: Re
     aoSelecionarStatusDaTabela,
     aoAtualizarObservacaoDaTabela,
     aoAbrirModalParcial,
+    aoRevisar,
   } = data;
 
   const linha = listaOrdenada[index];
@@ -482,6 +485,7 @@ const ComponenteLinha = memo(({ index, style, data }: { index: number; style: Re
       </div>
 
       <div className={estilos.colunaObsLargura}>
+        {linha.frequenciaId !== null && linha.jaSalvo && <button type="button" className={estilos.botaoRevisaoFrequencia} aria-label={`Conferência do registro ${linha.frequenciaId}`} onClick={() => aoRevisar(Number(linha.frequenciaId))}>Conferência / correção</button>}
         {linha.status === "PRESENCA_PARCIAL" ? (
           <div
             className={estilos.caixaParcial}
@@ -571,7 +575,9 @@ export const TabelaFrequencia = memo(
     paginacaoGrade,
     aoMudarPagina,
     pendenciasSemIdentidadeCanonica = 0,
-  }: { estaCarregando: FrequencyModel['estado']['indicadorCarregamento']; erroCarregamento: FrequencyModel['estado']['erroCargaFrequencia']; listaDeFrequencia: FrequencyModel['estado']['listaDaFrequencia']; statusDaData: FrequencyModel['estado']['statusDaDataValidada']; eGestorOperacional: FrequencyModel['auth']['eGestorOperacional']; edicaoBloqueada: boolean; aoSelecionarStatusDaTabela: FrequencyModel['acoes']['invocarMudancaDeStatusDoUsuarioNaTabela']; aoAtualizarObservacaoDaTabela: FrequencyModel['acoes']['invocarAlteracaoDeAnotacaoDeObservacao']; aoAbrirModalParcial: FrequencyModel['acoes']['setEstadoDoModalParcial']; funcaoObterJanelaDeEdicao: FrequencyModel['utilitarios']['obterRelatorioDaJanelaDeEdicao']; paginacaoGrade: FrequencyModel['estado']['paginacaoGrade']; aoMudarPagina: FrequencyModel['acoes']['setPaginaGrade']; pendenciasSemIdentidadeCanonica?: number }) => {
+    aoRevisaoConcluida,
+  }: { estaCarregando: FrequencyModel['estado']['indicadorCarregamento']; erroCarregamento: FrequencyModel['estado']['erroCargaFrequencia']; listaDeFrequencia: FrequencyModel['estado']['listaDaFrequencia']; statusDaData: FrequencyModel['estado']['statusDaDataValidada']; eGestorOperacional: FrequencyModel['auth']['eGestorOperacional']; edicaoBloqueada: boolean; aoSelecionarStatusDaTabela: FrequencyModel['acoes']['invocarMudancaDeStatusDoUsuarioNaTabela']; aoAtualizarObservacaoDaTabela: FrequencyModel['acoes']['invocarAlteracaoDeAnotacaoDeObservacao']; aoAbrirModalParcial: FrequencyModel['acoes']['setEstadoDoModalParcial']; funcaoObterJanelaDeEdicao: FrequencyModel['utilitarios']['obterRelatorioDaJanelaDeEdicao']; paginacaoGrade: FrequencyModel['estado']['paginacaoGrade']; aoMudarPagina: FrequencyModel['acoes']['setPaginaGrade']; pendenciasSemIdentidadeCanonica?: number; aoRevisaoConcluida?: () => void }) => {
+    const [revisaoId, setRevisaoId] = useState<number | null>(null);
     const [preferenciaVirtualizacao, setPreferenciaVirtualizacao] = useState(() => {
       try {
         const valorSalvo = localStorage.getItem("sgt_frequencia_virtualizacao");
@@ -645,6 +651,7 @@ export const TabelaFrequencia = memo(
         aoSelecionarStatusDaTabela,
         aoAtualizarObservacaoDaTabela,
         aoAbrirModalParcial,
+        aoRevisar: setRevisaoId,
       }),
       [
         listaOrdenada,
@@ -781,6 +788,9 @@ export const TabelaFrequencia = memo(
             </div>
           </div>
         )}
+        <ModalPainel aberto={revisaoId !== null} titulo="Conferência de frequência" detalhe={revisaoId ? `Registro #${revisaoId}` : ''} aoFechar={() => setRevisaoId(null)} selo="Solicitação e decisão" permitirTelaCheia={false}>
+          {revisaoId !== null && <RevisaoRegistro key={revisaoId} id={revisaoId} aoAtualizar={() => {setRevisaoId(null);aoRevisaoConcluida?.();}} />}
+        </ModalPainel>
       </div>
     );
   },

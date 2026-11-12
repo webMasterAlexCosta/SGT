@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, lazy, Suspense } from "react";
 import {
   AlertTriangle,
   BarChart3,
@@ -12,6 +12,7 @@ import { usePainel } from "./index.ts";
 import { ServicoSistema } from "../../../services/system/ServicoSistema.ts";
 import estilos from "./index.module.css";
 import { IndicadorEfetivo } from "../components/IndicadorEfetivo/index.tsx";
+const PainelDesempenho = lazy(() => import('../components/PainelDesempenho'));
 import { exportarPainelGerencial, exportarPainelPdf } from "../exportacao.ts";
 import {
   AlertasDecisao,
@@ -201,6 +202,7 @@ const RadarExecutivo = ({ dados, aoAbrirSecao }: { dados: (import("../../../cont
 };
 
 const OPCOES_VISAO = [
+  { id: "desempenho", rotulo: "Desempenho" },
   { id: "resumo", rotulo: "Resumo" },
   { id: "contratos", rotulo: "Contratos" },
   { id: "operacao", rotulo: "Operação" },
@@ -230,6 +232,7 @@ const Espaco = ({ tamanho = "simples", children }: { tamanho?: (string); childre
 );
 
 export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }) => {
+  const [visaoPainel, setVisaoPainel] = useState("desempenho");
   const {
     dados,
     atividades,
@@ -244,8 +247,7 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
     perfil,
     user,
     acoes,
-  } = usePainel(onNavigate);
-  const [visaoPainel, setVisaoPainel] = useState("resumo");
+  } = usePainel(onNavigate, visaoPainel !== 'desempenho');
   const [indicadorEfetivoRelatorio, setIndicadorEfetivoRelatorio] = useState<import("../../../contracts/painel").StaffingReport | null>(null);
   useEffect(() => setIndicadorEfetivoRelatorio(null), [referencia]);
   const exibir = (secao: (string)) => visaoPainel === "tudo" || visaoPainel === secao;
@@ -259,6 +261,12 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
 
   return (
     <main className={estilos.pagina}>
+      <NavegacaoPainel visao={visaoPainel} aoMudar={setVisaoPainel} />
+      {visaoPainel === 'desempenho' ? (
+        <Suspense fallback={<p role="status">Abrindo painel de desempenho…</p>}>
+          <PainelDesempenho referenciaInicial={referencia} aoNavegar={onNavigate} />
+        </Suspense>
+      ) : <>
       <CabecalhoGovernanca
         dados={(dados) ?? undefined}
         referencia={referencia}
@@ -285,15 +293,13 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
           <b>{Number(processamento?.progresso || 0)}%</b>
         </section>
       )}
-      {carregando && !dados && <div className={estilos.carregando}>A página permanece disponível enquanto o MySQL consolida os dados.</div>}
+      {carregando && !dados && <div className={estilos.carregando}>A página permanece disponível enquanto o PostgreSQL consolida os dados.</div>}
 
       {dados && (
         <>
           <div className={estilos.avisoEscopo}>
             Seja bem-vindo, {obterNomeUsuario(user)}. <DataHoraLocalUsuario user={user} />.
           </div>
-
-          <NavegacaoPainel visao={visaoPainel} aoMudar={setVisaoPainel} />
 
           {exibir("resumo") && (
             <section id="painel-resumo" className={estilos.blocoVisao}>
@@ -400,6 +406,7 @@ export const Painel = ({ onNavigate }: { onNavigate: (caminho: string) => void }
           )}
         </>
       )}
+      </>}
     </main>
   );
 };

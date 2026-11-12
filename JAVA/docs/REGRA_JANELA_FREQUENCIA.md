@@ -1,14 +1,14 @@
-# Frequência — janela operacional vigente
+# Frequência — lançamento e edição configuráveis
 
-**Decisão humana de 09/11/2026, aplicada à derivada atual.** Substitui a duração fixa de sete dias nos cortes anteriores; os IDs canônicos permanecem. A investigação anterior foi preservada em [REGRA_SETE_DIAS.md](REGRA_SETE_DIAS.md). Este documento define a regra, sem atribuir aprovação a testes não executados.
+**Decisão humana de 11/11/2026:** proposta aprovada para implementação e avaliação pela chefia. Substitui o padrão anterior de 30 datas civis compartilhado entre lançamento e edição. Recibos anteriores não homologam esta mudança.
 
 ## Contagem e configuração
 
-A janela tem **N dias civis configuráveis, padrão de 30**, em `America/Sao_Paulo`. D é a data de início do plantão e conta como primeiro dia. A edição operacional depende de `agora < início de D+N`; no instante exato do limite, a frequência está fechada para a via operacional. Não são dias úteis nem N períodos de24 horas desde a gravação.
-
-Com N=30, frequência de 01/01 encerra a janela em 31/01 às 00:00. Com N=7 explicitamente configurado, encerra em08/01 às 00:00. Testar a alternativa7 não comprova o padrão de 30. Inclusão, alteração operacional ou retificação não mudam D nem reiniciam o prazo. Turno22:00–06:00 pertence ao dia de início.
-
-A propriedade de servidor é `frequencia.janela-operacional-dias`, alimentada por `FREQUENCIA_JANELA_OPERACIONAL_DIAS`, padrão de 30 e valor positivo. `PoliticaTemporalFrequenciaServico` centraliza o cálculo e o fechamento. Essa configuração não concede permissão individual de desbloqueio retroativo. O frontend não redefine o prazo; usa `prazoEdicao` e estados efetivos da API.
+- Lançar: `FREQUENCIA_JANELA_OPERACIONAL_DIAS=7`, propriedade `frequencia.janela-operacional-dias`. D é a data de início do plantão e conta como dia 1. Plantão de 10/11 pode ser lançado até o instante anterior a 17/11 00:00, em `America/Sao_Paulo`. Não são dias úteis.
+- Editar: `FREQUENCIA_EDICAO_HORAS=72`, propriedade `frequencia.edicao-horas`. São 72 horas decorridas desde o primeiro lançamento: 12/11 14h → limite exclusivo 15/11 14h. Editar não renova esse prazo e a edição pode ultrapassar o prazo para primeiro lançamento.
+- Valores positivos, alteráveis no `.env` do Java; reiniciar a API para aplicar configuração. Novos registros capturam ambos os prazos em campos imutáveis. Acervo sem captura não recebe classificação histórica dentro/fora; edição de registros ainda abertos usa primeiro timestamp + configuração de edição, preservando FECHADA já persistida. Ampliar configuração não reabre registros fechados.
+- Primeiro lançamento, edições e fechamento automático compartilham a mesma política no backend. O React exibe `prazoEdicao` enviado pelo Java. O job persiste FECHADA após vencer a edição; a proteção já vigora na leitura/escrita antes do job.
+- Turno noturno pertence à data de início. Futuro continua vedado para todos. Histórico classificado usa o primeiro timestamp e prazo capturado, sem reclassificação por retificação posterior ou mudanças do `.env`.
 
 ## Autorização e eixos preservados
 
@@ -20,7 +20,7 @@ A propriedade de servidor é `frequencia.janela-operacional-dias`, alimentada po
 - `estadoNegocial`, `validadeOperacional` e `estadoAuditoria` continuam independentes. Perda retroativa de cobertura preserva a prova e retira o fato da visão operacional válida conforme o fluxo autorizado.
 - O limite é aplicado na leitura/escrita independentemente de o scheduler já ter persistido fechamento/evento. Não existe tolerância adicional pelo intervalo do job.
 
-## Reconciliação dos catálogos
+## Catálogos anteriores (redação histórica substituída pela decisão acima)
 
 | Identificador preservado | Redação temporal aplicável agora |
 |---|---|

@@ -18,6 +18,8 @@
 .sobreposicao { position: fixed; inset: 0; z-index: 12000; display: grid; place-items: center; padding: clamp(10px,1.6vw,26px); background: rgba(6,26,39,.68); backdrop-filter: blur(7px); }
 .modal { display: flex; flex-direction: column; width: min(1480px,97vw); max-height: 95vh; overflow: hidden; border: 1px solid rgba(255,255,255,.55); border-radius: 18px; background: #f7fafc; box-shadow: 0 34px 100px rgba(0,25,45,.38); }
 .modalTelaCheia { width: calc(100vw - 18px); height: calc(100vh - 18px); max-height: none; border-radius: 13px; }
+.sobreposicaoLateral { display: flex; justify-content: flex-end; align-items: stretch; padding: 0; }
+.modalLateral { box-sizing: border-box; width: min(32rem, 95vw); height: 100dvh; max-height: 100dvh; border-radius: 0; }
 .cabecalho { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 15px 20px; border-bottom: 4px solid var(--cor-correios-amarelo-500); background: linear-gradient(125deg, var(--cor-correios-azul-950), var(--cor-correios-azul-700)); color: #fff; }
 .cabecalho h2 { margin: 2px 0 0; font-size: 1.24rem; }
 .cabecalho p { margin: 4px 0 0; color: rgba(255,255,255,.82); font-size: .76rem; }

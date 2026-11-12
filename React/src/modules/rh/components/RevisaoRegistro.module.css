@@ -1,0 +1,8 @@
+.revisao { margin-top: 1rem; padding-top: .75rem; font-size: .85rem; color: var(--cor-texto-principal); }
+.revisao form label { display: grid; gap: .4rem; }
+.revisao textarea { min-height: 6rem; width: 100%; resize: vertical; color: inherit; background: var(--cor-fundo-elevado); border: 1px solid var(--cor-borda-sutil); border-radius: 5px; padding: .6rem; font: inherit; }
+.revisao form > div { display: flex; gap: .6rem; margin-top: .6rem; }
+.revisao button { padding: .5rem .7rem; border: 1px solid var(--cor-borda-sutil); border-radius: 5px; color: var(--cor-correios-azul-900); background: var(--cor-fundo-elevado); cursor: pointer; }
+.revisao button:disabled { opacity: .6; cursor: default; }
+.revisao :is(button,textarea):focus-visible { outline: 3px solid var(--cor-foco); outline-offset: 3px; }
+.nota { font-size: .76rem; color: var(--cor-texto-secundario); line-height: 1.55; }

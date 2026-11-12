@@ -121,6 +121,8 @@ public class FiltroCacheConsultaHttpRedis extends OncePerRequestFilter {
                 // precisam refletir progresso imediatamente.
                 || uri.startsWith("/api/frequencias/fechamentos/")
                 || uri.startsWith("/api/painel/calculos/")
+                // O analítico valida escopo/filtros em toda consulta e não serve agregados obsoletos.
+                || uri.equals("/api/painel/analitico") || uri.startsWith("/api/painel/analitico/")
                 // Exportações assíncronas possuem estado mutável e os arquivos
                 // podem ter centenas de MB. Nunca envolver essas rotas com
                 // ContentCachingResponseWrapper: isso copiaria o relatório inteiro

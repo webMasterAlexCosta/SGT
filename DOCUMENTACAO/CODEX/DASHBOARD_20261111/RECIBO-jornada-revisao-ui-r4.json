@@ -1,0 +1,16 @@
+{
+  "jar": "b1b87261111a5ac182b498a2fcb93a3f4c986f22795e593a0bf66a3bd53eb814",
+  "natureza": "Dados exclusivamente sintéticos de laboratório",
+  "data": "2026-11-11",
+  "registro": 190,
+  "operacionalSolicitou": true,
+  "gestorRetificou": "PRESENCA → FALTA",
+  "estadoAposRetificacao": "RETIFICADA_GESTOR v3",
+  "gestorDecidiu": "CONFERIDA",
+  "indicadorAntes": 1,
+  "indicadorDepois": 0,
+  "totalDoDia": 1,
+  "classificacaoDentroDoPrazoAntesEDepois": 1,
+  "senhaConfirmadaEmCadaMutacao": true,
+  "metodoData": "Teclas nativas do campo date; fill isolado não disparou onChange neste driver."
+}

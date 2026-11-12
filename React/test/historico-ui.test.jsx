@@ -47,6 +47,16 @@ describe('Confirmação histórica fiel à intenção analisada', () => {
     expect(requisitar.mock.calls.find(([cfg]) => cfg.url.endsWith('/previa'))[0].data.versaoEsperada).toBe(5);
   });
 
+  it('aguarda versões atuais antes de permitir uma nova prévia',async()=>{
+    let resolver;
+    requisitar.mockImplementation(({method})=>method==='GET'?new Promise(resolve=>{resolver=resolve;}):Promise.resolve(previa));
+    montar();fireEvent.click(screen.getByRole('button',{name:'Carregar versões atuais'}));
+    expect(screen.getByRole('button',{name:'Gerar prévia'})).toBeDisabled();
+    await act(async()=>resolver({version:5}));
+    await aprovar();
+    expect(requisitar.mock.calls.find(([cfg])=>cfg.url.endsWith('/previa'))[0].data.versaoEsperada).toBe(5);
+  });
+
   it('impede submissão direta antes da prévia Java e aceite explícito', () => {
     montar();
     fireEvent.submit(screen.getByRole('form', { name: 'Fonte histórica' }));

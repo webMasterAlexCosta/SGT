@@ -22,6 +22,12 @@ const dependenciasFrontend = {
 };
 
 const PILHA_DE_TECNOLOGIAS = [
+  {
+    categoria: "Frontend e interface",
+    nome: `TypeScript ${dependenciasFrontend.typescript}`,
+    papel: "Tipagem estática dos contratos e componentes",
+    icone: <Code2 size={20} />,
+  },
   // Frontend e interface
   {
     categoria: "Frontend e interface",
@@ -223,14 +229,14 @@ const PILHA_DE_TECNOLOGIAS = [
   // Dados e segurança
   {
     categoria: "Dados e segurança",
-    nome: "MySQL",
+    nome: "PostgreSQL",
     papel: "Banco de dados relacional",
     icone: <Database size={20} />,
   },
   {
     categoria: "Dados e segurança",
-    nome: "MySQL Connector/J",
-    papel: "Driver JDBC do MySQL",
+    nome: "PostgreSQL JDBC",
+    papel: "Driver JDBC do PostgreSQL",
     icone: <Database size={20} />,
   },
   {
@@ -335,8 +341,8 @@ const PILHA_DE_TECNOLOGIAS = [
   },
   {
     categoria: "Qualidade e testes",
-    nome: "Testcontainers MySQL",
-    papel: "Banco MySQL real em testes",
+    nome: "Testcontainers PostgreSQL",
+    papel: "Dependência disponível; integrações atuais usam PostgreSQL real isolado explicitamente configurado",
     icone: <Database size={20} />,
   },
   {

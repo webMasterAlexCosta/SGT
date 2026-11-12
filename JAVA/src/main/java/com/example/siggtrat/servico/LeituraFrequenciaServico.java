@@ -34,6 +34,10 @@ public class LeituraFrequenciaServico implements com.example.siggtrat.diagnostic
         this.gestoes = gestoes;
     }
 
+    public String textoRestrito(String texto, NivelExposicaoDadosPessoais nivel) {
+        return minimizador.restrito(texto, nivel);
+    }
+
     @Transactional(propagation = Propagation.MANDATORY)
     public NivelExposicaoDadosPessoais nivel(UsuarioAplicacao usuario, Long contratoId,
                                             Long gestaoHistoricaId, String finalidade,

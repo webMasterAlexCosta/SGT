@@ -161,8 +161,8 @@ class FrequenciaEtapa09Test {
         FrequenciaRepositorio repo=mock(FrequenciaRepositorio.class); AuditoriaFrequenciaServico aud=mock(AuditoriaFrequenciaServico.class); PoliticaTemporalFrequenciaServico pol=new PoliticaTemporalFrequenciaServico(7);
         var tx=mock(org.springframework.transaction.PlatformTransactionManager.class);
         when(tx.getTransaction(any())).thenReturn(new org.springframework.transaction.support.SimpleTransactionStatus());
-        var s=new FechamentoAutomaticoFrequenciaNegocialServico(repo,pol,aud,tx,mock(com.example.siggtrat.servico.InvalidacaoCacheServico.class),500); Frequencia f=frequenciaBase(); f.setId(100L); f.setDataReferencia(LocalDate.now(pol.zona()).minusDays(8)); f.setEstadoNegocial(EstadoNegocialFrequencia.ABERTA);
-        when(repo.buscarAbertasVencidasApos(eq(EstadoNegocialFrequencia.ABERTA),any(),eq(0L),any())).thenReturn(List.of(f)); when(aud.snapshot(f)).thenReturn("antes");
+        var s=new FechamentoAutomaticoFrequenciaNegocialServico(repo,pol,aud,tx,mock(com.example.siggtrat.servico.InvalidacaoCacheServico.class),500); Frequencia f=frequenciaBase(); f.setId(100L); f.setDataReferencia(LocalDate.now(pol.zona()).minusDays(8)); f.setRegistradoEm(Instant.now().minus(java.time.Duration.ofDays(8))); f.setEstadoNegocial(EstadoNegocialFrequencia.ABERTA);
+        when(repo.buscarEdicoesVencidasApos(eq(EstadoNegocialFrequencia.ABERTA),any(),any(),eq(0L),any())).thenReturn(List.of(f)); when(aud.snapshot(f)).thenReturn("antes");
         assertEquals(1,s.fecharVencidas()); assertEquals(EstadoNegocialFrequencia.FECHADA,f.getEstadoNegocial()); verify(repo).save(f); verify(repo).flush(); verify(aud).registrar(eq(f),eq(TipoEventoFrequencia.FECHAMENTO_AUTOMATICO),eq("antes"),anyString(),isNull(),isNull(),isNull());
     }
 

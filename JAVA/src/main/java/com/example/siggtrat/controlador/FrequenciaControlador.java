@@ -92,6 +92,25 @@ public class FrequenciaControlador implements com.example.siggtrat.diagnostico.D
         return ResponseEntity.ok(frequenciaServico.salvarOuAtualizar(dto));
     }
 
+    @GetMapping("/{id}/revisao")
+    public ResponseEntity<com.example.siggtrat.dto.RevisaoFrequenciaDTO> revisao(@PathVariable Long id) {
+        return ResponseEntity.ok(frequenciaServico.consultarRevisao(id));
+    }
+
+    @PostMapping("/{id}/revisao")
+    @ExigirSenha
+    public ResponseEntity<com.example.siggtrat.dto.RevisaoFrequenciaDTO> solicitarRevisao(@PathVariable Long id,
+            @Valid @RequestBody com.example.siggtrat.dto.RevisaoFrequenciaDTO.Comando comando) {
+        return ResponseEntity.ok(frequenciaServico.comandarRevisao(id, comando, false));
+    }
+
+    @PostMapping("/{id}/revisao/decisao")
+    @ExigirSenha
+    public ResponseEntity<com.example.siggtrat.dto.RevisaoFrequenciaDTO> decidirRevisao(@PathVariable Long id,
+            @Valid @RequestBody com.example.siggtrat.dto.RevisaoFrequenciaDTO.Comando comando) {
+        return ResponseEntity.ok(frequenciaServico.comandarRevisao(id, comando, true));
+    }
+
     @PostMapping("/lote")
     @ExigirSenha
     public ResponseEntity<List<FrequenciaDTO>> salvarOuAtualizarLote(

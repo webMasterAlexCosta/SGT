@@ -24,6 +24,8 @@ import java.util.Locale;
                 @Index(name = "idx_frequencia_pessoa_data", columnList = "id_pessoa,data_referencia"),
                 @Index(name = "idx_frequencia_vinculo_data", columnList = "id_vinculo_contratual,data_referencia"),
                 @Index(name = "idx_frequencia_alocacao_data", columnList = "id_alocacao_vinculo,data_referencia"),
+                @Index(name = "idx_frequencia_estado_edicao", columnList = "estado_negocial,prazo_edicao_em,id"),
+                @Index(name = "idx_frequencia_estado_registro", columnList = "estado_negocial,registrado_em,id"),
                 @Index(name = "idx_frequencia_estado_data", columnList = "estado_negocial,data_referencia"),
                 @Index(name = "idx_frequencia_validade_data", columnList = "validade_operacional,data_referencia"),
                 @Index(name = "idx_frequencia_data", columnList = "data_referencia"),
@@ -90,6 +92,29 @@ public class Frequencia {
     @Column(name = "registrado_em", nullable = false, updatable = false)
     @org.hibernate.annotations.FractionalSeconds(6)
     private Instant registradoEm = com.example.siggtrat.utilitario.PrecisaoTemporal.agoraMicros();
+
+    /** Prazos capturados no primeiro lançamento; nulos no acervo anterior à proposta. */
+    @Column(name = "revisao_solicitada_status", length = 20)
+    private String revisaoSolicitadaStatus;
+    @Column(name = "revisao_solicitada_em")
+    private Instant revisaoSolicitadaEm;
+    @Column(name = "revisao_solicitante_id")
+    private Long revisaoSolicitanteId;
+    @Column(name = "revisao_solicitada_motivo", length = 1000)
+    private String revisaoSolicitadaMotivo;
+    @Column(name = "revisao_decidida_em")
+    private Instant revisaoDecididaEm;
+    @Column(name = "revisao_decisor_id")
+    private Long revisaoDecisorId;
+    @Column(name = "revisao_decisao_motivo", length = 1000)
+    private String revisaoDecisaoMotivo;
+
+    @Column(name = "prazo_lancamento_em", updatable = false)
+    @org.hibernate.annotations.FractionalSeconds(6)
+    private Instant prazoLancamentoEm;
+    @Column(name = "prazo_edicao_em", updatable = false)
+    @org.hibernate.annotations.FractionalSeconds(6)
+    private Instant prazoEdicaoEm;
 
     @Column(name = "autor_original_id", updatable = false)
     private Long autorOriginalId;
@@ -360,6 +385,24 @@ public class Frequencia {
     public void setBloqueadaEdicaoOperacional(Boolean bloqueadaEdicaoOperacional) { this.bloqueadaEdicaoOperacional = bloqueadaEdicaoOperacional; }
     public Integer getVersaoNegocial() { return versaoNegocial; }
     public void setVersaoNegocial(Integer versaoNegocial) { this.versaoNegocial = versaoNegocial; }
+    public String getRevisaoSolicitadaStatus() { return revisaoSolicitadaStatus; }
+    public void setRevisaoSolicitadaStatus(String valor) { revisaoSolicitadaStatus = valor; }
+    public Instant getRevisaoSolicitadaEm() { return revisaoSolicitadaEm; }
+    public void setRevisaoSolicitadaEm(Instant valor) { revisaoSolicitadaEm = valor; }
+    public Long getRevisaoSolicitanteId() { return revisaoSolicitanteId; }
+    public void setRevisaoSolicitanteId(Long valor) { revisaoSolicitanteId = valor; }
+    public String getRevisaoSolicitadaMotivo() { return revisaoSolicitadaMotivo; }
+    public void setRevisaoSolicitadaMotivo(String valor) { revisaoSolicitadaMotivo = valor; }
+    public Instant getRevisaoDecididaEm() { return revisaoDecididaEm; }
+    public void setRevisaoDecididaEm(Instant valor) { revisaoDecididaEm = valor; }
+    public Long getRevisaoDecisorId() { return revisaoDecisorId; }
+    public void setRevisaoDecisorId(Long valor) { revisaoDecisorId = valor; }
+    public String getRevisaoDecisaoMotivo() { return revisaoDecisaoMotivo; }
+    public void setRevisaoDecisaoMotivo(String valor) { revisaoDecisaoMotivo = valor; }
+    public Instant getPrazoLancamentoEm() { return prazoLancamentoEm; }
+    public void setPrazoLancamentoEm(Instant valor) { prazoLancamentoEm = valor; }
+    public Instant getPrazoEdicaoEm() { return prazoEdicaoEm; }
+    public void setPrazoEdicaoEm(Instant valor) { prazoEdicaoEm = valor; }
     public Instant getRegistradoEm() { return registradoEm; }
     public void setRegistradoEm(Instant registradoEm) { this.registradoEm = com.example.siggtrat.utilitario.PrecisaoTemporal.instantePersistivelMicros(registradoEm); }
     public Long getAutorOriginalId() { return autorOriginalId; }
