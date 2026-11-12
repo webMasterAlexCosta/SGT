@@ -1,5 +1,7 @@
 # UX do painel gerencial completo — 12/11/2026
 
+**Recorte histórico:** esta iteração refinou todos os blocos da visão **Desempenho**. Resumo, Contratos e Operação não foram redesenhados nesta etapa. O esclarecimento humano posterior ampliou o trabalho para essas visões e determinou a retirada da aba legada de Governança; ver [a entrega correspondente](PAINEL_GERAL_LOGIN_20261112.md). Os hashes e checks abaixo pertencem à iteração anterior.
+
 O pedido humano foi esclarecido: melhorar a experiência do **painel analítico inteiro de cinco períodos**, já implementado, abrangendo os blocos A–H do texto de referência. A primeira iteração, limitada às três barras de metas, foi insuficiente e fica registrada apenas como histórico. Esta entrega cobre a composição completa, preservando os contratos e as decisões negociais vigentes.
 
 ## O que mudou
