@@ -2,7 +2,7 @@
 
 Especificação atual: decisões humanas de 11/11/2026 e mockup desktop v3 aprovado, consolidadas no [adendo do plano](PLANO_GESTAO_REFERENCIA.md#adendo-de-execução-aprovado--11112026). As adaptações preliminares que deixavam prazo/revisão indisponíveis foram substituídas. Homologação desta alteração depende de recibos e pareceres novos.
 
-Adendo humano de 12/11/2026: Diário é o padrão de **todas** as visões. Desempenho preserva os cinco calendários descritos abaixo; Resumo, Contratos e Operação passam a iniciar em um dia, mantendo as janelas históricas existentes de 7, 15, 30, 60 e 90 dias e seus cálculos. O indicador de efetivo também inicia em DIARIO; demais granularidades existentes são selecionadas explicitamente. A aba e o checklist exclusivos de Governança foram retirados. Integridade e atividade recente ficam em Operação; comparação e matriz de unidades ficam em Contratos. Isso não recria o módulo removido de Governança de Terceiros. Ver [alterações, validação e limites desta entrega](PAINEL_GERAL_LOGIN_20261112.md).
+Correção humana de 12/11/2026: Diário é o padrão de **todas** as visões. Resumo, Contratos e Operação devem seguir o padrão completo de Desempenho: aparência, cinco calendários, filtros, comparação e detalhes. A entrega anterior conservou janelas móveis nessas três telas e foi rejeitada; não houve decisão humana autorizando essa redução de escopo. A correção está registrada em [paridade das visões](CORRECAO_PARIDADE_20261112.md), ainda sujeita à validação final. Os endpoints antigos preservam compatibilidade, sem definir a experiência nova. A aba e o checklist exclusivos de Governança continuam retirados.
 
 ## Calendário e recortes
 

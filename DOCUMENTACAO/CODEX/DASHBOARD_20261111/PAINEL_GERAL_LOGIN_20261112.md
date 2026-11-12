@@ -1,5 +1,7 @@
 # Painel gerencial, login e identificação SGT — 12/11/2026
 
+**Entrega rejeitada quanto à paridade de UX das três visões.** Este documento descreve o checkpoint anterior; seus testes não comprovam o atendimento ao pedido de ferramentas equivalentes a Desempenho. Ver a [correção em andamento](CORRECAO_PARIDADE_20261112.md). O usuário não aprovou a manutenção das janelas móveis como substituição dos cinco calendários.
+
 Pedido humano: melhorar Resumo, Contratos e Operação a partir do acabamento aceito em Desempenho; retirar Governança legada; adotar Diário como padrão; remover o modo visual do login e refatorar o TSX; identificar Alex Costa 89618815 e nomear o projeto/JAR SGT. Checkpoint anterior publicado antes das correções: `a561e5b09f44e2dc9da963afb1f8cd191ca25abe`. Correções e assets foram commitados e enviados em checkpoints sucessivos, conforme solicitado.
 
 ## Resultado
