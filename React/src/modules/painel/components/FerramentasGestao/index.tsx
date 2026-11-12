@@ -846,7 +846,7 @@ export const ComparativoPeriodo = ({ periodo = {}, comparativo = {} }: { periodo
 
   if (!temBaseComparavel) {
     return (
-      <Cartao titulo="Comparação com a janela anterior" icone={BarChart3} detalhe="Janelas de igual duração" largo>
+      <Cartao titulo="Comparação com a janela anterior" icone={BarChart3} detalhe="Intervalos indicados no recorte" largo>
         <FaixaResumo
           itens={[
             {
@@ -911,7 +911,7 @@ export const ComparativoPeriodo = ({ periodo = {}, comparativo = {} }: { periodo
   ];
 
   return (
-    <Cartao titulo="Comparação com a janela anterior" icone={BarChart3} detalhe="Janelas de igual duração" largo>
+    <Cartao titulo="Comparação com a janela anterior" icone={BarChart3} detalhe="Intervalos indicados no recorte" largo>
       <div className={estilos.comparativoGrade}>
         {itens.map((item) => (
           <div key={item.rotulo} className={item.classe}>
