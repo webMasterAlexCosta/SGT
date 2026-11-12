@@ -2,6 +2,8 @@
 
 Especificação atual: decisões humanas de 11/11/2026 e mockup desktop v3 aprovado, consolidadas no [adendo do plano](PLANO_GESTAO_REFERENCIA.md#adendo-de-execução-aprovado--11112026). As adaptações preliminares que deixavam prazo/revisão indisponíveis foram substituídas. Homologação desta alteração depende de recibos e pareceres novos.
 
+Adendo humano de 12/11/2026: Diário é o padrão de **todas** as visões. Desempenho preserva os cinco calendários descritos abaixo; Resumo, Contratos e Operação passam a iniciar em um dia, mantendo as janelas históricas existentes de 7, 15, 30, 60 e 90 dias e seus cálculos. O indicador de efetivo também inicia em DIARIO; demais granularidades existentes são selecionadas explicitamente. A aba e o checklist exclusivos de Governança foram retirados. Integridade e atividade recente ficam em Operação; comparação e matriz de unidades ficam em Contratos. Isso não recria o módulo removido de Governança de Terceiros. Ver [alterações, validação e limites desta entrega](PAINEL_GERAL_LOGIN_20261112.md).
+
 ## Calendário e recortes
 
 | Seleção | Intervalo inclusivo do KPI |
@@ -57,8 +59,8 @@ Todas as leituras revalidam escopo. 400 para parâmetros inválidos, 403 para fi
 
 ## Interface e integração
 
-Visão Desempenho inicial, demais modos e funcionalidades preservados. Componentes compactos conforme mockup, estados de consulta/erro/base zero, cancelamento individual e geração de sessão. 403 não encerra sessão. Detalhamento preserva recorte; ESC/foco e teclado conferidos na homologação.
+Visão Desempenho inicial; navegação vigente: Desempenho, Resumo, Contratos, Operação e Tudo. Estados de consulta/erro/base zero, cancelamento individual e geração de sessão preservados. 403 não encerra sessão. Detalhamento preserva recorte; ESC/foco e teclado conferidos no laboratório. A identificação do desenvolvedor é “Sistema desenvolvido por Alex Costa 89618815”. O login mantém os fluxos de acesso, sem alternância de modo visual.
 
 XLSX/PDF incluem recorte, períodos, contagens, classificação, bases, metas propostas, metodologia e página das unidades/heatmap. Footer usa SVG locais Devicon (React, TypeScript, Vite, Java, Spring, PostgreSQL e Redis), com licença MIT distribuída. Nenhum ícone depende de rede em execução.
 
-Entrega: HMR React e API real separados; no checkpoint, React dist → static Spring → Maven/JAR → SPA/assets/rotas profundas/API/Redis, com hashes vinculados. Laboratório privado e suítes sequenciais, teto agregado 15 GB. Sem implantação produtiva. Commit/push somente após revisão Astra/xhigh e homologação Sol/xhigh aprovadas, conforme autorização humana.
+Entrega: HMR React e API real separados; no checkpoint, React dist → static Spring → Maven/JAR → SPA/assets/rotas profundas/API/Redis, com hashes vinculados. Laboratório privado e suítes sequenciais, teto agregado 15 GB. Sem implantação produtiva. O gate de revisão Astra/xhigh e homologação Sol/xhigh pertence ao checkpoint R4 de 11/11. Para o ajuste atual, o pedido humano de 12/11 autoriza checkpoints de commit/push antes das correções e publicação das correções e documentação; não concede nova revisão independente ou aceite de produção.
