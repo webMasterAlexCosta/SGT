@@ -1,0 +1,1 @@
+var e=e=>({sujeitoARevisao:!!e?.sujeitoARevisao,quantidadePendencias:Number(e?.quantidadePendencias||0),mensagem:String(e?.mensagem||``).trim()});export{e as t};

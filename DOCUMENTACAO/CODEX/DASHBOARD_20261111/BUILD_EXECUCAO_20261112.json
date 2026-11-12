@@ -1,0 +1,128 @@
+{
+  "pedido": "Build React, conteúdo de dist em JAVA/src/main/resources/static, Maven clean package e execução do JAR a partir de JAVA/target, precedidos por commit e push.",
+  "checkpoint_previo_publicado": "c9a1d0fb1abbe9b5eeb274b0171feff0b69ad4dc",
+  "branch": "codex/sgt-progresso-seguro-20261111",
+  "estado_previo": "React/dist ausente e static vazia; checkpoint preserva exatamente esse estado e as alterações UX/documentais.",
+  "checks": [
+    {
+      "check": "react-build",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "run",
+        "build"
+      ],
+      "exit": 0,
+      "seconds": 13.52
+    },
+    {
+      "check": "assets-check",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "run",
+        "sync:java:check"
+      ],
+      "exit": 0,
+      "seconds": 0.15
+    },
+    {
+      "check": "assets-sync",
+      "cwd": "React",
+      "argv": [
+        "npm",
+        "run",
+        "sync:java"
+      ],
+      "exit": 0,
+      "seconds": 0.22
+    },
+    {
+      "check": "java-clean-package",
+      "cwd": "JAVA",
+      "argv": [
+        "bash",
+        "./mvnw",
+        "-B",
+        "-ntp",
+        "-T1",
+        "clean",
+        "package"
+      ],
+      "exit": 0,
+      "seconds": 84.12
+    }
+  ],
+  "java_unitarios": {
+    "tests": 808,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "jar_sha256": "13dda6173b8af06d371ee1264d456c0b70dd5e5a169fdd65b88fc58324e358d8",
+  "assets_dist_static_jar": 111,
+  "classes_iguais_ao_jar_ux_anterior": 866,
+  "frontend_igual_ao_jar_ux_anterior": true,
+  "dotenv_diretorios_privados_e_senhas_lab_ausentes": true,
+  "execucao": {
+    "unit": "sgt-target-api-20261112.service",
+    "cwd": "/home/alexcosta/Documentos/Desenvolvimento/ect/GTRAT/SGT/JAVA/target",
+    "jar": "sig-gtrat-backend-0.0.4-operacional-20261101.jar",
+    "jar_sha256": "13dda6173b8af06d371ee1264d456c0b70dd5e5a169fdd65b88fc58324e358d8",
+    "port": 58501,
+    "csrf_status": 200,
+    "database_ownership": "limited role, isolated UI database verified"
+  },
+  "smoke_http": {
+    "jar_sha256": "13dda6173b8af06d371ee1264d456c0b70dd5e5a169fdd65b88fc58324e358d8",
+    "spa": [
+      {
+        "rota": "/",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/painel",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/contratos",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/relatorio-mensal",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/historico",
+        "status": 200,
+        "igual_dist": true
+      }
+    ],
+    "assets_servidos_com_hash_igual_ao_dist": 111,
+    "api_anonima_contratos": 401,
+    "csrf_bootstrap": 200,
+    "cookies_e_tokens_nao_registrados": true
+  },
+  "terminal": {
+    "build": "BUILD SUCCESS",
+    "startup": "Started AplicacaoBackendSigGtrat in 16.458 seconds",
+    "erros_startup": 0,
+    "avisos": "Lombok sun.misc.Unsafe, Hibernate FractionalSeconds obsoleto, chamada varargs em teste, dialeto PostgreSQL explicitado desnecessariamente. Sem alteração de código por avisos.",
+    "limite_verificacao": "Log específico Tomcat started não emitido; startup confirmado pela mensagem da aplicação, PID/cwd e HTTP. ITs não executados neste package."
+  },
+  "memoria": {
+    "cgroup_build_max_mib": 2048,
+    "pico_build_reportado": "1.3G",
+    "swap_build_bytes": 0,
+    "servicos_max_somado_mib": 4096,
+    "reserva_entrada_mib": 8192,
+    "teto_humano_gb": 15
+  },
+  "preservacao": "target e static anteriores arquivadas localmente antes do clean/cópia; JAR anterior imutável preservado.",
+  "logs_locais": ".homologacao/build-execucao-20261112",
+  "estado_git_resultado": "Build, cópia e recibo posteriores ao checkpoint; sem novo commit/push após a execução."
+}
