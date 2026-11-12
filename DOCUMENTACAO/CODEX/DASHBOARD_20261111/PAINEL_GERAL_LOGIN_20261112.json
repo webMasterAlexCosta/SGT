@@ -1,0 +1,1277 @@
+{
+  "data": "2026-11-12",
+  "checkpoint_fontes": "0ce220fa4d8735e3703b374d6f63628a0419e094",
+  "checkpoint_assets": "7f37f98d1ebb875d8a2c5acd20e46bfee45e4501",
+  "jar": "JAVA/target/SGT.jar",
+  "jar_sha256": "13ec71f30cba4385cfac62cb9604355b729eb2439203ba64f5700ca8c8fb6490",
+  "manifesto_fontes_sha256": "8188c8ed53940dff4813aaa99d5ed4b57af51a16753ce9e167b6a5dfecebc075",
+  "classes_java_principais_identicas_ao_final01": 866,
+  "assets_dist_static_jar": 110,
+  "java_unitarios": {
+    "tests": 808,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "react": {
+    "arquivos": 113,
+    "testes": 879,
+    "falhas": 0,
+    "preparacao_typecheck_build": true,
+    "lint_script_disponivel": false
+  },
+  "python": {
+    "operacao": 31,
+    "helpers": 106,
+    "falhas": 0
+  },
+  "integracao": {
+    "criterio": "última execução por classe/caso; tentativas anteriores preservadas; não representa uma única execução integral sem interrupções",
+    "classes_ordinarias": 373,
+    "casos": {
+      "passed": 1598
+    },
+    "por_classe": {
+      "AditamentoAtomicidadeReleituraHttpIT": {
+        "passed": 1
+      },
+      "AditamentosRemanejamentosHttpIT": {
+        "passed": 7
+      },
+      "AdministracaoContratoHttpIT": {
+        "passed": 7
+      },
+      "AlocacaoRetomadaInvariantesApiHttpIT": {
+        "passed": 1
+      },
+      "AlocacaoRetroativaConfiguracaoAuditoriaIndependenteHttpIT": {
+        "passed": 9
+      },
+      "AlocacaoRetroativaRotuloAuditoriaIndependenteHttpIT": {
+        "passed": 6
+      },
+      "ArtefatoEmpacotadoIT": {
+        "passed": 3
+      },
+      "AuditoriaCancelamentoRemanejamentoReplayHttpIT": {
+        "passed": 5
+      },
+      "AuditoriaDadosRestritosNovaAuditoriaHttpIT": {
+        "passed": 4
+      },
+      "AuditoriaFinalCorrecaoCpfControlesHttpIT": {
+        "passed": 2
+      },
+      "AuditoriaFinalFimNaturalProrrogacaoHttpIT": {
+        "passed": 2
+      },
+      "AuditoriaFinalMetadadosEmissaoMinimizacaoHttpIT": {
+        "passed": 4
+      },
+      "AuditoriaFinalPendenciaFimControlesHttpIT": {
+        "passed": 2
+      },
+      "AuditoriaFinalPendenciaFimNaturalProrrogacaoHttpIT": {
+        "passed": 3
+      },
+      "AuditoriaFinalPessoasLacunasEspecificasHttpIT": {
+        "passed": 3
+      },
+      "AuditoriaFinalResolucaoPendenciaFimSuperadoHttpIT": {
+        "passed": 2
+      },
+      "AuditoriaIndependenteReplayVigenciaHttpIT": {
+        "passed": 1
+      },
+      "AuditoriaInstrumentosConcorrentesHttpIT": {
+        "passed": 3
+      },
+      "AuditoriaTransversalHttpIT": {
+        "passed": 1
+      },
+      "AutenticacaoPerfilContratoHttpIT": {
+        "passed": 8
+      },
+      "AutenticacaoSessaoUnicaIT": {
+        "passed": 1
+      },
+      "AutenticacaoTodasRotasHttpIT": {
+        "passed": 1
+      },
+      "B01PerfisOcorrenciaHttpIT": {
+        "passed": 3
+      },
+      "CacheEscopoTemporalHttpIT": {
+        "passed": 6
+      },
+      "CacheRotasRetiradasRedisHttpIT": {
+        "passed": 1
+      },
+      "CalendarioSemContratoConcorrenciaHttpIT": {
+        "passed": 1
+      },
+      "CalendarioVersionamentoFontesHttpIT": {
+        "passed": 4
+      },
+      "CancelamentoCapacidadeContratualHttpIT": {
+        "passed": 3
+      },
+      "Candidato10CapacidadeFixtureUfMySqlIT": {
+        "passed": 1
+      },
+      "Candidato10TrocaInicialSessaoRevogadaRedIT": {
+        "passed": 2
+      },
+      "Candidato2DocumentoPerdaVersaoRedIT": {
+        "passed": 1
+      },
+      "Candidato2DocumentoRevogacaoConcorrenteRedIT": {
+        "passed": 1
+      },
+      "Candidato2PosicaoFonteNominalPontualHttpIT": {
+        "passed": 1
+      },
+      "Candidato2ProvasNomeEscopoTemporalHttpIT": {
+        "passed": 2
+      },
+      "Candidato2RevogacaoExecutorProvaHttpIT": {
+        "passed": 2
+      },
+      "Candidato3PrecisaoConhecimentoProvasHttpIT": {
+        "passed": 3
+      },
+      "Candidato3ReplayIdentificadorExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "Candidato4CatalogosPrecisaoRevogacaoHttpIT": {
+        "passed": 3
+      },
+      "Candidato4ComplementoNomeHistoricoRedIT": {
+        "passed": 2
+      },
+      "Candidato4EmissaoExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "Candidato4EmissaoPrecisaoInstantesRedIT": {
+        "passed": 1
+      },
+      "Candidato4FontesExecutorRevogadoRedIT": {
+        "passed": 4
+      },
+      "Candidato4FrequenciaExecutorRevogadoRedIT": {
+        "passed": 4
+      },
+      "Candidato4InativacaoExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "Candidato4PessoasExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "Candidato4PrecisaoEventosVinculoAlocacaoRedIT": {
+        "passed": 1
+      },
+      "Candidato4PrecisaoFatosTemporaisRedIT": {
+        "passed": 2
+      },
+      "Candidato4PrecisaoRecibosInstrumentosRedIT": {
+        "passed": 3
+      },
+      "Candidato4RecibosVinculoAlocacaoPrecisaoHttpIT": {
+        "passed": 2
+      },
+      "Candidato5ComplementoNomePeriodoHttpIT": {
+        "passed": 5
+      },
+      "Candidato6RascunhoExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "Candidato8CatalogosMestreExecutorRevogadoRedIT": {
+        "passed": 10
+      },
+      "Candidato8ComandosRestantesExecutorRevogadoRedIT": {
+        "passed": 3
+      },
+      "Candidato8CriacaoContratoExecutorRevogadoRedIT": {
+        "passed": 1
+      },
+      "Candidato8PessoaExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "Candidato8RegraAdicionalExecutorRevogadoRedIT": {
+        "passed": 1
+      },
+      "Candidato8StatusExecutorRevogadoRedIT": {
+        "passed": 1
+      },
+      "Candidato8UsuariosComandosExecutorRevogadoRedIT": {
+        "passed": 5
+      },
+      "Candidato9ConcessoesMesmoEscopoConcorrentesRedIT": {
+        "passed": 2
+      },
+      "Candidato9CriacoesCatalogosExecutorRevogadoRedIT": {
+        "passed": 4
+      },
+      "Candidato9CriacoesExecutorRevogadoRedIT": {
+        "passed": 4
+      },
+      "Candidato9PermissoesDocumentoExecutorRevogadoRedIT": {
+        "passed": 2
+      },
+      "CargoCicloHierarquiaHttpIT": {
+        "passed": 1
+      },
+      "CargoIdentidadeConcorrenteHttpIT": {
+        "passed": 6
+      },
+      "CargoOrdemNamespaceHttpIT": {
+        "passed": 1
+      },
+      "CatalogoPublicacaoConcorrenteAuditoriaIndependenteHttpIT": {
+        "passed": 12
+      },
+      "CatalogosContratoHttpIT": {
+        "passed": 8
+      },
+      "CatalogosPessoasConclusaoHttpIT": {
+        "passed": 7
+      },
+      "CatalogosTemporalHttpIT": {
+        "passed": 7
+      },
+      "CatalogosTransferenciaLacunasHttpIT": {
+        "passed": 11
+      },
+      "CatalogosTransicoesControles6EHttpIT": {
+        "passed": 12
+      },
+      "CatalogosTransicoesOperacionaisHttpIT": {
+        "passed": 25
+      },
+      "CatalogosVersaoCanonicaAuditoriaIndependenteHttpIT": {
+        "passed": 5
+      },
+      "CicloVidaContratosHttpIT": {
+        "passed": 5
+      },
+      "CodigosErroPublicosHttpIT": {
+        "passed": 1
+      },
+      "ComposicaoFotografiaRascunhoHttpIT": {
+        "passed": 1
+      },
+      "ComposicaoPreservacaoIntegralHttpIT": {
+        "passed": 4
+      },
+      "ComposicaoPublicacaoConcorrenciaHttpIT": {
+        "passed": 1
+      },
+      "ConcessaoContextualOcorrenciaHttpIT": {
+        "passed": 28
+      },
+      "ConclusaoAditamentoRetificacaoQuantitativaHttpIT": {
+        "passed": 2
+      },
+      "ConclusaoAlcancePreviaContratoHttpIT": {
+        "passed": 2
+      },
+      "ConclusaoApiCanonicaHttpIT": {
+        "passed": 4
+      },
+      "ConclusaoAud01PendenciasHttpIT": {
+        "passed": 10
+      },
+      "ConclusaoAud01RecorrenciaPendenciaHttpIT": {
+        "passed": 1
+      },
+      "ConclusaoAud02DesligamentoHttpIT": {
+        "passed": 20
+      },
+      "ConclusaoAud03VinculosTransferenciaProgramadaHttpIT": {
+        "passed": 7
+      },
+      "ConclusaoAud04IdentidadeContratualHttpIT": {
+        "passed": 8
+      },
+      "ConclusaoAud05PainelCapacidadesHttpIT": {
+        "passed": 7
+      },
+      "ConclusaoAud06FrequenciaEscopoPaginaHttpIT": {
+        "passed": 7
+      },
+      "ConclusaoBootstrapCatalogosMySqlIT": {
+        "passed": 3
+      },
+      "ConclusaoBootstrapUsuariosSeguroMySqlIT": {
+        "passed": 15
+      },
+      "ConclusaoCacheRedisRealHttpIT": {
+        "passed": 3
+      },
+      "ConclusaoCancelamentoFuturoHttpIT": {
+        "passed": 1
+      },
+      "ConclusaoCorrecaoAnulacaoOperacaoHttpIT": {
+        "passed": 1
+      },
+      "ConclusaoEfetivoContratoHttpIT": {
+        "passed": 4
+      },
+      "ConclusaoFotografiaContratoHttpIT": {
+        "passed": 4
+      },
+      "ConclusaoFrequenciaIdempotenciaOperacionalHttpIT": {
+        "passed": 7
+      },
+      "ConclusaoHabilitacaoSemOrigemHttpIT": {
+        "passed": 5
+      },
+      "ConclusaoPessoasCriteriosFronteirasHttpIT": {
+        "passed": 17
+      },
+      "ConclusaoPublicacaoCamposObrigatoriosHttpIT": {
+        "passed": 10
+      },
+      "ConclusaoPublicacaoPreviaHttpIT": {
+        "passed": 3
+      },
+      "ConclusaoRelatoriosConhecimentoHttpIT": {
+        "passed": 2
+      },
+      "ConclusaoRelatoriosOperacionaisHttpIT": {
+        "passed": 2
+      },
+      "ConclusaoRetificacaoAdministrativaHttpIT": {
+        "passed": 2
+      },
+      "ConclusaoTransferenciaAlocacaoHttpIT": {
+        "passed": 5
+      },
+      "ConclusaoTransferenciaContratoHttpIT": {
+        "passed": 8
+      },
+      "ConclusaoTransferenciaPreviaHttpIT": {
+        "passed": 5
+      },
+      "ContraprovasPendenciasH04HttpIT": {
+        "passed": 2
+      },
+      "ContratoAnulacaoFuturaHttpIT": {
+        "passed": 4
+      },
+      "ContratoCatalogoFotografiaHttpIT": {
+        "passed": 1
+      },
+      "ContratoConfiguracaoLegadaHttpIT": {
+        "passed": 6
+      },
+      "ContratoContagemOperacionalEquivalenciaHttpIT": {
+        "passed": 1
+      },
+      "ContratosCatalogosEmpresaHttpIT": {
+        "passed": 15
+      },
+      "ContratosCompletudeHttpIT": {
+        "passed": 3
+      },
+      "ContratosCriteriosComplementaresHttpIT": {
+        "passed": 28
+      },
+      "ContratosCriteriosEspecificosHttpIT": {
+        "passed": 11
+      },
+      "ContratosCrudHttpIT": {
+        "passed": 5
+      },
+      "ContratosEscopoHttpIT": {
+        "passed": 2
+      },
+      "ContratosFotografiaAusenteHttpIT": {
+        "passed": 7
+      },
+      "ContratosLacunasFuncionaisHttpIT": {
+        "passed": 9
+      },
+      "ContratosLacunasHttpIT": {
+        "passed": 5
+      },
+      "ContratosLegadoPoliticaComplementarHttpIT": {
+        "passed": 2
+      },
+      "ContratosLegadoSemProvaHttpIT": {
+        "passed": 8
+      },
+      "ContratosOpcoesTemporalHttpIT": {
+        "passed": 1
+      },
+      "ContratosPisoReplayHttpIT": {
+        "passed": 4
+      },
+      "ContratosPrecedenciaBifurcadaHttpIT": {
+        "passed": 5
+      },
+      "ContratosPrecedenciaCnpjNovaAuditoriaHttpIT": {
+        "passed": 4
+      },
+      "ContratosPrecedenciaCnpjRegressaoHttpIT": {
+        "passed": 3
+      },
+      "ContratosRegrasHttpIT": {
+        "passed": 16
+      },
+      "ContratosTemporalLacunasHttpIT": {
+        "passed": 7
+      },
+      "ContratosVigenciaDependentesNovaAuditoriaHttpIT": {
+        "passed": 6
+      },
+      "ContratosVigenciaRetificacaoContinuidadeNovaAuditoriaHttpIT": {
+        "passed": 6
+      },
+      "DashboardPrazosRevisaoHttpIT": {
+        "passed": 3
+      },
+      "DatabaseAvailabilityIT": {
+        "passed": 3
+      },
+      "DatabaseLoadIT": {
+        "passed": 1
+      },
+      "DatabaseSchemaContractIT": {
+        "passed": 2
+      },
+      "DesligamentoFrequenciaProvaPreservadaHttpIT": {
+        "passed": 1
+      },
+      "DiagnosticoSpringRuntimeIT": {
+        "passed": 2
+      },
+      "DirectDatabaseServiceSmokeIT": {
+        "passed": 3
+      },
+      "DocumentoLegadoIntegridadeHttpIT": {
+        "passed": 3
+      },
+      "DocumentoVersaoCanonicaH04HttpIT": {
+        "passed": 8
+      },
+      "DocumentosCadeiaConcorrenciaNovaAuditoriaHttpIT": {
+        "passed": 1
+      },
+      "DocumentosContratuaisHttpIT": {
+        "passed": 5
+      },
+      "DocumentosInstrumentosPersistenciaHttpIT": {
+        "passed": 3
+      },
+      "DocumentosPermissoesTransferenciaGestaoHttpIT": {
+        "passed": 4
+      },
+      "DocumentosRascunhoCommitRollbackHttpIT": {
+        "passed": 3
+      },
+      "EmissaoRetificacaoConcorrenciaAuditoriaHttpIT": {
+        "passed": 2
+      },
+      "EmissaoSemFrequenciaInvalidacaoHttpIT": {
+        "passed": 2
+      },
+      "EmissaoVinculoTransferidoInvalidacaoHttpIT": {
+        "passed": 1
+      },
+      "EmpregadoConsultaFiltradaEscalaHttpIT": {
+        "passed": 2
+      },
+      "EmpregadoContextoCanonicoControlesHttpIT": {
+        "passed": 4
+      },
+      "EmpregadoHistoricoEscopoAtualHttpIT": {
+        "passed": 2
+      },
+      "EmpregadoTransferenciaGestaoEfetivaHttpIT": {
+        "passed": 6
+      },
+      "EstruturaAdministrativaAutorizacaoConcorrenteHttpIT": {
+        "passed": 3
+      },
+      "Etapa11PersistenceIT": {
+        "passed": 1
+      },
+      "Etapa12PersistenceIT": {
+        "passed": 3
+      },
+      "FechamentoCancelamentoConcorrenteH04HttpIT": {
+        "passed": 4
+      },
+      "FechamentoContratoTransferidoHttpIT": {
+        "passed": 2
+      },
+      "FechamentoDataFuturaHttpIT": {
+        "passed": 2
+      },
+      "FechamentoJarRecuperacaoIT": {
+        "passed": 5
+      },
+      "FechamentosTransacoesHttpIT": {
+        "passed": 7
+      },
+      "FormatoHashEventosMarcadorJpaIT": {
+        "passed": 1
+      },
+      "FornecedorAutorizacaoConcorrenteHttpIT": {
+        "passed": 2
+      },
+      "FornecedorCriacaoAutorizacaoConcorrenteHttpIT": {
+        "passed": 1
+      },
+      "FornecedorEmailFormatoHttpIT": {
+        "passed": 8
+      },
+      "FornecedorIntegridadeAuditoriaHttpIT": {
+        "passed": 10
+      },
+      "FornecedorOperacionalHttpIT": {
+        "passed": 5
+      },
+      "FrequenciaAdicionalJustificativaLimiteHttpIT": {
+        "passed": 10
+      },
+      "FrequenciaAnulacaoContratoPreservacaoHttpIT": {
+        "passed": 1
+      },
+      "FrequenciaAuditoriaMinimizacaoHttpIT": {
+        "passed": 9
+      },
+      "FrequenciaCoberturaTemporalRecusasHttpIT": {
+        "passed": 3
+      },
+      "FrequenciaComplementosEscopoAposPerdaCoberturaHttpIT": {
+        "passed": 2
+      },
+      "FrequenciaComplementosEscopoTemporalHttpIT": {
+        "passed": 17
+      },
+      "FrequenciaComplementosHistoricoHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaComplementosHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaComplementosIdentidadeLegadaHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaComplementosPresidenciaHttpIT": {
+        "passed": 2
+      },
+      "FrequenciaConcorrenciaContratoHttpIT": {
+        "passed": 2
+      },
+      "FrequenciaConsultaMinimizacaoHttpIT": {
+        "passed": 10
+      },
+      "FrequenciaContratosHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaEvidenciasIntegridadeHttpIT": {
+        "passed": 2
+      },
+      "FrequenciaFontePreservadaB06HttpIT": {
+        "passed": 1
+      },
+      "FrequenciaFonteRetiradaRevisaoHttpIT": {
+        "passed": 4
+      },
+      "FrequenciaFontesMotivoObrigatorioHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaFotografiaIdentidadeHttpIT": {
+        "passed": 8
+      },
+      "FrequenciaFotografiaLegadaHttpIT": {
+        "passed": 2
+      },
+      "FrequenciaFotografiasAusentesHttpIT": {
+        "passed": 5
+      },
+      "FrequenciaFronteiraTrintaDiasHttpIT": {
+        "passed": 3
+      },
+      "FrequenciaGestaoTransferidaAditamentoHttpIT": {
+        "passed": 2
+      },
+      "FrequenciaHistoricoEscopoTransferidoHttpIT": {
+        "passed": 1
+      },
+      "FrequenciaHistoricoIndicadoresAuditoriaHttpIT": {
+        "passed": 4
+      },
+      "FrequenciaJanelaAmpliadaPreservaFechadaHttpIT": {
+        "passed": 1
+      },
+      "FrequenciaJanelaConfiguravelHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaJanelaSeteDiasHttpIT": {
+        "passed": 7
+      },
+      "FrequenciaMaterializacaoTrintaDiasHttpIT": {
+        "passed": 1
+      },
+      "FrequenciaMatrizEntradasHttpIT": {
+        "passed": 3
+      },
+      "FrequenciaMemoriaManualAuditoriaHttpIT": {
+        "passed": 5
+      },
+      "FrequenciaNomeLegadoDesconhecidoHttpIT": {
+        "passed": 6
+      },
+      "FrequenciaPermissaoHistoricaHttpIT": {
+        "passed": 3
+      },
+      "FrequenciaRelatoriosLacunasHttpIT": {
+        "passed": 16
+      },
+      "FrequenciaTemporalBordasHttpIT": {
+        "passed": 2
+      },
+      "GestaoLocalInativacaoSuperintendenciaConcorrenteHttpIT": {
+        "passed": 1
+      },
+      "GradeFrequenciaElegibilidadeContratoHttpIT": {
+        "passed": 3
+      },
+      "GradeFrequenciaRotulosHistoricosHttpIT": {
+        "passed": 2
+      },
+      "HistoricoAssinaturaLegadaMistaHttpIT": {
+        "passed": 1
+      },
+      "HistoricoOcorrenciaContextoAtualHttpIT": {
+        "passed": 1
+      },
+      "HistoricosEmpregadosContratoHttpIT": {
+        "passed": 3
+      },
+      "IdempotenciaFontesFrequenciaHttpIT": {
+        "passed": 3
+      },
+      "IdentidadeCanonicaAposEsperaPostgresIT": {
+        "passed": 2
+      },
+      "IdentidadeCanonicaFechamentoHttpIT": {
+        "passed": 3
+      },
+      "ImpactoCapacidadeLimitesHttpIT": {
+        "passed": 1
+      },
+      "Ind08AcervoDerivadoMascaraHttpIT": {
+        "passed": 2
+      },
+      "Ind08LeituraHistoricaCampoHttpIT": {
+        "passed": 7
+      },
+      "Ind08OrigemPublicacaoHttpIT": {
+        "passed": 2
+      },
+      "Ind08VigenciaComposicaoDKHttpIT": {
+        "passed": 2
+      },
+      "InstrumentosConfiguracaoHistoricaHttpIT": {
+        "passed": 7
+      },
+      "InstrumentosFotografiaCatalogoHttpIT": {
+        "passed": 2
+      },
+      "InstrumentosFronteiraCicloVidaHttpIT": {
+        "passed": 7
+      },
+      "InstrumentosQuantitativosRotulosAuditoriaIndependenteHttpIT": {
+        "passed": 5
+      },
+      "JarHttpRealIT": {
+        "passed": 1
+      },
+      "MestreAlocacaoFrequenciaConcorrenciaHttpIT": {
+        "passed": 2
+      },
+      "MestreContratosFornecedorConcorrenciaHttpIT": {
+        "passed": 4
+      },
+      "MestreDocumentoRetificacaoConcorrenteHttpIT": {
+        "passed": 1
+      },
+      "MotivosProvaContextoHistoricoHttpIT": {
+        "passed": 6
+      },
+      "MotorTemporalVigenciaReplayIT": {
+        "passed": 13
+      },
+      "NovaAuditoriaFotografiasTardiasPessoasHttpIT": {
+        "passed": 2
+      },
+      "ObservacaoAtoresLocksPostgresIT": {
+        "passed": 3
+      },
+      "OcorrenciaAutorizacaoTemporalHttpIT": {
+        "passed": 18
+      },
+      "OcorrenciaContextoRegistrado43HttpIT": {
+        "passed": 4
+      },
+      "OcorrenciaEscopoAposPerdaCoberturaHttpIT": {
+        "passed": 1
+      },
+      "OcorrenciaFalhaFisicaGravacaoHttpIT": {
+        "passed": 3
+      },
+      "OcorrenciaIdentidadeLegadaHttpIT": {
+        "passed": 1
+      },
+      "OcorrenciaNomeLegadoHttpIT": {
+        "passed": 2
+      },
+      "OcorrenciaPrimeiroLancamento43HttpIT": {
+        "passed": 4
+      },
+      "OcorrenciaPrivacidadeHistoricaHttpIT": {
+        "passed": 6
+      },
+      "OcorrenciaProvaPreservadaHttpIT": {
+        "passed": 1
+      },
+      "OcorrenciasPainelAssincronoHttpIT": {
+        "passed": 4
+      },
+      "PaineisHttpIT": {
+        "passed": 3
+      },
+      "PainelAnaliticoPostgresIT": {
+        "passed": 5
+      },
+      "PainelBissextoDtoRealHttpIT": {
+        "passed": 1
+      },
+      "PainelEfetivoTemporalIT": {
+        "passed": 27
+      },
+      "PendenciaEscopoEfetivoHttpIT": {
+        "passed": 1
+      },
+      "PendenciaFrequenciaResponsabilidadeAtualHttpIT": {
+        "passed": 3
+      },
+      "PendenciasRecorteSincronizacaoHttpIT": {
+        "passed": 6
+      },
+      "PermissaoOcorrenciaMultidiasSemOrigemH04HttpIT": {
+        "passed": 2
+      },
+      "PermissoesMinimizacaoHttpIT": {
+        "passed": 16
+      },
+      "PessoasAssinaturaImpactoVolumeHttpIT": {
+        "passed": 1
+      },
+      "PessoasAtomicidadeHttpIT": {
+        "passed": 5
+      },
+      "PessoasComposicaoConsentimentoHttpIT": {
+        "passed": 4
+      },
+      "PessoasComposicaoFuturaHttpIT": {
+        "passed": 3
+      },
+      "PessoasContinuidadeLegadoNovaAuditoriaHttpIT": {
+        "passed": 3
+      },
+      "PessoasCriteriosComplementaresHttpIT": {
+        "passed": 4
+      },
+      "PessoasCriteriosTemporaisComplementaresHttpIT": {
+        "passed": 1
+      },
+      "PessoasDesligamentoExcedenteFuturoHttpIT": {
+        "passed": 2
+      },
+      "PessoasEscopoOperacionalHttpIT": {
+        "passed": 21
+      },
+      "PessoasExcedenteNarrativasHttpIT": {
+        "passed": 1
+      },
+      "PessoasFotografiaTransferenciaRestauradaHttpIT": {
+        "passed": 4
+      },
+      "PessoasFotografiasHistoricasAusentesHttpIT": {
+        "passed": 18
+      },
+      "PessoasHistoricoMinimizacaoHttpIT": {
+        "passed": 4
+      },
+      "PessoasIdentidadeLegadaHttpIT": {
+        "passed": 1
+      },
+      "PessoasLacunasHttpIT": {
+        "passed": 8
+      },
+      "PessoasLimitesHistoricosCriteriosHttpIT": {
+        "passed": 5
+      },
+      "PessoasMatriculaConcorrenciaHttpIT": {
+        "passed": 1
+      },
+      "PessoasMinimizacaoEventosHttpIT": {
+        "passed": 6
+      },
+      "PessoasNarrativasMinimizacaoHttpIT": {
+        "passed": 3
+      },
+      "PessoasOcupacaoPrecedenciaNovaAuditoriaHttpIT": {
+        "passed": 4
+      },
+      "PessoasPoliticaMatriculaFuturaHttpIT": {
+        "passed": 13
+      },
+      "PessoasProgramacaoCanceladaHttpIT": {
+        "passed": 1
+      },
+      "PessoasProjecaoHabilitacaoHttpIT": {
+        "passed": 2
+      },
+      "PessoasProjecaoTransferenciaHttpIT": {
+        "passed": 3
+      },
+      "PessoasProrrogacaoPlanejadaNovaAuditoriaHttpIT": {
+        "passed": 3
+      },
+      "PessoasProvaLeituraTemporalHttpIT": {
+        "passed": 2
+      },
+      "PessoasProvaNomeHistoricoHttpIT": {
+        "passed": 8
+      },
+      "PessoasRecontratacaoAposInativacaoHttpIT": {
+        "passed": 7
+      },
+      "PessoasRegrasOriginaisHttpIT": {
+        "passed": 8
+      },
+      "PessoasRestauracaoPrecedenciaHttpIT": {
+        "passed": 1
+      },
+      "PessoasRetificacaoAposTransferenciaHttpIT": {
+        "passed": 2
+      },
+      "PessoasTransferenciaGestaoEfetivaHttpIT": {
+        "passed": 3
+      },
+      "PessoasTransferenciaReativacaoTemporalHttpIT": {
+        "passed": 1
+      },
+      "PessoasValidacoesAdicionaisHttpIT": {
+        "passed": 5
+      },
+      "PessoasVinculosContratoHttpIT": {
+        "passed": 16
+      },
+      "Postgres186AmbienteHttpIT": {
+        "passed": 1
+      },
+      "PostgresMappingRoundTripIT": {
+        "passed": 4
+      },
+      "PostgresMembershipGraphIT": {
+        "passed": 7
+      },
+      "PreauditoriaAntecipacaoInicioVinculoHttpIT": {
+        "passed": 4
+      },
+      "PreauditoriaPainelAtividadesHttpIT": {
+        "passed": 3
+      },
+      "PreauditoriaPainelNovoDuranteRetificacaoHttpIT": {
+        "passed": 1
+      },
+      "PreauditoriaPainelRetificacaoConcorrenteHttpIT": {
+        "passed": 1
+      },
+      "PreauditoriaPainelRetificacaoHttpIT": {
+        "passed": 1
+      },
+      "PreauditoriaPendenciaHistoricaAposTransferenciaHttpIT": {
+        "passed": 1
+      },
+      "PreauditoriaPendenciaNarrativaHttpIT": {
+        "passed": 3
+      },
+      "PreservacaoFrequenciaSemFinanceiroHttpIT": {
+        "passed": 5
+      },
+      "PreviaCicloVidaLimitesHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaAditamentoGradeParcialAlocacaoLegadaHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaAditamentoRevisaoParcialHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaComposicaoAditamentoHttpIT": {
+        "passed": 3
+      },
+      "ProvaHistoricaComposicaoBaseRevisaoParcialHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaComposicaoProrrogacaoHttpIT": {
+        "passed": 2
+      },
+      "ProvaHistoricaConfiguracaoAlocacaoHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaContratoHttpIT": {
+        "passed": 11
+      },
+      "ProvaHistoricaGradeDiaNaoAtingidoHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaGradeFrequenciaPreexistenteHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaReprocessamentoTransferenciaOrigemHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaTransferenciaConvergenteOrigemAlocacaoHttpIT": {
+        "passed": 1
+      },
+      "ProvaHistoricaTransferenciaConvergenteRotulosHttpIT": {
+        "passed": 2
+      },
+      "ProvaHistoricaTransferenciaRevisaoParcialHttpIT": {
+        "passed": 10
+      },
+      "ProvaIntegralSemComposicaoOriginalHttpIT": {
+        "passed": 2
+      },
+      "ProvasHistoricasArquivoFonteIntegridadeHttpIT": {
+        "passed": 4
+      },
+      "PublicacaoCatalogoInativadoHttpIT": {
+        "passed": 1
+      },
+      "ReaberturaFimNaturalRevalidacoesHttpIT": {
+        "passed": 4
+      },
+      "ReducaoExcepcionalPersistenciaHttpIT": {
+        "passed": 1
+      },
+      "RelatorioCancelamentoAutoridadeAtualHttpIT": {
+        "passed": 1
+      },
+      "RelatorioComparacaoEscopoHttpIT": {
+        "passed": 7
+      },
+      "RelatorioExportacaoCancelamentoHttpIT": {
+        "passed": 1
+      },
+      "RelatorioFrequenciaCanonicaIT": {
+        "passed": 25
+      },
+      "RelatorioFrequenciaEscopoHistoricoIT": {
+        "passed": 16
+      },
+      "RelatorioJarMultipaginaIT": {
+        "passed": 1
+      },
+      "RelatorioNomeLegadoDesconhecidoHttpIT": {
+        "passed": 4
+      },
+      "RelatorioRotulosLegadosHttpIT": {
+        "passed": 2
+      },
+      "RelatoriosAdministrativosPendenciasHttpIT": {
+        "passed": 4
+      },
+      "RelatoriosConsultasHttpIT": {
+        "passed": 4
+      },
+      "RelatoriosExportacoesHttpIT": {
+        "passed": 8
+      },
+      "RelatoriosMinimizacaoExportacoesHttpIT": {
+        "passed": 8
+      },
+      "RelatoriosMinimizacaoHttpIT": {
+        "passed": 11
+      },
+      "RemanejamentoComposicaoInexistenteHttpIT": {
+        "passed": 1
+      },
+      "RemocaoFinanceiraHttpIT": {
+        "passed": 4
+      },
+      "RemocaoGovernancaTerceirosHttpIT": {
+        "passed": 5
+      },
+      "ReplayCapacidadeAumentoHttpIT": {
+        "passed": 1
+      },
+      "ReplayCapacidadeDependenteHttpIT": {
+        "passed": 2
+      },
+      "ReplayQuantitativoOverflowHttpIT": {
+        "passed": 2
+      },
+      "ReplayVigenciaFrequenciaRelatorioHttpIT": {
+        "passed": 2
+      },
+      "RepositoryQuerySmokeIT": {
+        "passed": 2
+      },
+      "RetificacaoCapacidadeContratualHttpIT": {
+        "passed": 2
+      },
+      "RetificacaoInicioEmissaoPreexistenteHttpIT": {
+        "passed": 1
+      },
+      "RetificacaoInicioEmissaoRollbackHttpIT": {
+        "passed": 1
+      },
+      "RetificacaoVigenciaDependenteHttpIT": {
+        "passed": 1
+      },
+      "RevisaoCandidato2IdentificadorRetroativoIT": {
+        "passed": 1
+      },
+      "RevisaoCandidato2PisoDocumentalContratoIT": {
+        "passed": 2
+      },
+      "RevisaoDownloadExpiracaoHttpIT": {
+        "passed": 1
+      },
+      "RevisaoDownloadsAutorizacaoAtualHttpIT": {
+        "passed": 3
+      },
+      "RevisaoEmissaoIdempotenciaConcorrenciaHttpIT": {
+        "passed": 1
+      },
+      "RevisaoExportacaoGeracaoAutorizacaoHttpIT": {
+        "passed": 2
+      },
+      "RevisaoFechamentoNegocialMysqlHttpIT": {
+        "passed": 1
+      },
+      "RevisaoGestaoSemOrigemHttpIT": {
+        "passed": 4
+      },
+      "RevisaoHistoricaAusenciaNominalHttpIT": {
+        "passed": 2
+      },
+      "RevisaoHistoricaAusenciaVersaoHttpIT": {
+        "passed": 5
+      },
+      "RevisaoHistoricaCatalogosIdentidadeHttpIT": {
+        "passed": 7
+      },
+      "RevisaoIndependenteCustodiaProvaContratoIT": {
+        "passed": 1
+      },
+      "RevisaoIndependenteProvaContratoIT": {
+        "passed": 5
+      },
+      "RevisaoIndependenteProvaContratoValidacaoIT": {
+        "passed": 2
+      },
+      "RevisaoNomeGestaoEventoVinculoHttpIT": {
+        "passed": 2
+      },
+      "RevisaoPrecedenciaExplicitaHttpIT": {
+        "passed": 2
+      },
+      "RevisaoPreviaSucessaoAlcanceHttpIT": {
+        "passed": 1
+      },
+      "SegurancaCacheUriCodificadaRedIT": {
+        "passed": 2
+      },
+      "SegurancaRevogacaoConcorrenteRedIT": {
+        "passed": 1
+      },
+      "SegurancaTodasRotasNovaAuditoriaHttpIT": {
+        "passed": 5
+      },
+      "SuperficieRenderizacaoSeguraHttpIT": {
+        "passed": 1
+      },
+      "SuperintendenciaCadastroAutorizacaoConcorrenteHttpIT": {
+        "passed": 2
+      },
+      "TemporalidadeInicializacaoHttpIT": {
+        "passed": 1
+      },
+      "TerminoVinculoEmissaoMaterializadaHttpIT": {
+        "passed": 2
+      },
+      "TokenAtivoRepositorioIT": {
+        "passed": 3
+      },
+      "TokenRevogacaoConcorrenciaH02IT": {
+        "passed": 1
+      },
+      "TokenRevogacaoReadCommittedPostgresIT": {
+        "passed": 1
+      },
+      "TransactionIntegrityIT": {
+        "passed": 5
+      },
+      "TransferenciaConcessaoObrigatoriaHttpIT": {
+        "passed": 1
+      },
+      "TransferenciaConferenciaAto64GreenHttpIT": {
+        "passed": 4
+      },
+      "TransferenciaConferenciaAto64RedHttpIT": {
+        "passed": 3
+      },
+      "TransferenciaConferenciaRollback64HttpIT": {
+        "passed": 1
+      },
+      "TransferenciaGestaoFuturaAcessoHttpIT": {
+        "passed": 6
+      },
+      "TransferenciaMapaIntegralHttpIT": {
+        "passed": 2
+      },
+      "TransferenciaPoliticaMatriculaHttpIT": {
+        "passed": 9
+      },
+      "TransversaisDocumentoIdempotenciaRedIT": {
+        "passed": 1
+      },
+      "TransversaisIdentidadeRetroativaRedIT": {
+        "passed": 4
+      },
+      "TransversaisIntegridadeSufixoHipoteseRedIT": {
+        "passed": 4
+      },
+      "TransversaisRelatorioFonteFuturaRedIT": {
+        "passed": 1
+      },
+      "VinculoAlocacaoConcorrenciaIT": {
+        "passed": 3
+      },
+      "VinculoConhecimentoSemOrigemHttpIT": {
+        "passed": 3
+      },
+      "VinculoElegivelFrequenciaConsultaHttpIT": {
+        "passed": 3
+      }
+    },
+    "exclusoes": [
+      {
+        "path": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/AnexoTraversalTcpJarIT.java",
+        "reason": "Cenário de preparação/carga/JAR histórico com precondições próprias; exige execução específica."
+      },
+      {
+        "path": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/FrequenciaTimerTrintaDiasJarIT.java",
+        "reason": "Cenário de preparação/carga/JAR histórico com precondições próprias; exige execução específica."
+      },
+      {
+        "path": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/PreparacaoFrontendRealIT.java",
+        "reason": "Cenário de preparação/carga/JAR histórico com precondições próprias; exige execução específica."
+      },
+      {
+        "path": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/ReinicioIntegralCorpusJarIT.java",
+        "reason": "Cenário de preparação/carga/JAR histórico com precondições próprias; exige execução específica."
+      },
+      {
+        "path": "JAVA/src/test/java/com/example/siggtrat/auditoria20261029/SessaoLogoutIdleConcorrenteJarIT.java",
+        "reason": "Cenário de preparação/carga/JAR histórico com precondições próprias; exige execução específica."
+      },
+      {
+        "path": "JAVA/src/test/java/com/example/siggtrat/integration/PrepararPainelAnaliticoLaboratorioIT.java",
+        "reason": "Cenário de preparação/carga/JAR histórico com precondições próprias; exige execução específica."
+      }
+    ]
+  },
+  "limites": {
+    "teto_humano_gb": 15,
+    "servicos_gib": 4.25,
+    "maximo_fase_pesada_gib": 3,
+    "coordenador_mib_por_unidade": 128,
+    "coordenadores_maximos": 2,
+    "limite_agregado_conservador_com_espera_gib": 9.5,
+    "fases_pesadas_paralelas": false,
+    "swap_cgroups": 0,
+    "reserva_minima_disponivel_mib": 8192
+  },
+  "sonar": {
+    "consulta": "SGT",
+    "projetos_retornados": 0,
+    "gate_e_metricas_nao_obtidos": true,
+    "scanner_executado": false
+  },
+  "producao_homologada": false,
+  "revisao_independente_desta_entrega": false,
+  "navegador": {
+    "recibo_sha256": "7cb55e341549126a47b2cfed1a5132fe5a69a9aea27f56ab2a26df6df9c1cb40",
+    "visoes_diarias": [
+      "Resumo",
+      "Contratos",
+      "Operação"
+    ],
+    "larguras_sem_overflow_e_sem_eixos_cortados": [
+      1280,
+      1440,
+      1920
+    ],
+    "barra_zero": "0%",
+    "console_fresco_erros_avisos": 0,
+    "login_credito_exato": true,
+    "login_modo_visual_ausente": true,
+    "desempenho_oito_fontes_inalteradas_desde": "a561e5b09f44e2dc9da963afb1f8cd191ca25abe"
+  },
+  "exportacao": {
+    "xlsx_zip_integro": true,
+    "xlsx_entradas": 16,
+    "pdf_assinatura_valida": true,
+    "xlsx_sha256": "a33d2a7a89f929d10102d5a4368924ef323b808a76a01181d93334ac801402bd",
+    "pdf_sha256": "71c885bda883947e480fd58889f946d650eba65382d679e1d5c743a2351f5f84"
+  },
+  "capturas": {
+    "antes-resumo.png": "c3d8f0d21c2e9763ac651b4aeaf26fa99fd270cc8a34602efc6a2ad7def728e7",
+    "antes-contratos.png": "9892953db7324e04092922dfc8a77562b6e4ed46b66d48465fef2018fb4986dc",
+    "antes-operacao.png": "6f41ab586fcd7f63d221abed6bb607b7601f9eb9cc1f2fbdd97c49ed6afa76c3",
+    "depois-login.png": "768256731161f158346a420c43d4b634fc50d9ff4f15750a90930ec9ab255780",
+    "depois-resumo.png": "274c84d38e4c6b5a4ad3cf3cf904f4d357d0c35502a1e329ad79b2790348258b",
+    "depois-contratos.png": "b23d7118f42d438e6dd22f67f6e48e720bd8312b146fb87c7413105614e27a82",
+    "depois-operacao.png": "42f902b548b166a038262b4fc9f18f6b48a275b10127e78bc38066e01fb3cdb8"
+  },
+  "comparacao_fotos": "Antes usa o padrão anterior de 30 dias; depois usa Diário. Não comparar os totais como se fossem o mesmo período.",
+  "reexecucoes": [
+    "Spy AOP resolvido antes do stubbing de aditamento; teste preserva prova de rollback.",
+    "CNPJ sintético individualizado por cenário; sem alterar unicidade de negócio.",
+    "Teste de artefato respeita finalName do POM; comparação integral preservada.",
+    "Dados anteriores do schema público e uploads preservados; novo schema por Hibernate/JPA, sem DDL manual ou purga.",
+    "Três classes que coordenam concorrência por SQL sem prefixo repetidas com currentSchema e SQL não qualificado; todos os prazos/assertivas mantidos.",
+    "Caracterização HTTP exige Redis exclusivo no índice 0; instância temporária própria, credencial sintética já existente e prova de PID/run_id; nenhum guardião alterado."
+  ],
+  "evidencias_locais": ".homologacao/painel-visoes-login-20261112/",
+  "arquivos_evidencia_sha256": {
+    "ultima-react-completo.log": "45a820f07046b13bf4a38f957100550311d7d0c5699b7c956478c8d35265b6ca",
+    "ultima-java-package.log": "2eced3ba35e50ca791476bb087cd28d86b6040ccaf4c6aac880e9944e2244d1d",
+    "jar-reteste-resultados.json": "e34812f32666416ba16a6c2d2a43b11cff07f41f07884cefae017310b8887d33",
+    "recuperacao-isolada-resultados.json": "606b74ce9545c11a3143148f1ce7bcfefae493a2fb00126fa823d04dca1de6bf",
+    "xml-manifesto-final.json": "5ab1f2a798bc0fd5ab77bbaf3a456c8f5a7f4a23f3d3daf8b1d3e3967b5cddb2",
+    "smoke-api-jar-final04.json": "fbb31eeacb67525cd7b8a28a36ccdd9086da4880594a11b00b41d411cfe909df",
+    "navegador-final04.json": "7cb55e341549126a47b2cfed1a5132fe5a69a9aea27f56ab2a26df6df9c1cb40",
+    "prova-isolamento.json": "97c0a045a7c842857eb4414bf67956e90a348d4fce2f3f74341c514d6d9d42c0",
+    "redis-http-isolamento.json": "a76a526c279f6c97cc772341bfe590800466340fa4be04d25b70748e31a79db4",
+    "redis-http-encerramento.json": "7d665a3f7ae7b6d23a8f4a8863813f77f56e65901d9717874db9b797f236a4ab"
+  },
+  "recursos_temporarios": {
+    "redis_exclusivo_encerrado": true,
+    "snapshot_privado_preservado": true,
+    "redis_da_interface_preservado": true
+  }
+}
