@@ -32,7 +32,8 @@ class CacheFrequenciaMinimizacaoTest {
 
     @ParameterizedTest
     @ValueSource(strings = {"/api/frequencias", "/api/frequencias/mensal", "/api/frequencias/intervalo",
-            "/api/frequencias/7/eventos", "/api/frequencias/7/evidencias-integridade"})
+            "/api/frequencias/7/eventos", "/api/frequencias/7/evidencias-integridade",
+            "/api/painel/analitico", "/api/painel/analitico/registros", "/api/painel/visoes"})
     void novaLeituraRevalidaPermissaoExpiradaSemReutilizarRespostaCompleta(String rota) throws Exception {
         autenticar();
         AtomicInteger consultasAuditadas = new AtomicInteger();

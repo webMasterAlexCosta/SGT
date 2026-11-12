@@ -479,8 +479,25 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
         LocalDate fimPeriodoAnterior = inicioPeriodo.minusDays(1);
         LocalDate inicioPeriodoAnterior = fimPeriodoAnterior.minusDays(periodoDias - 1L);
 
+        return calcularGestaoIntervalo(contexto, referencia, inicioPeriodo, inicioPeriodoAnterior, fimPeriodoAnterior,
+                contexto.gestaoLocalId(), contexto.superintendenciaId(), true, painelRepositorio);
+    }
+
+    /** Apenas chamado após autorização dos filtros pela consulta analítica. Não usa cache legado. */
+    @Transactional(readOnly = true)
+    public PainelGestaoDTO calcularGestaoRecortada(PainelCalculoContexto contexto,
+            com.example.siggtrat.repositorio.PainelAnaliticoRepositorio.Filtro filtro,
+            ResolvedorPeriodoPainel.Periodo periodo, boolean comparar, PainelRepositorio repositorio) {
+        return calcularGestaoIntervalo(contexto, periodo.fim(), periodo.inicio(), periodo.anteriorInicio(), periodo.anteriorFim(),
+                filtro.gestao(), filtro.superintendencia(), comparar, repositorio);
+    }
+
+    private PainelGestaoDTO calcularGestaoIntervalo(PainelCalculoContexto contexto, LocalDate referencia,
+            LocalDate inicioPeriodo, LocalDate inicioPeriodoAnterior, LocalDate fimPeriodoAnterior,
+            Long gestaoLocalId, Long superintendenciaId, boolean comparar, PainelRepositorio painelRepositorio) {
+        int periodoDias = Math.toIntExact(java.time.temporal.ChronoUnit.DAYS.between(inicioPeriodo, referencia) + 1);
         ContextoEscopo scope = new ContextoEscopo(
-                contexto.nivel(), contexto.nome(), contexto.superintendenciaId(), contexto.gestaoLocalId());
+                contexto.nivel(), contexto.nome(), superintendenciaId, gestaoLocalId);
         PainelGestaoDTO.ResumoEfetivo efetivo = painelRepositorio.obterResumoEfetivo(
                 referencia, scope.gestaoLocalId(), scope.superintendenciaId());
         PainelGestaoDTO.QuadroPessoal quadro = painelRepositorio.obterQuadroPessoal(
@@ -501,7 +518,7 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
         long ausenciasPeriodo = periodo.faltasNaoJustificadas() + periodo.atestados() + periodo.suspensoes();
         long ausenciasPeriodoAnterior = periodoAnterior.faltasNaoJustificadas()
                 + periodoAnterior.atestados() + periodoAnterior.suspensoes();
-        PainelGestaoDTO.ComparativoPeriodo comparativo = new PainelGestaoDTO.ComparativoPeriodo(
+        PainelGestaoDTO.ComparativoPeriodo comparativo = comparar ? new PainelGestaoDTO.ComparativoPeriodo(
                 inicioPeriodoAnterior,
                 fimPeriodoAnterior,
                 periodoAnterior.registrosOperacionais(),
@@ -514,7 +531,7 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
                 periodo.repousosTrabalhados() - periodoAnterior.repousosTrabalhados(),
                 arredondarUmaCasa(periodo.taxaPresenca() - periodoAnterior.taxaPresenca()),
                 arredondarUmaCasa(periodo.taxaAbsenteismo() - periodoAnterior.taxaAbsenteismo())
-        );
+        ) : null;
         PainelGestaoDTO.PressaoOperacional pressao = painelRepositorio.obterPressaoOperacional(
                 inicioPeriodo, referencia, efetivo.empregadosAtivosCadastrados(), ausenciasPeriodo,
                 scope.gestaoLocalId(), scope.superintendenciaId());
@@ -572,7 +589,7 @@ public class PainelServico implements com.example.siggtrat.diagnostico.Diagnosti
                         "As análises históricas de frequência usam o retrato organizacional gravado no lançamento.",
                         "Referências passadas limitam o quadro cadastral pela data de admissão, mas não reconstroem integralmente status ou jornada de pessoas sem lançamento porque o cadastro não mantém histórico estruturado desses campos.",
                         "As taxas do período usam apenas registros operacionais: presença, presença parcial, atraso, TR, falta, atestado e suspensão.",
-                        "A comparação usa uma janela imediatamente anterior com a mesma quantidade de dias; diferenças de taxa são pontos percentuais.",
+                        "A comparação usa os intervalos anterior/atual explicitados na resposta; diferenças de taxa são pontos percentuais.",
                         "DSR perdido é apresentado separadamente e não é somado ao absenteísmo, pois representa consequência em repouso, não ausência em dia programado.",
                         "RT é trabalho em repouso/folga; sua relação com ausências é observacional e não comprova substituição individual.",
                         "A cobertura por unidade usa empregados efetivamente esperados na data, respeitando jornada, folga remunerada aprovada e calendário aplicável.",

@@ -1,0 +1,22 @@
+.grade { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 1.25rem; align-items: start; min-width: 0; }
+.complementos { display: grid; gap: 1.25rem; min-width: 0; }
+.complementos table tbody tr:nth-child(even), .tabela tbody tr:nth-child(even) { background: var(--cor-correios-azul-50); }
+.complementos table tbody tr:hover, .complementos table tbody tr:focus-within, .tabela tbody tr:hover, .tabela tbody tr:focus-within { background: var(--cor-correios-azul-100); }
+.complementos section, .complementos article { min-width: 0; }
+.tabela { overflow-x: auto; }
+.tabela table { width: 100%; border-collapse: collapse; text-align: left; font-size: .8rem; }
+.tabela th, .tabela td { padding: .85rem .7rem; border-bottom: 1px solid var(--cor-borda-sutil); font-variant-numeric: tabular-nums; }
+.tabela thead { background: var(--cor-fundo-sutil); }
+.tabela small { display: block; color: var(--cor-texto-secundario); margin-top: .3rem; }
+.tabela button { min-height: 36px; border: 0; background: none; color: var(--cor-correios-azul-800); font-weight: 650; text-align: left; text-decoration: underline; text-underline-offset: .2em; }
+.tabela td[data-alerta="true"] { color: var(--cor-alerta-700); font-weight: 700; }
+.nota { color: var(--cor-texto-secundario); font-size: .78rem; line-height: 1.6; }
+.explorador { border: 1px solid var(--cor-borda-sutil); border-radius: 12px; background: var(--cor-fundo-elevado); padding: 1.1rem; min-width: 0; }
+.explorador > summary { color: var(--cor-correios-azul-900); font-size: .85rem; font-weight: 650; cursor: pointer; min-height: 24px; }
+.explorador[open] > summary { margin-bottom: 1rem; }
+.navegacaoSecoes { display: flex; gap: .5rem; flex-wrap: wrap; }
+.navegacaoSecoes a { padding: .65rem .8rem; border: 1px solid var(--cor-borda-sutil); border-radius: 7px; background: var(--cor-fundo-elevado); color: var(--cor-correios-azul-800); font-size: .78rem; text-underline-offset: .2em; }
+.comparacao { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 1rem; padding-top: 1rem; border-top: 1px solid var(--cor-borda-sutil); }
+.comparacao strong { display: block; font-size: 1.3rem; margin-top: .4rem; font-variant-numeric: tabular-nums; }
+@media(max-width:1100px) { .grade { grid-template-columns: 1fr; } }
+@media(max-width:600px) { .comparacao { grid-template-columns: 1fr; } }

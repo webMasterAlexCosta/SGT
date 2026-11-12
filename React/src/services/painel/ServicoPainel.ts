@@ -7,11 +7,13 @@ import { CONFIG } from "../../core/config";
 import type { PainelAnaliticoDTO, ParametrosAnalitico, PaginaRegistrosAnalitico, ParametrosRegistrosAnalitico } from '../../contracts/painel-analitico';
 
 export const ServicoPainel = {
+  buscarVisoes: async (params: ParametrosAnalitico, options: RequestOptions = {}) =>
+    requisitar<import('../../contracts/painel-visoes').PainelVisoesDTO>({ method: 'GET', url: '/painel/visoes', params: { ...params }, timeout: 120_000, ...options }),
   buscarRegistrosAnalitico: async (params: ParametrosRegistrosAnalitico, options: RequestOptions = {}) =>
     requisitar<PaginaRegistrosAnalitico>({ method: 'GET', url: '/painel/analitico/registros', params: { ...params }, timeout: 120_000, ...options }),
   buscarAnalitico: async (params: ParametrosAnalitico, options: RequestOptions = {}) =>
     requisitar<PainelAnaliticoDTO>({ method: 'GET', url: '/painel/analitico', params: { ...params }, timeout: 120_000, ...options }),
-  solicitarCalculo: async (referencia: (string), periodoDias = 30, forcar = false, options: RequestOptions = {}) =>
+  solicitarCalculo: async (referencia: (string), periodoDias = 1, forcar = false, options: RequestOptions = {}) =>
     requisitar<DTO.PainelCalculoDTO>({
       method: "POST",
       url: "/painel/calculos",

@@ -24,19 +24,38 @@ public class PainelRepositorio {
     private final JdbcTemplate jdbcTemplate;
     private final NamedParameterJdbcTemplate namedJdbcTemplate;
     private final PainelEfetivoRepositorio efetivoTemporal;
+    private final PainelAnaliticoRepositorio.Filtro recorte;
+    private final List<com.example.siggtrat.dto.PainelAnaliticoDTO.Unidade> unidadesPagina;
 
+    /** Instância imutável por consulta; o bean compartilhado nunca guarda filtros de usuário. */
+    public PainelRepositorio noRecorte(PainelAnaliticoRepositorio.Filtro filtro,
+            List<com.example.siggtrat.dto.PainelAnaliticoDTO.Unidade> unidades) {
+        return new PainelRepositorio(jdbcTemplate, namedJdbcTemplate, efetivoTemporal, filtro, List.copyOf(unidades));
+    }
+
+
+    @org.springframework.beans.factory.annotation.Autowired
     public PainelRepositorio(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
                              PainelEfetivoRepositorio efetivoTemporal) {
+        this(jdbcTemplate, namedJdbcTemplate, efetivoTemporal, null, List.of());
+    }
+
+    private PainelRepositorio(JdbcTemplate jdbcTemplate, NamedParameterJdbcTemplate namedJdbcTemplate,
+            PainelEfetivoRepositorio efetivoTemporal, PainelAnaliticoRepositorio.Filtro recorte,
+            List<com.example.siggtrat.dto.PainelAnaliticoDTO.Unidade> unidadesPagina) {
         this.jdbcTemplate = jdbcTemplate;
         this.namedJdbcTemplate = namedJdbcTemplate;
         this.efetivoTemporal = efetivoTemporal;
+        this.recorte = recorte;
+        this.unidadesPagina = unidadesPagina;
     }
 
     public PainelGestaoDTO.ResumoEfetivo obterResumoEfetivo(LocalDate referencia, Long gestaoLocalId, Long superintendenciaId) {
         // Previsão e ocupação têm exatamente a mesma fonte canônica do /efetivo.
         // Os dois campos explicitamente cadastrais continuam descrevendo o cadastro legado.
         List<PainelEfetivoDTO.DetalheContrato> detalhes = efetivoTemporal.obterDetalhamentoContratos(
-                referencia, null, null, null, null, gestaoLocalId, superintendenciaId);
+                referencia, recorte == null ? null : recorte.contrato(), lotacaoRecorte(), null, null,
+                gestaoLocalId, superintendenciaId, recorte == null ? null : recorte.prestador());
         long previsto = detalhes.stream().mapToLong(PainelEfetivoDTO.DetalheContrato::efetivoPrevisto).sum();
         long vinculado = detalhes.stream().mapToLong(PainelEfetivoDTO.DetalheContrato::efetivoAlocado).sum();
         String empregadoScope = condicaoEscopo("e.id_gestao_local", gestaoLocalId, superintendenciaId);
@@ -706,6 +725,7 @@ public class PainelRepositorio {
             Long gestaoLocalId,
             Long superintendenciaId
     ) {
+        if (recorte != null) return unidadesRecortadas(referencia);
         List<PainelGestaoDTO.UnidadeGestao> unidades;
         if ("NACIONAL".equals(nivel)) unidades = unidadesPorSuperintendencia(referencia);
         else if ("SUPERINTENDENCIA".equals(nivel)) unidades = unidadesPorGestaoLocal(referencia, superintendenciaId);
@@ -1072,7 +1092,10 @@ public class PainelRepositorio {
         return new MapSqlParameterSource()
                 .addValue("referencia", referencia)
                 .addValue("scopeGestaoLocalId", gestaoLocalId)
-                .addValue("scopeSuperintendenciaId", superintendenciaId);
+                .addValue("scopeSuperintendenciaId", superintendenciaId)
+                .addValue("recorteContrato", recorte == null ? null : recorte.contrato())
+                .addValue("recortePrestador", recorte == null ? null : recorte.prestador())
+                .addValue("recorteLotacao", lotacaoRecorte());
     }
 
     /** Restringe as frequências pelo retrato organizacional gravado no cálculo. */
@@ -1081,23 +1104,67 @@ public class PainelRepositorio {
             Long gestaoLocalId,
             Long superintendenciaId
     ) {
-        if (gestaoLocalId != null) {
-            return " AND " + frequenciaAlias + ".gestao_local_snapshot_id = :scopeGestaoLocalId ";
-        }
-        if (superintendenciaId != null) {
-            return " AND " + frequenciaAlias
-                    + ".superintendencia_snapshot_id = :scopeSuperintendenciaId ";
-        }
-        return "";
+        String escopo = gestaoLocalId != null ? " AND " + frequenciaAlias + ".gestao_local_snapshot_id = :scopeGestaoLocalId "
+                : superintendenciaId != null ? " AND " + frequenciaAlias + ".superintendencia_snapshot_id = :scopeSuperintendenciaId " : "";
+        if (recorte == null) return escopo;
+        return escopo
+                + (recorte.contrato() == null ? "" : " AND " + frequenciaAlias + ".contrato_snapshot_id = :recorteContrato ")
+                + (recorte.prestador() == null ? "" : " AND " + frequenciaAlias + ".contrato_snapshot_id IN (SELECT id_contrato FROM contrato WHERE id_fornecedor = :recortePrestador) ")
+                + (lotacaoRecorte() == null ? "" : " AND " + frequenciaAlias + ".lotacao_snapshot_id = :recorteLotacao ");
     }
 
     private String condicaoEscopo(String gestaoLocalColumn, Long gestaoLocalId, Long superintendenciaId) {
-        if (gestaoLocalId != null) return " AND " + gestaoLocalColumn + " = :scopeGestaoLocalId ";
-        if (superintendenciaId != null) {
-            return " AND " + gestaoLocalColumn + " IN (SELECT cp_scope.id_gestao_local FROM gestao_local cp_scope "
-                    + "WHERE cp_scope.id_superintendencia = :scopeSuperintendenciaId) ";
-        }
-        return "";
+        String escopo = gestaoLocalId != null ? " AND " + gestaoLocalColumn + " = :scopeGestaoLocalId "
+                : superintendenciaId != null ? " AND " + gestaoLocalColumn + " IN (SELECT cp_scope.id_gestao_local FROM gestao_local cp_scope WHERE cp_scope.id_superintendencia = :scopeSuperintendenciaId) " : "";
+        if (recorte == null) return escopo;
+        String alias = gestaoLocalColumn.substring(0, gestaoLocalColumn.indexOf('.'));
+        return escopo + switch (alias) {
+            case "e", "e_multi" -> filtroCadastro(alias);
+            case "c", "c_vinculo" -> filtroContrato(alias);
+            case "l" -> (lotacaoRecorte() == null ? "" : " AND l.id_lotacao = :recorteLotacao ")
+                    + " AND EXISTS (SELECT 1 FROM empregado e_rec WHERE e_rec.id_lotacao = l.id_lotacao " + filtroCadastro("e_rec") + ") ";
+            case "j", "j_cfg" -> " AND EXISTS (SELECT 1 FROM empregado e_rec WHERE e_rec.id_jornada = " + alias + ".id_jornada " + filtroCadastro("e_rec") + ") ";
+            default -> throw new IllegalArgumentException("Alias de recorte não suportado");
+        };
+    }
+
+    private Long lotacaoRecorte() {
+        return recorte != null && recorte.tipo() == com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade.LOTACAO ? recorte.unidade() : null;
+    }
+
+    private String filtroCadastro(String alias) {
+        return (lotacaoRecorte() == null ? "" : " AND " + alias + ".id_lotacao = :recorteLotacao ")
+                + (recorte.contrato() == null && recorte.prestador() == null ? "" :
+                    " AND EXISTS (SELECT 1 FROM empregado_contrato ec_rec JOIN contrato c_rec ON c_rec.id_contrato = ec_rec.id_contrato WHERE ec_rec.id_empregado = "
+                    + alias + ".id_empregado " + filtroContrato("c_rec") + ") ");
+    }
+
+    private String filtroContrato(String alias) {
+        return (recorte.contrato() == null ? "" : " AND " + alias + ".id_contrato = :recorteContrato ")
+                + (recorte.prestador() == null ? "" : " AND " + alias + ".id_fornecedor = :recortePrestador ")
+                + (lotacaoRecorte() == null ? "" : " AND (EXISTS (SELECT 1 FROM empregado_contrato ec_loc JOIN empregado e_loc ON e_loc.id_empregado=ec_loc.id_empregado WHERE ec_loc.id_contrato="
+                    + alias + ".id_contrato AND e_loc.id_lotacao=:recorteLotacao) OR EXISTS (SELECT 1 FROM composicao_contratual comp_rec WHERE comp_rec.id_contrato="
+                    + alias + ".id_contrato AND comp_rec.id_lotacao=:recorteLotacao AND comp_rec.data_inicio_vigencia<=:referencia AND (comp_rec.data_fim_vigencia IS NULL OR comp_rec.data_fim_vigencia>=:referencia))) ");
+    }
+
+    private List<PainelGestaoDTO.UnidadeGestao> unidadesRecortadas(LocalDate ref) {
+        return unidadesPagina.stream().map(u -> {
+            Long gestao = recorte.tipo() == com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade.GESTAO_LOCAL ? u.id() : recorte.gestao();
+            Long se = recorte.tipo() == com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade.SUPERINTENDENCIA ? u.id() : recorte.superintendencia();
+            Long lotacao = recorte.tipo() == com.example.siggtrat.dto.PainelAnaliticoDTO.TipoUnidade.LOTACAO ? u.id() : null;
+            var contratos = efetivoTemporal.obterDetalhamentoContratos(ref, recorte.contrato(), lotacao, null, null, gestao, se, recorte.prestador());
+            long previsto = contratos.stream().mapToLong(PainelEfetivoDTO.DetalheContrato::efetivoPrevisto).sum();
+            long alocado = contratos.stream().mapToLong(PainelEfetivoDTO.DetalheContrato::efetivoAlocado).sum();
+            var bases = efetivoTemporal.obterCoberturaAnalitica(ref, ref, recorte.contrato(), lotacao, gestao, se, recorte.tipo(), recorte.prestador());
+            long esperados = bases.stream().mapToLong(PainelEfetivoRepositorio.BaseCobertura::esperados).sum();
+            long lancados = bases.stream().mapToLong(PainelEfetivoRepositorio.BaseCobertura::lancados).sum();
+            long pendentes = bases.stream().mapToLong(PainelEfetivoRepositorio.BaseCobertura::pendentes).sum();
+            var diario = noRecorte(new PainelAnaliticoRepositorio.Filtro(gestao, se, recorte.contrato(), recorte.tipo(), u.id(), recorte.prestador()), List.of())
+                    .obterAnalisePeriodo(ref, ref, gestao, se);
+            return new PainelGestaoDTO.UnidadeGestao(u.id(), recorte.tipo().name(), u.nome(), null,
+                    previsto, alocado, previsto-alocado, previsto == 0 ? null : alocado*100D/previsto,
+                    contratos.size(), 0, diario.faltasNaoJustificadas() + diario.atestados() + diario.suspensoes(), esperados, lancados, pendentes, esperados == 0 ? 0 : lancados*100D/esperados);
+        }).toList();
     }
 
     private long valorLong(Map<String, Object> row, String key) {
