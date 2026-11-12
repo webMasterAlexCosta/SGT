@@ -20,4 +20,7 @@ test('funil lê o mesmo total canônico e conserva o zero quando não houve lan�
   expect(screen.getByText('Registros lançados').parentElement?.querySelector('strong')?.textContent).toBe('5');
   rerender(<FunilFrequencia frequencia={{ ...frequencia, registrosEsperados: 0 }} />);
   expect(screen.getByText('Registros lançados').parentElement?.querySelector('strong')?.textContent).toBe('0');
+  const medidor = screen.getByRole('meter', { name: 'Registros lançados' });
+  expect(medidor.getAttribute('aria-valuenow')).toBe('0');
+  expect((medidor.firstElementChild as HTMLElement).style.width).toBe('0%');
 });

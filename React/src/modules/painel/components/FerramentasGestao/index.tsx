@@ -601,7 +601,7 @@ export const PadraoSemanal = ({ dados = [] }: { dados?: DTO.PainelGestaoDTOPadra
           <BarChart data={semana} margin={{ top: 8, right: 8, left: -18, bottom: 2 }}>
             <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#d9e5eb" />
             <XAxis dataKey="dia" tickFormatter={(valor: string) => valor.slice(0, 3)} />
-            <YAxis unit="%" />
+            <YAxis unit="%" width={72} tick={{ fontSize: 12 }} />
             <Tooltip formatter={(valor, nome, item) => [
               `${percentual(valor)} · ${numero(item.payload.ausencias)} ausência(s) · ${numero(item.payload.registrosOperacionais)} lançamento(s) operacionais`,
               "Absenteísmo",
@@ -642,7 +642,7 @@ export const FunilFrequencia = ({ frequencia = {} }: { frequencia?: CoverageView
         {etapas.map((item, indice) => (
           <div key={item.rotulo}>
             <div><span>{item.rotulo}</span><strong>{numero(item.valor)}</strong></div>
-            <div className={estilos.faixaFunil}><span style={{ width: `${Math.max(2, item.valor * 100 / maximo)}%`, background: [CORES.azulEscuro, CORES.azul, CORES.verde, CORES.vermelho, CORES.amarelo][indice] }} /></div>
+            <div className={estilos.faixaFunil} role="meter" aria-label={item.rotulo} aria-valuemin={0} aria-valuemax={maximo} aria-valuenow={item.valor}><span style={{ width: `${item.valor * 100 / maximo}%`, background: [CORES.azulEscuro, CORES.azul, CORES.verde, CORES.vermelho, CORES.amarelo][indice] }} /></div>
             <small>{item.detalhe}</small>
           </div>
         ))}
