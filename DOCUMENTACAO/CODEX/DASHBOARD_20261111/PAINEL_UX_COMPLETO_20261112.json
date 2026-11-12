@@ -1,0 +1,152 @@
+{
+  "escopo": "Painel gerencial analítico completo de cinco períodos: filtros, quatro KPIs, evolução/comparação, metas, heatmap, funil, diagnóstico, alertas, navegação e detalhes. Cálculos/API inalterados.",
+  "commit_auditoria_ja_publicado": "23dd2437db64036a0287365a183ab4e077df9054",
+  "estado_git_refinamento": "local, sem novo commit/push",
+  "jar_sha256": "bdf997e2cec5b5605a64f29b541ead4ea0c5aaa693eb1be67c757011f85cccc4",
+  "fontes_manifesto_sha256": "e018a5ff1e1323c43bfe0323ae7452c6adcdd66365ae7ffc9985c34b2f5b39d9",
+  "classes_java_inalteradas": 866,
+  "assets_dist_static_jar": 111,
+  "assets_anteriores_preservados": 692,
+  "inventario_static_completo_igual_fonte": 803,
+  "checks": [
+    {
+      "check": "react-tests",
+      "exit": 0
+    },
+    {
+      "check": "react-build",
+      "exit": 0
+    },
+    {
+      "check": "assets-check",
+      "exit": 0
+    },
+    {
+      "check": "assets-sync",
+      "exit": 0
+    },
+    {
+      "check": "java-package",
+      "exit": 0
+    }
+  ],
+  "react": {
+    "arquivos": 111,
+    "testes": 875,
+    "focais_apos_altura_final_grafico": 16,
+    "typecheck": "pass",
+    "build": "pass",
+    "lint": "script inexistente"
+  },
+  "java_unitarios": {
+    "tests": 808,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "limite_reuso": "O ajuste final de altura fixa 300px removeu avisos de inicialização Recharts após a suíte ampla. Build contém height:300; 16 testes pertinentes rechecados. Nenhum bytecode Java mudou; ITs de negócio não repetidos.",
+  "navegador": {
+    "api_real": true,
+    "periodos": [
+      {
+        "tipo": "DIARIO",
+        "registros": 1
+      },
+      {
+        "tipo": "SEMANAL",
+        "registros": 48
+      },
+      {
+        "tipo": "MENSAL",
+        "registros": 162
+      },
+      {
+        "tipo": "TRIMESTRAL",
+        "registros": 189
+      },
+      {
+        "tipo": "ANUAL",
+        "registros": 189
+      }
+    ],
+    "referencia": "2026-11-11",
+    "metricas_evolucao": 4,
+    "detalhes_enter_escape_retorno_foco": 11,
+    "heatmap_base_e_foco": true,
+    "contrato_unidade_limpar_comparar": true,
+    "combinacao_invalida": {
+      "http": 403,
+      "sessao_preservada": true,
+      "recuperacao_limpar": true
+    },
+    "diagnostico": "Unidades, contratos/prestadores, registros de origem e busca exercitados",
+    "navegacao_visoes": [
+      "Resumo",
+      "Contratos",
+      "Operação",
+      "Governança",
+      "Tudo",
+      "Desempenho"
+    ],
+    "exportacoes": [
+      "XLSX ZIP íntegro",
+      "PDF com assinatura válida"
+    ],
+    "viewports_sem_overflow": [
+      1280,
+      1440,
+      1920
+    ],
+    "zoom": "CSS 125%, sem overflow; não é zoom nativo do navegador",
+    "console_recarga_jar_final": "Total messages: 0 (Errors: 0, Warnings: 0)"
+  },
+  "smoke_http": {
+    "jar_sha256": "bdf997e2cec5b5605a64f29b541ead4ea0c5aaa693eb1be67c757011f85cccc4",
+    "spa": [
+      {
+        "rota": "/",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/painel",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/contratos",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/relatorio-mensal",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/historico",
+        "status": 200,
+        "igual_dist": true
+      }
+    ],
+    "assets_servidos_com_hash_igual_ao_dist": 111,
+    "api_anonima_contratos": 401,
+    "csrf_bootstrap": 200,
+    "cookies_e_tokens_nao_registrados": true
+  },
+  "limites_memoria": {
+    "teto_humano_bytes": 15000000000,
+    "servicos_max_bytes": 4294967296,
+    "suite_max_bytes": 2147483648,
+    "swap_suite": 0,
+    "min_available_mib": 8192
+  },
+  "capturas": {
+    "antes-completo.png": "89141f3bdca44222bd08ae4adb3496f689e42aa42fae78e0a8dc368976fd6177",
+    "antes-viewport.png": "6d0deb30c0adab65afca174d5e1994a2801c63b617a628ebd4016db9b7c3d842",
+    "depois-completo.png": "9bb60026c6cbf74e3c2a5f17e2a5d6571b53a90d8cb9654f53a8fc87b9a6d686",
+    "depois-viewport.png": "c34223df4c78cfe9a3e4a2e4df3fb01dd0ba22904cd6fe35b3231a3492333172",
+    "zoom125.png": "8d0d6f6653b5b3695f3d157729b3ec0939f23f6bd832b2339e958fe84ae618d5"
+  },
+  "logs_privados_locais": ".homologacao/painel-ux-completo-20261112"
+}

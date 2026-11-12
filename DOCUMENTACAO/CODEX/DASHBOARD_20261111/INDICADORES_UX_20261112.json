@@ -1,0 +1,140 @@
+{
+  "commit_auditoria_publicado": "23dd2437db64036a0287365a183ab4e077df9054",
+  "fonte_base": "mesmo commit; refinamento visual posterior local",
+  "jar_sha256": "2f2ebceb8fcd7dde177b8ff4555fc9da62aaca8c93dd59b270cfa1a9c0a80bb9",
+  "manifesto_fontes_sha256": "b37cfa2c7528d13dccfa125382603faaf748c40b66d34c68ec91c1138a4c54a1",
+  "classes_java_preservadas": 866,
+  "assets_dist_static_jar": 111,
+  "classes_backend_identicas_ao_jar_auditoria": true,
+  "checks": [
+    {
+      "check": "react-tests",
+      "exit": 0
+    },
+    {
+      "check": "react-build",
+      "exit": 0
+    },
+    {
+      "check": "assets-check",
+      "exit": 0
+    },
+    {
+      "check": "assets-sync",
+      "exit": 0
+    },
+    {
+      "check": "java-package",
+      "exit": 0
+    }
+  ],
+  "reempacotamento_recursos": {
+    "comando": "bash ./mvnw -B -ntp -T1 -DskipTests package",
+    "testes_repetidos": false,
+    "bytecodes_teste_iguais_ao_package_com_808_passes": true,
+    "residuos_target_preservados_fora_do_jar": 50
+  },
+  "react": {
+    "arquivos": 111,
+    "testes": 875,
+    "typecheck": "pass",
+    "build": "pass",
+    "lint": "script inexistente"
+  },
+  "java_unitarios": {
+    "tests": 808,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "integracao_backend": "Não repetida: nenhum fonte/bytecode Java ou contrato de API mudou; houve package com unitários e smoke real da candidata.",
+  "template_publico": "SGT_PUBLIC_ENV_TEMPLATE=React/.env.example, caminho absoluto em execução",
+  "tentativa_configuracao_padrao": "Preservada fora do Git; assets removidos do static a partir do inventário do backup. Build de configuração padrão não ativado nem publicado. Validação repetida com template público. JAR intermediário reteve 50 assets não referenciados no target e chegou ao smoke local; API anterior restaurada, resíduos preservados fora do target e JAR reempacotado antes da entrega.",
+  "smoke_http": {
+    "jar_sha256": "2f2ebceb8fcd7dde177b8ff4555fc9da62aaca8c93dd59b270cfa1a9c0a80bb9",
+    "spa": [
+      {
+        "rota": "/",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/painel",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/contratos",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/relatorio-mensal",
+        "status": 200,
+        "igual_dist": true
+      },
+      {
+        "rota": "/historico",
+        "status": 200,
+        "igual_dist": true
+      }
+    ],
+    "assets_servidos_com_hash_igual_ao_dist": 111,
+    "api_anonima_contratos": 401,
+    "csrf_bootstrap": 200,
+    "cookies_e_tokens_nao_registrados": true
+  },
+  "contraste": {
+    "texto/branco": 6.85,
+    "texto/alternado": 6.49,
+    "texto/hover": 6.39,
+    "percentual/branco": 10.67,
+    "percentual/alternado": 10.11,
+    "percentual/hover": 9.95,
+    "acao/branco": 7.38,
+    "acao/alternado": 6.99,
+    "acao/hover": 6.88
+  },
+  "navegador": {
+    "browser": "Chromium",
+    "origem_final": "http://127.0.0.1:58501/painel",
+    "viewport_comparacao": [
+      1440,
+      1000
+    ],
+    "largura_componente_css_px": 353.765625,
+    "valores_antes_depois": [
+      "3,7%",
+      "90%",
+      "88,9%"
+    ],
+    "dados_sinteticos_reais_mesma_referencia": "2026-11-11",
+    "detalhes_enter_escape": [
+      "Cobertura de frequência",
+      "Ocupação do efetivo",
+      "Qualidade cadastral"
+    ],
+    "overflow_componente": false,
+    "viewport_adicional_hmr": [
+      1100,
+      900
+    ],
+    "overflow_adicional_hmr": false,
+    "capturas": [
+      "antes.png",
+      "depois.png"
+    ],
+    "console_final_recarga": "console-final.txt"
+  },
+  "limites": {
+    "teto_humano_bytes": 15000000000,
+    "suite_bytes": 2147483648,
+    "servicos_bytes": 4294967296,
+    "swap_suite_bytes": 0,
+    "reserva_entrada_mib": 8192
+  },
+  "screenshots": {
+    "antes.png": "6316ae807a3aa68ff65caa2d96e78f635db93d240ab84fdb68666a205dee48a0",
+    "depois.png": "e9289171b41bc02250abbd03e12fa52d2ea010ff5f61e7edddca192bb07b5ce6"
+  }
+}

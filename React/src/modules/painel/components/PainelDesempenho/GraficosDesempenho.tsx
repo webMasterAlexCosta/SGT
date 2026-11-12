@@ -32,22 +32,22 @@ export function Evolucao({ dados, abrir }: { dados: PainelAnaliticoDTO; abrir: A
       <label className={estilos.seletorMetrica}><span className={estilos.somenteLeitor}>Métrica da evolução</span><select aria-label="Métrica da evolução" value={metrica} onChange={e => setMetrica(e.target.value as keyof TotaisAnalitico | 'pendentes')}><option value="registros">Registros operacionais</option><option value="presencas">Presenças</option><option value="ausencias">Ausências</option><option value="pendentes">Pendências de lançamento</option></select></label>
     </header>
     <div className={estilos.grafico}>
-      {pontos.length ? <ResponsiveContainer width="100%" height={185}>
-        <AreaChart data={pontos} margin={{ left: 10, right: 22, top: 14, bottom: 10 }} onClick={e => {
+      {pontos.length ? <ResponsiveContainer width="100%" height={300}>
+        <AreaChart data={pontos} margin={{ left: 0, right: 14, top: 16, bottom: 10 }} onClick={e => {
           const i = Number(e.activeTooltipIndex);
           if (e.activeTooltipIndex !== null && Number.isInteger(i) && dados.evolucao[i]) {
             detalhar(i);
           }
         }}>
-          <CartesianGrid vertical={false} stroke="var(--cor-borda-sutil)" />
-          <XAxis dataKey="rotulo" tick={{ fill: 'var(--cor-texto-secundario)', fontSize: 12 }} />
-          <YAxis allowDecimals={false} tick={{ fill: 'var(--cor-texto-secundario)', fontSize: 12 }} width={62} />
-          <Tooltip formatter={v => numero(Number(v ?? 0))} labelFormatter={label => {
+          <CartesianGrid vertical={false} stroke="var(--cor-borda-sutil)" strokeDasharray="3 4" />
+          <XAxis dataKey="rotulo" tick={{ fill: 'var(--cor-texto-secundario)', fontSize: 12 }} minTickGap={28} tickLine={false} axisLine={false} tickMargin={12} />
+          <YAxis allowDecimals={false} tick={{ fill: 'var(--cor-texto-secundario)', fontSize: 12 }} width={48} tickLine={false} axisLine={false} />
+          <Tooltip contentStyle={{ borderRadius: 8, borderColor: 'var(--cor-borda-sutil)', color: 'var(--cor-texto-principal)', fontSize: 13 }} formatter={v => numero(Number(v ?? 0))} labelFormatter={label => {
             const i = pontos.findIndex(p => p.rotulo === label); const p = dados.evolucao[i];
             return p ? <span>{intervalo(p.periodo.inicio, p.periodo.fim)}{p.periodo.parcial ? ' · PARCIAL' : ''}{p.periodoAnterior && <span style={{ display: 'block' }}>Anterior: {intervalo(p.periodoAnterior.inicio, p.periodoAnterior.fim)}</span>}</span> : String(label);
           }} />
-          <Legend />
-          <Area dataKey="atual" name="Atual" type="linear" stroke="var(--cor-correios-azul-600)" fill="var(--cor-correios-azul-100)" strokeWidth={3} dot={{ r: 4 }} isAnimationActive={false} />
+          <Legend wrapperStyle={{ fontSize: 12, paddingTop: 12 }} />
+          <Area dataKey="atual" name="Atual" type="linear" stroke="var(--cor-correios-azul-600)" fill="var(--cor-correios-azul-100)" strokeWidth={3} dot={{ r: 2.5 }} activeDot={{ r: 5 }} isAnimationActive={false} />
           {dados.selecao.comparar && <Area dataKey="anterior" name="Anterior equivalente" type="linear" stroke="var(--cor-texto-secundario)" fill="transparent" strokeDasharray="6 5" connectNulls={false} isAnimationActive={false} />}
         </AreaChart>
       </ResponsiveContainer> : <p className={estilos.vazio}>Nenhum ponto histórico disponível.</p>}

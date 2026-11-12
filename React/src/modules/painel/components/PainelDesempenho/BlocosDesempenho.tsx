@@ -17,18 +17,19 @@ export function IndicadoresPeriodo({ dados, abrir }: Props) {
     { nome: 'Fora do prazo', valor: numero(t.fora), texto: 'Primeiro lançamento após o prazo', ajuda: 'A edição preserva essa classificação', Icone: Clock3, metrica: 'fora' as const },
     { nome: 'Em revisão', valor: numero(t.emRevisao), texto: 'Solicitações aguardando o Gestor Local', ajuda: 'Pode coexistir com dentro ou fora do prazo', Icone: SearchCheck, metrica: 'revisao' as const },
   ];
-  return <section className={estilos.kpis} aria-label="Indicadores do período">{kpis.map(k => <button key={k.nome} type="button" className={estilos.kpi} aria-label={`${k.nome}: ${k.valor}`} onClick={() => abrir({ titulo: k.nome, faixa, totais: dados.resumoPeriodo, metrica: k.metrica })}>
-    <span>{k.nome}<k.Icone size={16} aria-hidden="true" /></span><strong>{k.valor}</strong><small>{k.texto}</small><p>{k.ajuda}</p>
+  return <section className={estilos.kpis} aria-label="Indicadores do período">{kpis.map(k => <button key={k.nome} type="button" className={estilos.kpi} data-metrica={k.metrica} aria-label={`${k.nome}: ${k.valor}`} onClick={() => abrir({ titulo: k.nome, faixa, totais: dados.resumoPeriodo, metrica: k.metrica })}>
+    <span className={estilos.rotuloKpi}>{k.nome}<k.Icone size={19} aria-hidden="true" /></span><strong>{k.valor}</strong><small>{k.texto}</small><p>{k.ajuda}</p><span className={estilos.acaoKpi}>Ver detalhes<ArrowUpRight size={15} aria-hidden="true" /></span>
   </button>)}</section>;
 }
 
 export function MetasProgresso({ dados, abrir }: Props) {
   return <section className={estilos.painel} aria-label="Indicadores de desempenho e metas"><header className={estilos.cabecalhoBloco}><div><h2>Indicadores de desempenho e metas</h2><p>Fotografia de {dataCivil(dados.referencia)} · metas propostas</p></div></header>
-    {dados.metas.map(m => <button type="button" className={estilos.meta} key={m.codigo} onClick={() => abrir({ titulo: m.nome, faixa: { inicio: dados.referencia, fim: dados.referencia, parcial: false, rotulo: 'Referência' }, totais: dados.resumoPeriodo, nota: m.fonte })}>
-      <span><strong>{m.nome}</strong><b>{percentual(m.valor)}</b></span>
+    <div className={estilos.listaMetas}>{dados.metas.map(m => <button type="button" className={estilos.meta} key={m.codigo} onClick={() => abrir({ titulo: m.nome, faixa: { inicio: dados.referencia, fim: dados.referencia, parcial: false, rotulo: 'Referência' }, totais: dados.resumoPeriodo, nota: m.fonte })}>
+      <span className={estilos.tituloMeta}><strong>{m.nome}</strong><b data-sem-base={m.valor === null}>{percentual(m.valor)}</b></span>
       {m.valor !== null ? <progress max={100} value={Math.max(0, Math.min(100, m.valor))} aria-label={m.nome} /> : <span className={estilos.semBase}>Sem base comprovada para publicar a taxa</span>}
-      <small>{m.fonte}</small><span className={estilos.alvo}>Meta proposta: {percentual(m.meta)}</span>
-    </button>)}
+      <small>{m.fonte}</small>
+      <span className={estilos.rodapeMeta}><span className={estilos.alvo}>Meta proposta: <b>{percentual(m.meta)}</b></span><span className={estilos.acaoMeta}>Ver base<ArrowUpRight size={14} aria-hidden="true" /></span></span>
+    </button>)}</div>
     <p className={estilos.nota}>Propostas para avaliação da chefia. Clique no indicador para consultar sua base.</p>
   </section>;
 }
@@ -45,7 +46,7 @@ export function FunilCobertura({ dados, abrir }: Props) {
 }
 
 export function AlertasOperacionais({ dados, abrir }: Props) {
-  return <section className={estilos.painel}><h2>Precisa da sua atenção</h2>{dados.alertas.length ? dados.alertas.map(a => <button key={a.codigo} type="button" className={estilos.alerta} onClick={() => abrir({ titulo: a.titulo, faixa: { inicio: a.codigo === 'REVISAO_SOLICITADA' || a.codigo === 'AUSENCIAS_REGISTRADAS' ? dados.intervalo.inicio : dados.referencia, fim: dados.referencia, parcial: false, rotulo: 'Alerta' }, totais: dados.resumoPeriodo, nota: a.mensagem, rota: a.rota })}>
+  return <section className={estilos.painel} aria-label="Alertas operacionais"><header className={estilos.cabecalhoBloco}><div><h2>Precisa da sua atenção</h2><p>Prioridades identificadas no recorte</p></div></header>{dados.alertas.length ? dados.alertas.map(a => <button key={a.codigo} type="button" className={estilos.alerta} onClick={() => abrir({ titulo: a.titulo, faixa: { inicio: a.codigo === 'REVISAO_SOLICITADA' || a.codigo === 'AUSENCIAS_REGISTRADAS' ? dados.intervalo.inicio : dados.referencia, fim: dados.referencia, parcial: false, rotulo: 'Alerta' }, totais: dados.resumoPeriodo, nota: a.mensagem, rota: a.rota })}>
     <AlertTriangle size={17} aria-hidden="true" /><span><strong>{a.titulo}</strong><small>{a.mensagem}</small></span><ArrowUpRight size={16} aria-hidden="true" />
   </button>) : <p className={estilos.vazio}>Nenhum alerta derivado das bases disponíveis neste recorte.</p>}</section>;
 }

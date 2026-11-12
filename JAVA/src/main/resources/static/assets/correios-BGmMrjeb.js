@@ -1,1 +1,0 @@
-var e=`/assets/correios-_LDgLVAb.png`;export{e as t};

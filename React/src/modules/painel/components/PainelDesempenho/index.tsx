@@ -1,5 +1,5 @@
 import React, { useCallback, useState } from 'react';
-import { AlertTriangle, CalendarDays, Download, RefreshCw } from 'lucide-react';
+import { AlertTriangle, CalendarDays, Download, FileText, RefreshCw } from 'lucide-react';
 import type { FaixaAnalitico, GranularidadePainel, TotaisAnalitico } from '../../../../contracts/painel-analitico';
 import { ModalPainel } from '../ModalPainel';
 import { Evolucao, Heatmap, type AbrirDetalhe, type DetalheDesempenho } from './GraficosDesempenho';
@@ -30,11 +30,11 @@ export default function PainelDesempenho({ referenciaInicial, aoNavegar }: { ref
   };
 
   return <div className={estilos.desempenho}>
-    <header className={estilos.titulo}><div><h1>Desempenho operacional</h1><p>Frequências, efetivo e prioridades para a decisão gerencial.</p></div><div className={estilos.acoesTitulo}><span><CalendarDays size={15} aria-hidden="true" />{dados ? `Referência ${dataCivil(dados.referencia)}` : 'Consulta ao servidor'}</span><div className={estilos.exportacoes}><Download size={16} aria-hidden="true" /><button type="button" disabled={!dados} onClick={() => void exportar('xlsx')}>Exportar XLSX</button><button type="button" disabled={!dados} onClick={() => void exportar('pdf')}>PDF</button></div></div></header>
-    <section className={estilos.painel} aria-label="Filtros de desempenho">
+    <header className={estilos.titulo}><div><h1>Desempenho operacional</h1><p>Frequências, efetivo e prioridades para a decisão gerencial.</p></div><div className={estilos.acoesTitulo}><div className={estilos.exportacoes}><button type="button" disabled={!dados} onClick={() => void exportar('xlsx')}><Download size={16} aria-hidden="true" />Exportar XLSX</button><button type="button" disabled={!dados} onClick={() => void exportar('pdf')}><FileText size={16} aria-hidden="true" />PDF</button></div></div></header>
+    <section className={`${estilos.painel} ${estilos.painelFiltros}`} aria-label="Filtros de desempenho">
       <div className={estilos.cabecalhoFiltro}>
         <div className={estilos.segmentado} aria-label="Período de análise">{periodos.map(p => <button key={p.id} type="button" aria-pressed={filtros.granularidade === p.id} onClick={() => { fechar(); alterar({ granularidade: p.id }); }}>{p.nome}</button>)}</div>
-        <label className={estilos.dataReferencia}>Referência<input aria-label="Data de referência" type="date" min={String(Number(hojeCivil().slice(0,4))-2)+hojeCivil().slice(4)} max={hojeCivil()} value={filtros.referencia} onChange={e => { if (e.target.value) { fechar(); alterar({ referencia: e.target.value }); } }} /></label>
+        <label className={estilos.dataReferencia}><CalendarDays size={16} aria-hidden="true" />Referência<input aria-label="Data de referência" type="date" min={String(Number(hojeCivil().slice(0,4))-2)+hojeCivil().slice(4)} max={hojeCivil()} value={filtros.referencia} onChange={e => { if (e.target.value) { fechar(); alterar({ referencia: e.target.value }); } }} /></label>
         <label className={estilos.checkbox}><input type="checkbox" checked={filtros.comparar} onChange={e => { fechar(); alterar({ comparar: e.target.checked }); }} />Comparar período anterior</label>
         <button type="button" className={estilos.atualizar} aria-label="Atualizar desempenho" onClick={recarregar}><RefreshCw size={16} aria-hidden="true" /></button>
       </div>
@@ -47,14 +47,14 @@ export default function PainelDesempenho({ referenciaInicial, aoNavegar }: { ref
     </section>
     {erro && <div role="alert" className={estilos.erro}><AlertTriangle size={19} aria-hidden="true" /><span>{erro}</span><button type="button" onClick={recarregar}>Tentar novamente</button></div>}
     {erroExportacao && <p role="alert" className={estilos.erro}>{erroExportacao}</p>}
-    <div role="status" aria-live="polite">{carregando && <p className={estilos.carregando}>Consultando indicadores reais no servidor…</p>}</div>
+    <div role="status" aria-live="polite" className={estilos.statusConsulta}>{carregando && <p className={estilos.carregando}>Consultando indicadores reais no servidor…</p>}</div>
     {dados && faixa && <>
-      <div className={estilos.intervaloAplicado}><div><strong>{periodos.find(p => p.id === dados.intervalo.granularidade)?.nome} · {intervalo(dados.intervalo.inicio, dados.intervalo.fim)}</strong><span>{dados.intervalo.parcial ? 'Período parcial' : 'Período completo'}</span></div><small>{dados.comparativo && <>Anterior: {intervalo(dados.intervalo.anteriorInicio,dados.intervalo.anteriorFim)} · </>}{dados.escopo.nome}</small></div>
+      <div className={estilos.intervaloAplicado}><div><strong>{periodos.find(p => p.id === dados.intervalo.granularidade)?.nome} · {intervalo(dados.intervalo.inicio, dados.intervalo.fim)}</strong><span>{dados.intervalo.parcial ? 'Período parcial' : 'Período completo'}</span>{dados.comparativo && <small>Anterior equivalente: {intervalo(dados.intervalo.anteriorInicio,dados.intervalo.anteriorFim)}</small>}</div><div className={estilos.contextoConsulta}><small>{dados.escopo.nome}</small><small>Atualizado em <time dateTime={dados.geradoEm}>{new Date(dados.geradoEm).toLocaleString('pt-BR')}</time></small></div></div>
       <IndicadoresPeriodo dados={dados} abrir={abrir} />
-      <div className={estilos.faixaAnalise}><MetasProgresso dados={dados} abrir={abrir} /><Evolucao dados={dados} abrir={abrir} /></div>
+      <div className={estilos.faixaAnalise}><Evolucao dados={dados} abrir={abrir} /><MetasProgresso dados={dados} abrir={abrir} /></div>
       <div className={estilos.faixaCobertura}><Heatmap dados={dados} abrir={abrir} /><FunilCobertura dados={dados} abrir={abrir} /></div>
+      <div className={estilos.faixaDiagnostico}><DiagnosticoRecorte dados={dados} abrir={abrir} /><AlertasOperacionais dados={dados} abrir={abrir} /></div>
       <nav className={estilos.paginacao} aria-label="Páginas das unidades"><button type="button" disabled={!dados.paginaUnidades} onClick={() => alterar({ paginaUnidades: dados.paginaUnidades - 1 })}>Anterior</button><span>{dados.totalUnidades} unidade(s) · página {dados.paginaUnidades + 1}</span><button type="button" disabled={(dados.paginaUnidades + 1) * dados.tamanhoPagina >= dados.totalUnidades} onClick={() => alterar({ paginaUnidades: dados.paginaUnidades + 1 })}>Próxima</button></nav>
-      <div className={estilos.faixaDiagnostico}><AlertasOperacionais dados={dados} abrir={abrir} /><DiagnosticoRecorte dados={dados} abrir={abrir} /></div>
       <details className={estilos.metodologia}><summary>Fontes e regras dos indicadores</summary><p>Versão {dados.versaoMetodologia} · gerado em {new Date(dados.geradoEm).toLocaleString('pt-BR')}</p><ul>{[...dados.metodologia, ...dados.indisponibilidades].map(m => <li key={m}>{m}</li>)}</ul></details>
     </>}
     <ModalPainel aberto={Boolean(detalhe && dados)} titulo={detalhe?.titulo || ''} detalhe={detalhe ? intervalo(detalhe.faixa.inicio, detalhe.faixa.fim) : ''} aoFechar={fechar} selo="Origem do indicador" permitirTelaCheia={false} lateral>
