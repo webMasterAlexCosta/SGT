@@ -160,16 +160,25 @@ class ArtefatoEmpacotadoIT {
         assertNotNull(group, "groupId explícito da candidata ausente");
         assertNotNull(artifact, "artifactId explícito da candidata ausente");
         assertNotNull(version, "versão explícita da candidata ausente");
+        Element configuracaoBuild = elementoFilho(project, "build");
+        String nomeFinal = configuracaoBuild == null ? null : filho(configuracaoBuild, "finalName");
+        if (nomeFinal == null || nomeFinal.isBlank()) nomeFinal = artifact + "-" + version;
+        assertFalse(nomeFinal.contains("${"), "finalName precisa estar resolvido para identificar o JAR real");
         Path build = base.resolve(System.getProperty("sgt.build.directory", "target")).normalize();
-        Path jar = build.resolve(artifact + "-" + version + ".jar");
+        Path jar = build.resolve(nomeFinal + ".jar");
         assertTrue(Files.isRegularFile(jar), "Execute Maven verify com package/repackage; JAR ausente: " + jar);
         assertTrue(Files.isDirectory(build.resolve("classes")), "Diretório classes ausente: " + build);
         return new Projeto(group, artifact, version, build, build.resolve("classes"), jar);
     }
 
     private String filho(Element parent, String name) {
+        Element element = elementoFilho(parent, name);
+        return element == null ? null : element.getTextContent().trim();
+    }
+
+    private Element elementoFilho(Element parent, String name) {
         for (Node child = parent.getFirstChild(); child != null; child = child.getNextSibling()) {
-            if (child instanceof Element element && name.equals(element.getLocalName())) return element.getTextContent().trim();
+            if (child instanceof Element element && name.equals(element.getLocalName())) return element;
         }
         return null;
     }
