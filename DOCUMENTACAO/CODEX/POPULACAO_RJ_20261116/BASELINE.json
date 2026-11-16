@@ -1,0 +1,32 @@
+{
+  "data": "2026-11-16",
+  "baseline_commit": "e873b36b7382c510cc2284340df44c9ddad80ef7",
+  "baseline_tag_local": "codex/baseline-rj-20261116",
+  "branch": "codex/sgt-progresso-seguro-20261111",
+  "arvore_limpa": true,
+  "fontes_manifesto_sha256": "5c622818523ac2b37817140d0b139cdacf72d7a38d62a1773a817b32611184a4",
+  "fontes_arquivo_sha256": "8d79f80a4c807dc72ed4385c0693d986804e54f65d9b710892abf5ebd8184063",
+  "jar_sha256": "877d243c76d460d0bf7ed1b4b2dfe8fe492af41d5d21782110d58e7cebcfe0f4",
+  "target_arquivo_sha256": "2b8353adfa676774939015c0f705ad50fdb5d3977143b8674cc78a6851a62807",
+  "api_estava_ativa": true,
+  "api_parada_para_clean_package": true,
+  "fonte_ou_dados_alterados": false,
+  "build_pre_alteracao": "aprovado",
+  "observacao": "Backup e logs privados locais; não publicar credenciais ou target.",
+  "build_exit": 0,
+  "build_segundos": 107.12,
+  "build_comando": [
+    "bash",
+    "./mvnw",
+    "-B",
+    "-ntp",
+    "-T1",
+    "-Dtest.jvm.args=-Xmx768m -XX:MaxMetaspaceSize=256m -XX:ActiveProcessorCount=2",
+    "clean",
+    "package"
+  ],
+  "jar_apos_build_sha256": "877d243c76d460d0bf7ed1b4b2dfe8fe492af41d5d21782110d58e7cebcfe0f4",
+  "java_unitarios_aprovados": 811,
+  "pico_build": "1.3 GiB",
+  "swap_build_bytes": 0
+}
