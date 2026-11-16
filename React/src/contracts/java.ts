@@ -1756,7 +1756,7 @@ export interface PainelGestaoDTOUnidadeGestao {
   empregadosEsperados: number;
   registrosEsperados: number;
   pendentesFrequencia: number;
-  percentualCoberturaEscala: number;
+  percentualCoberturaEscala: number | null;
 }
 
 export interface PainelGestaoDTOSerieTemporal {

@@ -1159,12 +1159,26 @@ public class PainelRepositorio {
             long esperados = bases.stream().mapToLong(PainelEfetivoRepositorio.BaseCobertura::esperados).sum();
             long lancados = bases.stream().mapToLong(PainelEfetivoRepositorio.BaseCobertura::lancados).sum();
             long pendentes = bases.stream().mapToLong(PainelEfetivoRepositorio.BaseCobertura::pendentes).sum();
-            var diario = noRecorte(new PainelAnaliticoRepositorio.Filtro(gestao, se, recorte.contrato(), recorte.tipo(), u.id(), recorte.prestador()), List.of())
-                    .obterAnalisePeriodo(ref, ref, gestao, se);
+            var unidadeRecortada = noRecorte(new PainelAnaliticoRepositorio.Filtro(gestao, se, recorte.contrato(), recorte.tipo(), u.id(), recorte.prestador()), List.of());
+            var diario = unidadeRecortada.obterAnalisePeriodo(ref, ref, gestao, se);
+            long alertas = unidadeRecortada.contarAlertasContratuais(ref, gestao, se);
+            boolean coberturaComprovada = esperados > 0 && bases.stream().allMatch(b -> b.semGrade() == 0);
             return new PainelGestaoDTO.UnidadeGestao(u.id(), recorte.tipo().name(), u.nome(), null,
                     previsto, alocado, previsto-alocado, previsto == 0 ? null : alocado*100D/previsto,
-                    contratos.size(), 0, diario.faltasNaoJustificadas() + diario.atestados() + diario.suspensoes(), esperados, lancados, pendentes, esperados == 0 ? 0 : lancados*100D/esperados);
+                    contratos.size(), alertas, diario.faltasNaoJustificadas() + diario.atestados() + diario.suspensoes(), esperados, lancados, pendentes, coberturaComprovada ? lancados*100D/esperados : null);
         }).toList();
+    }
+
+    /** Alertas cadastrais: um contrato ativo conta uma vez, mesmo com mais de uma pendência. */
+    private long contarAlertasContratuais(LocalDate referencia, Long gestao, Long se) {
+        String sql = """
+                SELECT COUNT(*) FROM contrato c
+                 WHERE COALESCE(c.ativo, TRUE) = TRUE
+                   AND (c.data_fim < :referencia OR c.data_fim IS NULL
+                        OR COALESCE(c.efetivo_previsto, 0) <= 0)
+                """ + condicaoEscopo("c.id_gestao_local", gestao, se);
+        Long quantidade = namedJdbcTemplate.queryForObject(sql, parametrosBase(referencia, gestao, se), Long.class);
+        return quantidade == null ? 0 : quantidade;
     }
 
     private long valorLong(Map<String, Object> row, String key) {

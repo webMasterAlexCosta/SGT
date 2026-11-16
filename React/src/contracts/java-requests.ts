@@ -1745,7 +1745,7 @@ export interface RequestPainelGestaoDTOUnidadeGestao {
   empregadosEsperados?: number;
   registrosEsperados?: number;
   pendentesFrequencia?: number;
-  percentualCoberturaEscala?: number;
+  percentualCoberturaEscala?: number | null;
 }
 
 export interface RequestPainelGestaoDTOSerieTemporal {

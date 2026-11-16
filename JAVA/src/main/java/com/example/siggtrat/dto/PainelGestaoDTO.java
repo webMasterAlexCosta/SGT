@@ -220,7 +220,7 @@ public record PainelGestaoDTO(
             long empregadosEsperados,
             @JsonAlias("registrosLancados") long registrosEsperados,
             long pendentesFrequencia,
-            double percentualCoberturaEscala
+            Double percentualCoberturaEscala
     ) {}
 
     public record SerieTemporal(

@@ -7,6 +7,7 @@ import { api } from '../src/core/http';
 import { invalidarGeracaoSessao } from '../src/core/security/geracaoSessao';
 import PainelGerencial from '../src/modules/painel/components/PainelGerencial';
 import { fixtureVisoes } from './fixtures/painel-visoes';
+import { ComparativoUnidades, PrioridadesPorUnidade } from '../src/modules/painel/components/FerramentasGestao';
 import { linhasVisao } from '../src/modules/painel/components/PainelGerencial/exportacao';
 
 let anterior: typeof api.defaults.adapter;
@@ -62,5 +63,23 @@ describe('paridade do painel gerencial', () => {
     expect(linhas[0]).toEqual(['SGT — Contratos', 'ANUAL']);
     expect(linhas.flat()).toContain('Contratos sem data final');
     expect(linhas.flat()).toContain('01/01/2026 a 10/11/2026');
+  });
+});
+
+
+describe('bases do comparativo por unidade', () => {
+  const semBase = { id: 1, tipo: 'LOTACAO', nome: 'Unidade sem grade', uf: null, efetivoPrevisto: 10,
+    efetivoAtual: 10, saldo: 0, percentualOcupacao: 100, contratosVigentes: 1, alertasContratuais: 0,
+    ausenciasNaReferencia: 0, empregadosEsperados: 1, registrosEsperados: 0, pendentesFrequencia: 0,
+    percentualCoberturaEscala: null };
+  it('mostra indisponibilidade sem inventar cobertura ou prioridade crítica', () => {
+    render(<><ComparativoUnidades unidades={[semBase]} /><PrioridadesPorUnidade unidades={[semBase]} /></>);
+    expect(screen.getByText('Sem base')).toBeVisible();
+    expect(screen.getByText('Nenhuma unidade ultrapassou os critérios explícitos de atenção.')).toBeVisible();
+  });
+  it('calcula a média apenas das unidades com cobertura comprovada', () => {
+    render(<ComparativoUnidades unidades={[semBase, { ...semBase, id: 2, nome: 'Unidade com base', percentualCoberturaEscala: 80 }]} />);
+    expect(screen.getByText('80%')).toBeVisible();
+    expect(screen.queryByText('40%')).toBeNull();
   });
 });

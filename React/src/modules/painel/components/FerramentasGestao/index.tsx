@@ -40,7 +40,7 @@ import estilos from "./index.module.css";
 import { BotaoAjudaPainel, BotaoExpandirPainel, ModalAjudaIndicador, ModalPainel } from "../ModalPainel/index.tsx";
 
 const numero = (valor: (number | undefined) | (number) | (import("recharts").TooltipValueType | undefined)) => new Intl.NumberFormat("pt-BR").format(Number(valor || 0));
-const percentual = (valor: (number | undefined) | (number) | (import("recharts").TooltipValueType | undefined)) => `${Number(valor || 0).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+const percentual = (valor: number | null | undefined | import("recharts").TooltipValueType) => valor === null ? "Sem base" : `${Number(valor || 0).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
 const dataHora = (valor: (`${number}-${number}-${number}T${string}` | null | undefined)) => valor ? new Date(valor).toLocaleString("pt-BR") : "Sem atualização no período";
 const mesAno = (valor: (`${number}-${number}-${number}` | null)) => valor
   ? new Intl.DateTimeFormat("pt-BR", { month: "short", year: "2-digit" })
@@ -118,7 +118,8 @@ const CORES = {
   turquesa: "#0f9aa8",
 };
 
-const corCobertura = (valor: (number)) => {
+const corCobertura = (valor: number | null) => {
+  if (valor == null) return CORES.cinza;
   const n = Number(valor || 0);
   if (n >= 95) return CORES.verde;
   if (n >= 85) return CORES.azul;
@@ -655,24 +656,26 @@ export const FunilFrequencia = ({ frequencia = {} }: { frequencia?: CoverageView
 export const ComparativoUnidades = ({ unidades = [], nivel }: { unidades?: DTO.PainelGestaoDTOUnidadeGestao[]; nivel?: string }) => {
   const dados = useMemo(() => unidades
     .filter((item) => Number(item.empregadosEsperados || 0) > 0 || item.percentualOcupacao != null)
-    .sort((a, b) => Number(a.percentualCoberturaEscala || 0) - Number(b.percentualCoberturaEscala || 0)
+    .sort((a, b) => (a.percentualCoberturaEscala ?? Infinity) - (b.percentualCoberturaEscala ?? Infinity)
       || Number(b.alertasContratuais || 0) - Number(a.alertasContratuais || 0))
     .slice(0, 12)
     .map((item) => ({
       nome: (item.nome?.length || 0) > 24 ? `${item.nome?.slice(0, 22)}…` : item.nome,
-      cobertura: Number(item.percentualCoberturaEscala || 0),
+      cobertura: item.empregadosEsperados > 0 ? item.percentualCoberturaEscala : null,
       ocupacao: item.percentualOcupacao == null ? null : Number(item.percentualOcupacao),
       pendentes: Number(item.pendentesFrequencia || 0),
       corCobertura: corCobertura(item.percentualCoberturaEscala),
       corOcupacao: corOcupacao(item.percentualOcupacao),
     })), [unidades]);
+  const coberturas = dados.flatMap(item => item.cobertura == null ? [] : [item.cobertura]);
+  const coberturaMedia = coberturas.length ? coberturas.reduce((soma, valor) => soma + valor, 0) / coberturas.length : null;
   const rotulo = nivel === "NACIONAL" ? "gestor estadual" : nivel === "SUPERINTENDENCIA" ? "Gestão Local" : "lotação";
   return (
     <Cartao titulo="Comparativo de capacidade e cobertura na referência" icone={BarChart3} detalhe={`Até 12 ${rotulo}(s) prioritária(s)`} largo>
       <FaixaResumo
         itens={[
           { rotulo: "Unidades comparadas", valor: numero(dados.length), classe: estilos.resumoInfo },
-          { rotulo: "Cobertura média", valor: dados.length ? percentual(dados.reduce((soma, item) => soma + Number(item.cobertura || 0), 0) / dados.length) : "0%", classe: estilos.resumoSucesso },
+          { rotulo: "Cobertura média", valor: percentual(coberturaMedia), classe: estilos.resumoSucesso },
           { rotulo: "Pendências", valor: numero(dados.reduce((soma, item) => soma + Number(item.pendentes || 0), 0)), classe: estilos.resumoAtencao },
         ]}
       />
@@ -702,19 +705,19 @@ export const ComparativoUnidades = ({ unidades = [], nivel }: { unidades?: DTO.P
         </div>
         </>
       ) : <div className={estilos.vazio}>Sem unidades com escala esperada ou dimensionamento contratual para comparar.</div>}
-      <p className={estilos.nota}>Cobertura da escala, pendências e ausências deste comparativo são uma fotografia da data de referência; não são médias do período selecionado. A lista prioriza menor cobertura e maior quantidade de alertas contratuais. Ocupação acima de 100% indica efetivo vinculado superior ao previsto.</p>
+      <p className={estilos.nota}>Cobertura da escala, pendências e ausências deste comparativo são uma fotografia da data de referência; não são médias do período selecionado. A média considera somente unidades com cobertura comprovada; sem escala esperada ou com grade incompleta, a cobertura fica indisponível. A lista prioriza menor cobertura e maior quantidade de alertas cadastrais de contratos ativos (vencidos, sem término ou sem efetivo previsto), contados uma vez por contrato. Ocupação acima de 100% indica efetivo vinculado superior ao previsto.</p>
     </Cartao>
   );
 };
 
 const motivosUnidade = (unidade: (DTO.PainelGestaoDTOUnidadeGestao)) => {
   const motivos: string[] = [];
-  if (Number(unidade.alertasContratuais || 0) > 0) motivos.push(`${numero(unidade.alertasContratuais)} alerta(s) contratual(is)`);
-  if (Number(unidade.empregadosEsperados || 0) > 0 && Number(unidade.percentualCoberturaEscala || 0) < 85) {
+  if (Number(unidade.alertasContratuais || 0) > 0) motivos.push(`${numero(unidade.alertasContratuais)} alerta(s) cadastral(is) de contrato`);
+  if (Number(unidade.empregadosEsperados || 0) > 0 && unidade.percentualCoberturaEscala != null && unidade.percentualCoberturaEscala < 85) {
     motivos.push(`${numero(unidade.pendentesFrequencia)} pendência(s) de frequência · cobertura ${percentual(unidade.percentualCoberturaEscala)}`);
   }
   if (Number(unidade.percentualOcupacao || 0) > 110) motivos.push("ocupação acima de 110%");
-  if (unidade.efetivoPrevisto != null && Number(unidade.percentualOcupacao || 0) < 80) motivos.push("ocupação abaixo de 80%");
+  if (Number(unidade.efetivoPrevisto || 0) > 0 && unidade.percentualOcupacao != null && unidade.percentualOcupacao < 80) motivos.push("ocupação abaixo de 80%");
   if (Number(unidade.ausenciasNaReferencia || 0) > 0) motivos.push(`${numero(unidade.ausenciasNaReferencia)} ausência(s) na referência`);
   return motivos;
 };

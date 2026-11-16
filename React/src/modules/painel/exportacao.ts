@@ -142,7 +142,7 @@ const statusGestao = (condicaoCritica: boolean, condicaoAtencao = false): { text
 };
 
 const classificacaoUnidade = (item: DTO.PainelGestaoDTOUnidadeGestao) => {
-  const cobertura = Number(item?.percentualCoberturaEscala || 0);
+  const cobertura = item.percentualCoberturaEscala;
   const ocupacao = item?.percentualOcupacao == null ? null : Number(item.percentualOcupacao);
   const alertas = Number(item?.alertasContratuais || 0);
   const pendentes = Number(item?.pendentesFrequencia || 0);
@@ -150,14 +150,14 @@ const classificacaoUnidade = (item: DTO.PainelGestaoDTOUnidadeGestao) => {
   const motivos: string[] = [];
 
   if (alertas > 0) motivos.push(`${alertas} alerta(s) contratual(is)`);
-  if (Number(item?.empregadosEsperados || 0) > 0 && cobertura < 85) motivos.push(`cobertura ${cobertura.toFixed(1)}%`);
+  if (Number(item?.empregadosEsperados || 0) > 0 && cobertura != null && cobertura < 85) motivos.push(`cobertura ${cobertura.toFixed(1)}%`);
   if (pendentes > 0) motivos.push(`${pendentes} pendência(s) de frequência`);
   if (ocupacao != null && ocupacao > 110) motivos.push(`ocupação ${ocupacao.toFixed(1)}% acima do previsto`);
   if (ocupacao != null && item?.efetivoPrevisto != null && ocupacao < 80) motivos.push(`ocupação ${ocupacao.toFixed(1)}% abaixo do previsto`);
   if (ausencias > 0) motivos.push(`${ausencias} ausência(s) na referência`);
 
-  const critico = alertas > 0 || (Number(item?.empregadosEsperados || 0) > 0 && cobertura < 85) || (ocupacao != null && (ocupacao > 110 || ocupacao < 80));
-  const atencao = !critico && (pendentes > 0 || ausencias > 0 || (Number(item?.empregadosEsperados || 0) > 0 && cobertura < 95));
+  const critico = alertas > 0 || (Number(item?.empregadosEsperados || 0) > 0 && cobertura != null && cobertura < 85) || (ocupacao != null && (ocupacao > 110 || ocupacao < 80));
+  const atencao = !critico && (pendentes > 0 || ausencias > 0 || (Number(item?.empregadosEsperados || 0) > 0 && cobertura != null && cobertura < 95));
   const status = statusGestao(critico, atencao);
   return { ...status, motivos: motivos.join(" · ") || "Sem desvio relevante pelos critérios exibidos" };
 };
@@ -465,7 +465,7 @@ const planilhaUnidades = (dados: DTO.PainelGestaoDTO) => {
             celulaInteiro(item.alertasContratuais),
             celulaInteiro(item.empregadosEsperados),
             celulaInteiro(item.pendentesFrequencia),
-            Number(item.empregadosEsperados || 0) > 0 ? celulaPercentual(item.percentualCoberturaEscala) : "Sem escala esperada",
+            Number(item.empregadosEsperados || 0) > 0 && item.percentualCoberturaEscala != null ? celulaPercentual(item.percentualCoberturaEscala) : "Sem base",
             celulaXlsx(classificacao.texto, classificacao.estilo),
             classificacao.motivos,
           ],
@@ -509,7 +509,7 @@ const planilhaRiscosAlertas = (dados: DTO.PainelGestaoDTO) => {
         celulaXlsx(classificacao.texto, classificacao.estilo),
         item.nome || "—",
         item.uf || item.tipo || "—",
-        Number(item.empregadosEsperados || 0) > 0 ? celulaPercentual(item.percentualCoberturaEscala) : "—",
+        Number(item.empregadosEsperados || 0) > 0 && item.percentualCoberturaEscala != null ? celulaPercentual(item.percentualCoberturaEscala) : "Sem base",
         celulaInteiro(item.pendentesFrequencia),
         item.percentualOcupacao == null ? "—" : celulaPercentual(item.percentualOcupacao),
         celulaInteiro(item.alertasContratuais),
@@ -1006,7 +1006,7 @@ export const exportarPainelPdf = async (dados: DTO.PainelGestaoDTO | null, perio
         item.percentualOcupacao == null ? "—" : textoPercentual(item.percentualOcupacao),
         valor(item.empregadosEsperados),
         valor(("registrosLancados" in item && typeof item.registrosLancados === "number") ? item.registrosLancados : item.registrosEsperados),
-        Number(item.empregadosEsperados || 0) > 0 ? textoPercentual(item.percentualCoberturaEscala) : "N/A",
+        Number(item.empregadosEsperados || 0) > 0 && item.percentualCoberturaEscala != null ? textoPercentual(item.percentualCoberturaEscala) : "Sem base",
         valor(item.pendentesFrequencia),
         valor(item.alertasContratuais),
       ]),

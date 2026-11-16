@@ -29,7 +29,7 @@ import estilos from "./index.module.css";
 import { BotaoAjudaPainel, BotaoExpandirPainel, ModalAjudaIndicador, ModalPainel } from "../ModalPainel/index.tsx";
 
 const numero = (valor: (unknown) | (number) | (number | undefined) | (string | number | undefined)) => new Intl.NumberFormat("pt-BR").format(Number(valor || 0));
-const percentual = (valor: (number | undefined) | (number)) => `${Number(valor || 0).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
+const percentual = (valor: number | null | undefined) => valor === null ? "Sem base" : `${Number(valor || 0).toLocaleString("pt-BR", { maximumFractionDigits: 1 })}%`;
 const dataBr = (valor: (`${number}-${number}-${number}` | null | undefined) | (string)) => valor ? new Intl.DateTimeFormat("pt-BR").format(new Date(`${valor}T12:00:00`)) : "—";
 
 const classeSaldo = (valor: (number | undefined) | (number | null)) => Number(valor || 0) < 0 ? estilos.valorCritico : estilos.valorNormal;

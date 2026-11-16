@@ -65,4 +65,42 @@ class PainelVisoesPostgresIT extends PostgresIntegrationTestSupport {
         assertThrows(org.springframework.web.server.ResponseStatusException.class,
                 () -> servico.obter("DIARIO", ref, fora.contrato().getId(), null, null, true, 0, null));
     }
+
+    @Test void unidadesNaoInventamCoberturaEContamAlertasSemDuplicarContratos() {
+        var a = PainelAnaliticoFixture.criar(em, "Unidade com alerta");
+        var b = PainelAnaliticoFixture.criar(em, "Unidade sem grade", false, a.gestao());
+        a.contrato().setDataFim(null);
+        a.contrato().setEfetivoPrevisto(0); // Duas condições cadastrais; um único contrato em alerta.
+        PainelAnaliticoFixture.frequencia(em, a, ref.minusDays(1), "FALTA");
+        PainelAnaliticoFixture.frequencia(em, a, ref, "ATESTADO");
+        em.flush();
+        var contexto = mock(PainelServico.class, CALLS_REAL_METHODS);
+        doReturn(new PainelServico.PainelCalculoContexto("Gestão Local", a.gestao().getNome(), a.gestao().getSuperintendencia().getId(), a.gestao().getId(), true, true, true, true, true)).when(contexto).contextoAtual();
+        var servico = new PainelVisoesServico(new PainelAnaliticoServico(analiticoRepo, efetivoRepo, contexto), contexto, gestaoRepo);
+        var d = servico.obter("MENSAL", ref, a.contrato().getId(), "LOTACAO", a.lotacao().getId(), true, 0, null);
+        var unidade = d.gestao().unidades().getFirst();
+        assertEquals(1, unidade.alertasContratuais());
+        assertEquals(1, unidade.ausenciasNaReferencia());
+        assertEquals(2, d.gestao().periodo().faltasNaoJustificadas() + d.gestao().periodo().atestados());
+        var semGrade = servico.obter("DIARIO", ref, b.contrato().getId(), "LOTACAO", b.lotacao().getId(), false, 0, null);
+        assertNull(semGrade.gestao().unidades().getFirst().percentualCoberturaEscala());
+        var domingo = servico.obter("DIARIO", LocalDate.of(2026,11,8), a.contrato().getId(), "LOTACAO", a.lotacao().getId(), false, 0, null);
+        assertNull(domingo.gestao().unidades().getFirst().percentualCoberturaEscala());
+        assertEquals(0, semGrade.gestao().unidades().getFirst().alertasContratuais());
+    }
+
+    @Test void composicaoSemEmpregadoNoCadastroPreservaContratoNoRecorte() {
+        var a = PainelAnaliticoFixture.criar(em, "Composição vaga");
+        em.remove(a.empregado());
+        a.vinculo().setDataFim(ref.minusDays(1));
+        a.alocacao().setDataFim(ref.minusDays(1));
+        em.flush();
+        var contexto = mock(PainelServico.class, CALLS_REAL_METHODS);
+        doReturn(new PainelServico.PainelCalculoContexto("Gestão Local", a.gestao().getNome(), a.gestao().getSuperintendencia().getId(), a.gestao().getId(), true, true, true, true, true)).when(contexto).contextoAtual();
+        var servico = new PainelVisoesServico(new PainelAnaliticoServico(analiticoRepo, efetivoRepo, contexto), contexto, gestaoRepo);
+        var d = servico.obter("DIARIO", ref, a.contrato().getId(), "LOTACAO", a.lotacao().getId(), false, 0, null);
+        assertEquals(1, d.gestao().contratos().total());
+        assertEquals(10, d.gestao().efetivo().efetivoPrevisto());
+        assertEquals(0, d.gestao().unidades().getFirst().efetivoAtual());
+    }
 }

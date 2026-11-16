@@ -1,4 +1,4 @@
-# Correção de paridade das três visões — pausada por franquia
+# Correção de paridade das três visões — retomada em validação
 
 O usuário rejeitou a entrega `13995677` e confirmou que Resumo, Contratos e Operação precisam seguir o padrão completo de Desempenho. O refinamento anterior não cumpriu esse requisito. A descrição anterior de janelas móveis como decisão humana era uma interpretação indevida: o pedido é de cinco calendários, com Diário por padrão.
 
@@ -45,3 +45,13 @@ Consulta nativa de franquia: 99% usados, 1% restante; redefinição prevista par
 4. Commit/push de implementação, nova integração dist → static → wrapper clean package → JAR, preservando backups e novos recibos. Não rerodar `integrar.py` sem adaptar rótulos/manifestos: ele contém a expectativa do artefato anterior e não deve sobrescrever evidências.
 5. Repetir a suíte completa aplicável após o commit da implementação, sobre os mesmos bytes: frontend, Java unitário, integrações PostgreSQL/Redis isoladas, helpers e cenários JAR/recuperação. Inventariar novamente (novo PainelVisoesPostgresIT); usar schema isolado criado por Hibernate, sem DDL manual. Cenário JarHttpRealIT exige Redis DB0 exclusivo próprio; preservar o DB0 da UI. Helpers anteriores em `.homologacao/painel-visoes-login-20261112/` contêm hashes/caminhos antigos e precisam revisão antes do uso.
 6. Registrar resultados, limites e hashes atuais; atualizar fotos finais das três visões; commit/push da documentação/artefatos públicos, Git limpo e entrega com antes/depois. Não tratar os checkpoints acima como aceite final.
+
+## Retomada autorizada — 16/11/2026
+
+Agendamento único explicitamente autorizado e acionado às 10h05 (Brasília), após confirmação de redefinição e 100% da franquia disponível. Agendamento removido depois do acionamento. Git encontrado limpo em `1fac8fac`; serviços próprios desligados, PostgreSQL18.6 e Redis do laboratório restaurados sem purga. Role limitada/ownership de `sgt_dashboard_lab` novamente conferidos.
+
+O teste novo reproduziu alerta contratual indevidamente zerado. Corrigido o contador por unidade e filtro: contratos ativos vencidos, sem término ou sem efetivo cadastrado contam uma única vez. A UI explicita essa natureza cadastral. Cobertura sem esperados ou com grade incompleta retorna null; a UI/exportação apresenta indisponibilidade, e a média não inclui unidades sem base. Ausência diária e composição sem empregado possuem regressões próprias. Nenhum arquivo de Desempenho foi alterado.
+
+Checkpoint focal: oito testes PostgreSQL e nove React aprovados, typecheck aprovado. A primeira fixture de composição vaga violava a regra de empregado ativo com contrato; corrigida a preparação sintética, sem relaxar a regra ou as assertivas. Logs em `.homologacao/painel-paridade-20261116/`. Suíte completa, integração final e QA das três telas ainda em execução.
+
+Host observado: Node26.13.1/npm12.2.2, Java25.0.5 e wrapper Maven3.9.16. Node26.13.0 continua fixado no manifesto; não foi encontrado entre os executáveis locais conferidos. Não houve migração de manifests/lockfiles nem alteração de instalações globais. Registrar a divergência como limite de ambiente; não alegar revalidação da patch26.13.0 a partir de testes26.13.1.
