@@ -1,4 +1,4 @@
-# Correção de paridade das três visões — retomada em validação
+# Correção de paridade das três visões — verificada no laboratório
 
 O usuário rejeitou a entrega `13995677` e confirmou que Resumo, Contratos e Operação precisam seguir o padrão completo de Desempenho. O refinamento anterior não cumpriu esse requisito. A descrição anterior de janelas móveis como decisão humana era uma interpretação indevida: o pedido é de cinco calendários, com Diário por padrão.
 
@@ -79,3 +79,54 @@ Checkpoint `c09c1944` publicado antes da segunda alteração. A contagem de pend
 O teste original `controleDuzentosChunkQuinhentosConcluiEmAteCentoEVinteSegundos` passou integralmente: 200 registros em 112.149 ms (limite original de 120 s), segundo POST HTTP 202 em 322 ms (timeout original de 15 s), mesmo job/tentativa e fotografia inalterada. Os 811 unitários passaram no empacotamento. JAR focal `877d243c76d460d0bf7ed1b4b2dfe8fe492af41d5d21782110d58e7cebcfe0f4`; evidências preservadas em `.homologacao/fechamento-regressao-20261116-r2/`.
 
 A suíte integral será repetida após este commit, pois os serviços de frequência mudaram. As execuções anteriores permanecem como diagnóstico, sem aprovar os bytes novos. Não há conclusão da campanha até essa repetição.
+
+
+## Conclusão da correção — 16/11/2026
+
+Implementação e correções preservadas/publicadas antes da suíte final, no commit `c61dc9eb4914a1dabd555e91b7025fe465253a2b`. A execução abaixo ocorreu depois desse commit. A primeira rodada expôs dois problemas no fechamento: tempo de processamento e reenvio terminal. Foram corrigidos sem alterar os limites dos testes; esta rodada completa valida os serviços corrigidos. Os oito arquivos de fonte de Desempenho permanecem sem alterações. Não houve revisão independente nem aceite humano novo nesta etapa; o resultado é a verificação técnica do laboratório para o escopo solicitado.
+
+### Experiência das três telas
+
+Resumo, Contratos e Operação reutilizam o acabamento e os componentes analíticos de Desempenho: Diário como padrão; cinco calendários reais (Diário, Semanal, Mensal, Trimestral e Anual); referência; contrato/prestador/unidade; limpar filtros; comparação anterior; atualização; quatro indicadores com detalhes; evolução, metas, cobertura por unidade, funil, diagnóstico, alertas; PDF/XLSX do mesmo recorte. A consulta `/api/painel/visoes` entrega dados analíticos e complementares sob a mesma autorização e fotografia transacional. Ausência de base de cobertura permanece indisponível, sem zero inventado.
+
+- **Resumo:** visão de contratos vigentes, ocupação, registros e cobertura; análise detalhada e atalhos; explorador de efetivo sob demanda.
+- **Contratos:** vigência, ocupação, déficit e vencimentos; tabela pesquisável com linhas alternadas e destaque de interação; capacidade e detalhes por contrato; análises cadastrais e prioridades por unidade.
+- **Operação:** registros, presenças, ausências e revisão; absenteísmo, pressão operacional, distribuição de status, padrão semanal e ranking por lotação/turno.
+
+O explorador avançado de efetivo é uma análise adicional, explicitamente separada, com filtros próprios por lotação, turno e cargo. Também inicia em Diário. Seus períodos e exportações próprios não substituem os cinco calendários comuns das três telas.
+
+### Validação dos bytes entregues
+
+| Verificação | Resultado |
+| --- | --- |
+| React/Vitest | 886 testes em 114 arquivos, todos aprovados |
+| Preparação, TypeScript e build React | 6 verificações preparatórias, typecheck e build aprovados; não há script lint |
+| Java/Maven wrapper clean package | 811 testes unitários aprovados |
+| PostgreSQL/Redis e JAR | 1601 casos aprovados; 373 classes ordinárias e 6 classes especiais; sem falhas, erros ou skips nos casos selecionados |
+| Python | 31 testes operacionais + 106 helpers aprovados |
+| Recuperação | Cinco cenários executados: atomicidade, chunk500, revogação, recuperação e chunk1; mantidos os limites dos testes |
+| Integração final | 111 assets iguais em dist/static/JAR/HTTP, cinco rotas SPA e API real conferidos |
+
+Na repetição final, os 200 registros levaram 112538 ms em chunk500 e 88990 ms em chunk1, ambos dentro dos 120 s originais. Os respectivos reenvios responderam HTTP 202 em 462 ms e 406 ms, preservando o mesmo job.
+
+Os oito testes PostgreSQL e nove React focais anteriores à suíte reproduziram/validaram as correções; não são somados novamente aos totais finais. Os bootstraps de schema também ficam separados da contagem funcional. A sessão coordenadora terminou com sinal 143 durante o lote 11, mas o serviço de teste continuou e terminou com BUILD SUCCESS: 63 casos aprovados nos XML e Failsafe. O código de saída do wrapper desse lote não foi observado e permanece null no recibo, sem aprovação inventada. A sequência retomou no lote 12 em serviço próprio, sem repetir os lotes já concluídos e sem mudar fonte ou JAR. A consolidação verifica hashes de fontes, classes principais/de teste e assets; não usa recibos históricos para aprovar a fonte atual. [Recibo completo desta execução](PARIDADE_FINAL_20261116.json).
+
+JAR executado a partir de `JAVA/target/SGT.jar`, porta 58501, SHA-256 `877d243c76d460d0bf7ed1b4b2dfe8fe492af41d5d21782110d58e7cebcfe0f4`. O build passou sem atualizar manifests ou lockfiles. Node 26.13.1 foi o runtime disponível: a patch 26.13.0 fixada não foi revalidada. Maven 3.9.16, Java 25.0.5, PostgreSQL 18.6 e Redis 8.10.3 observados no host.
+
+As suítes pesadas foram sequenciais via heavy-run.py, reserva disponível de 8 GiB, Maven 512 MiB, fork Java 768 MiB/metaspace 256 MiB e Node 768 MiB. Cada etapa ficou em cgroup de 2 ou 3 GiB; serviços próprios com limites separados, orçamento agregado abaixo de 15 GB. Os picos por etapa e amostras agregadas com alvo de 10 s constam do recibo; swap zero nas amostras. Houve uma lacuna de coleta quando a sessão terminou com exit 143; o monitor foi retomado em serviço próprio. A lacuna está quantificada no recibo, e os limites dos cgroups permaneceram impostos durante esse intervalo. Nenhum processo alheio foi encerrado. O cenário de cancelamento conserva seu heap menor de 192 MiB.
+
+### Navegador e evidências visuais
+
+QA no Chromium contra o JAR real, dados sintéticos e referência 11/11/2026. Conferidos os cinco períodos em cada visão, filtros combinados, comparação ligada/desligada, totais analíticos/complementares, pesquisa/estado vazio da tabela contratual, 12 aberturas de indicadores por teclado, fechamento ESC e retorno de foco. O registro operacional de origem foi carregado de fato. As seis exportações foram baixadas; XLSX íntegros e PDFs com período/metodologia preservados, renderização nativa legível. Não foi feita certificação PDF/UA.
+
+Larguras de 1024, 1440 e 1920 px nas três visões, sem transbordamento horizontal dos filtros; sem erros/warnings no console observado. O explorador adicional carregou 30 previstos, 27 alocados, 1 ausente e 26 pendências na referência do laboratório, com Diário selecionado.
+
+Campanha local ignorada `.homologacao/painel-paridade-20261116-r2/`: `qa-real.json`, `smoke-http.json`, manifestos/recibos, logs/XML, `antes-resumo.png`, `antes-contratos.png`, `antes-operacao.png` e `depois-*-viewport.png`. Os arquivos anteriores foram preservados; capturas finais usam o mesmo tamanho 1440×1000 e referência das capturas de comparação. Não publicar ambientes, credenciais ou os arquivos privados dessa campanha.
+
+O último acesso ao JAR confirmou HTTP 200, Diário selecionado, referência sintética 11/11/2026 e rodapé de autoria. O terminal registrou uma linha ERROR com `AsyncRequestNotUsableException`/`ClientAbortException` durante a troca rápida de referência no QA: a conexão daquela consulta foi cancelada pelo navegador; o filtro registrou HTTP 200, e as consultas subsequentes responderam 200. Não foi demonstrada falha funcional nesse evento. Observação preservada no recibo, sem alegar terminal totalmente livre de erros.
+
+### Exclusões e limites explícitos
+
+O inventário cobre 385 classes IT. Quatro testes são provas congeladas do JAR histórico (`AnexoTraversalTcpJarIT`, `FrequenciaTimerTrintaDiasJarIT`, `ReinicioIntegralCorpusJarIT`, `SessaoLogoutIdleConcorrenteJarIT`), com guardas próprias: não foram adulterados para aceitar o JAR atual. `PreparacaoFrontendRealIT` e `PrepararPainelAnaliticoLaboratorioIT` são preparação de corpus/fixtures, não testes de aceite; não foram executados para sobrescrever o laboratório. Essas seis classes estão excluídas de forma explícita, não declaradas aprovadas.
+
+Sonar somente leitura não encontrou projeto SGT; não há gate declarado nesta correção. A campanha não homologa produção, Windows nativo, LAN externa ou todo o acervo documental histórico. A franquia foi conferida após o reset e durante a execução; a regra de pausa em 1% restante foi preservada, sem usar créditos. O agendamento único autorizado foi removido após o acionamento.

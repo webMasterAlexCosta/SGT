@@ -2,7 +2,7 @@
 
 Especificação atual: decisões humanas de 11/11/2026 e mockup desktop v3 aprovado, consolidadas no [adendo do plano](PLANO_GESTAO_REFERENCIA.md#adendo-de-execução-aprovado--11112026). As adaptações preliminares que deixavam prazo/revisão indisponíveis foram substituídas. Homologação desta alteração depende de recibos e pareceres novos.
 
-Correção humana de 12/11/2026: Diário é o padrão de **todas** as visões. Resumo, Contratos e Operação devem seguir o padrão completo de Desempenho: aparência, cinco calendários, filtros, comparação e detalhes. A entrega anterior conservou janelas móveis nessas três telas e foi rejeitada; não houve decisão humana autorizando essa redução de escopo. A correção está registrada em [paridade das visões](CORRECAO_PARIDADE_20261112.md), ainda sujeita à validação final. Os endpoints antigos preservam compatibilidade, sem definir a experiência nova. A aba e o checklist exclusivos de Governança continuam retirados.
+Correção humana de 12/11/2026: Diário é o padrão de **todas** as visões. Resumo, Contratos e Operação devem seguir o padrão completo de Desempenho: aparência, cinco calendários, filtros, comparação e detalhes. A entrega anterior conservou janelas móveis nessas três telas e foi rejeitada; não houve decisão humana autorizando essa redução de escopo. A correção está registrada em [paridade das visões](CORRECAO_PARIDADE_20261112.md), verificada no laboratório em 16/11/2026 com [recibo dos bytes atuais](PARIDADE_FINAL_20261116.json). Os endpoints antigos preservam compatibilidade, sem definir a experiência nova. A aba e o checklist exclusivos de Governança continuam retirados.
 
 ## Calendário e recortes
 
