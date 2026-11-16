@@ -55,3 +55,12 @@ O teste novo reproduziu alerta contratual indevidamente zerado. Corrigido o cont
 Checkpoint focal: oito testes PostgreSQL e nove React aprovados, typecheck aprovado. A primeira fixture de composição vaga violava a regra de empregado ativo com contrato; corrigida a preparação sintética, sem relaxar a regra ou as assertivas. Logs em `.homologacao/painel-paridade-20261116/`. Suíte completa, integração final e QA das três telas ainda em execução.
 
 Host observado: Node26.13.1/npm12.2.2, Java25.0.5 e wrapper Maven3.9.16. Node26.13.0 continua fixado no manifesto; não foi encontrado entre os executáveis locais conferidos. Não houve migração de manifests/lockfiles nem alteração de instalações globais. Registrar a divergência como limite de ambiente; não alegar revalidação da patch26.13.0 a partir de testes26.13.1.
+
+
+## Checkpoint antes da correção de desempenho — 16/11/2026
+
+As três telas foram verificadas no JAR real: cinco calendários, filtros, comparação, detalhes por teclado, exportações e larguras 1024/1440/1920. Capturas antes/depois preservadas. React: 886 testes/114 arquivos, seis verificações preparatórias, typecheck/build. Java: 811 unitários; matriz ordinária: 1.589 casos em 373 classes sem falhas/erros/skips; Python: 137. Correspondência do JAR, HTTP real/reinício, relatório multipágina, cancelamento e carga PostgreSQL aprovados.
+
+A recuperação de atomicidade passou, mas o controle de 200 registros com chunk500 excedeu 120 segundos, em duas execuções. Os outros três cenários de recuperação ainda não foram executados. Não declarar a suíte completa aprovada. A reprodução preservou o teste e coletou threads/GC: leituras temporais repetidas, sem OOM/swap e sem bloqueadores no snapshot PostgreSQL. A criação da presença padrão e sua gravação resolvem o mesmo contexto duas vezes sob os mesmos locks; a correção será restrita a esse reaproveitamento local, com autorização, locks e transação preservados.
+
+Este checkpoint versiona os assets do JAR `a98e82ec1bc44f43bd07776a5e29c24aed5b7e9fac66f982f6cc3a36c94afef6` antes de alterar o serviço de frequência. O código do painel e as oito fontes de Desempenho permanecem preservados. [Recibo parcial e falha explícita](PARIDADE_CHECKPOINT_20261116.json). Evidências privadas em `.homologacao/painel-paridade-20261116/`, incluindo a reprodução diagnóstica; não sobrescrever.

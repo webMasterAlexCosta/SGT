@@ -1,0 +1,93 @@
+{
+  "status": "paridade de UI verificada; suíte final interrompida por falha de desempenho em recuperação",
+  "data": "2026-11-16",
+  "checkpoint_fontes": "d959f269d98294639a401a41c2b74803ecdd0371",
+  "jar_sha256": "a98e82ec1bc44f43bd07776a5e29c24aed5b7e9fac66f982f6cc3a36c94afef6",
+  "fontes_manifesto_sha256": "bd5fb074e636721ae98007954471c81e31e032828946cb70db6db3933c702d41",
+  "react": {
+    "tests": 886,
+    "files": 114,
+    "preparacao": 6,
+    "typecheck_build": true
+  },
+  "java_unitarios": 811,
+  "python": 137,
+  "integracao_ordinaria": {
+    "classes": 373,
+    "tests": 1589,
+    "failures": 0,
+    "errors": 0,
+    "skipped": 0
+  },
+  "especiais_aprovados": [
+    "ArtefatoEmpacotadoIT",
+    "JarHttpRealIT",
+    "RelatorioJarMultipaginaIT",
+    "RelatorioCancelamentoAutoridadeAtualHttpIT",
+    "DatabaseLoadIT"
+  ],
+  "recuperacao": {
+    "atomicidade": "aprovada",
+    "chunk500": "falhou em duas execuções: job de 200 registros não chegou ao terminal em 120 s",
+    "revogacao": "ainda não executada",
+    "recuperacao": "ainda não executada",
+    "chunk1": "ainda não executada"
+  },
+  "diagnostico": "Leituras temporais repetidas; criação da presença padrão e gravação resolvem novamente o mesmo contexto sob locks. GC acumulado 3,746 s na reprodução; sem OOM/swap; snapshot sem bloqueadores PostgreSQL. Eliminar somente a duplicação local, preservar autorização/locks/atomicidade e revalidar.",
+  "amostra_memoria": {
+    "at": "2026-11-16T11:41:00.605418-03:00",
+    "services": [
+      {
+        "Id": "sgt-dashboard-pg-proposta-20261111.service",
+        "ActiveState": "active",
+        "MemoryCurrent": "495325184",
+        "MemoryPeak": "507744256",
+        "MemoryMax": "805306368",
+        "MemorySwapMax": "0"
+      },
+      {
+        "Id": "sgt-dashboard-redis-proposta-20261111.service",
+        "ActiveState": "active",
+        "MemoryCurrent": "7548928",
+        "MemoryPeak": "9498624",
+        "MemoryMax": "268435456",
+        "MemorySwapMax": "0"
+      },
+      {
+        "Id": "sgt-sgt-api-final-20261112.service",
+        "ActiveState": "active",
+        "MemoryCurrent": "772464640",
+        "MemoryPeak": "829272064",
+        "MemoryMax": "2147483648",
+        "MemorySwapMax": "0"
+      },
+      {
+        "Id": "sgt-redis-http-jar-20261116.service",
+        "ActiveState": "active",
+        "MemoryCurrent": "2359296",
+        "MemoryPeak": "4653056",
+        "MemoryMax": "268435456",
+        "MemorySwapMax": "0"
+      },
+      {
+        "Id": "sgt-paridade-jar-multipagina-20261116.service",
+        "ActiveState": "active",
+        "MemoryCurrent": "1388371968",
+        "MemoryPeak": "1388601344",
+        "MemoryMax": "3221225472",
+        "MemorySwapMax": "0"
+      }
+    ],
+    "available_bytes": 22414811136,
+    "host_total_minus_available_bytes": 10553819136,
+    "task_active_current_bytes": 2666070016,
+    "task_active_caps_bytes": 6710886400
+  },
+  "evidencias": {
+    "checks.json": "180e7f9920275dad667788da256a9e791d8c95195512fe85f4df53709056d193",
+    "qa-real.json": "33be3e14b1d1a0d31fdbf20568f082cdbd7e195d24893d5a0863ca61d294d0a1",
+    "smoke-http.json": "d6d3981b9af17d3522eb6ac408c6f4f0ca9214589d6b34bfd656ede9ef7b2b59",
+    "recuperacao-isolada-chunk500.log": "506f79fecf34243fc220aa39ffd3a9d7c9821efb3d9fdf7b91d0bb35813e77f6",
+    "recuperacao-diag-chunk500.log": "3e8c9cdbe7b4f9ffd9d77733374d8813087fa2d6244f3bdf59749fc029b677d7"
+  }
+}
