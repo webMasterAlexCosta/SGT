@@ -538,10 +538,14 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
                 }
 
                 boolean alteracaoExplicita = alteracao != null;
+                // O contexto é resolvido após os locks canônicos e usado somente
+                // nesta frequência, na mesma transação. Não é cache entre itens.
+                ResolvedorContextoTemporalFrequenciaServico.Contexto temporalPadrao = alteracaoExplicita
+                        ? null : resolvedorContextoTemporal.resolver(empregado, dataReferencia);
                 FrequenciaDTO dto = alteracaoExplicita
                         ? copiarAlteracaoFechamento(alteracao, empregadoId, dataReferencia)
                         : criarFrequenciaPadraoFechamento(empregado, dataReferencia, contexto,
-                        empregadosComFaltaRecente.contains(empregadoId));
+                        empregadosComFaltaRecente.contains(empregadoId), temporalPadrao);
 
                 if (acessoOrganizacionalServico.ehGestaoLocal(user)
                         && (dto.getJustificativaRetificacao() == null || dto.getJustificativaRetificacao().isBlank())) {
@@ -551,7 +555,7 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
                 }
 
                 salvarOuAtualizarInterno(dto, user, contexto.calendario(), contexto,
-                        alteracaoExplicita, true);
+                        alteracaoExplicita, true, temporalPadrao);
                 if (existente == null) inseridos++;
                 else atualizados++;
             }
@@ -631,9 +635,8 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
     private FrequenciaDTO criarFrequenciaPadraoFechamento(Empregado empregado,
                                                            LocalDate dataReferencia,
                                                            ContextoLote contexto,
-                                                           boolean perdeuDsr) {
-        ResolvedorContextoTemporalFrequenciaServico.Contexto temporal =
-                resolvedorContextoTemporal.resolver(empregado, dataReferencia);
+                                                           boolean perdeuDsr,
+                                                           ResolvedorContextoTemporalFrequenciaServico.Contexto temporal) {
 
         Frequencia referencia = new Frequencia();
         referencia.setEmpregado(empregado);
@@ -701,6 +704,17 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
                                                 ContextoLote contexto,
                                                 boolean registrarTrilhaIndividual,
                                                 boolean escopoJaValidado) {
+        return salvarOuAtualizarInterno(dto, usuarioAtual, calendarioCache, contexto,
+                registrarTrilhaIndividual, escopoJaValidado, null);
+    }
+
+    private FrequenciaDTO salvarOuAtualizarInterno(FrequenciaDTO dto,
+                                                UsuarioAplicacao usuarioAtual,
+                                                Map<LocalDate, List<CalendarioEvento>> calendarioCache,
+                                                ContextoLote contexto,
+                                                boolean registrarTrilhaIndividual,
+                                                boolean escopoJaValidado,
+                                                ResolvedorContextoTemporalFrequenciaServico.Contexto temporalPadraoFechamento) {
         validarEntrada(dto);
         acessoOrganizacionalServico.exigirFrequenciaDiaria(usuarioAtual);
 
@@ -731,7 +745,8 @@ public class FrequenciaServico implements com.example.siggtrat.diagnostico.Diagn
             if (empregado == null) {
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Empregado não encontrado.");
             }
-            temporal = resolvedorContextoTemporal.resolver(empregado, dataRef);
+            temporal = temporalPadraoFechamento != null ? temporalPadraoFechamento
+                    : resolvedorContextoTemporal.resolver(empregado, dataRef);
         }
         exigirAutorizacaoNoContexto(usuarioAtual, temporal);
 
