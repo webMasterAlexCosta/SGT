@@ -1,0 +1,1 @@
+org.springframework.boot.EnvironmentPostProcessor=com.example.siggtrat.configuracao.demonstracao.SelecaoBancoDemonstracaoRj
