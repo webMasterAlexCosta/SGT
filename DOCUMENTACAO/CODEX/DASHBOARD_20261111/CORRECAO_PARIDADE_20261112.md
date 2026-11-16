@@ -70,3 +70,12 @@ Este checkpoint versiona os assets do JAR `a98e82ec1bc44f43bd07776a5e29c24aed5b7
 Checkpoint `b39215d2` enviado antes da alteração. `FrequenciaServico` passou a reutilizar o contexto temporal somente entre a criação da presença implícita e a gravação do mesmo item, dentro da mesma transação e sob os locks canônicos. Alterações explícitas e escrita individual mantêm resolução própria; autorização, locks e commit do bloco preservados. Os 811 unitários passaram.
 
 JAR focal `3784a922b9ff588b23aaf7c368f38fab998bc62a560c84e4493daf1c6847e8d6`: os 200 registros concluíram em 115.448 ms, dentro dos 120 s. O teste completo ainda falhou: o segundo POST idêntico excedeu o timeout HTTP de 15 s. O caminho de fechamento concluído conta pendentes reconstruindo o histórico de todos os vínculos antes de excluir quem já possui frequência. A próxima correção antecipará somente essa exclusão definitiva, mantendo as demais validações e a rechecagem posterior. Evidência integral preservada em `.homologacao/fechamento-regressao-20261116/privado/controle-200-evidencias/`; não declarar a suíte aprovada.
+
+
+### Regressão do reenvio corrigida
+
+Checkpoint `c09c1944` publicado antes da segunda alteração. A contagem de pendentes agora exclui pessoas com frequência já registrada antes da reconstrução temporal, usando o mesmo predicado canônico/operacional existente. A rechecagem posterior foi preservada, assim como autorização, escopo e transações. Não foi introduzido cache global nem atalho de idempotência que dispense autorização.
+
+O teste original `controleDuzentosChunkQuinhentosConcluiEmAteCentoEVinteSegundos` passou integralmente: 200 registros em 112.149 ms (limite original de 120 s), segundo POST HTTP 202 em 322 ms (timeout original de 15 s), mesmo job/tentativa e fotografia inalterada. Os 811 unitários passaram no empacotamento. JAR focal `877d243c76d460d0bf7ed1b4b2dfe8fe492af41d5d21782110d58e7cebcfe0f4`; evidências preservadas em `.homologacao/fechamento-regressao-20261116-r2/`.
+
+A suíte integral será repetida após este commit, pois os serviços de frequência mudaram. As execuções anteriores permanecem como diagnóstico, sem aprovar os bytes novos. Não há conclusão da campanha até essa repetição.

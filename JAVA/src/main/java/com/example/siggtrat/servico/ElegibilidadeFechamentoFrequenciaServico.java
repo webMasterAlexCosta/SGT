@@ -75,6 +75,13 @@ public class ElegibilidadeFechamentoFrequenciaServico implements com.example.sig
                 List<Long> ids = candidatosVinculo(lotacao, jornada, contratosIds, apos, PAGINA);
                 long quantidade = 0;
                 for (Long id : ids) {
+                    if (semFrequencia) {
+                        VinculoContratual vinculo = em.find(VinculoContratual.class, id);
+                        // Uma frequência já registrada não contribui para os pendentes.
+                        // Evita reconstruir todo o histórico no reenvio do fechamento.
+                        if (vinculo != null && vinculo.getPessoa() != null
+                                && possuiFrequencia(vinculo.getPessoa(), data)) continue;
+                    }
                     var contexto = contextoElegivel(id, data, lotacao, jornada, contratosIds);
                     if (contexto == null) continue;
                     Pessoa pessoa = contexto.pessoa();
